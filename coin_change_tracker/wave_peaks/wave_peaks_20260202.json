@@ -1,0 +1,147 @@
+{
+  "date": "20260202",
+  "data_points": 722,
+  "peaks_count": 6,
+  "false_breakout": null,
+  "peaks": [
+    {
+      "b_point": {
+        "index": 22,
+        "timestamp": "2026-02-02T00:22:00.268660+08:00",
+        "beijing_time": "2026-02-02 00:22:00",
+        "value": -66.9
+      },
+      "a_point": {
+        "index": 140,
+        "timestamp": "2026-02-02T02:21:00.246412+08:00",
+        "beijing_time": "2026-02-02 02:21:00",
+        "value": 6.24
+      },
+      "c_point": {
+        "index": 229,
+        "timestamp": "2026-02-02T03:50:00.273942+08:00",
+        "beijing_time": "2026-02-02 03:50:00",
+        "value": -43.16
+      },
+      "amplitude": 73.14,
+      "decline": 49.4,
+      "decline_ratio": 67.54170084768936
+    },
+    {
+      "b_point": {
+        "index": 268,
+        "timestamp": "2026-02-02T04:29:00.265135+08:00",
+        "beijing_time": "2026-02-02 04:29:00",
+        "value": -61.22
+      },
+      "a_point": {
+        "index": 284,
+        "timestamp": "2026-02-02T04:45:00.271161+08:00",
+        "beijing_time": "2026-02-02 04:45:00",
+        "value": -19.65
+      },
+      "c_point": {
+        "index": 302,
+        "timestamp": "2026-02-02T05:03:00.269821+08:00",
+        "beijing_time": "2026-02-02 05:03:00",
+        "value": -41.16
+      },
+      "amplitude": 41.57,
+      "decline": 21.509999999999998,
+      "decline_ratio": 51.74404618715419
+    },
+    {
+      "b_point": {
+        "index": 358,
+        "timestamp": "2026-02-02T05:59:00.241206+08:00",
+        "beijing_time": "2026-02-02 05:59:00",
+        "value": -57.38
+      },
+      "a_point": {
+        "index": 374,
+        "timestamp": "2026-02-02T06:15:00.263223+08:00",
+        "beijing_time": "2026-02-02 06:15:00",
+        "value": -18.75
+      },
+      "c_point": {
+        "index": 423,
+        "timestamp": "2026-02-02T07:04:00.266624+08:00",
+        "beijing_time": "2026-02-02 07:04:00",
+        "value": -49.41
+      },
+      "amplitude": 38.63,
+      "decline": 30.659999999999997,
+      "decline_ratio": 79.3683665544913
+    },
+    {
+      "b_point": {
+        "index": 430,
+        "timestamp": "2026-02-02T07:11:00.245280+08:00",
+        "beijing_time": "2026-02-02 07:11:00",
+        "value": -101.53
+      },
+      "a_point": {
+        "index": 456,
+        "timestamp": "2026-02-02T07:37:00.267326+08:00",
+        "beijing_time": "2026-02-02 07:37:00",
+        "value": -23.22
+      },
+      "c_point": {
+        "index": 483,
+        "timestamp": "2026-02-02T08:04:00.270456+08:00",
+        "beijing_time": "2026-02-02 08:04:00",
+        "value": -70.1
+      },
+      "amplitude": 78.31,
+      "decline": 46.879999999999995,
+      "decline_ratio": 59.86464053122206
+    },
+    {
+      "b_point": {
+        "index": 483,
+        "timestamp": "2026-02-02T08:04:00.270456+08:00",
+        "beijing_time": "2026-02-02 08:04:00",
+        "value": -70.1
+      },
+      "a_point": {
+        "index": 518,
+        "timestamp": "2026-02-02T08:39:00.242859+08:00",
+        "beijing_time": "2026-02-02 08:39:00",
+        "value": 2.82
+      },
+      "c_point": {
+        "index": 553,
+        "timestamp": "2026-02-02T09:14:00.262541+08:00",
+        "beijing_time": "2026-02-02 09:14:00",
+        "value": -49.22
+      },
+      "amplitude": 72.91999999999999,
+      "decline": 52.04,
+      "decline_ratio": 71.36588041689524
+    },
+    {
+      "b_point": {
+        "index": 555,
+        "timestamp": "2026-02-02T09:16:07.999631+08:00",
+        "beijing_time": "2026-02-02 09:16:07",
+        "value": -51.31
+      },
+      "a_point": {
+        "index": 575,
+        "timestamp": "2026-02-02T09:36:00.251857+08:00",
+        "beijing_time": "2026-02-02 09:36:00",
+        "value": -1.02
+      },
+      "c_point": {
+        "index": 610,
+        "timestamp": "2026-02-02T10:11:00.710654+08:00",
+        "beijing_time": "2026-02-02 10:11:00",
+        "value": -27.25
+      },
+      "amplitude": 50.29,
+      "decline": 26.23,
+      "decline_ratio": 52.15748657784848
+    }
+  ],
+  "processed_at": "2026-02-18T09:45:43.941456"
+}

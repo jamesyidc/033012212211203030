@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>恐慌清洗指数 - 测试翻页功能</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #00d4ff;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .chart-box {
+            background: #16213e;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 2px solid #00d4ff44;
+        }
+        
+        .chart-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #0f3460;
+            border-radius: 10px;
+            border: 2px solid #00d4ff;
+        }
+        
+        .date-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.5);
+        }
+        
+        .date-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.7);
+        }
+        
+        .date-btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .date-display {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00d4ff;
+            padding: 15px 30px;
+            background: #1a1a2e;
+            border-radius: 10px;
+            border: 3px solid #00d4ff;
+            min-width: 180px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        }
+        
+        .chart {
+            width: 100%;
+            height: 450px;
+        }
+        
+        .chart-title {
+            font-size: 20px;
+            color: #00d4ff;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .status {
+            text-align: center;
+            padding: 15px;
+            background: #0f3460;
+            border-radius: 8px;
+            margin-top: 20px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">🔥 恐慌清洗指数 - 翻页功能测试</div>
+        
+        <!-- 图表1: 24小时数据 -->
+        <div class="chart-box">
+            <div class="chart-title">📈 图表1: 24小时爆仓 + 全网持仓 + 恐慌指数</div>
+            
+            <div class="chart-controls">
+                <button class="date-btn" onclick="changeDate24h(-1)">◀ 前一天</button>
+                <div class="date-display" id="date24h">2026-02-11</div>
+                <button class="date-btn" onclick="changeDate24h(1)">后一天 ▶</button>
+                <button class="date-btn" onclick="goToday24h()">📅 今天</button>
+            </div>
+            
+            <div id="chart24h" class="chart"></div>
+        </div>
+        
+        <!-- 图表2: 1小时数据 -->
+        <div class="chart-box">
+            <div class="chart-title">⚡ 图表2: 1小时爆仓金额</div>
+            
+            <div class="chart-controls">
+                <button class="date-btn" onclick="changeDate1h(-1)">◀ 前一天</button>
+                <div class="date-display" id="date1h">2026-02-11</div>
+                <button class="date-btn" onclick="changeDate1h(1)">后一天 ▶</button>
+                <button class="date-btn" onclick="goToday1h()">📅 今天</button>
+            </div>
+            
+            <div id="chart1h" class="chart"></div>
+        </div>
+        
+        <div class="status">
+            💡 提示: 两个图表可以独立翻页查看不同日期的数据
+        </div>
+    </div>
+    
+    <script>
+        // 当前日期
+        let current24hDate = new Date('2026-02-11');
+        let current1hDate = new Date('2026-02-11');
+        
+        // 初始化图表
+        const chart24h = echarts.init(document.getElementById('chart24h'), 'dark');
+        const chart1h = echarts.init(document.getElementById('chart1h'), 'dark');
+        
+        // 格式化日期为 YYYY-MM-DD
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        // 图表1: 改变日期
+        function changeDate24h(days) {
+            current24hDate.setDate(current24hDate.getDate() + days);
+            const dateStr = formatDate(current24hDate);
+            document.getElementById('date24h').textContent = dateStr;
+            console.log('图表1日期改变:', dateStr);
+            load24hData(dateStr);
+        }
+        
+        // 图表2: 改变日期
+        function changeDate1h(days) {
+            current1hDate.setDate(current1hDate.getDate() + days);
+            const dateStr = formatDate(current1hDate);
+            document.getElementById('date1h').textContent = dateStr;
+            console.log('图表2日期改变:', dateStr);
+            load1hData(dateStr);
+        }
+        
+        // 图表1: 回到今天
+        function goToday24h() {
+            current24hDate = new Date('2026-02-11');
+            const dateStr = formatDate(current24hDate);
+            document.getElementById('date24h').textContent = dateStr;
+            console.log('图表1回到今天:', dateStr);
+            load24hData(dateStr);
+        }
+        
+        // 图表2: 回到今天
+        function goToday1h() {
+            current1hDate = new Date('2026-02-11');
+            const dateStr = formatDate(current1hDate);
+            document.getElementById('date1h').textContent = dateStr;
+            console.log('图表2回到今天:', dateStr);
+            load1hData(dateStr);
+        }
+        
+        // 加载24小时数据
+        function load24hData(date) {
+            // 模拟数据
+            const times = [];
+            const liquidation24h = [];
+            const openInterest = [];
+            const panicIndex = [];
+            
+            for (let i = 0; i < 24; i++) {
+                const hour = String(i).padStart(2, '0');
+                times.push(`${hour}:00`);
+                liquidation24h.push(15000 + Math.random() * 3000);
+                openInterest.push(56 + Math.random() * 2);
+                panicIndex.push(0.12 + Math.random() * 0.05);
+            }
+            
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'cross' }
+                },
+                legend: {
+                    data: ['24小时爆仓', '全网持仓', '恐慌指数'],
+                    top: 0,
+                    textStyle: { color: '#00d4ff' }
+                },
+                grid: {
+                    left: '3%',
+                    right: '5%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: times,
+                    axisLabel: { color: '#888' }
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '爆仓(万$)',
+                        axisLabel: { color: '#888' }
+                    },
+                    {
+                        type: 'value',
+                        name: '持仓(亿$)',
+                        position: 'right',
+                        axisLabel: { color: '#888' }
+                    },
+                    {
+                        type: 'value',
+                        name: '恐慌(%)',
+                        position: 'right',
+                        offset: 80,
+                        axisLabel: { 
+                            color: '#888',
+                            formatter: value => (value * 100).toFixed(2) + '%'
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: '24小时爆仓',
+                        type: 'line',
+                        data: liquidation24h,
+                        smooth: true,
+                        lineStyle: { width: 3, color: '#667eea' }
+                    },
+                    {
+                        name: '全网持仓',
+                        type: 'line',
+                        data: openInterest,
+                        yAxisIndex: 1,
+                        smooth: true,
+                        lineStyle: { width: 2, color: '#38ef7d' }
+                    },
+                    {
+                        name: '恐慌指数',
+                        type: 'line',
+                        data: panicIndex,
+                        yAxisIndex: 2,
+                        smooth: true,
+                        lineStyle: { width: 2, color: '#f5576c', type: 'dashed' }
+                    }
+                ]
+            };
+            
+            chart24h.setOption(option);
+        }
+        
+        // 加载1小时数据
+        function load1hData(date) {
+            // 模拟数据
+            const times = [];
+            const liquidation1h = [];
+            
+            for (let i = 0; i < 24; i++) {
+                const hour = String(i).padStart(2, '0');
+                times.push(`${hour}:00`);
+                liquidation1h.push(3500 + Math.random() * 1000);
+            }
+            
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis'
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: times,
+                    axisLabel: { color: '#888' }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '1小时爆仓(万$)',
+                    axisLabel: { color: '#888' }
+                },
+                series: [{
+                    name: '1小时爆仓',
+                    type: 'line',
+                    data: liquidation1h,
+                    smooth: true,
+                    lineStyle: { width: 3, color: '#667eea' },
+                    areaStyle: {
+                        color: {
+                            type: 'linear',
+                            x: 0, y: 0, x2: 0, y2: 1,
+                            colorStops: [
+                                { offset: 0, color: 'rgba(102, 126, 234, 0.5)' },
+                                { offset: 1, color: 'rgba(118, 75, 162, 0.1)' }
+                            ]
+                        }
+                    }
+                }]
+            };
+            
+            chart1h.setOption(option);
+        }
+        
+        // 响应式
+        window.addEventListener('resize', () => {
+            chart24h.resize();
+            chart1h.resize();
+        });
+        
+        // 初始加载
+        load24hData(formatDate(current24hDate));
+        load1hData(formatDate(current1hDate));
+        
+        console.log('✅ 页面加载完成，翻页功能已就绪！');
+    </script>
+</body>
+</html>

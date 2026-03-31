@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>GDrive状态测试</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #000; color: #0f0; }
+        .status { font-size: 24px; margin: 20px 0; }
+        .running { color: #0f0; }
+        .stopped { color: #f00; }
+        pre { background: #111; padding: 15px; border: 1px solid #333; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Google Drive Detector 实时状态</h1>
+    <div id="time"></div>
+    <div class="status" id="status">正在加载...</div>
+    <pre id="data"></pre>
+    
+    <script>
+        async function loadStatus() {
+            const now = new Date().toLocaleString('zh-CN');
+            document.getElementById('time').textContent = '刷新时间: ' + now;
+            
+            try {
+                const response = await fetch('/api/gdrive-detector/status');
+                const result = await response.json();
+                
+                document.getElementById('data').textContent = JSON.stringify(result, null, 2);
+                
+                if (result.success && result.data.detector_running) {
+                    document.getElementById('status').innerHTML = 
+                        '✅ <span class="running">运行中</span> - 最后检查: ' + 
+                        result.data.last_check_time + ' | 延迟: ' + 
+                        result.data.delay_minutes.toFixed(1) + '分钟';
+                } else {
+                    document.getElementById('status').innerHTML = 
+                        '❌ <span class="stopped">已停止</span>';
+                }
+            } catch (error) {
+                document.getElementById('status').innerHTML = 
+                    '❌ <span class="stopped">API错误: ' + error.message + '</span>';
+                document.getElementById('data').textContent = '错误: ' + error;
+            }
+        }
+        
+        loadStatus();
+        setInterval(loadStatus, 10000); // 每10秒刷新
+    </script>
+</body>
+</html>

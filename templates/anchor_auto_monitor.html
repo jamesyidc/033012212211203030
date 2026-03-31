@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>锚点单自动开仓监控</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .control-panel {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+        
+        .btn-primary {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #059669;
+        }
+        
+        .btn-secondary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #2563eb;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #4ade80;
+        }
+        
+        .section {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .section h2 {
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+            padding-bottom: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        th {
+            background: rgba(255,255,255,0.15);
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .badge-created { background: #10b981; color: white; }
+        .badge-monitored { background: #3b82f6; color: white; }
+        .badge-skipped { background: #6b7280; color: white; }
+        .badge-failed { background: #ef4444; color: white; }
+        .badge-new { background: #8b5cf6; color: white; }
+        .badge-maintain { background: #f59e0b; color: white; }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid #10b981;
+            color: #4ade80;
+        }
+        
+        .alert-error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            color: #fca5a5;
+        }
+        
+        .signal-item {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #8b5cf6;
+        }
+        
+        .signal-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .signal-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            font-size: 14px;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .auto-scan-status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-left: 15px;
+        }
+        
+        .status-running {
+            background: #10b981;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-stopped {
+            background: #6b7280;
+            color: white;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚓ 锚点单自动开仓监控</h1>
+        <p class="subtitle">实时监控逃顶信号，自动创建和维护锚点单</p>
+        
+        <!-- 控制面板 -->
+        <div class="control-panel">
+            <button class="btn btn-primary" onclick="manualScan()">🔍 手动扫描</button>
+            <button class="btn btn-secondary" onclick="refreshData()">🔄 刷新数据</button>
+            <button class="btn btn-secondary" onclick="window.location.href='/trading-manager'">⚙️ 交易配置</button>
+            <span id="scan-status" class="auto-scan-status status-stopped">⏸️ 手动模式</span>
+        </div>
+        
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">逃顶信号数</div>
+                <div class="stat-value" id="signal-count">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">今日创建</div>
+                <div class="stat-value" id="today-created">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">今日监控</div>
+                <div class="stat-value" id="today-monitored">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">活跃锚点单</div>
+                <div class="stat-value" id="active-anchors">-</div>
+            </div>
+        </div>
+        
+        <!-- 消息提示 -->
+        <div id="message"></div>
+        
+        <!-- 当前逃顶信号 -->
+        <div class="section">
+            <h2>📊 当前逃顶信号</h2>
+            <div id="current-signals" class="loading">加载中...</div>
+        </div>
+        
+        <!-- 触发历史 -->
+        <div class="section">
+            <h2>📜 触发历史记录（最近20条）</h2>
+            <div id="trigger-history" class="loading">加载中...</div>
+        </div>
+    </div>
+    
+    <script>
+        // 全局变量
+        let refreshInterval = null;
+        
+        // 页面加载时初始化
+        window.onload = () => {
+            refreshData();
+            // 每30秒自动刷新
+            refreshInterval = setInterval(refreshData, 30000);
+        };
+        
+        // 刷新所有数据
+        async function refreshData() {
+            await loadSignals();
+            await loadHistory();
+            await loadStats();
+        }
+        
+        // 加载逃顶信号
+        async function loadSignals() {
+            try {
+                const response = await fetch('/api/trading/anchor/signals');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('signal-count').textContent = data.count;
+                    displaySignals(data.signals);
+                } else {
+                    showError('加载信号失败: ' + data.error);
+                }
+            } catch (error) {
+                showError('加载信号失败: ' + error.message);
+            }
+        }
+        
+        // 显示信号列表
+        function displaySignals(signals) {
+            const container = document.getElementById('current-signals');
+            
+            if (!signals || signals.length === 0) {
+                container.innerHTML = '<div class="empty">📭 暂无逃顶信号</div>';
+                return;
+            }
+            
+            let html = '';
+            for (const signal of signals) {
+                html += `
+                    <div class="signal-item">
+                        <div class="signal-header">
+                            ${signal.inst_id}
+                            <button class="btn btn-secondary" style="float:right; padding:5px 15px; font-size:12px;" 
+                                    onclick="checkAnchorStatus('${signal.inst_id}')">
+                                检查状态
+                            </button>
+                        </div>
+                        <div class="signal-details">
+                            <div>💰 当前价: ${signal.current_price.toFixed(4)}</div>
+                            <div>📍 压力线1: ${signal.pressure1.toFixed(4)} (${signal.distance_to_resistance_1.toFixed(2)}%)</div>
+                            <div>📍 压力线2: ${signal.pressure2.toFixed(4)} (${signal.distance_to_resistance_2.toFixed(2)}%)</div>
+                            <div>📊 7日位置: ${signal.position_7d.toFixed(1)}%</div>
+                            <div>📊 48h位置: ${signal.position_48h.toFixed(1)}%</div>
+                            <div>⏰ 时间: ${signal.timestamp}</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        // 加载触发历史
+        async function loadHistory() {
+            try {
+                const response = await fetch('/api/trading/anchor/trigger-history?limit=20');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayHistory(data.history);
+                } else {
+                    document.getElementById('trigger-history').innerHTML = 
+                        '<div class="empty">加载失败: ' + data.error + '</div>';
+                }
+            } catch (error) {
+                document.getElementById('trigger-history').innerHTML = 
+                    '<div class="empty">加载失败: ' + error.message + '</div>';
+            }
+        }
+        
+        // 显示历史记录
+        function displayHistory(history) {
+            const container = document.getElementById('trigger-history');
+            
+            if (!history || history.length === 0) {
+                container.innerHTML = '<div class="empty">📭 暂无触发记录</div>';
+                return;
+            }
+            
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>币种</th>
+                            <th>类型</th>
+                            <th>已有锚点单</th>
+                            <th>压力线1</th>
+                            <th>压力线2</th>
+                            <th>当前价</th>
+                            <th>开仓金额</th>
+                            <th>执行动作</th>
+                            <th>说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            for (const record of history) {
+                const actionBadge = getActionBadge(record.action_taken);
+                const typeBadge = record.trigger_type === 'new' ? 
+                    '<span class="badge badge-new">新建</span>' : 
+                    '<span class="badge badge-maintain">维护</span>';
+                
+                html += `
+                    <tr>
+                        <td>${record.timestamp}</td>
+                        <td><strong>${record.inst_id}</strong></td>
+                        <td>${typeBadge}</td>
+                        <td>${record.has_existing_anchor ? '✅ 是' : '❌ 否'}</td>
+                        <td>${record.pressure1.toFixed(4)}</td>
+                        <td>${record.pressure2.toFixed(4)}</td>
+                        <td>${record.current_price.toFixed(4)}</td>
+                        <td>${record.open_amount ? record.open_amount.toFixed(2) + ' USDT' : '-'}</td>
+                        <td>${actionBadge}</td>
+                        <td style="font-size:12px;">${record.skip_reason || '-'}</td>
+                    </tr>
+                `;
+            }
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        // 获取动作徽章
+        function getActionBadge(action) {
+            const badges = {
+                'created': '<span class="badge badge-created">✅ 已创建</span>',
+                'monitored': '<span class="badge badge-monitored">👁️ 监控</span>',
+                'skipped': '<span class="badge badge-skipped">⏭️ 跳过</span>',
+                'failed': '<span class="badge badge-failed">❌ 失败</span>'
+            };
+            return badges[action] || action;
+        }
+        
+        // 加载统计数据
+        async function loadStats() {
+            // 这里可以添加统计API调用
+            // 暂时用触发历史来计算统计
+            try {
+                const response = await fetch('/api/trading/anchor/trigger-history?limit=100');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const history = data.history;
+                    const today = new Date().toISOString().split('T')[0];
+                    
+                    const todayRecords = history.filter(r => 
+                        r.timestamp && r.timestamp.startsWith(today)
+                    );
+                    
+                    const created = todayRecords.filter(r => r.action_taken === 'created').length;
+                    const monitored = todayRecords.filter(r => r.action_taken === 'monitored').length;
+                    
+                    document.getElementById('today-created').textContent = created;
+                    document.getElementById('today-monitored').textContent = monitored;
+                }
+                
+                // 获取活跃锚点单数量
+                const anchorsResponse = await fetch('/api/trading/positions/opens?is_anchor=1&limit=100');
+                const anchorsData = await anchorsResponse.json();
+                if (anchorsData.success) {
+                    document.getElementById('active-anchors').textContent = anchorsData.total;
+                }
+                
+            } catch (error) {
+                console.error('加载统计失败:', error);
+            }
+        }
+        
+        // 手动扫描
+        async function manualScan() {
+            showMessage('🔍 开始扫描...', 'info');
+            
+            try {
+                const response = await fetch('/api/trading/anchor/auto-scan', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'}
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage(
+                        `✅ 扫描完成: ${data.summary}`,
+                        'success'
+                    );
+                    
+                    // 刷新数据
+                    setTimeout(refreshData, 1000);
+                } else {
+                    showError('扫描失败: ' + data.error);
+                }
+            } catch (error) {
+                showError('扫描失败: ' + error.message);
+            }
+        }
+        
+        // 检查锚点单状态
+        async function checkAnchorStatus(instId) {
+            try {
+                const response = await fetch(`/api/trading/anchor/check-existing?inst_id=${instId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (data.has_anchor) {
+                        const info = data.anchor_info;
+                        alert(`${instId} 已有锚点单:\n` +
+                              `开仓价: ${info.open_price}\n` +
+                              `金额: ${info.open_size} USDT\n` +
+                              `时间: ${info.timestamp}`);
+                    } else {
+                        alert(`${instId} 没有锚点单\n可以新建锚点单`);
+                    }
+                } else {
+                    alert('检查失败: ' + data.error);
+                }
+            } catch (error) {
+                alert('检查失败: ' + error.message);
+            }
+        }
+        
+        // 显示消息
+        function showMessage(msg, type = 'info') {
+            const msgDiv = document.getElementById('message');
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+            msgDiv.innerHTML = `<div class="alert ${alertClass}">${msg}</div>`;
+            
+            setTimeout(() => {
+                msgDiv.innerHTML = '';
+            }, 5000);
+        }
+        
+        // 显示错误
+        function showError(msg) {
+            showMessage('❌ ' + msg, 'error');
+        }
+    </script>
+</body>
+</html>

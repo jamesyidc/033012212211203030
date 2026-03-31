@@ -1,0 +1,419 @@
+{
+  "analysis_time": "2026-02-28 16:09:09",
+  "period": "2026-02-01 to 2026-02-28",
+  "total_days": 25,
+  "signal_groups": {
+    "做空": [
+      {
+        "date": "2026-02-02",
+        "color_counts": {
+          "green": 0,
+          "red": 12,
+          "yellow": 0,
+          "blank": 0,
+          "blank_ratio": 0.0
+        },
+        "stats": {
+          "lowest": -136.05,
+          "highest": 6.24,
+          "max_increase": 142.29
+        },
+        "description": "🔴 只有红色柱子，预判下跌行情，建议做空。操作提示：相对高点做空"
+      },
+      {
+        "date": "2026-02-04",
+        "color_counts": {
+          "green": 0,
+          "red": 12,
+          "yellow": 0,
+          "blank": 0,
+          "blank_ratio": 0.0
+        },
+        "stats": {
+          "lowest": -170.06,
+          "highest": 24.44,
+          "max_increase": 194.5
+        },
+        "description": "🔴 只有红色柱子，预判下跌行情，建议做空。操作提示：相对高点做空"
+      },
+      {
+        "date": "2026-02-13",
+        "color_counts": {
+          "green": 0,
+          "red": 6,
+          "yellow": 0,
+          "blank": 6,
+          "blank_ratio": 50.0
+        },
+        "stats": {
+          "lowest": -51.73,
+          "highest": 109.4,
+          "max_increase": 161.13
+        },
+        "description": "🔴⚪ 红色+空白（空白占比50.0%>=25%），预判下跌行情，建议做空。操作提示：相对高点做空"
+      },
+      {
+        "date": "2026-02-22",
+        "color_counts": {
+          "green": 0,
+          "red": 12,
+          "yellow": 0,
+          "blank": 0,
+          "blank_ratio": 0.0
+        },
+        "stats": {
+          "lowest": -114.76,
+          "highest": 0.83,
+          "max_increase": 115.59
+        },
+        "description": "🔴 只有红色柱子，预判下跌行情，建议做空。操作提示：相对高点做空"
+      },
+      {
+        "date": "2026-02-27",
+        "color_counts": {
+          "green": 0,
+          "red": 12,
+          "yellow": 0,
+          "blank": 0,
+          "blank_ratio": 0.0
+        },
+        "stats": {
+          "lowest": -66.14,
+          "highest": 48.75,
+          "max_increase": 114.89
+        },
+        "description": "🔴 只有红色柱子，预判下跌行情，建议做空。操作提示：相对高点做空"
+      },
+      {
+        "date": "2026-02-28",
+        "color_counts": {
+          "green": 0,
+          "red": 8,
+          "yellow": 0,
+          "blank": 4,
+          "blank_ratio": 33.33333333333333
+        },
+        "stats": {
+          "lowest": -172.41,
+          "highest": -2.3,
+          "max_increase": 170.11
+        },
+        "description": "🔴⚪ 红色+空白（空白占比33.3%>=25%），预判下跌行情，建议做空。操作提示：相对高点做空"
+      }
+    ],
+    "诱空试盘抄底": [
+      {
+        "date": "2026-02-05",
+        "color_counts": {
+          "green": 0,
+          "red": 11,
+          "yellow": 0,
+          "blank": 1,
+          "blank_ratio": 8.333333333333332
+        },
+        "stats": {
+          "lowest": -267.82,
+          "highest": 56.97,
+          "max_increase": 324.79
+        },
+        "description": "⚪🔴 只有红色和空白（空白占比8.3%<25%），诱空行情，可以试盘抄底。操作提示：低点做多"
+      },
+      {
+        "date": "2026-02-16",
+        "color_counts": {
+          "green": 0,
+          "red": 11,
+          "yellow": 0,
+          "blank": 1,
+          "blank_ratio": 8.333333333333332
+        },
+        "stats": {
+          "lowest": -64.19,
+          "highest": 0.74,
+          "max_increase": 64.93
+        },
+        "description": "⚪🔴 只有红色和空白（空白占比8.3%<25%），诱空行情，可以试盘抄底。操作提示：低点做多"
+      },
+      {
+        "date": "2026-02-19",
+        "color_counts": {
+          "green": 0,
+          "red": 11,
+          "yellow": 0,
+          "blank": 1,
+          "blank_ratio": 8.333333333333332
+        },
+        "stats": {
+          "lowest": -141.31,
+          "highest": -0.23,
+          "max_increase": 141.08
+        },
+        "description": "⚪🔴 只有红色和空白（空白占比8.3%<25%），诱空行情，可以试盘抄底。操作提示：低点做多"
+      }
+    ],
+    "等待新低": [
+      {
+        "date": "2026-02-06",
+        "color_counts": {
+          "green": 4,
+          "red": 7,
+          "yellow": 1,
+          "blank": 0,
+          "blank_ratio": 0.0
+        },
+        "stats": {
+          "lowest": -408.19,
+          "highest": 60.38,
+          "max_increase": 468.57
+        },
+        "description": "🟢🔴🟡 有绿有红有黄，红色+黄色共8根(>=3根)，可能还有新低，建议等待。操作提示：高点做空"
+      },
+      {
+        "date": "2026-02-09",
+        "color_counts": {
+          "green": 1,
+          "red": 8,
+          "yellow": 1,
+          "blank": 2,
+          "blank_ratio": 16.666666666666664
+        },
+        "stats": {
+          "lowest": -129.39,
+          "highest": 24.57,
+          "max_increase": 153.96
+        },
+        "description": "🟢🔴🟡 有绿有红有黄，红色+黄色共9根(>=3根)，可能还有新低，建议等待。操作提示：高点做空"
+      },
+      {
+        "date": "2026-02-18",
+        "color_counts": {
+          "green": 7,
+          "red": 3,
+          "yellow": 1,
+          "blank": 0,
+          "blank_ratio": 0.0
+        },
+        "stats": {
+          "lowest": -39.63,
+          "highest": 42.77,
+          "max_increase": 82.4
+        },
+        "description": "🟢🔴🟡 有绿有红有黄，红色+黄色共4根(>=3根)，可能还有新低，建议等待。操作提示：高点做空"
+      },
+      {
+        "date": "2026-02-21",
+        "color_counts": {
+          "green": 3,
+          "red": 7,
+          "yellow": 2,
+          "blank": 0,
+          "blank_ratio": 0.0
+        },
+        "stats": {
+          "lowest": -43.38,
+          "highest": 58.45,
+          "max_increase": 101.83
+        },
+        "description": "🟢🔴🟡 有绿有红有黄，红色+黄色共9根(>=3根)，可能还有新低，建议等待。操作提示：高点做空"
+      }
+    ],
+    "诱多不参与": [
+      {
+        "date": "2026-02-07",
+        "color_counts": {
+          "green": 12,
+          "red": 0,
+          "yellow": 0,
+          "blank": 0,
+          "blank_ratio": 0.0
+        },
+        "stats": {
+          "lowest": -42.66,
+          "highest": 115.44,
+          "max_increase": 158.1
+        },
+        "description": "🟢 全部绿色柱子，单边诱多行情，不参与操作。操作提示：不参与"
+      },
+      {
+        "date": "2026-02-08",
+        "color_counts": {
+          "green": 12,
+          "red": 0,
+          "yellow": 0,
+          "blank": 0,
+          "blank_ratio": 0.0
+        },
+        "stats": {
+          "lowest": -18.94,
+          "highest": 55.49,
+          "max_increase": 74.43
+        },
+        "description": "🟢 全部绿色柱子，单边诱多行情，不参与操作。操作提示：不参与"
+      },
+      {
+        "date": "2026-02-14",
+        "color_counts": {
+          "green": 12,
+          "red": 0,
+          "yellow": 0,
+          "blank": 0,
+          "blank_ratio": 0.0
+        },
+        "stats": {
+          "lowest": -2.76,
+          "highest": 152.22,
+          "max_increase": 154.98
+        },
+        "description": "🟢 全部绿色柱子，单边诱多行情，不参与操作。操作提示：不参与"
+      },
+      {
+        "date": "2026-02-17",
+        "color_counts": {
+          "green": 12,
+          "red": 0,
+          "yellow": 0,
+          "blank": 0,
+          "blank_ratio": 0.0
+        },
+        "stats": {
+          "lowest": -10.88,
+          "highest": 76.41,
+          "max_increase": 87.29
+        },
+        "description": "🟢 全部绿色柱子，单边诱多行情，不参与操作。操作提示：不参与"
+      },
+      {
+        "date": "2026-02-26",
+        "color_counts": {
+          "green": 12,
+          "red": 0,
+          "yellow": 0,
+          "blank": 0,
+          "blank_ratio": 0.0
+        },
+        "stats": {
+          "lowest": -47.75,
+          "highest": 265.0,
+          "max_increase": 312.75
+        },
+        "description": "🟢 全部绿色柱子，单边诱多行情，不参与操作。操作提示：不参与"
+      }
+    ],
+    "低吸": [
+      {
+        "date": "2026-02-10",
+        "color_counts": {
+          "green": 8,
+          "red": 4,
+          "yellow": 0,
+          "blank": 0,
+          "blank_ratio": 0.0
+        },
+        "stats": {
+          "lowest": -51.36,
+          "highest": 59.78,
+          "max_increase": 111.14
+        },
+        "description": "🟢🔴 有绿有红无黄，红色区间为低吸机会。操作提示：低点做多"
+      },
+      {
+        "date": "2026-02-12",
+        "color_counts": {
+          "green": 9,
+          "red": 3,
+          "yellow": 0,
+          "blank": 0,
+          "blank_ratio": 0.0
+        },
+        "stats": {
+          "lowest": -14.45,
+          "highest": 127.23,
+          "max_increase": 141.68
+        },
+        "description": "🟢🔴 有绿有红无黄，红色区间为低吸机会。操作提示：低点做多"
+      },
+      {
+        "date": "2026-02-15",
+        "color_counts": {
+          "green": 6,
+          "red": 5,
+          "yellow": 0,
+          "blank": 0,
+          "blank_ratio": 0.0
+        },
+        "stats": {
+          "lowest": -69.94,
+          "highest": 67.88,
+          "max_increase": 137.82
+        },
+        "description": "🟢🔴 有绿有红无黄，红色区间为低吸机会。操作提示：低点做多"
+      },
+      {
+        "date": "2026-02-20",
+        "color_counts": {
+          "green": 6,
+          "red": 6,
+          "yellow": 0,
+          "blank": 0,
+          "blank_ratio": 0.0
+        },
+        "stats": {
+          "lowest": -19.87,
+          "highest": 86.3,
+          "max_increase": 106.17
+        },
+        "description": "🟢🔴 有绿有红无黄，红色区间为低吸机会。操作提示：低点做多"
+      },
+      {
+        "date": "2026-02-25",
+        "color_counts": {
+          "green": 10,
+          "red": 1,
+          "yellow": 1,
+          "blank": 0,
+          "blank_ratio": 0.0
+        },
+        "stats": {
+          "lowest": -47.44,
+          "highest": 280.22,
+          "max_increase": 327.66
+        },
+        "description": "🟢🔴🟡 有绿有红有黄，但红色+黄色共2根(<3根)，红色区间为低吸机会。操作提示：低点做多"
+      }
+    ],
+    "观望": [
+      {
+        "date": "2026-02-23",
+        "color_counts": {
+          "green": 0,
+          "red": 10,
+          "yellow": 2,
+          "blank": 0,
+          "blank_ratio": 0.0
+        },
+        "stats": {
+          "lowest": -131.99,
+          "highest": 2.48,
+          "max_increase": 134.47
+        },
+        "description": "🔴🟡 红色柱子+黄色柱子，没有绿色柱子，多空博弈方向不明。操作提示：无，不参与"
+      },
+      {
+        "date": "2026-02-24",
+        "color_counts": {
+          "green": 0,
+          "red": 6,
+          "yellow": 2,
+          "blank": 4,
+          "blank_ratio": 33.33333333333333
+        },
+        "stats": {
+          "lowest": -86.94,
+          "highest": 5.31,
+          "max_increase": 92.25
+        },
+        "description": "🔴🟡 红色柱子+黄色柱子，没有绿色柱子，多空博弈方向不明。操作提示：无，不参与"
+      }
+    ]
+  }
+}

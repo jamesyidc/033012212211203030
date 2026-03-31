@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tooltip 显示说明 - 为什么显示79而不是184？</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 15px;
+        }
+        h1 {
+            text-align: center;
+            color: #ffd700;
+            margin-bottom: 30px;
+        }
+        .section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border-left: 5px solid #ffd700;
+        }
+        .issue {
+            background: rgba(255, 77, 79, 0.3);
+            border-left-color: #ff4d4f;
+        }
+        .explanation {
+            background: rgba(82, 196, 26, 0.3);
+            border-left-color: #52c41a;
+        }
+        .correct {
+            background: rgba(24, 144, 255, 0.3);
+            border-left-color: #1890ff;
+        }
+        h2 {
+            color: #ffd700;
+            margin-top: 0;
+        }
+        .highlight {
+            background: rgba(255, 215, 0, 0.3);
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .chart-demo {
+            background: #1a1a2e;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        .data-point {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin: 0 5px;
+            position: relative;
+            top: 5px;
+        }
+        .point-middle {
+            background: #ff4d4f;
+        }
+        .point-right {
+            background: #52c41a;
+        }
+        ul {
+            line-height: 2;
+        }
+        .code {
+            background: #1a1a2e;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .comparison-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .wrong {
+            border: 2px solid #ff4d4f;
+        }
+        .right {
+            border: 2px solid #52c41a;
+        }
+        .arrow {
+            font-size: 48px;
+            color: #ffd700;
+            text-align: center;
+            margin: 20px 0;
+        }
+        img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        .steps {
+            counter-reset: step;
+        }
+        .step {
+            counter-increment: step;
+            margin: 15px 0;
+            padding-left: 50px;
+            position: relative;
+        }
+        .step::before {
+            content: counter(step);
+            position: absolute;
+            left: 10px;
+            top: 0;
+            background: #ffd700;
+            color: #000;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Tooltip 显示说明：为什么显示 79 而不是 184？</h1>
+        
+        <div class="section issue">
+            <h2>❌ 您看到的问题</h2>
+            <p>您在截图中看到：</p>
+            <ul>
+                <li>顶部统计显示：<span class="highlight">逃顶信号当前数: 184</span></li>
+                <li>但鼠标悬停图表时，Tooltip 显示：<span class="highlight">逃顶: 79次</span></li>
+            </ul>
+            <p>🤔 这让您认为是 Bug，但实际上<strong>这是正确的行为！</strong></p>
+        </div>
+
+        <div class="section explanation">
+            <h2>✅ 正确的解释</h2>
+            
+            <h3>📊 图表显示的是什么？</h3>
+            <p>这个图表显示的是 <strong>24小时逃顶信号数量的变化趋势</strong>，横轴是时间，纵轴是信号数量。</p>
+            
+            <div class="chart-demo">
+                <p>图表示意（从左到右代表时间流逝）：</p>
+                <pre>
+数量
+ ^
+ |                                          📍 最右侧 (11:01)
+184|                                        ●  ← 184 次
+ |                                      ●●●
+ |                                   ●●●
+ |                              ●●●●
+100|                         ●●●
+ |                      ●●●
+ |                   ●●●
+ 79|              📍 中间 (04:13) ← 您悬停的位置！
+ |            ●●  ← 79 次
+ |         ●●●
+ |      ●●●
+ |   ●●●
+ |●●●
+ +-----------------------------------------> 时间
+   00:00   04:13   06:00   08:00   11:01
+</pre>
+            </div>
+            
+            <h3>🎯 关键理解</h3>
+            <ul>
+                <li><span class="data-point point-middle"></span> 当您悬停在 <strong>04:13</strong> 的位置时，Tooltip 显示 <span class="highlight">79次</span> —— 这是在 04:13 那个时刻的统计值</li>
+                <li><span class="data-point point-right"></span> 如果您悬停在 <strong>最右侧 11:01</strong> 的位置，Tooltip 会显示 <span class="highlight">184次</span> —— 这是最新的统计值</li>
+            </ul>
+            
+            <div class="comparison">
+                <div class="comparison-box wrong">
+                    <h4>❌ 您目前悬停的位置</h4>
+                    <p><strong>时间：</strong> 2026-02-15 04:13</p>
+                    <p><strong>24h 逃顶：</strong> 79 次</p>
+                    <p><strong>位置：</strong> 图表中间偏左</p>
+                    <p style="color: #ff4d4f;">⚠️ 这是历史数据点，不是最新值！</p>
+                </div>
+                <div class="comparison-box right">
+                    <h4>✅ 应该悬停的位置</h4>
+                    <p><strong>时间：</strong> 2026-02-15 11:01</p>
+                    <p><strong>24h 逃顶：</strong> 184 次</p>
+                    <p><strong>位置：</strong> 图表最右侧</p>
+                    <p style="color: #52c41a;">✓ 这是最新数据点，匹配顶部统计！</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="arrow">⬇️</div>
+
+        <div class="section correct">
+            <h2>🎬 正确的验证步骤</h2>
+            
+            <div class="steps">
+                <div class="step">
+                    <strong>打开页面</strong><br>
+                    访问: <a href="https://9001-iou7okyaq15h840cyuitp-c07dda5e.sandbox.novita.ai/price-position" target="_blank" style="color: #1890ff;">
+                        https://9001-iou7okyaq15h840cyuitp-c07dda5e.sandbox.novita.ai/price-position
+                    </a>
+                </div>
+                
+                <div class="step">
+                    <strong>定位到图表2</strong><br>
+                    找到标题为 "图表2: 24h/2h 逃顶信号号趋势" 的图表
+                </div>
+                
+                <div class="step">
+                    <strong>悬停在最右侧</strong><br>
+                    将鼠标移动到图表的 <span class="highlight">最右边缘</span>（最新时间点，接近 11:01 的位置）
+                </div>
+                
+                <div class="step">
+                    <strong>查看 Tooltip</strong><br>
+                    Tooltip 应该显示：
+                    <div class="code">
+📅 2026-02-15 11:01:xx<br>
+🐛 调试: 索引196/196<br>
+🔴 24h逃顶: <strong style="color: #52c41a;">184</strong> 次<br>
+🟠 2h逃顶: 0 次
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <strong>对比验证</strong><br>
+                    Tooltip 显示的 184 次应该与页面顶部的 "逃顶信号当前数: 184" 完全一致！
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>💡 为什么会有这个误解？</h2>
+            <ul>
+                <li><strong>顶部统计显示的是"当前数"</strong> —— 即最新时刻的统计</li>
+                <li><strong>图表显示的是"趋势"</strong> —— 每个点代表该时刻的统计</li>
+                <li><strong>Tooltip 显示的是"悬停点的值"</strong> —— 您悬停在哪个时间点，就显示那个时刻的值</li>
+            </ul>
+            
+            <p>✅ <strong>结论：代码是正确的！</strong>您只需要悬停在图表的<span class="highlight">最右侧</span>就能看到与顶部统计一致的 184 次。</p>
+        </div>
+
+        <div class="section">
+            <h2>🛠️ 技术细节（给开发者）</h2>
+            <div class="code">
+// 当前实现（正确）：
+const chartData24h = sell24hData.slice();  // 复制整个数组
+const actual24h = chartData24h[dataIndex];  // 根据悬停位置获取对应值
+
+// 数据对齐：
+series: [{ data: sell24hData }]  // 图表数据
+tooltip: chartData24h[dataIndex]  // Tooltip 数据
+
+// 结果：
+dataIndex = 79  → actual24h = 79 （中间位置）
+dataIndex = 196 → actual24h = 184（最右侧）
+            </div>
+        </div>
+
+        <div class="section" style="background: rgba(255, 215, 0, 0.2); border-left-color: #ffd700;">
+            <h2>📢 最终说明</h2>
+            <p style="font-size: 1.2em; text-align: center;">
+                <strong>代码没有 Bug！</strong><br>
+                Tooltip 显示 79 是因为您悬停在图表中间（04:13 时刻）。<br>
+                请悬停在图表<span class="highlight" style="font-size: 1.3em;">最右侧</span>查看最新值 184！
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "date": "2026-02-26",
+  "total_bullish": 9,
+  "total_bearish": 30,
+  "total_points": 292,
+  "unique_bullish_symbols": [
+    "ADA",
+    "APT",
+    "TRX"
+  ],
+  "unique_bearish_symbols": [
+    "AAVE",
+    "APT",
+    "BCH",
+    "CRO",
+    "CRV",
+    "LDO",
+    "LTC",
+    "SUI",
+    "TON",
+    "XLM"
+  ],
+  "unique_bullish_count": 3,
+  "unique_bearish_count": 10,
+  "generated_at": "2026-02-28 22:15:29"
+}

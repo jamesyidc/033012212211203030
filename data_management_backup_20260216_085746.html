@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据管理与备份系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .panels {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .panel {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        
+        .panel h2 {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .panel-icon {
+            font-size: 1.5em;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn.secondary {
+            background: #6c757d;
+        }
+        
+        .btn.danger {
+            background: #dc3545;
+        }
+        
+        .systems-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .system-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .system-item h3 {
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .system-info {
+            font-size: 0.9em;
+            color: #666;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .system-info span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .backup-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .backup-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .backup-info h4 {
+            font-size: 1em;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .backup-info p {
+            font-size: 0.85em;
+            color: #666;
+            margin: 3px 0;
+        }
+        
+        .backup-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.85em;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+        }
+        
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗄️ 数据管理与备份系统</h1>
+            <p>统计、备份、恢复您的所有JSONL数据</p>
+        </div>
+        
+        <div id="alertContainer"></div>
+        
+        <div class="panels">
+            <!-- 数据统计面板 -->
+            <div class="panel">
+                <h2><span class="panel-icon">📊</span> 数据统计概览</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>总目录数</h3>
+                        <div class="value" id="totalDirs">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>总文件数</h3>
+                        <div class="value" id="totalFiles">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>总记录数</h3>
+                        <div class="value" id="totalRecords">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>总大小 (MB)</h3>
+                        <div class="value" id="totalSize">-</div>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="scanData()">
+                    🔍 重新扫描数据
+                </button>
+            </div>
+            
+            <!-- 备份管理面板 -->
+            <div class="panel">
+                <h2><span class="panel-icon">💾</span> 备份管理</h2>
+                
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button class="btn" onclick="createBackup('full')">
+                        📦 创建完整备份
+                    </button>
+                    <button class="btn secondary" onclick="createBackup('incremental')">
+                        📥 创建增量备份
+                    </button>
+                </div>
+                
+                <div id="backupList" class="backup-list">
+                    <div class="loading">加载备份列表</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 各系统详细数据 -->
+        <div class="panel">
+            <h2><span class="panel-icon">📂</span> 各系统数据详情</h2>
+            
+            <div id="systemsList" class="systems-list">
+                <div class="loading">加载系统数据</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let statsData = null;
+        
+        // 页面加载时获取统计数据
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadStatistics();
+            await loadBackupList();
+        });
+        
+        // 加载统计数据
+        async function loadStatistics() {
+            try {
+                const response = await fetch('/api/data-management/statistics');
+                const result = await response.json();
+                
+                if (result.success) {
+                    statsData = result.data;
+                    displayStatistics(statsData);
+                } else {
+                    // 如果没有统计数据，自动扫描
+                    showAlert('暂无统计数据，正在扫描...', 'info');
+                    await scanData();
+                }
+            } catch (error) {
+                console.error('加载统计数据失败:', error);
+                showAlert('加载统计数据失败: ' + error.message, 'error');
+            }
+        }
+        
+        // 显示统计数据
+        function displayStatistics(data) {
+            const summary = data.summary;
+            
+            document.getElementById('totalDirs').textContent = summary.total_directories;
+            document.getElementById('totalFiles').textContent = summary.total_files.toLocaleString();
+            document.getElementById('totalRecords').textContent = summary.total_records.toLocaleString();
+            document.getElementById('totalSize').textContent = summary.total_size_mb.toFixed(2);
+            
+            // 显示各系统详情
+            const systemsList = document.getElementById('systemsList');
+            systemsList.innerHTML = '';
+            
+            // 按记录数排序
+            const sortedDirs = Object.entries(data.directories).sort((a, b) => b[1].total_records - a[1].total_records);
+            
+            sortedDirs.forEach(([dirName, info]) => {
+                const item = document.createElement('div');
+                item.className = 'system-item';
+                
+                let dateInfo = '';
+                if (info.date_range.min && info.date_range.max) {
+                    const daysDiff = Math.floor((new Date(info.date_range.max) - new Date(info.date_range.min)) / (1000 * 60 * 60 * 24)) + 1;
+                    dateInfo = `<span>📅 ${info.date_range.min} 至 ${info.date_range.max} (${daysDiff} 天)</span>`;
+                }
+                
+                item.innerHTML = `
+                    <h3>📁 ${dirName}</h3>
+                    <div class="system-info">
+                        <span>📄 ${info.files.length} 个文件</span>
+                        <span>📝 ${info.total_records.toLocaleString()} 条记录</span>
+                        <span>💾 ${(info.total_size / (1024 * 1024)).toFixed(2)} MB</span>
+                        ${dateInfo}
+                    </div>
+                `;
+                
+                systemsList.appendChild(item);
+            });
+        }
+        
+        // 扫描数据
+        async function scanData() {
+            showAlert('正在扫描数据，请稍候...', 'info');
+            
+            try {
+                const response = await fetch('/api/data-management/scan', {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    statsData = result.data;
+                    displayStatistics(statsData);
+                    showAlert('✅ 数据扫描完成！', 'success');
+                } else {
+                    showAlert('❌ 扫描失败: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('❌ 扫描失败: ' + error.message, 'error');
+            }
+        }
+        
+        // 加载备份列表
+        async function loadBackupList() {
+            try {
+                const response = await fetch('/api/data-backup/list');
+                const result = await response.json();
+                
+                const backupList = document.getElementById('backupList');
+                
+                if (result.success) {
+                    if (result.output.includes('找到 0 个备份')) {
+                        backupList.innerHTML = '<div style="text-align: center; padding: 30px; color: #999;">暂无备份</div>';
+                    } else {
+                        // 解析输出显示备份列表
+                        backupList.innerHTML = `<pre style="font-size: 0.9em; white-space: pre-wrap;">${result.output}</pre>`;
+                    }
+                } else {
+                    backupList.innerHTML = '<div class="alert alert-error">加载备份列表失败</div>';
+                }
+            } catch (error) {
+                console.error('加载备份列表失败:', error);
+            }
+        }
+        
+        // 创建备份
+        async function createBackup(type) {
+            const typeName = type === 'full' ? '完整备份' : '增量备份';
+            
+            if (!confirm(`确认创建${typeName}？\n\n${type === 'full' ? '完整备份将打包所有数据，可能需要几分钟。' : '增量备份只备份修改过的文件，速度较快。'}`)) {
+                return;
+            }
+            
+            showAlert(`正在创建${typeName}，请稍候...`, 'info');
+            
+            try {
+                const response = await fetch('/api/data-backup/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ type })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert(`✅ ${typeName}创建成功！`, 'success');
+                    await loadBackupList();
+                } else {
+                    showAlert(`❌ 创建失败: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showAlert(`❌ 创建失败: ${error.message}`, 'error');
+            }
+        }
+        
+        // 显示提示
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type === 'success' ? 'success' : 'error'}`;
+            alert.textContent = message;
+            
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alert);
+            
+            // 3秒后自动消失
+            setTimeout(() => {
+                alert.classList.add('hidden');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

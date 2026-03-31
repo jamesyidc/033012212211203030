@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📁 每日文件夹更新监控</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .status-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .status-header h2 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .status-badge.ok {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-badge.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-item .label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .info-item .value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            word-break: break-all;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #0dcaf0 100%);
+            color: white;
+        }
+
+        .log-viewer {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+
+        .log-viewer pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .folder-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .folder-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #6c757d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .folder-item.today {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+
+        .folder-item.yesterday {
+            border-left-color: #ffc107;
+        }
+
+        .folder-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .folder-id {
+            font-size: 12px;
+            color: #666;
+            font-family: monospace;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .modal-header h3 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            line-height: 20px;
+        }
+
+        .close-btn:hover {
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📁 每日文件夹更新监控</h1>
+            <p>自动扫描并更新Google Drive文件夹配置</p>
+        </div>
+
+        <!-- Status Card -->
+        <div class="status-card">
+            <div class="status-header">
+                <h2>📊 当前状态</h2>
+                <span class="status-badge" id="statusBadge">检查中...</span>
+            </div>
+
+            <div id="alertContainer"></div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="label">📅 配置日期</div>
+                    <div class="value" id="configDate">加载中...</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">📅 今天日期</div>
+                    <div class="value" id="todayDate">加载中...</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">📁 当前文件夹ID</div>
+                    <div class="value" id="folderId" style="font-size: 14px;">加载中...</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">📄 最新TXT文件</div>
+                    <div class="value" id="latestTxt">加载中...</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">🕐 最后更新时间</div>
+                    <div class="value" id="lastUpdate">加载中...</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">📊 TXT文件数量</div>
+                    <div class="value" id="txtCount">加载中...</div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="checkStatus()">
+                    🔄 刷新状态
+                </button>
+                <button class="btn btn-success" onclick="triggerUpdate()">
+                    ⚡ 立即更新
+                </button>
+                <button class="btn btn-warning" onclick="viewFolders()">
+                    📁 查看文件夹列表
+                </button>
+                <button class="btn btn-info" onclick="viewLog()">
+                    📝 查看日志
+                </button>
+            </div>
+        </div>
+
+        <!-- Recent Folders -->
+        <div class="status-card" id="foldersCard" style="display: none;">
+            <div class="status-header">
+                <h2>📁 最近文件夹</h2>
+            </div>
+            <div class="folder-list" id="folderList">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>加载中...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Log Viewer -->
+        <div class="status-card" id="logCard" style="display: none;">
+            <div class="status-header">
+                <h2>📝 执行日志</h2>
+            </div>
+            <div class="log-viewer" id="logViewer">
+                <pre>等待日志...</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="updateModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+                <h3>⚡ 正在更新...</h3>
+            </div>
+            <div id="modalBody">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>正在扫描并更新文件夹配置...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let updateInterval;
+
+        // 页面加载时检查状态
+        window.onload = function() {
+            checkStatus();
+            // 每30秒自动刷新
+            updateInterval = setInterval(checkStatus, 30000);
+        };
+
+        // 检查状态
+        async function checkStatus() {
+            try {
+                const response = await fetch('/api/folder-update-status');
+                const data = await response.json();
+
+                if (data.success) {
+                    updateUI(data.data);
+                } else {
+                    showAlert('error', '获取状态失败: ' + (data.message || '未知错误'));
+                }
+            } catch (error) {
+                console.error('检查状态失败:', error);
+                showAlert('error', '网络错误，无法获取状态');
+            }
+        }
+
+        // 更新UI
+        function updateUI(data) {
+            // 更新日期
+            document.getElementById('configDate').textContent = data.config_date || '未知';
+            document.getElementById('todayDate').textContent = data.today_date || '未知';
+            document.getElementById('folderId').textContent = (data.folder_id || '未知').substring(0, 30) + '...';
+            document.getElementById('latestTxt').textContent = data.latest_txt || '未知';
+            document.getElementById('lastUpdate').textContent = data.last_updated || '未知';
+            document.getElementById('txtCount').textContent = data.txt_count || '0';
+
+            // 更新状态徽章
+            const statusBadge = document.getElementById('statusBadge');
+            const alertContainer = document.getElementById('alertContainer');
+            alertContainer.innerHTML = '';
+
+            if (data.need_update) {
+                statusBadge.textContent = '⚠️ 需要更新';
+                statusBadge.className = 'status-badge warning';
+                showAlert('warning', data.message || '配置日期与今天不匹配，建议更新');
+            } else {
+                statusBadge.textContent = '✅ 正常';
+                statusBadge.className = 'status-badge ok';
+                if (data.message) {
+                    showAlert('success', data.message);
+                }
+            }
+        }
+
+        // 触发更新
+        async function triggerUpdate() {
+            document.getElementById('updateModal').classList.add('show');
+            document.getElementById('modalBody').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>正在扫描父文件夹...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch('/api/trigger-folder-update', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('modalBody').innerHTML = `
+                        <div class="alert alert-success">
+                            <strong>✅ 更新成功！</strong>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="label">新文件夹ID</div>
+                                <div class="value" style="font-size: 14px;">${data.data.folder_id}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">日期</div>
+                                <div class="value">${data.data.date}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">最新文件</div>
+                                <div class="value">${data.data.latest_txt || '无'}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">文件数量</div>
+                                <div class="value">${data.data.txt_count || 0}</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <button class="btn btn-primary" onclick="closeModal(); checkStatus();">
+                                关闭并刷新
+                            </button>
+                        </div>
+                    `;
+
+                    // 3秒后自动关闭并刷新
+                    setTimeout(() => {
+                        closeModal();
+                        checkStatus();
+                    }, 3000);
+                } else {
+                    document.getElementById('modalBody').innerHTML = `
+                        <div class="alert alert-error">
+                            <strong>❌ 更新失败</strong>
+                        </div>
+                        <p>${data.message || '未知错误'}</p>
+                        <div style="margin-top: 20px;">
+                            <button class="btn btn-primary" onclick="closeModal()">
+                                关闭
+                            </button>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('更新失败:', error);
+                document.getElementById('modalBody').innerHTML = `
+                    <div class="alert alert-error">
+                        <strong>❌ 网络错误</strong>
+                    </div>
+                    <p>${error.message}</p>
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-primary" onclick="closeModal()">
+                            关闭
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // 查看文件夹列表
+        async function viewFolders() {
+            const card = document.getElementById('foldersCard');
+            const list = document.getElementById('folderList');
+
+            if (card.style.display === 'none') {
+                card.style.display = 'block';
+                list.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>加载中...</p>
+                    </div>
+                `;
+
+                try {
+                    const response = await fetch('/api/list-recent-folders');
+                    const data = await response.json();
+
+                    if (data.success && data.data.folders) {
+                        const folders = data.data.folders;
+                        const today = data.data.today;
+
+                        list.innerHTML = folders.map((folder, index) => {
+                            const isToday = folder.name.includes(today);
+                            const isYesterday = index === 1;
+                            const className = isToday ? 'today' : (isYesterday ? 'yesterday' : '');
+
+                            return `
+                                <div class="folder-item ${className}">
+                                    <div>
+                                        <div class="folder-name">
+                                            ${isToday ? '🎯 ' : ''}${folder.name}
+                                        </div>
+                                        <div class="folder-id">${folder.id}</div>
+                                    </div>
+                                    ${folder.txt_count ? `<span>📄 ${folder.txt_count} files</span>` : ''}
+                                </div>
+                            `;
+                        }).join('');
+                    } else {
+                        list.innerHTML = '<p style="padding: 20px; text-align: center;">无法加载文件夹列表</p>';
+                    }
+                } catch (error) {
+                    list.innerHTML = '<p style="padding: 20px; text-align: center; color: red;">加载失败</p>';
+                }
+            } else {
+                card.style.display = 'none';
+            }
+        }
+
+        // 查看日志
+        async function viewLog() {
+            const card = document.getElementById('logCard');
+            const viewer = document.getElementById('logViewer');
+
+            if (card.style.display === 'none') {
+                card.style.display = 'block';
+                viewer.innerHTML = '<pre>加载中...</pre>';
+
+                try {
+                    const response = await fetch('/api/get-update-log');
+                    const data = await response.json();
+
+                    if (data.success) {
+                        viewer.innerHTML = `<pre>${data.data.log || '暂无日志'}</pre>`;
+                    } else {
+                        viewer.innerHTML = '<pre>无法加载日志</pre>';
+                    }
+                } catch (error) {
+                    viewer.innerHTML = '<pre>加载失败</pre>';
+                }
+            } else {
+                card.style.display = 'none';
+            }
+        }
+
+        // 显示提示
+        function showAlert(type, message) {
+            const container = document.getElementById('alertContainer');
+            const className = `alert alert-${type}`;
+            const icon = type === 'success' ? '✅' : (type === 'warning' ? '⚠️' : '❌');
+
+            container.innerHTML = `
+                <div class="${className}">
+                    <span>${icon}</span>
+                    <span>${message}</span>
+                </div>
+            `;
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('updateModal').classList.remove('show');
+        }
+
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const modal = document.getElementById('updateModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+    </script>
+</body>
+</html>

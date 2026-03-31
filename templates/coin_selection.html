@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <title>币种选择系统 - 智能交易辅助</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 框架1: 实时统计 */
+        .stats-box {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .stats-box h2 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-sub {
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* 框架2: 筛选条件 */
+        .filter-box {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .filter-box h2 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-items {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .filter-item {
+            background: #e8f5e9;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #4caf50;
+        }
+
+        .filter-item.disabled {
+            background: #ffebee;
+            border-left-color: #f44336;
+        }
+
+        .filter-icon {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .filter-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .filter-desc {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* 框架3: 小趋势仓位 */
+        .position-box {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .position-box h2 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .position-content {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .position-main {
+            flex: 1;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            color: white;
+        }
+
+        .position-value {
+            font-size: 72px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .position-label {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .position-details {
+            flex: 2;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .position-detail-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* 框架4: 币种排名 */
+        .coins-box {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .coins-box h2 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .coins-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .coins-table thead {
+            background: #f8f9fa;
+        }
+
+        .coins-table th {
+            padding: 12px;
+            text-align: left;
+            font-size: 13px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .coins-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        .coins-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .coin-symbol {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .coin-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-right: 4px;
+            font-weight: 600;
+        }
+
+        .tag-v1 {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .tag-v2 {
+            background: #cfe2ff;
+            color: #084298;
+        }
+
+        .tag-rush-up {
+            background: #d1e7dd;
+            color: #0a3622;
+        }
+
+        .tag-priority {
+            background: #f8d7da;
+            color: #58151c;
+        }
+
+        .positive {
+            color: #4caf50;
+            font-weight: 600;
+        }
+
+        .negative {
+            color: #f44336;
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-btn">← 返回首页</a>
+
+        <!-- 框架1: 实时统计 -->
+        <div class="stats-box">
+            <h2>📊 实时统计</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">币种池总数</div>
+                    <div class="stat-value" id="pool-size" style="color: #667eea;">-</div>
+                    <div class="stat-sub">筛选后的币种</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">最高得分</div>
+                    <div class="stat-value" id="max-score" style="color: #fbbf24;">-</div>
+                    <div class="stat-sub">当前最优币种</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">平均得分</div>
+                    <div class="stat-value" id="avg-score" style="color: #10b981;">-</div>
+                    <div class="stat-sub">池内平均水平</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">更新时间</div>
+                    <div class="stat-value" id="update-time" style="color: #6b7280; font-size: 14px;">-</div>
+                    <div class="stat-sub">最后数据更新</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 框架2: 筛选条件 (市场池) -->
+        <div class="filter-box">
+            <h2>🔍 筛选条件 (市场池)</h2>
+            <div class="filter-items">
+                <div class="filter-item">
+                    <div class="filter-icon">✅</div>
+                    <div class="filter-title">V1/V2筛选</div>
+                    <div class="filter-desc" id="filter-v1v2">ratio2 ≥ 100%</div>
+                </div>
+                <div class="filter-item">
+                    <div class="filter-icon">✅</div>
+                    <div class="filter-title">急涨优先</div>
+                    <div class="filter-desc" id="filter-rush">急涨 > 急跌</div>
+                </div>
+                <div class="filter-item">
+                    <div class="filter-icon">✅</div>
+                    <div class="filter-title">优先级筛选</div>
+                    <div class="filter-desc" id="filter-priority">优先级 ≥ 4</div>
+                </div>
+                <div class="filter-item">
+                    <div class="filter-icon">⭐</div>
+                    <div class="filter-title">8大因子评分</div>
+                    <div class="filter-desc" id="filter-factors">6大因子综合打分</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 框架3: 小趋势仓位情况 -->
+        <div class="position-box">
+            <h2>📈 小趋势仓位情况</h2>
+            <div class="position-content">
+                <div class="position-main">
+                    <div class="position-value" id="total-position">-</div>
+                    <div class="position-label" id="position-level">建议总仓位</div>
+                </div>
+                <div class="position-details">
+                    <div class="position-detail-card">
+                        <div class="detail-label">星星仓位</div>
+                        <div class="detail-value" id="star-position" style="color: #fbbf24;">-</div>
+                    </div>
+                    <div class="position-detail-card">
+                        <div class="detail-label">持仓量仓位</div>
+                        <div class="detail-value" id="oi-position" style="color: #10b981;">-</div>
+                    </div>
+                    <div class="position-detail-card">
+                        <div class="detail-label">趋势得分</div>
+                        <div class="detail-value" id="trend-score" style="color: #667eea;">-</div>
+                    </div>
+                    <div class="position-detail-card">
+                        <div class="detail-label">趋势判断</div>
+                        <div class="detail-value" id="trend-text" style="font-size: 18px;">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 框架4: 币种排名 (按总分排序) -->
+        <div class="coins-box">
+            <h2>💎 币种排名 (按总分排序)</h2>
+            <div id="coins-content" class="loading">正在加载数据...</div>
+        </div>
+    </div>
+
+    <script>
+        // 加载数据
+        async function loadData() {
+            try {
+                // 1. 获取开仓逻辑数据（大趋势 + 小趋势仓位）
+                const openingRes = await fetch('/api/opening-logic/suggestion');
+                const openingData = await openingRes.json();
+                
+                // 2. 获取星星系统数据（币种池）
+                const starRes = await fetch('/api/star-system/data');
+                const starData = await starRes.json();
+                
+                // 3. 获取币种选择排名数据
+                const rankingRes = await fetch('/api/coin-selection/ranking');
+                const rankingData = await rankingRes.json();
+                
+                // 更新框架3: 小趋势仓位情况
+                if (openingData.success && openingData.data) {
+                    const data = openingData.data;
+                    const posInfo = data.position_info;
+                    
+                    // 总仓位
+                    document.getElementById('total-position').textContent = posInfo.position_percent + '%';
+                    document.getElementById('position-level').textContent = posInfo.position_level;
+                    
+                    // 仓位明细
+                    document.getElementById('star-position').textContent = posInfo.star_position + '%';
+                    document.getElementById('oi-position').textContent = posInfo.oi_position + '%';
+                    
+                    // 趋势信息
+                    document.getElementById('trend-score').textContent = data.trend_score + '分';
+                    document.getElementById('trend-text').textContent = data.trend;
+                    
+                    // 根据趋势类型设置颜色
+                    const posMain = document.querySelector('.position-main');
+                    if (data.suggestion_type === 'long') {
+                        posMain.style.background = 'linear-gradient(135deg, #4ade80 0%, #10b981 100%)';
+                    } else if (data.suggestion_type === 'short') {
+                        posMain.style.background = 'linear-gradient(135deg, #f87171 0%, #ef4444 100%)';
+                    } else {
+                        posMain.style.background = 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)';
+                    }
+                }
+                
+                // 更新框架1: 实时统计
+                if (rankingData.success && rankingData.data && rankingData.data.coins) {
+                    const coins = rankingData.data.coins;
+                    document.getElementById('pool-size').textContent = coins.length;
+                    
+                    // 计算最高分和平均分（这里暂时用ratio2作为临时得分）
+                    if (coins.length > 0) {
+                        const scores = coins.map(c => {
+                            const ratio = typeof c.ratio2 === 'string' ? 
+                                parseFloat(c.ratio2.replace('%', '')) : (c.ratio2 || 0);
+                            return ratio;
+                        });
+                        const maxScore = Math.max(...scores).toFixed(1);
+                        const avgScore = (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1);
+                        
+                        document.getElementById('max-score').textContent = maxScore;
+                        document.getElementById('avg-score').textContent = avgScore;
+                    }
+                    
+                    document.getElementById('update-time').textContent = 
+                        rankingData.update_time ? formatTime(rankingData.update_time) : '-';
+                }
+                
+                // 更新框架2: 筛选条件
+                if (starData.success && starData.v1v2_coins && starData.coin_lists) {
+                    const v1v2 = starData.v1v2_coins;
+                    const lists = starData.coin_lists;
+                    
+                    document.getElementById('filter-v1v2').textContent = 
+                        `V1: ${v1v2.v1_count || 0}个, V2: ${v1v2.v2_count || 0}个`;
+                    document.getElementById('filter-rush').textContent = 
+                        `急涨>急跌: ${(lists.rush_up_gt_down_coins || []).length}个`;
+                    document.getElementById('filter-priority').textContent = 
+                        `高优先级: ${(lists.priority_high_coins || []).length}个`;
+                }
+                
+                // 更新框架4: 币种列表
+                renderCoins((rankingData.data && rankingData.data.coins) || [], starData);
+                
+            } catch (error) {
+                console.error('加载数据失败:', error);
+                document.getElementById('coins-content').innerHTML = 
+                    '<div class="error">❌ 加载失败，请刷新页面重试</div>';
+            }
+        }
+        
+        // 渲染币种列表
+        function renderCoins(coins, starData) {
+            if (!coins || coins.length === 0) {
+                document.getElementById('coins-content').innerHTML = 
+                    '<div class="error">暂无符合条件的币种</div>';
+                return;
+            }
+            
+            const v1v2 = starData.v1v2_coins || {};
+            const lists = starData.coin_lists || {};
+            
+            const v1Coins = new Set(v1v2.v1_coins || []);
+            const v2Coins = new Set(v1v2.v2_coins || []);
+            const rushUpCoins = new Set(lists.only_rush_up_coins || []);
+            const priorityCoins = new Set(lists.priority_high_coins || []);
+            
+            let html = `
+                <table class="coins-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>币种</th>
+                            <th>标签</th>
+                            <th>24h涨跌</th>
+                            <th>急涨/急跌</th>
+                            <th>优先级</th>
+                            <th>V1V2比值</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            coins.forEach((coin, index) => {
+                const symbol = coin.symbol.replace('-USDT-SWAP', '');
+                const tags = [];
+                
+                if (v1Coins.has(symbol)) tags.push('<span class="coin-tag tag-v1">V1</span>');
+                if (v2Coins.has(symbol)) tags.push('<span class="coin-tag tag-v2">V2</span>');
+                if (rushUpCoins.has(symbol)) tags.push('<span class="coin-tag tag-rush-up">只涨</span>');
+                if (priorityCoins.has(symbol)) tags.push('<span class="coin-tag tag-priority">高优</span>');
+                
+                const changeClass = coin.change_24h >= 0 ? 'positive' : 'negative';
+                const changeText = coin.change_24h >= 0 ? `+${coin.change_24h}%` : `${coin.change_24h}%`;
+                
+                html += `
+                    <tr>
+                        <td><strong>${index + 1}</strong></td>
+                        <td><span class="coin-symbol">${symbol}</span></td>
+                        <td>${tags.join(' ') || '-'}</td>
+                        <td class="${changeClass}">${changeText}</td>
+                        <td>${coin.rush_up || 0} / ${coin.rush_down || 0}</td>
+                        <td>${coin.priority_level || '-'}</td>
+                        <td>${coin.ratio2 || 0}%</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                    </tbody>
+                </table>
+            `;
+            
+            document.getElementById('coins-content').innerHTML = html;
+        }
+        
+        // 格式化时间
+        function formatTime(timeStr) {
+            if (!timeStr) return '-';
+            const time = timeStr.split(' ')[1] || timeStr;
+            return time.substring(0, 5);
+        }
+        
+        // 页面加载时获取数据
+        loadData();
+        
+        // 每30秒自动刷新
+        setInterval(loadData, 30000);
+    </script>
+</body>
+</html>

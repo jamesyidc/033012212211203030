@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1分钟涨跌速监控系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .info-item {
+            background: rgba(255,255,255,0.1);
+            padding: 10px 20px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .info-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-home {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .stats-bar {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #b0b0b0;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        
+        .stat-value.up {
+            color: #10b981;
+        }
+        
+        .stat-value.down {
+            color: #ef4444;
+        }
+        
+        .stat-value.normal {
+            color: #6b7280;
+        }
+        
+        .coins-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .coin-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .coin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .coin-card.super-strong-up {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            animation: pulse-up 2s infinite;
+        }
+        
+        .coin-card.very-strong-up {
+            border-color: #34d399;
+            background: rgba(52, 211, 153, 0.08);
+        }
+        
+        .coin-card.strong-up {
+            border-color: #6ee7b7;
+            background: rgba(110, 231, 183, 0.06);
+        }
+        
+        .coin-card.general-up {
+            border-color: #a7f3d0;
+            background: rgba(167, 243, 208, 0.04);
+        }
+        
+        .coin-card.super-strong-down {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            animation: pulse-down 2s infinite;
+        }
+        
+        .coin-card.very-strong-down {
+            border-color: #f87171;
+            background: rgba(248, 113, 113, 0.08);
+        }
+        
+        .coin-card.strong-down {
+            border-color: #fca5a5;
+            background: rgba(252, 165, 165, 0.06);
+        }
+        
+        .coin-card.general-down {
+            border-color: #fecaca;
+            background: rgba(254, 202, 202, 0.04);
+        }
+        
+        @keyframes pulse-up {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(16, 185, 129, 0.6);
+            }
+        }
+        
+        @keyframes pulse-down {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(239, 68, 68, 0.6);
+            }
+        }
+        
+        .coin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .coin-symbol {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        .alert-badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .alert-badge.super-strong {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+        
+        .alert-badge.very-strong {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+        
+        .alert-badge.strong {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        
+        .alert-badge.general {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .coin-data {
+            margin-top: 15px;
+        }
+        
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .data-row:last-child {
+            border-bottom: none;
+        }
+        
+        .data-label {
+            color: #b0b0b0;
+            font-size: 14px;
+        }
+        
+        .data-value {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .change-percent {
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .change-percent.up {
+            color: #10b981;
+        }
+        
+        .change-percent.down {
+            color: #ef4444;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+            color: #b0b0b0;
+        }
+        
+        .countdown {
+            display: inline-block;
+            background: rgba(255,255,255,0.1);
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .coins-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ 1分钟涨跌速监控系统</h1>
+            <div class="header-info">
+                <div class="info-item">
+                    <div class="info-label">监控币种</div>
+                    <div class="info-value">27 种</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">采集间隔</div>
+                    <div class="info-value">15 秒</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">计算周期</div>
+                    <div class="info-value">1 分钟</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">最后更新</div>
+                    <div class="info-value" id="last-update">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">下次更新</div>
+                    <div class="info-value">
+                        <span id="countdown">15</span>秒
+                    </div>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <a href="/" class="btn-home">
+                    🏠 返回首页
+                </a>
+            </div>
+        </div>
+        
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-label">超强上涨</div>
+                <div class="stat-value up" id="super-strong-up-count">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">很强上涨</div>
+                <div class="stat-value up" id="very-strong-up-count">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">较强上涨</div>
+                <div class="stat-value up" id="strong-up-count">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">一般上涨</div>
+                <div class="stat-value up" id="general-up-count">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">一般下跌</div>
+                <div class="stat-value down" id="general-down-count">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">较强下跌</div>
+                <div class="stat-value down" id="strong-down-count">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">很强下跌</div>
+                <div class="stat-value down" id="very-strong-down-count">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">超强下跌</div>
+                <div class="stat-value down" id="super-strong-down-count">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">正常</div>
+                <div class="stat-value normal" id="normal-count">27</div>
+            </div>
+        </div>
+        
+        <div id="coins-container" class="coins-grid">
+            <div class="loading">正在加载数据...</div>
+        </div>
+    </div>
+    
+    <script>
+        let countdownValue = 15;
+        let countdownInterval = null;
+        
+        // 格式化时间
+        function formatTime(timestamp) {
+            if (!timestamp) return '-';
+            const date = new Date(timestamp.replace(' ', 'T'));
+            return date.toLocaleTimeString('zh-CN', { hour12: false });
+        }
+        
+        // 格式化价格
+        function formatPrice(price) {
+            return parseFloat(price).toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 4
+            });
+        }
+        
+        // 获取预警级别中文名称
+        function getAlertLevelText(alertLevel, alertType) {
+            const levelMap = {
+                'super_strong_up': '超强上涨',
+                'very_strong_up': '很强上涨',
+                'strong_up': '较强上涨',
+                'general_up': '一般上涨',
+                'super_strong_down': '超强下跌',
+                'very_strong_down': '很强下跌',
+                'strong_down': '较强下跌',
+                'general_down': '一般下跌',
+                'normal': '正常'
+            };
+            return levelMap[alertLevel] || '正常';
+        }
+        
+        // 获取预警级别样式类
+        function getAlertClass(alertLevel) {
+            return alertLevel.replace('_', '-');
+        }
+        
+        // 获取预警徽章样式
+        function getBadgeClass(alertLevel) {
+            if (alertLevel.includes('super_strong')) return 'super-strong';
+            if (alertLevel.includes('very_strong')) return 'very-strong';
+            if (alertLevel.includes('strong')) return 'strong';
+            if (alertLevel.includes('general')) return 'general';
+            return '';
+        }
+        
+        // 加载数据
+        function loadData() {
+            fetch('/api/price-speed/latest')
+                .then(res => res.json())
+                .then(response => {
+                    if (response.success && response.data) {
+                        renderCoins(response.data);
+                        updateStats(response.data);
+                        document.getElementById('last-update').textContent = formatTime(response.update_time);
+                    }
+                })
+                .catch(err => {
+                    console.error('加载数据失败:', err);
+                });
+        }
+        
+        // 渲染币种卡片
+        function renderCoins(coins) {
+            const container = document.getElementById('coins-container');
+            
+            if (coins.length === 0) {
+                container.innerHTML = '<div class="loading">暂无数据</div>';
+                return;
+            }
+            
+            // 排序：预警级别优先
+            coins.sort((a, b) => {
+                const order = {
+                    'super_strong_down': 1,
+                    'very_strong_down': 2,
+                    'strong_down': 3,
+                    'general_down': 4,
+                    'super_strong_up': 5,
+                    'very_strong_up': 6,
+                    'strong_up': 7,
+                    'general_up': 8,
+                    'normal': 9
+                };
+                return (order[a.alert_level] || 9) - (order[b.alert_level] || 9);
+            });
+            
+            container.innerHTML = coins.map(coin => {
+                const alertClass = getAlertClass(coin.alert_level);
+                const badgeClass = getBadgeClass(coin.alert_level);
+                const changeClass = coin.change_percent >= 0 ? 'up' : 'down';
+                const changeSign = coin.change_percent >= 0 ? '+' : '';
+                
+                return `
+                    <div class="coin-card ${alertClass}">
+                        <div class="coin-header">
+                            <div class="coin-symbol">${coin.symbol}</div>
+                            ${coin.alert_level !== 'normal' ? 
+                                `<div class="alert-badge ${badgeClass}">${getAlertLevelText(coin.alert_level, coin.alert_type)}</div>` 
+                                : ''}
+                        </div>
+                        <div class="change-percent ${changeClass}">
+                            ${changeSign}${coin.change_percent.toFixed(2)}%
+                        </div>
+                        <div class="coin-data">
+                            <div class="data-row">
+                                <span class="data-label">当前价格</span>
+                                <span class="data-value">$${formatPrice(coin.current_price)}</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">1分钟前</span>
+                                <span class="data-value">$${formatPrice(coin.previous_price)}</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">更新时间</span>
+                                <span class="data-value">${formatTime(coin.timestamp)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // 更新统计数据
+        function updateStats(coins) {
+            const stats = {
+                'super_strong_up': 0,
+                'very_strong_up': 0,
+                'strong_up': 0,
+                'general_up': 0,
+                'general_down': 0,
+                'strong_down': 0,
+                'very_strong_down': 0,
+                'super_strong_down': 0,
+                'normal': 0
+            };
+            
+            coins.forEach(coin => {
+                stats[coin.alert_level] = (stats[coin.alert_level] || 0) + 1;
+            });
+            
+            document.getElementById('super-strong-up-count').textContent = stats['super_strong_up'];
+            document.getElementById('very-strong-up-count').textContent = stats['very_strong_up'];
+            document.getElementById('strong-up-count').textContent = stats['strong_up'];
+            document.getElementById('general-up-count').textContent = stats['general_up'];
+            document.getElementById('general-down-count').textContent = stats['general_down'];
+            document.getElementById('strong-down-count').textContent = stats['strong_down'];
+            document.getElementById('very-strong-down-count').textContent = stats['very_strong_down'];
+            document.getElementById('super-strong-down-count').textContent = stats['super_strong_down'];
+            document.getElementById('normal-count').textContent = stats['normal'];
+        }
+        
+        // 倒计时
+        function startCountdown() {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            
+            countdownValue = 15;
+            document.getElementById('countdown').textContent = countdownValue;
+            
+            countdownInterval = setInterval(() => {
+                countdownValue--;
+                document.getElementById('countdown').textContent = countdownValue;
+                
+                if (countdownValue <= 0) {
+                    loadData();
+                    countdownValue = 15;
+                }
+            }, 1000);
+        }
+        
+        // 初始化
+        loadData();
+        startCountdown();
+    </script>
+</body>
+</html>

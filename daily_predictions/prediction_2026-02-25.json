@@ -1,0 +1,15 @@
+{
+  "date": "2026-02-25",
+  "timestamp": "2026-02-25 02:00:00",
+  "analysis_time": "02:00:00",
+  "color_counts": {
+    "green": 10,
+    "red": 1,
+    "yellow": 1,
+    "blank": 0,
+    "blank_ratio": 0.0
+  },
+  "signal": "低吸",
+  "description": "🟢🔴🟡 有绿有红有黄，但红色+黄色共2根(<3根)，红色区间为低吸机会。操作提示：低点做多",
+  "is_temp": false
+}

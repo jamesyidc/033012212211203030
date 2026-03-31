@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交易信号分发系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            color: #718096;
+            font-size: 14px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .stat-card h3 {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 8px;
+        }
+        
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1a202c;
+        }
+        
+        .signals-container {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .signals-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .signals-header h2 {
+            font-size: 24px;
+            color: #1a202c;
+        }
+        
+        .refresh-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .refresh-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+        
+        .signal-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+        
+        .signal-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+        }
+        
+        .signal-card.executed {
+            opacity: 0.6;
+            background: #f7fafc;
+        }
+        
+        .signal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .signal-title {
+            flex: 1;
+        }
+        
+        .signal-title h3 {
+            font-size: 20px;
+            color: #1a202c;
+            margin-bottom: 4px;
+        }
+        
+        .signal-title p {
+            color: #718096;
+            font-size: 13px;
+        }
+        
+        .signal-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-long {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .badge-short {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        
+        .badge-pending {
+            background: #fef5e7;
+            color: #744210;
+        }
+        
+        .badge-executed {
+            background: #e6f7ff;
+            color: #003a8c;
+        }
+        
+        .signal-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .info-group {
+            background: #f7fafc;
+            padding: 16px;
+            border-radius: 8px;
+        }
+        
+        .info-group h4 {
+            font-size: 13px;
+            color: #718096;
+            margin-bottom: 8px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .info-label {
+            color: #4a5568;
+        }
+        
+        .info-value {
+            font-weight: 600;
+            color: #1a202c;
+        }
+        
+        .check-points {
+            background: #f7fafc;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .check-points h4 {
+            font-size: 13px;
+            color: #718096;
+            margin-bottom: 12px;
+        }
+        
+        .check-point {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+        
+        .check-point:last-child {
+            margin-bottom: 0;
+        }
+        
+        .signal-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .execute-btn {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .execute-btn:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+        }
+        
+        .cancel-btn {
+            background: #f56565;
+            color: white;
+        }
+        
+        .cancel-btn:hover {
+            background: #e53e3e;
+            transform: translateY(-2px);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+        }
+        
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 交易信号分发系统</h1>
+            <p>6大交易模型 · 智能买点监控 · 自动信号分发</p>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>待执行信号</h3>
+                <div class="value" id="pendingCount">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>今日信号</h3>
+                <div class="value" id="todayCount">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>历史信号</h3>
+                <div class="value" id="historyCount">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>激活模型</h3>
+                <div class="value" id="activeModels">1/6</div>
+            </div>
+        </div>
+        
+        <div class="signals-container">
+            <div class="signals-header">
+                <h2>待执行信号队列</h2>
+                <button class="refresh-btn" onclick="loadSignals()">🔄 刷新</button>
+            </div>
+            
+            <div id="signalsContent">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        async function loadSignals() {
+            try {
+                const response = await fetch('/api/trading-signals/pending');
+                const data = await response.json();
+                
+                // 更新统计数据
+                document.getElementById('pendingCount').textContent = data.pending_count || 0;
+                document.getElementById('todayCount').textContent = data.today_count || 0;
+                document.getElementById('historyCount').textContent = data.history_count || 0;
+                
+                // 渲染信号列表
+                const container = document.getElementById('signalsContent');
+                
+                if (!data.signals || data.signals.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                            </svg>
+                            <h3>暂无待执行信号</h3>
+                            <p>系统正在监控中，有新信号时会自动显示</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = data.signals.map(signal => renderSignalCard(signal)).join('');
+                
+            } catch (error) {
+                console.error('加载信号失败:', error);
+                document.getElementById('signalsContent').innerHTML = `
+                    <div class="empty-state">
+                        <h3>加载失败</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function renderSignalCard(signal) {
+            const isExecuted = signal.executed;
+            const direction = signal.direction === 'long' ? 'long' : 'short';
+            const directionText = signal.direction === 'long' ? '做多' : '做空';
+            const directionBadge = signal.direction === 'long' ? 'badge-long' : 'badge-short';
+            
+            return `
+                <div class="signal-card ${isExecuted ? 'executed' : ''}">
+                    <div class="signal-header">
+                        <div class="signal-title">
+                            <h3>${signal.model_name}</h3>
+                            <p>触发时间: ${new Date(signal.trigger_time).toLocaleString('zh-CN')}</p>
+                        </div>
+                        <div class="signal-badges">
+                            <span class="badge ${directionBadge}">${directionText}</span>
+                            <span class="badge ${isExecuted ? 'badge-executed' : 'badge-pending'}">
+                                ${isExecuted ? '已执行' : '待执行'}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    ${signal.market_data && signal.market_data.check_points ? `
+                    <div class="check-points">
+                        <h4>📊 检查点数据</h4>
+                        ${signal.market_data.check_points.map(cp => `
+                            <div class="check-point">
+                                <span>${cp.time}</span>
+                                <span>${cp.ratio.toFixed(2)}% ${cp.is_green ? '🟢' : '🔴'}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ` : ''}
+                    
+                    <div class="signal-content">
+                        <div class="info-group">
+                            <h4>📈 市场信息</h4>
+                            <div class="info-item">
+                                <span class="info-label">正数占比</span>
+                                <span class="info-value">${signal.market_data?.positive_ratio?.toFixed(2)}%</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">市场趋势</span>
+                                <span class="info-value">${signal.market_trend || '未知'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">信号类型</span>
+                                <span class="info-value">${signal.signal_type}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-group">
+                            <h4>💰 交易参数</h4>
+                            <div class="info-item">
+                                <span class="info-label">标的数量</span>
+                                <span class="info-value">${signal.trading_params?.symbols_count}个</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">单币仓位</span>
+                                <span class="info-value">${signal.trading_params?.position_per_symbol}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">杠杆倍数</span>
+                                <span class="info-value">${signal.trading_params?.leverage}倍</span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-group">
+                            <h4>⚙️ 执行状态</h4>
+                            <div class="info-item">
+                                <span class="info-label">执行状态</span>
+                                <span class="info-value">${isExecuted ? '✅ 已执行' : '⏳ 待执行'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">执行子系统</span>
+                                <span class="info-value">${signal.execution_subsystem || '未分配'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">最大仓位</span>
+                                <span class="info-value">${signal.trading_params?.max_position_per_symbol}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${!isExecuted ? `
+                    <div class="signal-actions">
+                        <button class="action-btn execute-btn" onclick="executeSignal('${signal.model_id}', '${signal.trigger_time}')">
+                            ✅ 执行信号
+                        </button>
+                        <button class="action-btn cancel-btn" onclick="cancelSignal('${signal.model_id}', '${signal.trigger_time}')">
+                            ❌ 取消信号
+                        </button>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+        
+        async function executeSignal(modelId, triggerTime) {
+            if (!confirm('确认执行此信号？')) return;
+            
+            try {
+                const response = await fetch('/api/trading-signals/execute', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({model_id: modelId, trigger_time: triggerTime})
+                });
+                
+                const result = await response.json();
+                alert(result.message);
+                loadSignals();
+            } catch (error) {
+                alert('执行失败: ' + error.message);
+            }
+        }
+        
+        async function cancelSignal(modelId, triggerTime) {
+            if (!confirm('确认取消此信号？')) return;
+            
+            try {
+                const response = await fetch('/api/trading-signals/cancel', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({model_id: modelId, trigger_time: triggerTime})
+                });
+                
+                const result = await response.json();
+                alert(result.message);
+                loadSignals();
+            } catch (error) {
+                alert('取消失败: ' + error.message);
+            }
+        }
+        
+        // 页面加载时初始化
+        loadSignals();
+        
+        // 每30秒自动刷新
+        setInterval(loadSignals, 30000);
+    </script>
+</body>
+</html>

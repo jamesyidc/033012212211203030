@@ -1,0 +1,8 @@
+{
+  "last_status": "above",
+  "last_ratio": 40.0,
+  "last_check_time": "2026-03-09 04:41:15",
+  "enabled": false,
+  "threshold": 40,
+  "allow_once": true
+}

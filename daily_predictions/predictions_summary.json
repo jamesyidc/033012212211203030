@@ -1,0 +1,272 @@
+{
+  "analysis_time": "2026-02-24 14:02:58",
+  "period": "2026-02-01 to 2026-02-24",
+  "total_days": 20,
+  "signal_distribution": {
+    "等待新低": 11,
+    "做空": 4,
+    "诱多不参与": 3,
+    "诱空试盘抄底": 1,
+    "观望": 1
+  },
+  "color_statistics": {
+    "green": {
+      "total": 81,
+      "average": 4.05
+    },
+    "red": {
+      "total": 116,
+      "average": 5.8
+    },
+    "yellow": {
+      "total": 30,
+      "average": 1.5
+    },
+    "blank": {
+      "total": 11,
+      "average": 0.55
+    }
+  },
+  "daily_predictions": [
+    {
+      "date": "2026-02-02",
+      "signal": "等待新低",
+      "description": "🔴🟡 红色+黄色，可能还有新低，建议等待。操作提示：高点做空",
+      "color_counts": {
+        "green": 0,
+        "red": 8,
+        "yellow": 4,
+        "blank": 0,
+        "blank_ratio": 0.0
+      }
+    },
+    {
+      "date": "2026-02-04",
+      "signal": "做空",
+      "description": "🔴 只有红色柱子，预判下跌行情，建议做空。操作提示：相对高点做空",
+      "color_counts": {
+        "green": 0,
+        "red": 12,
+        "yellow": 0,
+        "blank": 0,
+        "blank_ratio": 0.0
+      }
+    },
+    {
+      "date": "2026-02-05",
+      "signal": "等待新低",
+      "description": "🔴🟡 红色+黄色，可能还有新低，建议等待。操作提示：高点做空",
+      "color_counts": {
+        "green": 0,
+        "red": 9,
+        "yellow": 2,
+        "blank": 1,
+        "blank_ratio": 8.333333333333332
+      }
+    },
+    {
+      "date": "2026-02-06",
+      "signal": "等待新低",
+      "description": "🟢🔴🟡 有绿有红有黄，可能还有新低，建议等待。操作提示：高点做空",
+      "color_counts": {
+        "green": 1,
+        "red": 6,
+        "yellow": 5,
+        "blank": 0,
+        "blank_ratio": 0.0
+      }
+    },
+    {
+      "date": "2026-02-07",
+      "signal": "诱多不参与",
+      "description": "🟢 全部绿色柱子，单边诱多行情，不参与操作。操作提示：不参与",
+      "color_counts": {
+        "green": 12,
+        "red": 0,
+        "yellow": 0,
+        "blank": 0,
+        "blank_ratio": 0.0
+      }
+    },
+    {
+      "date": "2026-02-08",
+      "signal": "等待新低",
+      "description": "🟢🟡 只有绿色和黄色，可能还有新低，建议等待。操作提示：高点做空",
+      "color_counts": {
+        "green": 11,
+        "red": 0,
+        "yellow": 1,
+        "blank": 0,
+        "blank_ratio": 0.0
+      }
+    },
+    {
+      "date": "2026-02-09",
+      "signal": "等待新低",
+      "description": "🟢🔴🟡 有绿有红有黄，可能还有新低，建议等待。操作提示：高点做空",
+      "color_counts": {
+        "green": 1,
+        "red": 7,
+        "yellow": 2,
+        "blank": 2,
+        "blank_ratio": 16.666666666666664
+      }
+    },
+    {
+      "date": "2026-02-10",
+      "signal": "等待新低",
+      "description": "🟢🔴🟡 有绿有红有黄，可能还有新低，建议等待。操作提示：高点做空",
+      "color_counts": {
+        "green": 7,
+        "red": 4,
+        "yellow": 1,
+        "blank": 0,
+        "blank_ratio": 0.0
+      }
+    },
+    {
+      "date": "2026-02-12",
+      "signal": "等待新低",
+      "description": "🟢🔴🟡 有绿有红有黄，可能还有新低，建议等待。操作提示：高点做空",
+      "color_counts": {
+        "green": 8,
+        "red": 2,
+        "yellow": 2,
+        "blank": 0,
+        "blank_ratio": 0.0
+      }
+    },
+    {
+      "date": "2026-02-13",
+      "signal": "诱空试盘抄底",
+      "description": "⚪🔴 红色+空白且空白占比>25%，诱空行情，可以试盘抄底。操作提示：低点做多",
+      "color_counts": {
+        "green": 0,
+        "red": 6,
+        "yellow": 0,
+        "blank": 6,
+        "blank_ratio": 50.0
+      }
+    },
+    {
+      "date": "2026-02-14",
+      "signal": "诱多不参与",
+      "description": "🟢 全部绿色柱子，单边诱多行情，不参与操作。操作提示：不参与",
+      "color_counts": {
+        "green": 12,
+        "red": 0,
+        "yellow": 0,
+        "blank": 0,
+        "blank_ratio": 0.0
+      }
+    },
+    {
+      "date": "2026-02-15",
+      "signal": "等待新低",
+      "description": "🟢🔴🟡 有绿有红有黄，可能还有新低，建议等待。操作提示：高点做空",
+      "color_counts": {
+        "green": 5,
+        "red": 4,
+        "yellow": 2,
+        "blank": 0,
+        "blank_ratio": 0.0
+      }
+    },
+    {
+      "date": "2026-02-16",
+      "signal": "做空",
+      "description": "🔴⚪ 红色+少量空白（空白占比8.3%<25%），预判下跌行情，建议做空。操作提示：相对高点做空",
+      "color_counts": {
+        "green": 0,
+        "red": 11,
+        "yellow": 0,
+        "blank": 1,
+        "blank_ratio": 8.333333333333332
+      }
+    },
+    {
+      "date": "2026-02-17",
+      "signal": "诱多不参与",
+      "description": "🟢 全部绿色柱子，单边诱多行情，不参与操作。操作提示：不参与",
+      "color_counts": {
+        "green": 12,
+        "red": 0,
+        "yellow": 0,
+        "blank": 0,
+        "blank_ratio": 0.0
+      }
+    },
+    {
+      "date": "2026-02-18",
+      "signal": "等待新低",
+      "description": "🟢🔴🟡 有绿有红有黄，可能还有新低，建议等待。操作提示：高点做空",
+      "color_counts": {
+        "green": 6,
+        "red": 3,
+        "yellow": 2,
+        "blank": 0,
+        "blank_ratio": 0.0
+      }
+    },
+    {
+      "date": "2026-02-19",
+      "signal": "做空",
+      "description": "🔴⚪ 红色+少量空白（空白占比8.3%<25%），预判下跌行情，建议做空。操作提示：相对高点做空",
+      "color_counts": {
+        "green": 0,
+        "red": 11,
+        "yellow": 0,
+        "blank": 1,
+        "blank_ratio": 8.333333333333332
+      }
+    },
+    {
+      "date": "2026-02-20",
+      "signal": "等待新低",
+      "description": "🟢🔴🟡 有绿有红有黄，可能还有新低，建议等待。操作提示：高点做空",
+      "color_counts": {
+        "green": 5,
+        "red": 5,
+        "yellow": 2,
+        "blank": 0,
+        "blank_ratio": 0.0
+      }
+    },
+    {
+      "date": "2026-02-21",
+      "signal": "等待新低",
+      "description": "🟢🔴🟡 有绿有红有黄，可能还有新低，建议等待。操作提示：高点做空",
+      "color_counts": {
+        "green": 1,
+        "red": 6,
+        "yellow": 5,
+        "blank": 0,
+        "blank_ratio": 0.0
+      }
+    },
+    {
+      "date": "2026-02-22",
+      "signal": "做空",
+      "description": "🔴 只有红色柱子，预判下跌行情，建议做空。操作提示：相对高点做空",
+      "color_counts": {
+        "green": 0,
+        "red": 12,
+        "yellow": 0,
+        "blank": 0,
+        "blank_ratio": 0.0
+      }
+    },
+    {
+      "date": "2026-02-23",
+      "signal": "观望",
+      "description": "🔴🟡 红色柱子+黄色柱子，没有绿色柱子，多空博弈方向不明。操作提示：无，不参与",
+      "color_counts": {
+        "green": 0,
+        "red": 10,
+        "yellow": 2,
+        "blank": 0,
+        "blank_ratio": 0.0
+      }
+    }
+  ]
+}

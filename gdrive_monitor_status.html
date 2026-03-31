@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Drive 监控状态 - 11分钟超时保险机制</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        /* 🆕 数据源警告框 */
+        .data-source-warning {
+            background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(234,88,12,0.3));
+            border: 3px solid #f59e0b;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(245,158,11,0.4);
+            animation: warning-pulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes warning-pulse {
+            0%, 100% { border-color: #f59e0b; box-shadow: 0 10px 40px rgba(245,158,11,0.4); }
+            50% { border-color: #f97316; box-shadow: 0 10px 60px rgba(245,158,11,0.6); }
+        }
+        
+        .warning-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .warning-icon {
+            font-size: 48px;
+            animation: warning-shake 2s ease-in-out infinite;
+        }
+        
+        @keyframes warning-shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px) rotate(-5deg); }
+            75% { transform: translateX(5px) rotate(5deg); }
+        }
+        
+        .warning-title h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            color: #fbbf24;
+        }
+        
+        .warning-title p {
+            font-size: 14px;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .warning-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .detail-item {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 8px;
+        }
+        
+        .detail-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fbbf24;
+        }
+        
+        /* 🆕 父文件夹ID配置框样式 */
+        .root-folders-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .root-folder-box {
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .root-folder-odd {
+            background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(37,99,235,0.3));
+            border: 3px solid #3b82f6;
+        }
+        
+        .root-folder-even {
+            background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(124,58,237,0.3));
+            border: 3px solid #8b5cf6;
+        }
+        
+        .root-folder-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .root-folder-icon {
+            font-size: 42px;
+        }
+        
+        .root-folder-title h3 {
+            font-size: 22px;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+        
+        .root-folder-title p {
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            margin: 0;
+        }
+        
+        .root-folder-content {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 12px;
+        }
+        
+        .folder-id-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .folder-id-value {
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fbbf24;
+            word-break: break-all;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            border: 1px solid rgba(251,191,36,0.3);
+        }
+        
+        .folder-status {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .status-badge-info {
+            background: rgba(59,130,246,0.2);
+            color: #93c5fd;
+            border: 1px solid #3b82f6;
+        }
+        
+        .status-badge-success {
+            background: rgba(16,185,129,0.2);
+            color: #6ee7b7;
+            border: 1px solid #10b981;
+        }
+        
+        .status-badge-warning {
+            background: rgba(245,158,11,0.2);
+            color: #fcd34d;
+            border: 1px solid #f59e0b;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .root-folders-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* 超时保险框 */
+        .insurance-box {
+            background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(220,38,38,0.3));
+            border: 3px solid #ef4444;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(239,68,68,0.3);
+            animation: pulse-border 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-border {
+            0%, 100% { border-color: #ef4444; box-shadow: 0 10px 40px rgba(239,68,68,0.3); }
+            50% { border-color: #f97316; box-shadow: 0 10px 60px rgba(239,68,68,0.5); }
+        }
+        
+        .insurance-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .insurance-icon {
+            font-size: 48px;
+            animation: rotate 4s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .insurance-title {
+            flex: 1;
+        }
+        
+        .insurance-title h2 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .insurance-title p {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .insurance-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .status-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .status-card h3 {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 10px;
+        }
+        
+        .status-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .status-card .description {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        /* 进度条 */
+        .progress-container {
+            margin: 20px 0;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .progress-bar-bg {
+            width: 100%;
+            height: 30px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #fbbf24 60%, #ef4444 90%);
+            border-radius: 15px;
+            transition: width 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .progress-markers {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            pointer-events: none;
+        }
+        
+        .progress-marker {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(255,255,255,0.5);
+        }
+        
+        .progress-marker::after {
+            content: attr(data-label);
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            white-space: nowrap;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        /* 状态指示器 */
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .status-safe {
+            background: rgba(16,185,129,0.2);
+            border: 2px solid #10b981;
+            color: #10b981;
+        }
+        
+        .status-warning {
+            background: rgba(251,191,36,0.2);
+            border: 2px solid #fbbf24;
+            color: #fbbf24;
+        }
+        
+        .status-danger {
+            background: rgba(239,68,68,0.2);
+            border: 2px solid #ef4444;
+            color: #ef4444;
+            animation: blink 1s ease-in-out infinite;
+        }
+        
+        .status-recovering {
+            background: rgba(168,85,247,0.2);
+            border: 2px solid #a855f7;
+            color: #a855f7;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+        }
+        
+        /* 监控面板 */
+        .monitor-panel {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 30px;
+        }
+        
+        .monitor-panel h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .stat-item .label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 5px;
+        }
+        
+        .stat-item .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4ade80;
+        }
+        
+        /* 日志区域 */
+        .log-panel {
+            background: rgba(0,0,0,0.4);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .log-panel h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .log-entry {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.05);
+            border-left: 3px solid;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        
+        .log-entry.info { border-left-color: #3b82f6; }
+        .log-entry.success { border-left-color: #10b981; }
+        .log-entry.warning { border-left-color: #fbbf24; }
+        .log-entry.error { border-left-color: #ef4444; }
+        
+        .log-time {
+            color: rgba(255,255,255,0.5);
+            margin-right: 10px;
+        }
+        
+        .home-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+        }
+        
+        .home-btn:hover {
+            background: rgba(74,222,128,0.2);
+            border-color: #4ade80;
+            transform: translateY(-2px);
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .insurance-status {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="home-btn">
+            <span>🏠</span>
+            <span>返回首页</span>
+        </a>
+        
+        <div class="header">
+            <h1>🛡️ Google Drive 监控保险系统</h1>
+            <div class="subtitle">11分钟超时自动恢复机制 - 实时监控</div>
+        </div>
+        
+        <!-- 🆕 数据源状态警告框 -->
+        <div id="dataSourceWarning" class="data-source-warning" style="display: none;">
+            <div class="warning-header">
+                <div class="warning-icon">⚠️</div>
+                <div class="warning-title">
+                    <h2>数据源状态异常</h2>
+                    <p id="dataSourceMessage">检查中...</p>
+                </div>
+            </div>
+            <div class="warning-details">
+                <div class="detail-item">
+                    <div class="detail-label">今天日期 (北京时间)</div>
+                    <div class="detail-value" id="todayDate">--</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Google Drive 中的数据日期</div>
+                    <div class="detail-value" id="gdriveDataDates">--</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">建议操作</div>
+                    <div class="detail-value" style="font-size: 14px; line-height: 1.6;">
+                        1. 检查外部数据生成程序是否正常运行<br>
+                        2. 确认 Google Drive 中是否有新文件上传<br>
+                        3. 如果数据源已恢复，监控系统会自动检测
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 🆕 父文件夹ID配置框 -->
+        <div class="root-folders-container">
+            <!-- 单数日期父文件夹 -->
+            <div class="root-folder-box root-folder-odd">
+                <div class="root-folder-header">
+                    <div class="root-folder-icon">1️⃣</div>
+                    <div class="root-folder-title">
+                        <h3>单数日期父文件夹</h3>
+                        <p>1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31</p>
+                    </div>
+                </div>
+                <div class="root-folder-content">
+                    <div class="folder-id-label">Folder ID:</div>
+                    <div class="folder-id-value" id="rootFolderOdd">加载中...</div>
+                    <div class="folder-status" id="statusOdd">
+                        <span class="status-badge status-badge-info">📂 待检测</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 双数日期父文件夹 -->
+            <div class="root-folder-box root-folder-even">
+                <div class="root-folder-header">
+                    <div class="root-folder-icon">2️⃣</div>
+                    <div class="root-folder-title">
+                        <h3>双数日期父文件夹</h3>
+                        <p>2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30</p>
+                    </div>
+                </div>
+                <div class="root-folder-content">
+                    <div class="folder-id-label">Folder ID:</div>
+                    <div class="folder-id-value" id="rootFolderEven">加载中...</div>
+                    <div class="folder-status" id="statusEven">
+                        <span class="status-badge status-badge-info">📂 待检测</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 超时保险框 -->
+        <div class="insurance-box">
+            <div class="insurance-header">
+                <div class="insurance-icon">🛡️</div>
+                <div class="insurance-title">
+                    <h2>11分钟超时保险机制</h2>
+                    <p>当超过11分钟未找到TXT文件时,自动重新获取父文件夹ID并更新配置</p>
+                </div>
+                <div id="insuranceStatus" class="status-indicator status-safe">
+                    <div class="status-dot"></div>
+                    <span>正常运行</span>
+                </div>
+            </div>
+            
+            <div class="insurance-status">
+                <div class="status-card">
+                    <h3>⏱️ 距上次找到文件</h3>
+                    <div class="value" id="timeSinceLastFile" style="color: #10b981;">0.0</div>
+                    <div class="description">分钟 (阈值: 11分钟)</div>
+                </div>
+                
+                <div class="status-card">
+                    <h3>📂 当前文件夹</h3>
+                    <div class="value" id="currentFolder" style="color: #fbbf24; font-size: 16px;">加载中...</div>
+                    <div class="description" id="folderDate">--</div>
+                </div>
+                
+                <div class="status-card">
+                    <h3>📄 最新TXT文件</h3>
+                    <div class="value" id="latestFile" style="color: #3b82f6; font-size: 18px;">--</div>
+                    <div class="description" id="fileTime">--</div>
+                </div>
+                
+                <div class="status-card">
+                    <h3>🔄 恢复触发次数</h3>
+                    <div class="value" id="recoveryCount" style="color: #a855f7;">0</div>
+                    <div class="description">今日累计</div>
+                </div>
+            </div>
+            
+            <!-- 超时进度条 -->
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>超时进度</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressBar" style="width: 0%">
+                        <span id="progressText">安全</span>
+                    </div>
+                    <div class="progress-markers">
+                        <div class="progress-marker" style="left: 45.45%" data-label="5分钟"></div>
+                        <div class="progress-marker" style="left: 72.73%" data-label="8分钟"></div>
+                        <div class="progress-marker" style="left: 100%" data-label="11分钟"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 监控数据面板 -->
+        <div class="monitor-panel">
+            <h2>📊 监控数据统计</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="label">检测次数</div>
+                    <div class="value" id="checkCount">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="label">运行时长</div>
+                    <div class="value" id="uptime">00:00:00</div>
+                </div>
+                <div class="stat-item">
+                    <div class="label">找到文件数</div>
+                    <div class="value" id="filesFound">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="label">数据库记录</div>
+                    <div class="value" id="dbRecords">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="label">最后更新</div>
+                    <div class="value" style="font-size: 16px;" id="lastUpdate">--</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 日志面板 -->
+        <div class="log-panel">
+            <h3>📋 实时日志 <span style="font-size: 12px; color: rgba(255,255,255,0.5);">(最近20条)</span></h3>
+            <div id="logContainer">
+                <div class="log-entry info">
+                    <span class="log-time">--:--:--</span>
+                    <span>系统启动中...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let startTime = Date.now();
+        let lastFileFoundTime = Date.now();
+        let recoveryTriggered = 0;
+        let checkCount = 0;
+        let filesFound = 0;
+        
+        // 模拟数据更新 (实际应该从后端API获取)
+        function updateStatus() {
+            // 获取实时数据
+            fetch('/api/gdrive-monitor/status')
+                .then(response => response.json())
+                .then(data => {
+                    updateUI(data);
+                })
+                .catch(error => {
+                    console.error('Failed to fetch status:', error);
+                    // 使用模拟数据
+                    updateUIWithMockData();
+                });
+        }
+        
+        function updateUI(data) {
+            // 🆕 更新数据源警告
+            const warningBox = document.getElementById('dataSourceWarning');
+            const dataSourceStatus = data.data_source_status || 'unknown';
+            
+            if (dataSourceStatus === 'stale' || dataSourceStatus === 'empty' || dataSourceStatus === 'error') {
+                // 显示警告框
+                warningBox.style.display = 'block';
+                document.getElementById('dataSourceMessage').textContent = data.data_source_message || '数据源异常';
+                document.getElementById('todayDate').textContent = data.today_date || '--';
+                
+                // 显示 Google Drive 中的日期分布
+                const gDriveDates = data.gdrive_dates || {};
+                const datesList = Object.keys(gDriveDates).sort().reverse();
+                let datesText = '';
+                if (datesList.length > 0) {
+                    datesText = datesList.map(date => `${date} (${gDriveDates[date]} 文件)`).join(', ');
+                } else {
+                    datesText = '无数据文件';
+                }
+                document.getElementById('gdriveDataDates').textContent = datesText;
+            } else if (dataSourceStatus === 'active') {
+                // 数据源正常，隐藏警告框
+                warningBox.style.display = 'none';
+            }
+            
+            // 更新时间差
+            const timeSince = data.time_since_last_file || 0;
+            const minutes = (timeSince / 60).toFixed(1);
+            document.getElementById('timeSinceLastFile').textContent = minutes;
+            
+            // 更新进度条
+            const percent = Math.min((timeSince / 660) * 100, 100);
+            document.getElementById('progressBar').style.width = percent + '%';
+            document.getElementById('progressPercent').textContent = percent.toFixed(1) + '%';
+            
+            // 更新状态
+            const statusEl = document.getElementById('insuranceStatus');
+            if (timeSince < 300) {
+                statusEl.className = 'status-indicator status-safe';
+                statusEl.innerHTML = '<div class="status-dot"></div><span>正常运行</span>';
+                document.getElementById('progressText').textContent = '安全';
+            } else if (timeSince < 600) {
+                statusEl.className = 'status-indicator status-warning';
+                statusEl.innerHTML = '<div class="status-dot"></div><span>警告状态</span>';
+                document.getElementById('progressText').textContent = '警告';
+            } else if (timeSince < 660) {
+                statusEl.className = 'status-indicator status-danger';
+                statusEl.innerHTML = '<div class="status-dot"></div><span>即将触发</span>';
+                document.getElementById('progressText').textContent = '危险';
+            } else {
+                statusEl.className = 'status-indicator status-recovering';
+                statusEl.innerHTML = '<div class="status-dot"></div><span>恢复中...</span>';
+                document.getElementById('progressText').textContent = '恢复';
+            }
+            
+            // 更新其他数据
+            document.getElementById('currentFolder').textContent = data.current_folder_id || 'N/A';
+            document.getElementById('folderDate').textContent = data.folder_date || '--';
+            document.getElementById('latestFile').textContent = data.latest_file || '--';
+            document.getElementById('fileTime').textContent = data.file_time || '--';
+            document.getElementById('recoveryCount').textContent = data.recovery_count || 0;
+            document.getElementById('checkCount').textContent = data.check_count || 0;
+            document.getElementById('filesFound').textContent = data.files_found || 0;
+            document.getElementById('dbRecords').textContent = data.db_records || 0;
+            document.getElementById('lastUpdate').textContent = data.last_update || '--';
+            
+            // 更新运行时长
+            const uptime = formatUptime(data.uptime_seconds || 0);
+            document.getElementById('uptime').textContent = uptime;
+            
+            // 🆕 更新父文件夹ID（支持00:10清理机制）
+            // 判断今天是单数还是双数日期
+            const today = new Date();
+            const dayOfMonth = today.getDate();
+            const isOddDay = dayOfMonth % 2 === 1;
+            
+            const rootFolderOddEl = document.getElementById('rootFolderOdd');
+            const rootFolderEvenEl = document.getElementById('rootFolderEven');
+            const statusOddEl = document.getElementById('statusOdd');
+            const statusEvenEl = document.getElementById('statusEven');
+            
+            // 处理单数日期父文件夹
+            if (data.root_folder_odd && data.root_folder_odd !== 'N/A') {
+                rootFolderOddEl.textContent = data.root_folder_odd;
+                rootFolderOddEl.style.opacity = '1';
+                if (isOddDay) {
+                    statusOddEl.innerHTML = '<span class="status-badge status-badge-success">✅ 今天使用</span>';
+                } else {
+                    statusOddEl.innerHTML = '<span class="status-badge status-badge-info">📂 备用</span>';
+                }
+            } else {
+                rootFolderOddEl.textContent = '🧹 已清理';
+                rootFolderOddEl.style.opacity = '0.4';
+                statusOddEl.innerHTML = '<span class="status-badge" style="background: rgba(255,255,255,0.1);">🗑️ 00:10已清理</span>';
+            }
+            
+            // 处理双数日期父文件夹
+            if (data.root_folder_even && data.root_folder_even !== 'N/A') {
+                rootFolderEvenEl.textContent = data.root_folder_even;
+                rootFolderEvenEl.style.opacity = '1';
+                if (isOddDay) {
+                    statusEvenEl.innerHTML = '<span class="status-badge status-badge-info">📂 备用</span>';
+                } else {
+                    statusEvenEl.innerHTML = '<span class="status-badge status-badge-success">✅ 今天使用</span>';
+                }
+            } else {
+                rootFolderEvenEl.textContent = '🧹 已清理';
+                rootFolderEvenEl.style.opacity = '0.4';
+                statusEvenEl.innerHTML = '<span class="status-badge" style="background: rgba(255,255,255,0.1);">🗑️ 00:10已清理</span>';
+            }
+        }
+        
+        function updateUIWithMockData() {
+            // 模拟数据 (用于演示)
+            const now = Date.now();
+            const timeSince = (now - lastFileFoundTime) / 1000;
+            const minutes = (timeSince / 60).toFixed(1);
+            
+            document.getElementById('timeSinceLastFile').textContent = minutes;
+            
+            const percent = Math.min((timeSince / 660) * 100, 100);
+            document.getElementById('progressBar').style.width = percent + '%';
+            document.getElementById('progressPercent').textContent = percent.toFixed(1) + '%';
+            
+            // 模拟数据每3分钟重置一次
+            if (timeSince > 180) {
+                lastFileFoundTime = now;
+                filesFound++;
+                addLog('success', '✅ 找到新的TXT文件');
+            }
+            
+            // 更新统计
+            checkCount++;
+            document.getElementById('checkCount').textContent = checkCount;
+            document.getElementById('filesFound').textContent = filesFound;
+            
+            const uptime = formatUptime((now - startTime) / 1000);
+            document.getElementById('uptime').textContent = uptime;
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('zh-CN');
+        }
+        
+        function formatUptime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+        
+        function addLog(type, message) {
+            const logContainer = document.getElementById('logContainer');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            
+            const time = new Date().toLocaleTimeString('zh-CN');
+            entry.innerHTML = `<span class="log-time">${time}</span><span>${message}</span>`;
+            
+            logContainer.insertBefore(entry, logContainer.firstChild);
+            
+            // 保持最多20条日志
+            const entries = logContainer.getElementsByClassName('log-entry');
+            if (entries.length > 20) {
+                logContainer.removeChild(entries[entries.length - 1]);
+            }
+        }
+        
+        // 初始化
+        addLog('info', '🚀 监控系统启动');
+        addLog('info', '📂 配置文件加载完成');
+        addLog('success', '✅ 连接到数据库');
+        
+        // 定时更新
+        setInterval(updateStatus, 2000);
+        updateStatus();
+    </script>
+</body>
+</html>

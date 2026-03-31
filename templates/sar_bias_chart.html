@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAR偏向统计曲线图</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: #1e2139;
+            color: #fff;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            color: #00d4ff;
+        }
+        
+        .back-btn {
+            background: rgba(59, 125, 255, 0.2);
+            border: 1px solid rgba(59, 125, 255, 0.4);
+            color: #00d4ff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: rgba(59, 125, 255, 0.3);
+        }
+        
+        .controls {
+            background: rgba(42, 45, 71, 0.8);
+            border: 1px solid rgba(59, 125, 255, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .control-group label {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .control-group select {
+            background: rgba(30, 33, 57, 0.8);
+            border: 1px solid rgba(59, 125, 255, 0.3);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .control-group button {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #10b981;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .control-group button:hover {
+            background: rgba(16, 185, 129, 0.3);
+        }
+        
+        .chart-container {
+            background: rgba(42, 45, 71, 0.8);
+            border: 1px solid rgba(59, 125, 255, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .chart-container canvas {
+            max-height: 500px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(42, 45, 71, 0.8);
+            border: 1px solid rgba(59, 125, 255, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #00d4ff;
+        }
+        
+        .stat-value.bullish {
+            color: #10b981;
+        }
+        
+        .stat-value.bearish {
+            color: #ef4444;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        .info-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+        }
+        
+        .info-box strong {
+            color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 SAR偏向统计趋势图</h1>
+            <div style="display: flex; gap: 10px;">
+                <a href="/sar-slope" class="back-btn">← 返回列表</a>
+                <a href="/" class="back-btn">🏠 返回首页</a>
+            </div>
+        </div>
+        
+        <div class="info-box">
+            <strong>说明：</strong>
+            此图表显示"偏多占比 > 80%"和"偏空占比 > 80%"的币种数量随时间的变化趋势。
+            数据每5分钟更新一次，可用于判断整体市场情绪和趋势变化。
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label>时间范围</label>
+                <select id="hoursSelect">
+                    <option value="6">最近6小时</option>
+                    <option value="12">最近12小时</option>
+                    <option value="24" selected>最近24小时</option>
+                    <option value="48">最近48小时</option>
+                    <option value="72">最近3天</option>
+                    <option value="168">最近7天</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label>&nbsp;</label>
+                <button onclick="loadChart()">🔄 刷新数据</button>
+            </div>
+            
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="autoRefresh" checked> 自动刷新 (5分钟)
+                </label>
+            </div>
+        </div>
+        
+        <div class="stats" id="stats" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-label">当前偏多币种数</div>
+                <div class="stat-value bullish" id="currentBullish">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">当前偏空币种数</div>
+                <div class="stat-value bearish" id="currentBearish">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">平均偏多占比</div>
+                <div class="stat-value" id="avgBullish">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">平均偏空占比</div>
+                <div class="stat-value" id="avgBearish">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">数据点数</div>
+                <div class="stat-value" id="dataCount">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">更新时间</div>
+                <div class="stat-value" id="updateTime" style="font-size: 16px;">-</div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="biasChart"></canvas>
+        </div>
+        
+        <div id="loading" class="loading">正在加载数据...</div>
+    </div>
+    
+    <script>
+        let chart = null;
+        let autoRefreshInterval = null;
+        
+        async function loadChart() {
+            const hours = document.getElementById('hoursSelect').value;
+            
+            try {
+                document.getElementById('loading').style.display = 'block';
+                
+                const response = await fetch(`/api/sar-slope/bias-stats?hours=${hours}`);
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || '加载数据失败');
+                }
+                
+                document.getElementById('loading').style.display = 'none';
+                
+                if (result.count === 0) {
+                    alert('暂无数据，请等待系统开始采集数据（每5分钟一次）');
+                    return;
+                }
+                
+                // 更新统计信息
+                const latestData = result.data[result.data.length - 1];
+                document.getElementById('currentBullish').textContent = latestData.bullish_count;
+                document.getElementById('currentBearish').textContent = latestData.bearish_count;
+                document.getElementById('avgBullish').textContent = latestData.avg_bullish_ratio.toFixed(1) + '%';
+                document.getElementById('avgBearish').textContent = latestData.avg_bearish_ratio.toFixed(1) + '%';
+                document.getElementById('dataCount').textContent = result.count;
+                document.getElementById('updateTime').textContent = latestData.timestamp.substring(11, 16);
+                document.getElementById('stats').style.display = 'grid';
+                
+                // 准备图表数据
+                const labels = result.data.map(d => {
+                    const time = new Date(d.timestamp_iso);
+                    return time.toLocaleString('zh-CN', {
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                });
+                
+                const bullishData = result.data.map(d => d.bullish_count);
+                const bearishData = result.data.map(d => d.bearish_count);
+                
+                // 创建或更新图表
+                const ctx = document.getElementById('biasChart').getContext('2d');
+                
+                if (chart) {
+                    chart.destroy();
+                }
+                
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: '偏多占比 > 80% 币种数',
+                                data: bullishData,
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                borderWidth: 3,
+                                tension: 0.3,
+                                pointRadius: 4,
+                                pointHoverRadius: 6,
+                                fill: true
+                            },
+                            {
+                                label: '偏空占比 > 80% 币种数',
+                                data: bearishData,
+                                borderColor: '#ef4444',
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                borderWidth: 3,
+                                tension: 0.3,
+                                pointRadius: 4,
+                                pointHoverRadius: 6,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        },
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: '#fff',
+                                    font: {
+                                        size: 14
+                                    }
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: `SAR偏向统计趋势 - ${hours}小时`,
+                                color: '#fff',
+                                font: {
+                                    size: 18
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(42, 45, 71, 0.95)',
+                                titleColor: '#00d4ff',
+                                bodyColor: '#fff',
+                                borderColor: 'rgba(59, 125, 255, 0.5)',
+                                borderWidth: 1,
+                                callbacks: {
+                                    afterLabel: function(context) {
+                                        const dataIndex = context.dataIndex;
+                                        const record = result.data[dataIndex];
+                                        return [
+                                            `平均偏多: ${record.avg_bullish_ratio.toFixed(1)}%`,
+                                            `平均偏空: ${record.avg_bearish_ratio.toFixed(1)}%`
+                                        ];
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    color: '#fff',
+                                    stepSize: 1
+                                },
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                title: {
+                                    display: true,
+                                    text: '币种数量',
+                                    color: '#fff'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: '#fff',
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                },
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                }
+                            }
+                        }
+                    }
+                });
+                
+            } catch (error) {
+                console.error('加载失败:', error);
+                document.getElementById('loading').style.display = 'none';
+                alert('加载数据失败: ' + error.message);
+            }
+        }
+        
+        // 自动刷新
+        function setupAutoRefresh() {
+            const checkbox = document.getElementById('autoRefresh');
+            
+            if (checkbox.checked) {
+                autoRefreshInterval = setInterval(() => {
+                    console.log('自动刷新...');
+                    loadChart();
+                }, 5 * 60 * 1000); // 5分钟
+            } else {
+                if (autoRefreshInterval) {
+                    clearInterval(autoRefreshInterval);
+                    autoRefreshInterval = null;
+                }
+            }
+        }
+        
+        document.getElementById('autoRefresh').addEventListener('change', setupAutoRefresh);
+        document.getElementById('hoursSelect').addEventListener('change', loadChart);
+        
+        // 初始加载
+        loadChart();
+        setupAutoRefresh();
+    </script>
+</body>
+</html>

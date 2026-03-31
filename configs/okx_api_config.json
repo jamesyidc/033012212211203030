@@ -1,0 +1,9 @@
+{
+  "api_key": "d6b272da-b59e-4ca3-97bd-663102f981b3",
+  "secret_key": "5D76ACDE6D74CF07842661385E12C61E",
+  "passphrase": "Tencent@123",
+  "base_url": "https://www.okx.com",
+  "account_name": "主账户",
+  "updated_at": "2026-03-22T19:00:00Z",
+  "note": "主账号API配置 - 用于OKX交易下单"
+}

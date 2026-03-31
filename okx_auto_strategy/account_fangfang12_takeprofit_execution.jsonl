@@ -1,0 +1,4 @@
+{"timestamp": "2026-02-23T02:13:12.114903", "time": "2026-02-23 02:13:12", "account_id": "account_fangfang12", "takeprofit_type": "rsi", "allowed": false, "reason": "用户已暂停所有策略", "rsi_value": 1850, "profit_value": null}
+{"timestamp": "2026-02-19T06:40:51.953824", "time": "2026-02-19 06:40:51", "account_id": "account_fangfang12", "takeprofit_type": "rsi", "allowed": false, "reason": "RSI止盈已触发并执行，RSI=2074.95", "rsi_value": 2074.95, "profit_value": null}
+{"timestamp": "2026-02-19T08:24:59.561817", "time": "2026-02-19 08:24:59", "account_id": "account_fangfang12", "takeprofit_type": "rsi", "allowed": true, "reason": "开启RSI止盈监控，阈值1850", "rsi_value": 1850, "profit_value": null}
+{"timestamp": "2026-02-19T14:53:00.432479", "time": "2026-02-19 14:53:00", "account_id": "account_fangfang12", "takeprofit_type": "rsi", "allowed": false, "reason": "RSI止盈已触发并执行，RSI=1831.88", "rsi_value": 1831.88, "profit_value": null}

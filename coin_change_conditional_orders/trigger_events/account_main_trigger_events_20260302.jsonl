@@ -1,0 +1,1 @@
+{"timestamp": "2026-03-02 15:08:25", "account_id": "account_main", "order_id": "cond_order_e789273d", "order_type": "open_short", "trigger_condition": "above", "trigger_value": 50.0, "actual_value": 51.77, "target_strategy_code": "STG_SHORT_TOP8", "success": true, "message": "策略执行成功（模拟）"}

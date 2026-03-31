@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>{{ symbol }} K线图 [{{ cache_buster }}]</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0e1117;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        /* 导航栏样式 */
+        .nav-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #1a1d29;
+            border-radius: 8px;
+        }
+        .nav-btn {
+            padding: 10px 20px;
+            background: #2d3348;
+            border: none;
+            color: #e0e0e0;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        .nav-btn:hover {
+            background: #00d4aa;
+            color: #0e1117;
+            transform: translateY(-2px);
+        }
+        .nav-btn-primary {
+            background: #00d4aa;
+            color: #0e1117;
+            font-weight: bold;
+        }
+        .nav-btn-primary:hover {
+            background: #00e5ba;
+        }
+        
+        h1 { color: #00d4aa; margin-bottom: 20px; font-size: 24px; }
+        #kline-chart { 
+            width: 100%; 
+            height: 600px; 
+            background: #1a1d29;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+            color: #00d4aa;
+        }
+        .error {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+            color: #ff4444;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            background: #2d3348;
+            border: none;
+            color: #e0e0e0;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .tab-btn.active {
+            background: #00d4aa;
+            color: #0e1117;
+            font-weight: bold;
+        }
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #1a1d29;
+            border-radius: 8px;
+        }
+        .page-btn {
+            padding: 10px 20px;
+            background: #2d3348;
+            border: none;
+            color: #e0e0e0;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .page-btn:hover {
+            background: #3d4358;
+        }
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .page-info {
+            color: #00d4aa;
+            font-size: 14px;
+            font-weight: bold;
+        }
+    
+        .indicator-card {
+            background: #2d3348;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 3px solid #00d4aa;
+        }
+        .indicator-card h4 {
+            color: #00d4aa;
+            font-size: 14px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .indicator-card .value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+        .indicator-card .label {
+            font-size: 12px;
+            color: #888;
+        }
+        .indicator-card.bullish { border-left-color: #00d4aa; }
+        .indicator-card.bearish { border-left-color: #ff4444; }
+</style>
+</head>
+<body>
+    <div class="container">
+        <!-- 导航栏 -->
+        <div class="nav-bar">
+            <button class="nav-btn" onclick="goBack()">
+                <span>◀</span>
+                <span>返回上一页</span>
+            </button>
+            <button class="nav-btn nav-btn-primary" onclick="goHome()">
+                <span>🏠</span>
+                <span>返回首页</span>
+            </button>
+        </div>
+        
+        <h1>{{ symbol }} - K线图技术分析</h1>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTimeframe('5m')">5分钟</button>
+            <button class="tab-btn" onclick="switchTimeframe('1h')">1小时</button>
+        </div>
+        
+        <!-- 翻页控制 -->
+        <div class="pagination" id="pagination" style="display: none;">
+            <button class="page-btn" id="prevPageBtn" onclick="prevPage()" disabled>◀ 上一页</button>
+            <div class="page-info" id="pageInfo">第1页 / 共1页</div>
+            <button class="page-btn" id="nextPageBtn" onclick="nextPage()" disabled>下一页 ▶</button>
+        </div>
+        
+        <div id="loading" class="loading">正在加载数据...</div>
+        <div id="kline-chart"></div>
+
+        
+        <!-- 技术指标数据面板 -->
+        <div id="indicator-panel" style="display: none; margin-top: 20px; background: #1a1d29; border-radius: 8px; padding: 20px;">
+            <h3 style="color: #00d4aa; margin-bottom: 15px; font-size: 18px;">📊 当前K线技术指标</h3>
+            <div id="indicator-data" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                <!-- Indicator data will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const symbol = '{{ symbol }}';
+        let klineChart = null;
+        let currentTimeframe = '5m';
+        
+        // 分页相关变量
+        let allData = []; // 存储所有数据
+        let currentPage = 1;
+        let itemsPerPage = 144; // 每页144条数据（12小时 × 12条/小时）
+        let totalPages = 1;
+        
+        // 全局标记点（基于全部10天数据计算）
+        let globalMarkPoints = [];
+        
+        // 导航函数
+        function goBack() {
+            window.location.href = 'https://5000-iz6uddj6rs3xe48ilsyqq-2e1b9533.sandbox.novita.ai/kline-indicators';
+        }
+        
+        function goHome() {
+            window.location.href = '/';
+        }
+        
+        // 初始化图表
+        function initChart() {
+            const chartDom = document.getElementById('kline-chart');
+            if (chartDom && typeof echarts !== 'undefined') {
+                klineChart = echarts.init(chartDom);
+                console.log('✅ 图表初始化成功');
+                return true;
+            }
+            console.error('❌ 图表初始化失败');
+            return false;
+        }
+        
+        // 加载数据
+        async function loadData(timeframe) {
+            currentTimeframe = timeframe;
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+            
+            try {
+                console.log('📊 开始加载数据:', symbol, timeframe);
+                
+                const response = await fetch(`/api/symbol/${symbol}/kline?timeframe=${timeframe}&_=${Date.now()}`);
+                const result = await response.json();
+                
+                if (!result.data || result.data.length === 0) {
+                    throw new Error('没有数据');
+                }
+                
+                console.log('✅ 数据加载成功，共', result.data.length, '条');
+                
+                // 保存所有数据并计算总页数
+                allData = result.data;
+                
+                // 计算从后往前的分页，确保最后一页是完整的144条
+                const remainder = allData.length % itemsPerPage;
+                if (remainder === 0) {
+                    // 数据量正好是144的倍数
+                    totalPages = allData.length / itemsPerPage;
+                } else {
+                    // 有余数，总页数向上取整
+                    totalPages = Math.ceil(allData.length / itemsPerPage);
+                }
+                
+                currentPage = totalPages; // 默认显示最新一页（最后一页）
+                
+                console.log('📄 分页信息:', {
+                    总数据量: allData.length,
+                    每页条数: itemsPerPage,
+                    总页数: totalPages,
+                    当前页: currentPage
+                });
+                
+                // 基于全部数据计算全局标记点
+                globalMarkPoints = calculateGlobalMarkPoints(allData);
+                
+                console.log('📍 全局标记点（基于全部10天数据）:', globalMarkPoints);
+                
+                // 显示翻页控制器
+                document.getElementById('pagination').style.display = 'flex';
+                
+                // 渲染当前页
+                renderCurrentPage();
+                loading.style.display = 'none';
+                
+            } catch (error) {
+                console.error('❌ 加载数据失败:', error);
+                loading.innerHTML = `<div class="error">加载失败: ${error.message}</div>`;
+            }
+        }
+        
+        // 从数据库标记中提取全局标记点
+        function calculateGlobalMarkPoints(data) {
+            const markPoints = [];
+            
+            console.log('📊 从数据库读取标记点...');
+            
+            // 遍历所有数据，从数据库标记中提取高低点
+            for (let i = 0; i < data.length; i++) {
+                const markers = data[i].markers;
+                if (!markers) continue;
+                
+                const [open, high, low, close] = data[i].data;
+                
+                // 7天最高点
+                if (markers.is_7d_high) {
+                    markPoints.push({
+                        name: '7D最高',
+                        globalIdx: i,
+                        value: high,
+                        itemStyle: { color: '#ff4444' }
+                    });
+                }
+                
+                // 7天最低点
+                if (markers.is_7d_low) {
+                    markPoints.push({
+                        name: '7D最低',
+                        globalIdx: i,
+                        value: low,
+                        itemStyle: { color: '#00d4aa' }
+                    });
+                }
+                
+                // 48小时最高点
+                if (markers.is_48h_high) {
+                    markPoints.push({
+                        name: '48H最高',
+                        globalIdx: i,
+                        value: high,
+                        itemStyle: { color: '#ff9800' }
+                    });
+                }
+                
+                // 48小时最低点
+                if (markers.is_48h_low) {
+                    markPoints.push({
+                        name: '48H最低',
+                        globalIdx: i,
+                        value: low,
+                        itemStyle: { color: '#2196f3' }
+                    });
+                }
+            }
+            
+            console.log('📌 全局标记点详情（数据库）:', markPoints.map(m => ({
+                名称: m.name,
+                全局索引: m.globalIdx,
+                值: m.value ? m.value.toFixed(4) : 'N/A'
+            })));
+            
+            return markPoints;
+        }
+        
+        // 从数据库标记中提取窄幅震荡K线区域
+        function detectNarrowRangeKlines(data, pageStartIdx, pageEndIdx) {
+            const markers = [];
+            
+            console.log('🔶 从数据库读取窄幅震荡K线标记...');
+            
+            let consecutiveCount = 0;
+            let consecutiveStart = -1;
+            
+            // 遍历当前页的数据，从数据库标记中提取窄幅震荡区域
+            for (let i = pageStartIdx; i < pageEndIdx; i++) {
+                if (i >= data.length) break;
+                
+                const markers_db = data[i].markers;
+                const isNarrowRange = markers_db && markers_db.is_narrow_range;
+                
+                if (isNarrowRange) {
+                    if (consecutiveCount === 0) {
+                        consecutiveStart = i - pageStartIdx; // 转换为页面内索引
+                    }
+                    consecutiveCount++;
+                } else {
+                    // 连续中断，如果之前有连续的窄幅震荡（≥2根），添加标记
+                    if (consecutiveCount >= 2) {
+                        markers.push({
+                            start: consecutiveStart,
+                            end: consecutiveStart + consecutiveCount - 1,
+                            count: consecutiveCount
+                        });
+                    }
+                    consecutiveCount = 0;
+                    consecutiveStart = -1;
+                }
+            }
+            
+            // 处理最后一段连续震荡
+            if (consecutiveCount >= 2) {
+                markers.push({
+                    start: consecutiveStart,
+                    end: consecutiveStart + consecutiveCount - 1,
+                    count: consecutiveCount
+                });
+            }
+            
+            console.log('🔶 窄幅震荡K线检测（数据库）:', markers.map(m => ({
+                起始索引: m.start,
+                结束索引: m.end,
+                连续根数: m.count
+            })));
+            
+            return markers;
+        }
+        
+        // 检测组合标记：同时满足多个条件的K线
+        function detectComboMarks(data, pageStartIdx, pageEndIdx) {
+            const comboMarks = [];
+            
+            console.log('🎯 检测组合标记（高低点 + 窄幅震荡）...');
+            
+            for (let i = pageStartIdx; i < pageEndIdx; i++) {
+                if (i >= data.length) break;
+                
+                const markers = data[i].markers;
+                if (!markers) continue;
+                
+                const [open, high, low, close] = data[i].data;
+                const pageIdx = i - pageStartIdx;
+                
+                // 统计满足的条件
+                let conditions = [];
+                let isHighPoint = false;
+                let isLowPoint = false;
+                
+                if (markers.is_7d_high) {
+                    conditions.push('7天最高');
+                    isHighPoint = true;
+                }
+                if (markers.is_7d_low) {
+                    conditions.push('7天最低');
+                    isLowPoint = true;
+                }
+                if (markers.is_48h_high) {
+                    conditions.push('48小时最高');
+                    isHighPoint = true;
+                }
+                if (markers.is_48h_low) {
+                    conditions.push('48小时最低');
+                    isLowPoint = true;
+                }
+                if (markers.is_narrow_range) {
+                    conditions.push('窄幅震荡');
+                }
+                
+                // 如果同时满足≥2个条件，添加组合标记
+                if (conditions.length >= 2) {
+                    const markName = conditions.join(' + ');
+                    const markValue = isLowPoint ? low : (isHighPoint ? high : close);
+                    
+                    comboMarks.push({
+                        name: markName,
+                        coord: [pageIdx, markValue],
+                        value: markValue,
+                        conditions: conditions,
+                        itemStyle: { 
+                            color: '#FFD700',  // 金色表示组合标记
+                            borderColor: '#FFA500',
+                            borderWidth: 2
+                        },
+                        symbol: 'diamond',  // 菱形符号
+                        symbolSize: 20
+                    });
+                    
+                    console.log(`  📍 组合标记 @ 索引${i}: ${markName}, 值=${markValue.toFixed(4)}`);
+                }
+            }
+            
+            console.log(`🎯 共检测到 ${comboMarks.length} 个组合标记`);
+            return comboMarks;
+        }
+        
+        // 将全局标记点转换为当前页的坐标
+        function getPageMarkPoints(pageStartIdx, pageEndIdx) {
+            const pageMarkPoints = [];
+            
+            console.log(`🔍 检查标记点是否在当前页 [${pageStartIdx}, ${pageEndIdx}) 范围内:`);
+            
+            // 遍历全局标记点，只显示在当前页范围内的
+            for (const mark of globalMarkPoints) {
+                const inRange = mark.globalIdx >= pageStartIdx && mark.globalIdx < pageEndIdx;
+                console.log(`  - ${mark.name}: 全局索引=${mark.globalIdx}, 在范围内=${inRange}`);
+                
+                if (inRange) {
+                    // 转换为页面内的相对索引
+                    const pageIdx = mark.globalIdx - pageStartIdx;
+                    pageMarkPoints.push({
+                        name: mark.name,
+                        coord: [pageIdx, mark.value],
+                        value: mark.value,
+                        itemStyle: mark.itemStyle
+                    });
+                }
+            }
+            
+            console.log('📍 当前页标记点:', pageMarkPoints.map(m => ({
+                名称: m.name,
+                值: m.value.toFixed(4),
+                页内索引: m.coord[0]
+            })));
+            
+            return pageMarkPoints;
+        }
+        
+        // 渲染当前页数据（从后往前分页，确保最后一页完整）
+        function renderCurrentPage() {
+            let startIdx, endIdx;
+            
+            if (currentPage === totalPages) {
+                // 最后一页：取最新的144条
+                endIdx = allData.length;
+                startIdx = Math.max(0, endIdx - itemsPerPage);
+            } else {
+                // 其他页：从后往前计算
+                const itemsAfter = (totalPages - currentPage) * itemsPerPage;
+                endIdx = allData.length - itemsAfter;
+                startIdx = Math.max(0, endIdx - itemsPerPage);
+            }
+            
+            const pageData = allData.slice(startIdx, endIdx);
+            
+            console.log('📊 渲染第', currentPage, '页，数据范围:', startIdx, '-', endIdx);
+            
+            renderChart(pageData);
+            updatePagination();
+        }
+        
+        // 更新翻页按钮状态
+        function updatePagination() {
+            document.getElementById('pageInfo').textContent = `第${currentPage}页 / 共${totalPages}页`;
+            document.getElementById('prevPageBtn').disabled = (currentPage <= 1);
+            document.getElementById('nextPageBtn').disabled = (currentPage >= totalPages);
+        }
+        
+        // 上一页
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderCurrentPage();
+            }
+        }
+        
+        // 下一页
+        function nextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderCurrentPage();
+            }
+        }
+        
+        // 渲染图表
+        function renderChart(data) {
+            if (!klineChart) {
+                console.error('❌ 图表未初始化');
+                return;
+            }
+            
+            // 提取数据
+            const times = data.map(item => {
+                const date = new Date(parseInt(item.timestamp));
+                return date.toLocaleString('zh-CN', { 
+                    timeZone: 'Asia/Shanghai',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            });
+            
+            const ohlcData = data.map(item => item.data); // [open, high, low, close]
+            const volumes = data.map(item => item.volume);
+            
+            // 提取技术指标数据
+            const sarData = data.map(item => {
+                const markers = item.markers;
+                return markers && markers.sar ? markers.sar : null;
+            });
+            
+            const rsiData = data.map(item => {
+                const markers = item.markers;
+                return markers && markers.rsi_14 ? markers.rsi_14 : null;
+            });
+            
+            const bbUpperData = data.map(item => {
+                const markers = item.markers;
+                return markers && markers.bb_upper ? markers.bb_upper : null;
+            });
+            
+            const bbMiddleData = data.map(item => {
+                const markers = item.markers;
+                return markers && markers.bb_middle ? markers.bb_middle : null;
+            });
+            
+            const bbLowerData = data.map(item => {
+                const markers = item.markers;
+                return markers && markers.bb_lower ? markers.bb_lower : null;
+            });
+            
+            // 提取SAR多空标签和买点4标记
+            const sarLabels = [];
+            const buyPoint4Marks = [];
+            
+            data.forEach((item, index) => {
+                const markers = item.markers;
+                if (markers) {
+                    // SAR标签
+                    if (markers.sar_count_label) {
+                        sarLabels.push({
+                            coord: [index, item.data[1]],  // 显示在K线最高点上方
+                            value: markers.sar_count_label,
+                            position: markers.sar_position === 'bullish' ? 'top' : 'bottom'
+                        });
+                    }
+                    
+                    // 买点4标记
+                    if (markers.is_buy_point_4) {
+                        buyPoint4Marks.push({
+                            name: '买点4',
+                            coord: [index, item.data[3]],  // 显示在收盘价位置
+                            value: item.data[3],
+                            itemStyle: { color: '#FFD700' }  // 金色
+                        });
+                    }
+                }
+            });
+            
+            console.log('📊 渲染数据:', {
+                条数: data.length,
+                第一条: data[0],
+                最后一条: data[data.length - 1],
+                SAR数据: sarData.filter(v => v !== null).length,
+                RSI数据: rsiData.filter(v => v !== null).length,
+                布林带数据: bbUpperData.filter(v => v !== null).length,
+                SAR标签: sarLabels.length,
+                买点4: buyPoint4Marks.length
+            });
+            
+            // 🔍 诊断OHLC数据
+            console.log('🔍 OHLC数据诊断:', {
+                第一条OHLC: ohlcData[0],
+                最后一条OHLC: ohlcData[ohlcData.length - 1],
+                OHLC示例前3条: ohlcData.slice(0, 3),
+                数据来源: 'item.data数组'
+            });
+            
+            // 获取当前页范围（与renderCurrentPage保持一致）
+            let pageStartIdx, pageEndIdx;
+            
+            if (currentPage === totalPages) {
+                // 最后一页：取最新的144条
+                pageEndIdx = allData.length;
+                pageStartIdx = Math.max(0, pageEndIdx - itemsPerPage);
+            } else {
+                // 其他页：从后往前计算
+                const itemsAfter = (totalPages - currentPage) * itemsPerPage;
+                pageEndIdx = allData.length - itemsAfter;
+                pageStartIdx = Math.max(0, pageEndIdx - itemsPerPage);
+            }
+            
+            // 获取当前页的标记点
+            const markPoints = getPageMarkPoints(pageStartIdx, pageEndIdx);
+            
+            // 检测组合标记（高低点 + 窄幅震荡）
+            const comboMarks = detectComboMarks(allData, pageStartIdx, pageEndIdx);
+            
+            // 从数据库标记中检测窄幅震荡K线
+            const narrowRangeMarkers = detectNarrowRangeKlines(allData, pageStartIdx, pageEndIdx);
+            
+            // 配置图表
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'cross' },
+                    backgroundColor: 'rgba(26, 29, 41, 0.95)',
+                    borderColor: '#2d3348',
+                    textStyle: { color: '#e0e0e0' },
+                    formatter: function(params) {
+                        if (!params || params.length === 0) return '';
+                        
+                        const dataIndex = params[0].dataIndex;
+                        const currentData = data[dataIndex];
+                        const markers = currentData.markers || {};
+                        const ohlc = currentData.data;
+                        
+                        let html = `<div style="padding: 5px;">`;
+                        html += `<div style="margin-bottom: 8px; font-weight: bold;">${params[0].axisValue}</div>`;
+                        
+                        // K线数据
+                        html += `<div style="color: #00d4aa;">● K线</div>`;
+                        html += `<div style="margin-left: 15px; font-size: 12px;">`;
+                        html += `open: <span style="color: #fff;">${ohlc[0].toFixed(2)}</span><br>`;
+                        html += `close: <span style="color: #fff;">${ohlc[3].toFixed(2)}</span><br>`;
+                        html += `lowest: <span style="color: #fff;">${ohlc[2].toFixed(2)}</span><br>`;
+                        html += `highest: <span style="color: #fff;">${ohlc[1].toFixed(2)}</span><br>`;
+                        html += `</div>`;
+                        
+                        // SAR
+                        html += `<div style="color: #FF6B6B; margin-top: 5px;">● SAR</div>`;
+                        html += `<div style="margin-left: 15px; font-size: 12px;">`;
+                        html += markers.sar ? `${markers.sar.toFixed(4)}` : '-';
+                        html += `</div>`;
+                        
+                        // 布林带
+                        html += `<div style="color: #9C27B0; margin-top: 5px;">● 布林带上轨</div>`;
+                        html += `<div style="margin-left: 15px; font-size: 12px;">`;
+                        html += markers.bb_upper ? `${markers.bb_upper.toFixed(4)}` : '-';
+                        html += `</div>`;
+                        
+                        html += `<div style="color: #2196F3; margin-top: 5px;">● 布林带中轨</div>`;
+                        html += `<div style="margin-left: 15px; font-size: 12px;">`;
+                        html += markers.bb_middle ? `${markers.bb_middle.toFixed(4)}` : '-';
+                        html += `</div>`;
+                        
+                        html += `<div style="color: #9C27B0; margin-top: 5px;">● 布林带下轨</div>`;
+                        html += `<div style="margin-left: 15px; font-size: 12px;">`;
+                        html += markers.bb_lower ? `${markers.bb_lower.toFixed(4)}` : '-';
+                        html += `</div>`;
+                        
+                        // RSI
+                        html += `<div style="color: #FFC107; margin-top: 5px;">● RSI</div>`;
+                        html += `<div style="margin-left: 15px; font-size: 12px;">`;
+                        html += markers.rsi_14 ? `${markers.rsi_14.toFixed(2)}` : '-';
+                        html += `</div>`;
+                        
+                        // 成交量
+                        const volumeParam = params.find(p => p.seriesName === '成交量');
+                        if (volumeParam) {
+                            html += `<div style="color: #888; margin-top: 5px;">● 成交量</div>`;
+                            html += `<div style="margin-left: 15px; font-size: 12px;">`;
+                            html += `${volumeParam.value.toFixed(2)}`;
+                            html += `</div>`;
+                        }
+                        
+                        html += `</div>`;
+                        return html;
+                    }
+                },
+                legend: {
+                    data: ['K线', 'SAR', '布林上轨', '布林中轨', '布林下轨', '成交量', 'RSI'],
+                    textStyle: { color: '#888' },
+                    top: '1%'
+                },
+                grid: [
+                    { left: '5%', right: '3%', top: '10%', height: '50%' },  // K线主图
+                    { left: '5%', right: '3%', top: '65%', height: '13%' },   // 成交量
+                    { left: '5%', right: '3%', top: '82%', height: '13%' }    // RSI
+                ],
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: times,
+                        gridIndex: 0,
+                        axisLine: { lineStyle: { color: '#2d3348' } },
+                        axisLabel: { show: false }
+                    },
+                    {
+                        type: 'category',
+                        data: times,
+                        gridIndex: 1,
+                        axisLine: { lineStyle: { color: '#2d3348' } },
+                        axisLabel: { show: false }
+                    },
+                    {
+                        type: 'category',
+                        data: times,
+                        gridIndex: 2,
+                        axisLine: { lineStyle: { color: '#2d3348' } },
+                        axisLabel: { 
+                            color: '#888',
+                            rotate: 0,
+                            interval: 'auto',
+                            formatter: function(value, index) {
+                                return index % 24 === 0 ? value : '';
+                            }
+                        }
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value',
+                        gridIndex: 0,
+                        scale: true,
+                        splitLine: { lineStyle: { color: '#2d3348' } },
+                        axisLabel: { color: '#888' }
+                    },
+                    {
+                        type: 'value',
+                        gridIndex: 1,
+                        splitLine: { show: false },
+                        axisLabel: { color: '#888' }
+                    },
+                    {
+                        type: 'value',
+                        gridIndex: 2,
+                        min: 0,
+                        max: 100,
+                        splitLine: { lineStyle: { color: '#2d3348' } },
+                        axisLabel: { color: '#888' }
+                    }
+                ],
+                series: [
+                    {
+                        name: 'K线',
+                        type: 'candlestick',
+                        data: ohlcData,
+                        xAxisIndex: 0,
+                        yAxisIndex: 0,
+                        itemStyle: {
+                            color: '#00d4aa',
+                            color0: '#ff4444',
+                            borderColor: '#00d4aa',
+                            borderColor0: '#ff4444'
+                        },
+                        markPoint: {
+                            data: [...markPoints, ...buyPoint4Marks, ...comboMarks],
+                            label: {
+                                formatter: function(param) {
+                                    return param.name + '\n' + param.value.toFixed(4);
+                                },
+                                fontSize: 11
+                            }
+                        },
+                        markArea: {
+                            silent: true,
+                            data: narrowRangeMarkers.map(marker => {
+                                return [
+                                    {
+                                        name: `震荡${marker.count}根`,
+                                        xAxis: marker.start,
+                                        itemStyle: {
+                                            color: 'rgba(255, 165, 0, 0.15)'
+                                        },
+                                        label: {
+                                            show: true,
+                                            position: 'top',
+                                            formatter: `震荡${marker.count}根`,
+                                            fontSize: 10,
+                                            color: '#ff9800'
+                                        }
+                                    },
+                                    {
+                                        xAxis: marker.end
+                                    }
+                                ];
+                            })
+                        }
+                    },
+                    {
+                        name: 'SAR',
+                        type: 'scatter',
+                        data: sarData,
+                        xAxisIndex: 0,
+                        yAxisIndex: 0,
+                        symbol: 'circle',
+                        symbolSize: 4,
+                        itemStyle: {
+                            color: '#FF6B6B'
+                        }
+                    },
+                    {
+                        name: '布林上轨',
+                        type: 'line',
+                        data: bbUpperData,
+                        xAxisIndex: 0,
+                        yAxisIndex: 0,
+                        lineStyle: {
+                            color: '#9C27B0',
+                            width: 1,
+                            type: 'dashed'
+                        },
+                        symbol: 'none'
+                    },
+                    {
+                        name: '布林中轨',
+                        type: 'line',
+                        data: bbMiddleData,
+                        xAxisIndex: 0,
+                        yAxisIndex: 0,
+                        lineStyle: {
+                            color: '#2196F3',
+                            width: 1
+                        },
+                        symbol: 'none'
+                    },
+                    {
+                        name: '布林下轨',
+                        type: 'line',
+                        data: bbLowerData,
+                        xAxisIndex: 0,
+                        yAxisIndex: 0,
+                        lineStyle: {
+                            color: '#9C27B0',
+                            width: 1,
+                            type: 'dashed'
+                        },
+                        symbol: 'none'
+                    },
+                    {
+                        name: '成交量',
+                        type: 'bar',
+                        data: volumes,
+                        xAxisIndex: 1,
+                        yAxisIndex: 1,
+                        itemStyle: {
+                            color: function(params) {
+                                const dataIndex = params.dataIndex;
+                                if (dataIndex === 0) return 'rgba(0, 212, 170, 0.5)';
+                                const current = ohlcData[dataIndex];
+                                const prev = ohlcData[dataIndex - 1];
+                                const isUp = current[3] >= prev[3];
+                                return isUp ? 'rgba(0, 212, 170, 0.5)' : 'rgba(255, 68, 68, 0.5)';
+                            }
+                        }
+                    },
+                    {
+                        name: 'RSI',
+                        type: 'line',
+                        data: rsiData,
+                        xAxisIndex: 2,
+                        yAxisIndex: 2,
+                        lineStyle: {
+                            color: '#FFC107',
+                            width: 2
+                        },
+                        symbol: 'none',
+                        markLine: {
+                            silent: true,
+                            data: [
+                                { yAxis: 70, lineStyle: { color: '#ff4444', type: 'dashed' } },
+                                { yAxis: 30, lineStyle: { color: '#00d4aa', type: 'dashed' } }
+                            ]
+                        }
+                    }
+                ]
+            };
+            
+            klineChart.setOption(option);
+            
+            // Show indicator panel for the latest candle
+            // Show indicator panel for the latest candle in current view
+            if (data && data.length > 0) {
+                updateIndicatorPanel(data.length - 1, data);
+            }
+
+            console.log('✅ 图表渲染成功');
+        }
+        
+        // 切换时间周期
+        function switchTimeframe(timeframe) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            loadData(timeframe);
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('load', function() {
+            console.log('🚀 页面加载完成，开始初始化');
+            
+            setTimeout(function() {
+                if (initChart()) {
+                    loadData('5m');
+                } else {
+                    document.getElementById('loading').innerHTML = '<div class="error">图表初始化失败</div>';
+                }
+            }, 300);
+        });
+    
+        
+        // Update indicator data panel
+        function updateIndicatorPanel(dataIndex, dataArray) {
+            const indicatorPanel = document.getElementById('indicator-panel');
+            const indicatorData = document.getElementById('indicator-data');
+            
+            if (!dataArray || dataIndex >= dataArray.length) {
+                indicatorPanel.style.display = 'none';
+                return;
+            }
+            
+            const currentData = dataArray[dataIndex];
+            const markers = currentData.markers || {};
+            const ohlc = currentData.data;
+            
+            // Format timestamp
+            const date = new Date(parseInt(currentData.timestamp));
+            const timeStr = date.toLocaleString('zh-CN', { 
+                timeZone: 'Asia/Shanghai',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            // Build HTML for indicator cards
+            let html = `
+                <div class="indicator-card">
+                    <h4>🕐 时间</h4>
+                    <div class="value">${timeStr}</div>
+                </div>
+                
+                <div class="indicator-card">
+                    <h4>📈 K线</h4>
+                    <div class="value">${ohlc[3].toFixed(2)}</div>
+                    <div class="label">开: ${ohlc[0].toFixed(2)} | 高: ${ohlc[1].toFixed(2)}<br>低: ${ohlc[2].toFixed(2)} | 收: ${ohlc[3].toFixed(2)}</div>
+                </div>
+                
+                <div class="indicator-card ${markers.sar_position === 'bullish' ? 'bullish' : 'bearish'}">
+                    <h4>🎯 SAR</h4>
+                    <div class="value">${markers.sar ? markers.sar.toFixed(4) : '-'}</div>
+                    <div class="label">
+                        持仓: ${markers.sar_position === 'bullish' ? '多头 (bullish)' : markers.sar_position === 'bearish' ? '空头 (bearish)' : '-'}<br>
+                        标签: ${markers.sar_count_label || '-'}
+                    </div>
+                </div>
+                
+                <div class="indicator-card">
+                    <h4>📊 RSI (14)</h4>
+                    <div class="value">${markers.rsi_14 ? markers.rsi_14.toFixed(2) : '-'}</div>
+                    <div class="label">
+                        ${markers.rsi_14 ? (markers.rsi_14 > 70 ? '超买区' : markers.rsi_14 < 30 ? '超卖区' : '正常区') : '-'}
+                    </div>
+                </div>
+                
+                <div class="indicator-card">
+                    <h4>📉 布林带</h4>
+                    <div class="value">${markers.bb_middle ? markers.bb_middle.toFixed(2) : '-'}</div>
+                    <div class="label">
+                        上轨: ${markers.bb_upper ? markers.bb_upper.toFixed(2) : '-'}<br>
+                        下轨: ${markers.bb_lower ? markers.bb_lower.toFixed(2) : '-'}
+                    </div>
+                </div>
+                
+                <div class="indicator-card">
+                    <h4>🎨 象限</h4>
+                    <div class="value">${markers.sar_quadrant || '-'}</div>
+                    <div class="label">SAR象限位置</div>
+                </div>
+            `;
+            
+            // Add buy point 4 indicator if present
+            if (markers.is_buy_point_4) {
+                html += `
+                <div class="indicator-card bullish">
+                    <h4>⭐ 买点4</h4>
+                    <div class="value">✓ 检测到</div>
+                    <div class="label">满足买点4条件</div>
+                </div>
+                `;
+            }
+            
+            // Add combo marks indicator (high/low + narrow range)
+            const comboConditions = [];
+            if (markers.is_7d_high) comboConditions.push('7天最高');
+            if (markers.is_7d_low) comboConditions.push('7天最低');
+            if (markers.is_48h_high) comboConditions.push('48小时最高');
+            if (markers.is_48h_low) comboConditions.push('48小时最低');
+            if (markers.is_narrow_range) comboConditions.push('窄幅震荡');
+            
+            if (comboConditions.length >= 2) {
+                const comboLabel = comboConditions.join(' + ');
+                html += `
+                <div class="indicator-card" style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #000;">
+                    <h4>💎 组合标记</h4>
+                    <div class="value">${comboConditions.length} 个条件</div>
+                    <div class="label" style="color: #333;">${comboLabel}</div>
+                </div>
+                `;
+            }
+            
+            // Add narrow range details
+            if (markers.is_narrow_range) {
+                const changePercent = markers.change_percent ? markers.change_percent.toFixed(3) : '-';
+                const rangePercent = markers.range_percent ? markers.range_percent.toFixed(3) : '-';
+                const consecutive = markers.consecutive_count || 0;
+                
+                html += `
+                <div class="indicator-card" style="border: 2px solid #FFA500;">
+                    <h4>🔶 窄幅震荡</h4>
+                    <div class="value">连续 ${consecutive} 根</div>
+                    <div class="label">
+                        涨跌: ${changePercent}%<br>
+                        震荡: ${rangePercent}%
+                    </div>
+                </div>
+                `;
+            }
+            
+            indicatorData.innerHTML = html;
+            indicatorPanel.style.display = 'block';
+        }
+</script>
+</body>
+</html>

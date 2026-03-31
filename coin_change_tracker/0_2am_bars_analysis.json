@@ -1,0 +1,2022 @@
+{
+  "analysis_time": "2026-02-25 01:49:20",
+  "period": "2026-02-01 to 2026-02-24",
+  "total_days": 24,
+  "total_bars": 288,
+  "color_distribution": {
+    "green": {
+      "count": 92,
+      "percentage": 31.94,
+      "description": "上涨>55%"
+    },
+    "red": {
+      "count": 128,
+      "percentage": 44.44,
+      "description": "上涨<45%"
+    },
+    "yellow": {
+      "count": 7,
+      "percentage": 2.43,
+      "description": "45%≤上涨≤55%"
+    },
+    "blank": {
+      "count": 61,
+      "percentage": 21.18,
+      "description": "上涨=0%"
+    }
+  },
+  "daily_results": [
+    {
+      "date": "20260201",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        }
+      ],
+      "color_count": {
+        "green": 0,
+        "red": 0,
+        "yellow": 0,
+        "blank": 12
+      }
+    },
+    {
+      "date": "20260202",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 21.11,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 26.67,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 34.07,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 43.7,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 15.93,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 18.89,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 35.19,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 32.92,
+          "color": "red",
+          "samples": 9
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 10.74,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 6.67,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 8.52,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 20.37,
+          "color": "red",
+          "samples": 10
+        }
+      ],
+      "color_count": {
+        "green": 0,
+        "red": 12,
+        "yellow": 0,
+        "blank": 0
+      }
+    },
+    {
+      "date": "20260203",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        }
+      ],
+      "color_count": {
+        "green": 0,
+        "red": 0,
+        "yellow": 0,
+        "blank": 12
+      }
+    },
+    {
+      "date": "20260204",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 12.59,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 7.41,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 8.15,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 11.11,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 11.11,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 9.63,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 9.63,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 8.15,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 8.52,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 10.0,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 4.07,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 4.44,
+          "color": "red",
+          "samples": 10
+        }
+      ],
+      "color_count": {
+        "green": 0,
+        "red": 12,
+        "yellow": 0,
+        "blank": 0
+      }
+    },
+    {
+      "date": "20260205",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 39.26,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 39.73,
+          "color": "red",
+          "samples": 11
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 10.37,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 8.52,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 0.0,
+          "color": "blank",
+          "samples": 10
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 15.93,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 5.19,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 17.78,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 5.93,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 5.93,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 5.19,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 8.52,
+          "color": "red",
+          "samples": 10
+        }
+      ],
+      "color_count": {
+        "green": 0,
+        "red": 11,
+        "yellow": 0,
+        "blank": 1
+      }
+    },
+    {
+      "date": "20260206",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 14.07,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 31.11,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 80.74,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 92.96,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 64.07,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 84.44,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 51.48,
+          "color": "yellow",
+          "samples": 10
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 9.63,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 24.44,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 11.48,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 12.59,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 2.96,
+          "color": "red",
+          "samples": 10
+        }
+      ],
+      "color_count": {
+        "green": 4,
+        "red": 7,
+        "yellow": 1,
+        "blank": 0
+      }
+    },
+    {
+      "date": "20260207",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 71.11,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 100.0,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 100.0,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 99.63,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 96.3,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 96.3,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 96.3,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 96.67,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 96.3,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 97.41,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 96.3,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 96.3,
+          "color": "green",
+          "samples": 10
+        }
+      ],
+      "color_count": {
+        "green": 12,
+        "red": 0,
+        "yellow": 0,
+        "blank": 0
+      }
+    },
+    {
+      "date": "20260208",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 73.7,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 93.7,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 88.15,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 88.52,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 86.3,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 78.89,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 70.74,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 57.41,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 81.48,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 84.44,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 94.81,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 91.11,
+          "color": "green",
+          "samples": 10
+        }
+      ],
+      "color_count": {
+        "green": 12,
+        "red": 0,
+        "yellow": 0,
+        "blank": 0
+      }
+    },
+    {
+      "date": "20260209",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 47.41,
+          "color": "yellow",
+          "samples": 10
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 30.74,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 61.85,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 16.3,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 3.7,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 0.74,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 0.0,
+          "color": "blank",
+          "samples": 10
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 2.59,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 0.0,
+          "color": "blank",
+          "samples": 10
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 1.11,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 3.33,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 3.33,
+          "color": "red",
+          "samples": 10
+        }
+      ],
+      "color_count": {
+        "green": 1,
+        "red": 8,
+        "yellow": 1,
+        "blank": 2
+      }
+    },
+    {
+      "date": "20260210",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 12.96,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 2.59,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 15.56,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 25.56,
+          "color": "red",
+          "samples": 10
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 71.11,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 98.89,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 93.7,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 81.48,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 78.52,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 94.81,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 100.0,
+          "color": "green",
+          "samples": 10
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 100.0,
+          "color": "green",
+          "samples": 10
+        }
+      ],
+      "color_count": {
+        "green": 8,
+        "red": 4,
+        "yellow": 0,
+        "blank": 0
+      }
+    },
+    {
+      "date": "20260211",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        }
+      ],
+      "color_count": {
+        "green": 0,
+        "red": 0,
+        "yellow": 0,
+        "blank": 12
+      }
+    },
+    {
+      "date": "20260212",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 76.85,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 99.59,
+          "color": "green",
+          "samples": 9
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 98.61,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 76.54,
+          "color": "green",
+          "samples": 9
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 61.11,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 32.1,
+          "color": "red",
+          "samples": 9
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 24.07,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 44.44,
+          "color": "red",
+          "samples": 9
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 88.43,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 93.83,
+          "color": "green",
+          "samples": 9
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 92.13,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 92.18,
+          "color": "green",
+          "samples": 9
+        }
+      ],
+      "color_count": {
+        "green": 9,
+        "red": 3,
+        "yellow": 0,
+        "blank": 0
+      }
+    },
+    {
+      "date": "20260213",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 33.8,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 0.0,
+          "color": "blank",
+          "samples": 9
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 0.0,
+          "color": "blank",
+          "samples": 8
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 0.0,
+          "color": "blank",
+          "samples": 8
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 2.06,
+          "color": "red",
+          "samples": 9
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 0.0,
+          "color": "blank",
+          "samples": 8
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 0.0,
+          "color": "blank",
+          "samples": 9
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 0.0,
+          "color": "blank",
+          "samples": 8
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 4.94,
+          "color": "red",
+          "samples": 9
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 11.11,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 10.3,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 5.35,
+          "color": "red",
+          "samples": 9
+        }
+      ],
+      "color_count": {
+        "green": 0,
+        "red": 6,
+        "yellow": 0,
+        "blank": 6
+      }
+    },
+    {
+      "date": "20260214",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 61.57,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 91.67,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 95.44,
+          "color": "green",
+          "samples": 9
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 96.3,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 96.28,
+          "color": "green",
+          "samples": 9
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 96.28,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 92.13,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 93.38,
+          "color": "green",
+          "samples": 9
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 95.83,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 96.3,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 96.3,
+          "color": "green",
+          "samples": 9
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 96.3,
+          "color": "green",
+          "samples": 8
+        }
+      ],
+      "color_count": {
+        "green": 12,
+        "red": 0,
+        "yellow": 0,
+        "blank": 0
+      }
+    },
+    {
+      "date": "20260215",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 17.28,
+          "color": "red",
+          "samples": 9
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 23.15,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 5.76,
+          "color": "red",
+          "samples": 9
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 8.64,
+          "color": "red",
+          "samples": 9
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 43.06,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 77.78,
+          "color": "green",
+          "samples": 9
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 71.3,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 87.24,
+          "color": "green",
+          "samples": 9
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 92.59,
+          "color": "green",
+          "samples": 7
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 75.93,
+          "color": "green",
+          "samples": 2
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 64.44,
+          "color": "green",
+          "samples": 5
+        }
+      ],
+      "color_count": {
+        "green": 6,
+        "red": 5,
+        "yellow": 0,
+        "blank": 1
+      }
+    },
+    {
+      "date": "20260216",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 4.12,
+          "color": "red",
+          "samples": 9
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 12.04,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 20.99,
+          "color": "red",
+          "samples": 9
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 14.81,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 11.11,
+          "color": "red",
+          "samples": 9
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 18.52,
+          "color": "red",
+          "samples": 9
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 32.87,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 21.81,
+          "color": "red",
+          "samples": 9
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 15.28,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 12.35,
+          "color": "red",
+          "samples": 9
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 4.53,
+          "color": "red",
+          "samples": 9
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 0.0,
+          "color": "blank",
+          "samples": 8
+        }
+      ],
+      "color_count": {
+        "green": 0,
+        "red": 11,
+        "yellow": 0,
+        "blank": 1
+      }
+    },
+    {
+      "date": "20260217",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 84.72,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 99.18,
+          "color": "green",
+          "samples": 9
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 100.0,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 93.83,
+          "color": "green",
+          "samples": 9
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 94.44,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 96.3,
+          "color": "green",
+          "samples": 9
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 97.53,
+          "color": "green",
+          "samples": 9
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 93.06,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 97.69,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 100.0,
+          "color": "green",
+          "samples": 9
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 100.0,
+          "color": "green",
+          "samples": 9
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 100.0,
+          "color": "green",
+          "samples": 8
+        }
+      ],
+      "color_count": {
+        "green": 12,
+        "red": 0,
+        "yellow": 0,
+        "blank": 0
+      }
+    },
+    {
+      "date": "20260218",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 64.2,
+          "color": "green",
+          "samples": 3
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 89.71,
+          "color": "green",
+          "samples": 9
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 91.67,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 95.06,
+          "color": "green",
+          "samples": 9
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 90.28,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 82.72,
+          "color": "green",
+          "samples": 9
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 39.35,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 62.55,
+          "color": "green",
+          "samples": 9
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 46.09,
+          "color": "yellow",
+          "samples": 9
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 15.74,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 17.7,
+          "color": "red",
+          "samples": 9
+        }
+      ],
+      "color_count": {
+        "green": 7,
+        "red": 3,
+        "yellow": 1,
+        "blank": 1
+      }
+    },
+    {
+      "date": "20260219",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 8.99,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 0.0,
+          "color": "blank",
+          "samples": 8
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 2.47,
+          "color": "red",
+          "samples": 9
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 3.7,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 5.56,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 5.56,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 13.89,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 11.11,
+          "color": "red",
+          "samples": 9
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 8.8,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 7.41,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 7.41,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 5.56,
+          "color": "red",
+          "samples": 8
+        }
+      ],
+      "color_count": {
+        "green": 0,
+        "red": 11,
+        "yellow": 0,
+        "blank": 1
+      }
+    },
+    {
+      "date": "20260220",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 6.02,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 21.79,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 26.34,
+          "color": "red",
+          "samples": 9
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 60.19,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 62.5,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 31.69,
+          "color": "red",
+          "samples": 9
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 35.19,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 80.09,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 92.59,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 70.78,
+          "color": "green",
+          "samples": 9
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 63.43,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 22.22,
+          "color": "red",
+          "samples": 8
+        }
+      ],
+      "color_count": {
+        "green": 6,
+        "red": 6,
+        "yellow": 0,
+        "blank": 0
+      }
+    },
+    {
+      "date": "20260221",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 86.11,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 73.02,
+          "color": "green",
+          "samples": 7
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 65.28,
+          "color": "green",
+          "samples": 8
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 25.93,
+          "color": "red",
+          "samples": 7
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 17.13,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 46.56,
+          "color": "yellow",
+          "samples": 7
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 39.35,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 6.35,
+          "color": "red",
+          "samples": 7
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 4.63,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 7.41,
+          "color": "red",
+          "samples": 7
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 8.47,
+          "color": "red",
+          "samples": 7
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 50.26,
+          "color": "yellow",
+          "samples": 7
+        }
+      ],
+      "color_count": {
+        "green": 3,
+        "red": 7,
+        "yellow": 2,
+        "blank": 0
+      }
+    },
+    {
+      "date": "20260222",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 10.19,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 11.11,
+          "color": "red",
+          "samples": 7
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 10.19,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 7.41,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 12.96,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 12.96,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 10.19,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 8.33,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 9.72,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 10.19,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 20.83,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 21.16,
+          "color": "red",
+          "samples": 7
+        }
+      ],
+      "color_count": {
+        "green": 0,
+        "red": 12,
+        "yellow": 0,
+        "blank": 0
+      }
+    },
+    {
+      "date": "20260223",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 20.37,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 12.96,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 21.16,
+          "color": "red",
+          "samples": 7
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 21.76,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 33.8,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 53.7,
+          "color": "yellow",
+          "samples": 8
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 52.78,
+          "color": "yellow",
+          "samples": 8
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 34.26,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 27.31,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 10.65,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 7.41,
+          "color": "red",
+          "samples": 8
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 8.47,
+          "color": "red",
+          "samples": 7
+        }
+      ],
+      "color_count": {
+        "green": 0,
+        "red": 10,
+        "yellow": 2,
+        "blank": 0
+      }
+    },
+    {
+      "date": "20260224",
+      "bars": [
+        {
+          "interval": "00:00-00:10",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "00:10-00:20",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "00:20-00:30",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "00:30-00:40",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "00:40-00:50",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "00:50-01:00",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:00-01:10",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:10-01:20",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:20-01:30",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:30-01:40",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:40-01:50",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        },
+        {
+          "interval": "01:50-02:00",
+          "up_ratio": 0,
+          "color": "blank",
+          "samples": 0
+        }
+      ],
+      "color_count": {
+        "green": 0,
+        "red": 0,
+        "yellow": 0,
+        "blank": 12
+      }
+    }
+  ]
+}

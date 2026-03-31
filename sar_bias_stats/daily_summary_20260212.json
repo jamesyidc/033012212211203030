@@ -1,0 +1,27 @@
+{
+  "date": "2026-02-12",
+  "total_bullish": 89,
+  "total_bearish": 9,
+  "total_points": 192,
+  "unique_bullish_symbols": [
+    "CFX",
+    "CRO",
+    "CRV",
+    "DOGE",
+    "DOT",
+    "LDO",
+    "LINK",
+    "NEAR",
+    "SUI",
+    "TAO",
+    "TON",
+    "XLM"
+  ],
+  "unique_bearish_symbols": [
+    "CFX",
+    "NEAR"
+  ],
+  "unique_bullish_count": 12,
+  "unique_bearish_count": 2,
+  "generated_at": "2026-02-28 22:15:29"
+}

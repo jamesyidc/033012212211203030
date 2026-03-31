@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>测试页面 - 基本功能</title>
+</head>
+<body style="padding: 20px; font-family: Arial;">
+    <h1>🔍 页面测试</h1>
+    <div id="test-results"></div>
+    
+    <script>
+        const results = [];
+        const testDiv = document.getElementById('test-results');
+        
+        // 测试1: JavaScript基础功能
+        try {
+            results.push('✅ JavaScript运行正常');
+        } catch(e) {
+            results.push('❌ JavaScript错误: ' + e.message);
+        }
+        
+        // 测试2: Fetch API
+        fetch('/api/latest')
+            .then(r => r.json())
+            .then(data => {
+                results.push('✅ Fetch API正常，获取到数据');
+                results.push('📊 计次数据: ' + JSON.stringify(data).substring(0, 100));
+                updateResults();
+            })
+            .catch(e => {
+                results.push('❌ Fetch失败: ' + e.message);
+                updateResults();
+            });
+        
+        // 测试3: Promise
+        Promise.resolve('test').then(() => {
+            results.push('✅ Promise正常');
+            updateResults();
+        });
+        
+        function updateResults() {
+            testDiv.innerHTML = results.map(r => '<p>' + r + '</p>').join('');
+        }
+        
+        updateResults();
+    </script>
+</body>
+</html>

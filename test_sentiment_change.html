@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2小时多空增量统计测试</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6 text-center">2小时内看多/看空增加统计测试</h1>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">API测试结果</h2>
+            <div id="apiResult" class="bg-gray-50 p-4 rounded font-mono text-sm">
+                正在加载...
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-bold mb-4">卡片预览</h2>
+            <div class="bg-white rounded-lg shadow-lg p-6 border-l-4 border-teal-500 max-w-sm mx-auto">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-gray-600 font-medium text-sm">2小时多空增量</span>
+                    <i class="text-teal-600">🔄</i>
+                </div>
+                <div class="grid grid-cols-2 gap-2 mt-3">
+                    <div class="text-center">
+                        <div class="text-xs text-gray-500 mb-1">看多增加</div>
+                        <div id="longIncrease" class="text-xl font-bold text-green-600">-</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-xs text-gray-500 mb-1">看空增加</div>
+                        <div id="shortIncrease" class="text-xl font-bold text-red-600">-</div>
+                    </div>
+                </div>
+                <div class="text-xs text-gray-400 mt-2 text-center">
+                    统计窗口：最近2小时
+                </div>
+                <div class="text-xs text-gray-400 mt-1 text-center">
+                    ⏰ <span id="updateTime">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        async function loadData() {
+            try {
+                const response = await fetch('/api/coin-change-tracker/sentiment-change-stats');
+                const data = await response.json();
+                
+                // 显示API结果
+                document.getElementById('apiResult').textContent = JSON.stringify(data, null, 2);
+                
+                // 更新卡片数据
+                if (data.success) {
+                    document.getElementById('longIncrease').textContent = data.long_increase;
+                    document.getElementById('shortIncrease').textContent = data.short_increase;
+                    document.getElementById('updateTime').textContent = data.update_time;
+                }
+            } catch (error) {
+                document.getElementById('apiResult').textContent = 'Error: ' + error.message;
+            }
+        }
+        
+        // 页面加载时立即获取数据
+        loadData();
+        
+        // 每30秒刷新一次
+        setInterval(loadData, 30000);
+    </script>
+</body>
+</html>

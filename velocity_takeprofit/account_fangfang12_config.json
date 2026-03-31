@@ -1,0 +1,9 @@
+{
+  "long_permission": true,
+  "short_permission": true,
+  "last_check_time": null,
+  "long_enabled": true,
+  "short_enabled": false,
+  "max_velocity_threshold": 15,
+  "min_velocity_threshold": -15
+}

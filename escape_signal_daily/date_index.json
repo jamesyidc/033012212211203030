@@ -1,0 +1,277 @@
+{
+  "version": "2.0",
+  "updated_at": "2026-02-07 12:44:57",
+  "total_days": 30,
+  "dates": [
+    {
+      "date": "2026-01-23",
+      "total_records": 1234,
+      "time_range": "00:00:16 ~ 21:16:41",
+      "max_signal_24h": 26,
+      "max_signal_2h": 0,
+      "avg_signal_24h": 26.0,
+      "avg_signal_2h": 0.0
+    },
+    {
+      "date": "2026-01-22",
+      "total_records": 1342,
+      "time_range": "00:00:22 ~ 23:59:13",
+      "max_signal_24h": 26,
+      "max_signal_2h": 0,
+      "avg_signal_24h": 26.0,
+      "avg_signal_2h": 0.0
+    },
+    {
+      "date": "2026-01-21",
+      "total_records": 1383,
+      "time_range": "00:00:09 ~ 23:59:19",
+      "max_signal_24h": 26,
+      "max_signal_2h": 0,
+      "avg_signal_24h": 26.0,
+      "avg_signal_2h": 0.0
+    },
+    {
+      "date": "2026-01-20",
+      "total_records": 693,
+      "time_range": "12:04:58 ~ 23:59:07",
+      "max_signal_24h": 26,
+      "max_signal_2h": 0,
+      "avg_signal_24h": 26.0,
+      "avg_signal_2h": 0.0
+    },
+    {
+      "date": "2026-01-19",
+      "total_records": 1355,
+      "time_range": "00:00:00 ~ 23:00:57",
+      "max_signal_24h": 26,
+      "max_signal_2h": 16,
+      "avg_signal_24h": 24.556457564575645,
+      "avg_signal_2h": 2.302583025830258
+    },
+    {
+      "date": "2026-01-18",
+      "total_records": 1433,
+      "time_range": "00:00:48 ~ 23:59:00",
+      "max_signal_24h": 277,
+      "max_signal_2h": 0,
+      "avg_signal_24h": 164.5129099790649,
+      "avg_signal_2h": 0.0
+    },
+    {
+      "date": "2026-01-17",
+      "total_records": 1408,
+      "time_range": "00:00:23 ~ 23:59:48",
+      "max_signal_24h": 277,
+      "max_signal_2h": 120,
+      "avg_signal_24h": 112.0049715909091,
+      "avg_signal_2h": 23.08096590909091
+    },
+    {
+      "date": "2026-01-16",
+      "total_records": 1435,
+      "time_range": "00:00:34 ~ 23:59:23",
+      "max_signal_24h": 14,
+      "max_signal_2h": 0,
+      "avg_signal_24h": 0.16445993031358885,
+      "avg_signal_2h": 0.0
+    },
+    {
+      "date": "2026-01-15",
+      "total_records": 1019,
+      "time_range": "00:00:34 ~ 23:59:34",
+      "max_signal_24h": 225,
+      "max_signal_2h": 17,
+      "avg_signal_24h": 55.76251226692836,
+      "avg_signal_2h": 1.801766437684004
+    },
+    {
+      "date": "2026-01-14",
+      "total_records": 1488,
+      "time_range": "00:00:16 ~ 23:59:34",
+      "max_signal_24h": 283,
+      "max_signal_2h": 74,
+      "avg_signal_24h": 234.7728494623656,
+      "avg_signal_2h": 22.170698924731184
+    },
+    {
+      "date": "2026-01-13",
+      "total_records": 1002,
+      "time_range": "15:26:34 ~ 23:59:15",
+      "max_signal_24h": 60,
+      "max_signal_2h": 57,
+      "avg_signal_24h": 8.90818363273453,
+      "avg_signal_2h": 8.187624750499001
+    },
+    {
+      "date": "2026-01-12",
+      "total_records": 2042,
+      "time_range": "00:00:42 ~ 22:04:10",
+      "max_signal_24h": 72,
+      "max_signal_2h": 36,
+      "avg_signal_24h": 42.615572967678744,
+      "avg_signal_2h": 2.187071498530852
+    },
+    {
+      "date": "2026-01-11",
+      "total_records": 2858,
+      "time_range": "00:00:18 ~ 23:59:42",
+      "max_signal_24h": 73,
+      "max_signal_2h": 50,
+      "avg_signal_24h": 54.98530440867739,
+      "avg_signal_2h": 5.920923722883135
+    },
+    {
+      "date": "2026-01-10",
+      "total_records": 1500,
+      "time_range": "00:00:31 ~ 23:59:17",
+      "max_signal_24h": 15,
+      "max_signal_2h": 3,
+      "avg_signal_24h": 4.213333333333333,
+      "avg_signal_2h": 0.44
+    },
+    {
+      "date": "2026-01-09",
+      "total_records": 2818,
+      "time_range": "00:00:54 ~ 23:59:31",
+      "max_signal_24h": 15,
+      "max_signal_2h": 13,
+      "avg_signal_24h": 13.207239176721078,
+      "avg_signal_2h": 1.1894960965223562
+    },
+    {
+      "date": "2026-01-08",
+      "total_records": 1360,
+      "time_range": "10:27:49 ~ 23:59:54",
+      "max_signal_24h": 0,
+      "max_signal_2h": 0,
+      "avg_signal_24h": 0.0,
+      "avg_signal_2h": 0.0
+    },
+    {
+      "date": "2026-01-07",
+      "total_records": 1466,
+      "time_range": "00:00:17 ~ 12:18:10",
+      "max_signal_24h": 128,
+      "max_signal_2h": 36,
+      "avg_signal_24h": 75.10777626193725,
+      "avg_signal_2h": 2.9631650750341065
+    },
+    {
+      "date": "2026-01-06",
+      "total_records": 2761,
+      "time_range": "00:00:43 ~ 23:59:16",
+      "max_signal_24h": 133,
+      "max_signal_2h": 57,
+      "avg_signal_24h": 87.98189061934082,
+      "avg_signal_2h": 10.500181093806592
+    },
+    {
+      "date": "2026-01-05",
+      "total_records": 2435,
+      "time_range": "00:00:02 ~ 23:59:56",
+      "max_signal_24h": 820,
+      "max_signal_2h": 102,
+      "avg_signal_24h": 408.452977412731,
+      "avg_signal_2h": 7.213552361396304
+    },
+    {
+      "date": "2026-01-04",
+      "total_records": 2533,
+      "time_range": "00:00:21 ~ 23:59:02",
+      "max_signal_24h": 791,
+      "max_signal_2h": 120,
+      "avg_signal_24h": 475.76233714962495,
+      "avg_signal_2h": 43.62692459534149
+    },
+    {
+      "date": "2026-01-03",
+      "total_records": 2406,
+      "time_range": "00:00:48 ~ 23:59:34",
+      "max_signal_24h": 966,
+      "max_signal_2h": 120,
+      "avg_signal_24h": 695.1454696591853,
+      "avg_signal_2h": 51.64630091438072
+    },
+    {
+      "date": "2026-01-02",
+      "total_records": 1420,
+      "time_range": "00:00:20 ~ 23:59:48",
+      "max_signal_24h": 275,
+      "max_signal_2h": 68,
+      "avg_signal_24h": 164.79929577464787,
+      "avg_signal_2h": 20.788732394366196
+    },
+    {
+      "date": "2026-01-01",
+      "total_records": 1114,
+      "time_range": "00:00:44 ~ 23:59:20",
+      "max_signal_24h": 15,
+      "max_signal_2h": 9,
+      "avg_signal_24h": 4.668761220825853,
+      "avg_signal_2h": 1.0601436265709157
+    },
+    {
+      "date": "2025-12-31",
+      "total_records": 857,
+      "time_range": "09:41:47 ~ 23:59:44",
+      "max_signal_24h": 0,
+      "max_signal_2h": 0,
+      "avg_signal_24h": 0.0,
+      "avg_signal_2h": 0.0
+    },
+    {
+      "date": "2025-12-30",
+      "total_records": 1332,
+      "time_range": "00:00:12 ~ 20:54:13",
+      "max_signal_24h": 72,
+      "max_signal_2h": 6,
+      "avg_signal_24h": 67.83933933933933,
+      "avg_signal_2h": 1.0810810810810811
+    },
+    {
+      "date": "2025-12-29",
+      "total_records": 1767,
+      "time_range": "00:00:16 ~ 23:59:12",
+      "max_signal_24h": 253,
+      "max_signal_2h": 49,
+      "avg_signal_24h": 105.19581211092246,
+      "avg_signal_2h": 5.056027164685909
+    },
+    {
+      "date": "2025-12-28",
+      "total_records": 1425,
+      "time_range": "00:00:17 ~ 23:59:16",
+      "max_signal_24h": 273,
+      "max_signal_2h": 78,
+      "avg_signal_24h": 210.5143859649123,
+      "avg_signal_2h": 21.67719298245614
+    },
+    {
+      "date": "2025-12-27",
+      "total_records": 1432,
+      "time_range": "00:00:33 ~ 23:59:17",
+      "max_signal_24h": 39,
+      "max_signal_2h": 27,
+      "avg_signal_24h": 5.522346368715084,
+      "avg_signal_2h": 1.5006983240223464
+    },
+    {
+      "date": "2025-12-26",
+      "total_records": 1434,
+      "time_range": "00:00:28 ~ 23:59:33",
+      "max_signal_24h": 48,
+      "max_signal_2h": 33,
+      "avg_signal_24h": 40.57880055788006,
+      "avg_signal_2h": 3.3472803347280333
+    },
+    {
+      "date": "2025-12-25",
+      "total_records": 843,
+      "time_range": "09:53:25 ~ 23:59:28",
+      "max_signal_24h": 9,
+      "max_signal_2h": 8,
+      "avg_signal_24h": 8.333333333333334,
+      "avg_signal_2h": 1.2799525504151839
+    }
+  ]
+}

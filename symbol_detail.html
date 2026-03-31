@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ symbol }} K线图 - 技术指标分析</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: #0e1117;
+            color: #e0e0e0;
+        }
+        
+        .header {
+            background: #1a1d29;
+            padding: 20px;
+            border-bottom: 2px solid #2d3348;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #00d4aa;
+        }
+        
+        .header .nav {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .header .nav a {
+            color: #888;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .header .nav a:hover {
+            background: #2d3348;
+            color: #00d4aa;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .timeframe-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab-btn {
+            padding: 12px 24px;
+            background: #1a1d29;
+            border: 2px solid #2d3348;
+            color: #888;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            background: #00d4aa;
+            color: #0e1117;
+            border-color: #00d4aa;
+        }
+        
+        .tab-btn:hover {
+            border-color: #00d4aa;
+            color: #00d4aa;
+        }
+        
+        .chart-container {
+            background: #1a1d29;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #00d4aa;
+        }
+        
+        .chart {
+            width: 100%;
+            height: 500px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+        
+        .spinner {
+            border: 3px solid #2d3348;
+            border-top: 3px solid #00d4aa;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: #1a1d29;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #00d4aa;
+        }
+        
+        .stat-label {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .stat-value.bullish {
+            color: #00d4aa;
+        }
+        
+        .stat-value.bearish {
+            color: #ff4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{ symbol.replace('-USDT-SWAP', '') }} 技术指标分析</h1>
+        <div class="nav">
+            <a href="/">← 返回首页</a>
+            <a href="/kline-indicators">K线指标监控</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="timeframe-tabs">
+            <button class="tab-btn active" data-timeframe="5m">5分钟</button>
+            <button class="tab-btn" data-timeframe="1h">1小时</button>
+        </div>
+        
+        <div id="stats-container" class="stats-grid">
+            <!-- 实时统计数据 -->
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">K线图 & 技术指标</div>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <div>正在加载K线数据...</div>
+            </div>
+            <div id="kline-chart" class="chart" style="display: none;"></div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">RSI指标 (相对强弱指数)</div>
+            <div id="rsi-chart" class="chart"></div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">SAR指标 & 布林带</div>
+            <div id="indicators-chart" class="chart"></div>
+        </div>
+    </div>
+    
+    <script>
+        const symbol = '{{ symbol }}';
+        let currentTimeframe = '5m';
+        let klineChart, rsiChart, indicatorsChart;
+        
+        // 初始化图表
+        function initCharts() {
+            klineChart = echarts.init(document.getElementById('kline-chart'));
+            rsiChart = echarts.init(document.getElementById('rsi-chart'));
+            indicatorsChart = echarts.init(document.getElementById('indicators-chart'));
+            
+            // 响应式
+            window.addEventListener('resize', () => {
+                klineChart.resize();
+                rsiChart.resize();
+                indicatorsChart.resize();
+            });
+        }
+        
+        // 加载数据
+        async function loadData(timeframe) {
+            currentTimeframe = timeframe;
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('kline-chart').style.display = 'none';
+            
+            try {
+                // 并行加载K线和指标数据
+                const [klineRes, indicatorsRes] = await Promise.all([
+                    fetch(`/api/symbol/${symbol}/kline?timeframe=${timeframe}`),
+                    fetch(`/api/symbol/${symbol}/indicators?timeframe=${timeframe}`)
+                ]);
+                
+                const klineData = await klineRes.json();
+                const indicatorsData = await indicatorsRes.json();
+                
+                if (klineData.success && indicatorsData.success) {
+                    renderCharts(klineData.data, indicatorsData.data);
+                    updateStats(indicatorsData.data);
+                } else {
+                    console.error('数据加载失败');
+                }
+            } catch (error) {
+                console.error('加载数据出错:', error);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('kline-chart').style.display = 'block';
+            }
+        }
+        
+        // 渲染图表
+        function renderCharts(klineData, indicatorsData) {
+            // 准备数据
+            const times = klineData.map(item => item.timestamp);
+            const ohlc = klineData.map(item => item.data);
+            const volumes = klineData.map(item => item.volume);
+            
+            const rsi = indicatorsData.map(item => item.rsi);
+            const sar = indicatorsData.map(item => item.sar);
+            const bbUpper = indicatorsData.map(item => item.bb_upper);
+            const bbMiddle = indicatorsData.map(item => item.bb_middle);
+            const bbLower = indicatorsData.map(item => item.bb_lower);
+            
+            // K线图
+            const klineOption = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross'
+                    },
+                    backgroundColor: 'rgba(26, 29, 41, 0.95)',
+                    borderColor: '#2d3348',
+                    textStyle: {
+                        color: '#e0e0e0'
+                    }
+                },
+                grid: [
+                    { left: '5%', right: '3%', top: '5%', height: '60%' },
+                    { left: '5%', right: '3%', top: '72%', height: '18%' }
+                ],
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: times,
+                        gridIndex: 0,
+                        axisLine: { lineStyle: { color: '#2d3348' } },
+                        axisLabel: { color: '#888' }
+                    },
+                    {
+                        type: 'category',
+                        data: times,
+                        gridIndex: 1,
+                        axisLine: { lineStyle: { color: '#2d3348' } },
+                        axisLabel: { color: '#888' }
+                    }
+                ],
+                yAxis: [
+                    {
+                        scale: true,
+                        gridIndex: 0,
+                        splitLine: { lineStyle: { color: '#2d3348' } },
+                        axisLine: { lineStyle: { color: '#2d3348' } },
+                        axisLabel: { color: '#888' }
+                    },
+                    {
+                        scale: true,
+                        gridIndex: 1,
+                        splitLine: { show: false },
+                        axisLine: { lineStyle: { color: '#2d3348' } },
+                        axisLabel: { color: '#888' }
+                    }
+                ],
+                dataZoom: [
+                    {
+                        type: 'inside',
+                        xAxisIndex: [0, 1],
+                        start: 0,
+                        end: 100
+                    },
+                    {
+                        show: true,
+                        xAxisIndex: [0, 1],
+                        type: 'slider',
+                        bottom: '5%',
+                        start: 0,
+                        end: 100,
+                        backgroundColor: '#1a1d29',
+                        fillerColor: 'rgba(0, 212, 170, 0.2)',
+                        borderColor: '#2d3348',
+                        textStyle: { color: '#888' }
+                    }
+                ],
+                series: [
+                    {
+                        name: 'K线',
+                        type: 'candlestick',
+                        data: ohlc,
+                        xAxisIndex: 0,
+                        yAxisIndex: 0,
+                        itemStyle: {
+                            color: '#00d4aa',
+                            color0: '#ff4444',
+                            borderColor: '#00d4aa',
+                            borderColor0: '#ff4444'
+                        }
+                    },
+                    {
+                        name: '成交量',
+                        type: 'bar',
+                        data: volumes,
+                        xAxisIndex: 1,
+                        yAxisIndex: 1,
+                        itemStyle: {
+                            color: 'rgba(0, 212, 170, 0.3)'
+                        }
+                    }
+                ]
+            };
+            
+            // RSI图
+            const rsiOption = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(26, 29, 41, 0.95)',
+                    borderColor: '#2d3348',
+                    textStyle: { color: '#e0e0e0' }
+                },
+                grid: {
+                    left: '5%',
+                    right: '3%',
+                    top: '10%',
+                    bottom: '15%'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: times,
+                    axisLine: { lineStyle: { color: '#2d3348' } },
+                    axisLabel: { color: '#888' }
+                },
+                yAxis: {
+                    type: 'value',
+                    min: 0,
+                    max: 100,
+                    splitLine: { lineStyle: { color: '#2d3348' } },
+                    axisLine: { lineStyle: { color: '#2d3348' } },
+                    axisLabel: { color: '#888' }
+                },
+                dataZoom: [
+                    {
+                        type: 'inside',
+                        start: 50,
+                        end: 100
+                    },
+                    {
+                        show: true,
+                        type: 'slider',
+                        bottom: '5%',
+                        start: 50,
+                        end: 100,
+                        backgroundColor: '#1a1d29',
+                        fillerColor: 'rgba(0, 212, 170, 0.2)',
+                        borderColor: '#2d3348',
+                        textStyle: { color: '#888' }
+                    }
+                ],
+                series: [
+                    {
+                        name: 'RSI(14)',
+                        type: 'line',
+                        data: rsi,
+                        smooth: true,
+                        lineStyle: { color: '#00d4aa', width: 2 },
+                        itemStyle: { color: '#00d4aa' },
+                        areaStyle: {
+                            color: {
+                                type: 'linear',
+                                x: 0, y: 0, x2: 0, y2: 1,
+                                colorStops: [
+                                    { offset: 0, color: 'rgba(0, 212, 170, 0.3)' },
+                                    { offset: 1, color: 'rgba(0, 212, 170, 0)' }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        name: '超买线',
+                        type: 'line',
+                        data: Array(times.length).fill(70),
+                        lineStyle: { color: '#ff4444', type: 'dashed' },
+                        symbol: 'none'
+                    },
+                    {
+                        name: '超卖线',
+                        type: 'line',
+                        data: Array(times.length).fill(30),
+                        lineStyle: { color: '#00d4aa', type: 'dashed' },
+                        symbol: 'none'
+                    }
+                ]
+            };
+            
+            // SAR & 布林带图
+            const indicatorsOption = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(26, 29, 41, 0.95)',
+                    borderColor: '#2d3348',
+                    textStyle: { color: '#e0e0e0' }
+                },
+                legend: {
+                    data: ['SAR', 'BB上轨', 'BB中轨', 'BB下轨'],
+                    textStyle: { color: '#888' },
+                    top: '3%'
+                },
+                grid: {
+                    left: '5%',
+                    right: '3%',
+                    top: '15%',
+                    bottom: '15%'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: times,
+                    axisLine: { lineStyle: { color: '#2d3348' } },
+                    axisLabel: { color: '#888' }
+                },
+                yAxis: {
+                    type: 'value',
+                    scale: true,
+                    splitLine: { lineStyle: { color: '#2d3348' } },
+                    axisLine: { lineStyle: { color: '#2d3348' } },
+                    axisLabel: { color: '#888' }
+                },
+                dataZoom: [
+                    {
+                        type: 'inside',
+                        start: 50,
+                        end: 100
+                    },
+                    {
+                        show: true,
+                        type: 'slider',
+                        bottom: '5%',
+                        start: 50,
+                        end: 100,
+                        backgroundColor: '#1a1d29',
+                        fillerColor: 'rgba(0, 212, 170, 0.2)',
+                        borderColor: '#2d3348',
+                        textStyle: { color: '#888' }
+                    }
+                ],
+                series: [
+                    {
+                        name: 'SAR',
+                        type: 'scatter',
+                        data: sar,
+                        symbolSize: 6,
+                        itemStyle: {
+                            color: function(params) {
+                                const idx = params.dataIndex;
+                                return indicatorsData[idx].sar_position === 'bullish' ? '#00d4aa' : '#ff4444';
+                            }
+                        }
+                    },
+                    {
+                        name: 'BB上轨',
+                        type: 'line',
+                        data: bbUpper,
+                        lineStyle: { color: '#ff4444', width: 1 },
+                        symbol: 'none'
+                    },
+                    {
+                        name: 'BB中轨',
+                        type: 'line',
+                        data: bbMiddle,
+                        lineStyle: { color: '#888', width: 1, type: 'dashed' },
+                        symbol: 'none'
+                    },
+                    {
+                        name: 'BB下轨',
+                        type: 'line',
+                        data: bbLower,
+                        lineStyle: { color: '#00d4aa', width: 1 },
+                        symbol: 'none'
+                    }
+                ]
+            };
+            
+            klineChart.setOption(klineOption);
+            rsiChart.setOption(rsiOption);
+            indicatorsChart.setOption(indicatorsOption);
+        }
+        
+        // 更新统计数据
+        function updateStats(indicatorsData) {
+            if (!indicatorsData || indicatorsData.length === 0) return;
+            
+            const latest = indicatorsData[indicatorsData.length - 1];
+            
+            const statsHTML = `
+                <div class="stat-card">
+                    <div class="stat-label">当前价格</div>
+                    <div class="stat-value">$${latest.price ? latest.price.toFixed(4) : 'N/A'}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">RSI(14)</div>
+                    <div class="stat-value ${latest.rsi > 70 ? 'bearish' : latest.rsi < 30 ? 'bullish' : ''}">
+                        ${latest.rsi ? latest.rsi.toFixed(2) : 'N/A'}
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">SAR位置</div>
+                    <div class="stat-value ${latest.sar_position === 'bullish' ? 'bullish' : 'bearish'}">
+                        ${latest.sar_label || 'N/A'}
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">SAR值</div>
+                    <div class="stat-value">$${latest.sar ? latest.sar.toFixed(4) : 'N/A'}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">布林带上轨</div>
+                    <div class="stat-value">$${latest.bb_upper ? latest.bb_upper.toFixed(4) : 'N/A'}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">布林带下轨</div>
+                    <div class="stat-value">$${latest.bb_lower ? latest.bb_lower.toFixed(4) : 'N/A'}</div>
+                </div>
+            `;
+            
+            document.getElementById('stats-container').innerHTML = statsHTML;
+        }
+        
+        // 切换时间周期
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                loadData(this.dataset.timeframe);
+            });
+        });
+        
+        // 初始化
+        initCharts();
+        loadData('5m');
+    </script>
+</body>
+</html>

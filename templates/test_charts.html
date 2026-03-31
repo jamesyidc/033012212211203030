@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>测试ECharts加载</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+</head>
+<body>
+    <h1>测试ECharts是否可用</h1>
+    <div id="testChart" style="width: 600px; height: 400px; border: 1px solid #ccc;"></div>
+    <script>
+        console.log('ECharts版本:', echarts.version);
+        var chart = echarts.init(document.getElementById('testChart'));
+        var option = {
+            title: { text: '测试图表' },
+            xAxis: { type: 'category', data: ['A', 'B', 'C'] },
+            yAxis: { type: 'value' },
+            series: [{ data: [120, 200, 150], type: 'line' }]
+        };
+        chart.setOption(option);
+        console.log('图表渲染完成');
+    </script>
+</body>
+</html>

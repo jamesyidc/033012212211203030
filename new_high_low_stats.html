@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>创新高创新低统计 - 价格位置预警系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: rgba(26, 26, 46, 0.8);
+            padding: 20px 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #a0a0a0;
+            font-size: 0.95em;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: #667eea;
+            text-decoration: none;
+            padding: 8px 16px;
+            border: 1px solid #667eea;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        
+        .back-link:hover {
+            background: #667eea;
+            color: #fff;
+        }
+        
+        .backup-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .backup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+        
+        .backup-btn:active {
+            transform: translateY(0);
+        }
+        
+        .backup-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(26, 26, 46, 0.8);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+        
+        .stat-card h2 {
+            color: #667eea;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-label {
+            color: #a0a0a0;
+        }
+        
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+        
+        .stat-value.high {
+            color: #10b981;
+        }
+        
+        .stat-value.low {
+            color: #ef4444;
+        }
+        
+        .chart-container {
+            background: rgba(26, 26, 46, 0.8);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            margin-bottom: 30px;
+        }
+        
+        .chart {
+            width: 100%;
+            height: 400px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(26, 26, 46, 0.8);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        th {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .event-new-high {
+            color: #10b981;
+        }
+        
+        .event-new-low {
+            color: #ef4444;
+        }
+        
+        .status-ok {
+            color: #10b981;
+        }
+        
+        .status-error {
+            color: #ef4444;
+        }
+        
+        .time-elapsed {
+            color: #a0a0a0;
+            font-size: 0.9em;
+        }
+        
+        .price-high {
+            color: #10b981;
+            font-weight: 600;
+        }
+        
+        .price-low {
+            color: #ef4444;
+            font-weight: 600;
+        }
+        
+        .coin-symbol {
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        details {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+        
+        details summary {
+            padding: 5px;
+            outline: none;
+        }
+        
+        details[open] summary {
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.3);
+            padding-bottom: 10px;
+        }
+        
+        code {
+            background: rgba(102, 126, 234, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #10b981;
+        }
+        
+        table {
+            font-size: 0.9em;
+        }
+        
+        .info-box {
+            background: rgba(26, 26, 46, 0.8);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            margin-top: 30px;
+        }
+        
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .info-box ul {
+            padding-left: 20px;
+            line-height: 1.8;
+        }
+        
+        .info-box li {
+            color: #a0a0a0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="/price-position" class="back-link">← 返回价格位置预警</a>
+            <h1>🎯 创新高创新低统计</h1>
+            <p class="subtitle">
+                基于历史最高价和最低价的创新高/创新低事件统计 | 
+                数据更新: <span id="update-time">--</span> | 
+                追踪币种: <span id="coin-count">--</span> 个 | 
+                状态: <span id="status" class="status-ok">正常</span>
+            </p>
+            
+            <!-- 🔥 系统更新说明 (2026-02-28) -->
+            <div style="margin-top: 15px; padding: 15px; background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10b981; border-radius: 8px;">
+                <h3 style="color: #10b981; margin-bottom: 10px;">✅ 系统修复更新 (v2.1 - 2026-02-28)</h3>
+                <div style="font-size: 0.9em; line-height: 1.8; color: #a0a0a0;">
+                    <p><strong>问题：</strong>每次重新部署后数据显示为空，停留在历史日期</p>
+                    
+                    <p><strong>根本原因：</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li>❌ <code>new-high-low-collector</code> 采集器未配置到PM2自动启动</li>
+                        <li>❌ 依赖链条：price-position采集 → new-high-low检测 → Flask API → 前端显示</li>
+                        <li>❌ 任何一环断裂都会导致"没有数据"</li>
+                    </ul>
+                    
+                    <p><strong>已修复：</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li>✅ 新增 <code>new-high-low-collector</code> 到 <code>ecosystem.config.js</code></li>
+                        <li>✅ 采集器每3分钟自动检测创新高/创新低事件</li>
+                        <li>✅ PM2配置已保存，重启后自动恢复所有采集器</li>
+                        <li>✅ 数据文件已纳入Git版本控制，防止丢失</li>
+                        <li>✅ 添加详细的部署指南：<code>NEW_HIGH_LOW_DEPLOYMENT_GUIDE.md</code></li>
+                    </ul>
+                    
+                    <p><strong>当前状态：</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li>🟢 price-position-collector: 运行正常 (每3分钟采集价格数据)</li>
+                        <li>🟢 new-high-low-collector: 运行正常 (每3分钟检测新高新低)</li>
+                        <li>🟢 数据实时更新: 今天已记录 <span id="today-events-count" style="color: #10b981; font-weight: bold;">--</span> 个事件</li>
+                        <li>🟢 追踪币种: 28个加密货币全覆盖</li>
+                    </ul>
+                    
+                    <p><strong>重新部署后的检查步骤：</strong></p>
+                    <ol style="margin-left: 20px; margin-top: 5px;">
+                        <li>确认进程运行: <code>pm2 list | grep new-high-low-collector</code></li>
+                        <li>检查数据文件: <code>ls data/new_high_low/new_high_low_events_*.jsonl</code></li>
+                        <li>等待3-5分钟让采集器生成今天的数据</li>
+                        <li>强制刷新页面: <code>Ctrl+F5</code> 清除浏览器缓存</li>
+                        <li>如仍无数据，查看日志: <code>pm2 logs new-high-low-collector</code></li>
+                    </ol>
+                    
+                    <p style="margin-top: 10px;"><strong>技术细节：</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>📊 采集逻辑: 读取price_position快照 → 比较历史极值 → 记录事件到JSONL</li>
+                        <li>💾 数据文件: <code>coin_highs_lows_state.json</code> (状态), <code>new_high_low_events_YYYYMMDD.jsonl</code> (事件)</li>
+                        <li>🔄 自动恢复: PM2守护进程确保崩溃后自动重启</li>
+                        <li>📁 版本控制: 重要数据文件已提交到Git，重新部署时保留历史数据</li>
+                    </ul>
+                    
+                    <p style="margin-top: 10px; padding: 10px; background: rgba(234, 179, 8, 0.1); border-radius: 6px;">
+                        <strong>⚠️ 注意事项：</strong><br>
+                        1. 首次部署后需等待3-5分钟让采集器生成今天的数据<br>
+                        2. 如果页面显示旧数据，请使用 <code>Ctrl+F5</code> 强制刷新<br>
+                        3. 详细故障排查步骤请参考：<code>NEW_HIGH_LOW_DEPLOYMENT_GUIDE.md</code>
+                    </p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 15px;">
+                <button id="backup-btn" class="backup-btn" onclick="backupData()">
+                    💾 备份数据
+                </button>
+                <span id="backup-status" style="margin-left: 10px; color: #a0a0a0;"></span>
+            </div>
+        </header>
+
+        <!-- 系统技术文档 -->
+        <div class="info-box">
+            <h3 style="cursor: pointer; user-select: none;" onclick="toggleTechDoc()">
+                📚 系统技术文档 
+                <span id="tech-doc-toggle" style="float: right; color: #667eea;">▼ 展开</span>
+            </h3>
+            <div id="tech-doc-content" style="display: none; margin-top: 15px;">
+                
+                <!-- 系统运行逻辑 -->
+                <details open>
+                    <summary style="color: #10b981; font-weight: 600; margin: 15px 0; cursor: pointer;">🔄 系统运行逻辑</summary>
+                    <div style="padding-left: 20px; line-height: 1.8; color: #a0a0a0;">
+                        <p><strong>1. 数据采集层（Backend Collector）</strong></p>
+                        <ul>
+                            <li>PM2守护进程 <code>new-high-low-collector</code> 每3分钟执行一次</li>
+                            <li>读取价格位置数据源: <code>/data/price_position/price_position_YYYYMMDD.jsonl</code></li>
+                            <li>提取最新快照的28个币种价格</li>
+                            <li>逐个币种比较当前价格与历史最高价/最低价</li>
+                            <li>检测到创新高/低时:
+                                <ul>
+                                    <li>记录事件到JSONL: <code>/data/new_high_low/new_high_low_events_YYYYMMDD.jsonl</code></li>
+                                    <li>更新状态文件: <code>/data/new_high_low/coin_highs_lows_state.json</code></li>
+                                    <li>打印日志: 🔥 创新高 / ❄️ 创新低</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        
+                        <p><strong>2. API接口层（Flask Backend）</strong></p>
+                        <ul>
+                            <li>路由: <code>GET /api/price-position/new-high-low-stats</code></li>
+                            <li>读取状态文件获取当前最高/低价</li>
+                            <li>读取过去8天的事件JSONL文件</li>
+                            <li>按时间范围统计: 今天、昨天、3天、7天</li>
+                            <li>返回JSON响应（<50ms）</li>
+                            <li>添加防缓存响应头（Cache-Control: no-store）</li>
+                        </ul>
+                        
+                        <p><strong>3. 前端展示层（HTML + ECharts）</strong></p>
+                        <ul>
+                            <li>页面路由: <code>/new-high-low-stats</code></li>
+                            <li>每60秒自动调用API刷新数据</li>
+                            <li>渲染4个统计卡片、2个ECharts图表、2个数据表格</li>
+                            <li>计算距今时长（getTimeElapsed函数）</li>
+                            <li>纯展示逻辑，零业务计算</li>
+                        </ul>
+                    </div>
+                </details>
+                
+                <!-- 数据流程图 -->
+                <details>
+                    <summary style="color: #10b981; font-weight: 600; margin: 15px 0; cursor: pointer;">📊 数据流程图</summary>
+                    <div style="padding-left: 20px;">
+                        <pre style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; overflow-x: auto; color: #e0e0e0; line-height: 1.6;">
+┌─────────────────────────────────────────────────────────────────┐
+│                     价格位置预警系统                              │
+│            /data/price_position/price_position_*.jsonl          │
+│  (price-position-collector 每5分钟采集OKX API价格数据)           │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │ 读取最新快照
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              创新高创新低采集器 (PM2 守护进程)                    │
+│          source_code/new_high_low_collector.py                  │
+│                    每3分钟执行一次                                │
+├─────────────────────────────────────────────────────────────────┤
+│  for 每个币种:                                                   │
+│    if 当前价格 > coin_state[symbol].highest_price:               │
+│        触发创新高事件 → 记录到JSONL                              │
+│        更新 highest_price 和 highest_time                        │
+│    if 当前价格 < coin_state[symbol].lowest_price:                │
+│        触发创新低事件 → 记录到JSONL                              │
+│        更新 lowest_price 和 lowest_time                          │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │ 写入文件
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                        数据持久化                                 │
+├─────────────────────────────────────────────────────────────────┤
+│  [状态文件] coin_highs_lows_state.json                           │
+│     └─ 每个币种的当前最高价、最低价及时间                         │
+│  [事件日志] new_high_low_events_YYYYMMDD.jsonl                   │
+│     └─ 每行记录一次创新高/低事件                                  │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │ API读取
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    Flask API 接口                                │
+│        /api/price-position/new-high-low-stats                   │
+├─────────────────────────────────────────────────────────────────┤
+│  1. 读取 coin_highs_lows_state.json                             │
+│  2. 读取过去8天的 new_high_low_events_*.jsonl                    │
+│  3. 按时间范围统计: today/yesterday/3days/7days                  │
+│  4. 计算 by_symbol 统计（每个币种的事件数）                      │
+│  5. 返回JSON响应 + 防缓存头                                      │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │ HTTP GET (每60秒)
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    前端页面 (HTML)                               │
+│              /new-high-low-stats                                │
+├─────────────────────────────────────────────────────────────────┤
+│  [统计卡片] 今天、昨天、3天、7天的创新高/低次数                   │
+│  [趋势图表] ECharts柱状图对比各时段数据                          │
+│  [币种图表] Top 15活跃币种横向柱状图                             │
+│  [状态表格] 28个币种的最高/低价、时间、距今时长                   │
+│  [事件列表] 最近100条创新高/低事件明细                           │
+└─────────────────────────────────────────────────────────────────┘</pre>
+                    </div>
+                </details>
+                
+                <!-- JSONL文件格式 -->
+                <details>
+                    <summary style="color: #10b981; font-weight: 600; margin: 15px 0; cursor: pointer;">📄 JSONL文件格式详解</summary>
+                    <div style="padding-left: 20px; color: #a0a0a0;">
+                        
+                        <p><strong>1. 状态文件: coin_highs_lows_state.json</strong></p>
+                        <p>路径: <code>/home/user/webapp/data/new_high_low/coin_highs_lows_state.json</code></p>
+                        <pre style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; overflow-x: auto; color: #e0e0e0;">
+{
+  "BTC": {
+    "highest_price": 68589.1,           // 历史最高价
+    "highest_time": "2026-02-16 22:22:26",  // 创建最高价的时间
+    "lowest_price": 68409.8,            // 历史最低价
+    "lowest_time": "2026-02-16 22:19:01"    // 创建最低价的时间
+  },
+  "ETH": { ... },
+  ... (共28个币种)
+}</pre>
+                        
+                        <p><strong>2. 事件日志: new_high_low_events_YYYYMMDD.jsonl</strong></p>
+                        <p>路径: <code>/home/user/webapp/data/new_high_low/new_high_low_events_20260216.jsonl</code></p>
+                        <p>格式: 每行一个JSON对象（JSONL格式，便于追加和流式读取）</p>
+                        <pre style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; overflow-x: auto; color: #e0e0e0;">
+// 创新高事件
+{
+  "time": "2026-02-16 22:22:26",       // 事件发生时间（北京时间）
+  "timestamp": 1771251746.0,           // Unix时间戳
+  "symbol": "BTC",                     // 币种代码
+  "event_type": "new_high",            // 事件类型: new_high | new_low
+  "price": 68589.1,                    // 当前价格（创新高）
+  "previous_high": 68500.0,            // 前一次最高价
+  "previous_time": "2026-02-16 20:15:00"  // 前高创建时间
+}
+
+// 创新低事件
+{
+  "time": "2026-02-16 22:29:24",
+  "timestamp": 1771252164.0,
+  "symbol": "TAO",
+  "event_type": "new_low",             // 创新低
+  "price": 188.1,                      // 当前价格（创新低）
+  "previous_low": 189.9,               // 前一次最低价
+  "previous_time": "2026-02-16 22:25:50"  // 前低创建时间
+}</pre>
+                        
+                        <p><strong>3. 源数据: price_position_YYYYMMDD.jsonl</strong></p>
+                        <p>路径: <code>/home/user/webapp/data/price_position/price_position_20260216.jsonl</code></p>
+                        <p>由 price-position-collector 每5分钟采集OKX API生成</p>
+                        <pre style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; overflow-x: auto; color: #e0e0e0;">
+{
+  "snapshot_time": "2026-02-16 22:30:00",
+  "positions": [
+    {
+      "inst_id": "BTC-USDT-SWAP",
+      "current_price": 68550.0,
+      "high_48h": 70929.0,
+      "low_48h": 68409.8,
+      "high_7d": 72276.0,
+      "low_7d": 65080.0,
+      "position_48h": 45.2,    // 在48h区间的位置百分比
+      "position_7d": 62.8      // 在7d区间的位置百分比
+    },
+    ... (共28个币种)
+  ]
+}</pre>
+                    </div>
+                </details>
+                
+                <!-- 核心功能 -->
+                <details>
+                    <summary style="color: #10b981; font-weight: 600; margin: 15px 0; cursor: pointer;">⚙️ 核心功能详解</summary>
+                    <div style="padding-left: 20px; line-height: 1.8; color: #a0a0a0;">
+                        
+                        <p><strong>功能1: 创新高/低检测</strong></p>
+                        <ul>
+                            <li><strong>触发条件</strong>:
+                                <ul>
+                                    <li>创新高: <code>current_price > coin_state[symbol].highest_price</code></li>
+                                    <li>创新低: <code>current_price < coin_state[symbol].lowest_price</code></li>
+                                </ul>
+                            </li>
+                            <li><strong>执行操作</strong>:
+                                <ul>
+                                    <li>记录事件到JSONL（时间、币种、价格、前值）</li>
+                                    <li>更新状态文件中的最高/低价和时间</li>
+                                    <li>打印日志到控制台（PM2日志）</li>
+                                </ul>
+                            </li>
+                            <li><strong>状态持久化</strong>: 每次采集后保存状态文件，确保服务重启后数据不丢失</li>
+                        </ul>
+                        
+                        <p><strong>功能2: 多时段统计</strong></p>
+                        <ul>
+                            <li><strong>今天</strong>: 过去24小时的事件（now - 1天 ~ now）</li>
+                            <li><strong>昨天</strong>: 24-48小时前的事件（now - 2天 ~ now - 1天）</li>
+                            <li><strong>最近3天</strong>: 过去72小时的事件（now - 3天 ~ now）</li>
+                            <li><strong>最近7天</strong>: 过去168小时的事件（now - 7天 ~ now）</li>
+                            <li>使用北京时区（pytz.timezone('Asia/Shanghai')）</li>
+                        </ul>
+                        
+                        <p><strong>功能3: 按币种统计</strong></p>
+                        <ul>
+                            <li>为每个时段计算 <code>by_symbol</code> 字典</li>
+                            <li>统计每个币种的创新高次数和创新低次数</li>
+                            <li>用于生成Top 15币种图表</li>
+                        </ul>
+                        
+                        <p><strong>功能4: 实时距今时长计算</strong></p>
+                        <ul>
+                            <li>前端JavaScript函数 <code>getTimeElapsed()</code></li>
+                            <li>计算最高/低价创建时间距当前的时长</li>
+                            <li>显示格式: "X天X小时前" / "X小时X分钟前" / "X分钟前" / "刚刚"</li>
+                            <li>每60秒随页面刷新自动更新</li>
+                        </ul>
+                        
+                        <p><strong>功能5: 防浏览器缓存</strong></p>
+                        <ul>
+                            <li>API响应头: <code>Cache-Control: no-store, no-cache, must-revalidate</code></li>
+                            <li>前端请求: URL添加时间戳 <code>?_t=Date.now()</code></li>
+                            <li>Fetch选项: <code>cache: 'no-store'</code></li>
+                            <li>确保数据永远是最新的，不受浏览器缓存影响</li>
+                        </ul>
+                    </div>
+                </details>
+                
+                <!-- 系统依赖 -->
+                <details>
+                    <summary style="color: #10b981; font-weight: 600; margin: 15px 0; cursor: pointer;">🔧 系统依赖清单</summary>
+                    <div style="padding-left: 20px; line-height: 1.8; color: #a0a0a0;">
+                        
+                        <p><strong>1. PM2守护进程</strong></p>
+                        <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+                            <tr style="background: rgba(102, 126, 234, 0.2);">
+                                <th style="padding: 8px; text-align: left; border: 1px solid rgba(255,255,255,0.1);">进程名称</th>
+                                <th style="padding: 8px; text-align: left; border: 1px solid rgba(255,255,255,0.1);">脚本路径</th>
+                                <th style="padding: 8px; text-align: left; border: 1px solid rgba(255,255,255,0.1);">作用</th>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);"><code>new-high-low-collector</code></td>
+                                <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">source_code/new_high_low_collector.py</td>
+                                <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">创新高低采集器（每3分钟）</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);"><code>price-position-collector</code></td>
+                                <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">source_code/price_position_collector.py</td>
+                                <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">价格位置数据源（每5分钟）</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);"><code>flask-app</code></td>
+                                <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">app.py</td>
+                                <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">Flask Web服务器（端口9002）</td>
+                            </tr>
+                        </table>
+                        
+                        <p><strong>2. Python依赖包</strong></p>
+                        <pre style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; color: #e0e0e0;">
+flask>=2.0.0              # Web框架
+pytz                      # 时区处理（北京时间）
+requests                  # HTTP请求（调用OKX API）
+sqlite3                   # 数据库（内置，用于signal_timeline）
+json                      # JSON解析（内置）
+datetime                  # 日期时间处理（内置）
+pathlib                   # 路径操作（内置）
+collections.defaultdict   # 统计数据结构（内置）</pre>
+                        
+                        <p><strong>3. Flask API路由</strong></p>
+                        <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+                            <tr style="background: rgba(102, 126, 234, 0.2);">
+                                <th style="padding: 8px; text-align: left; border: 1px solid rgba(255,255,255,0.1);">路由</th>
+                                <th style="padding: 8px; text-align: left; border: 1px solid rgba(255,255,255,0.1);">方法</th>
+                                <th style="padding: 8px; text-align: left; border: 1px solid rgba(255,255,255,0.1);">功能</th>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);"><code>/new-high-low-stats</code></td>
+                                <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">GET</td>
+                                <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">渲染前端HTML页面</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);"><code>/api/price-position/new-high-low-stats</code></td>
+                                <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">GET</td>
+                                <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">返回统计数据JSON</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);"><code>/price-position</code></td>
+                                <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">GET</td>
+                                <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">价格位置预警主页</td>
+                            </tr>
+                        </table>
+                        
+                        <p><strong>4. 前端依赖</strong></p>
+                        <pre style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; color: #e0e0e0;">
+ECharts 5.x               # 图表库（CDN: jsdelivr.net）
+  └─ 用于渲染趋势对比图和币种统计图
+
+JavaScript ES6+           # 原生JavaScript
+  ├─ Fetch API           # HTTP请求（替代AJAX）
+  ├─ async/await         # 异步处理
+  └─ setInterval         # 60秒自动刷新
+
+HTML5 + CSS3             # 页面结构和样式
+  ├─ Grid布局            # 响应式卡片网格
+  ├─ Flexbox             # 元素对齐
+  └─ CSS变量             # 主题颜色</pre>
+                        
+                        <p><strong>5. 数据目录结构</strong></p>
+                        <pre style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; color: #e0e0e0; font-family: monospace;">
+/home/user/webapp/
+├── data/
+│   ├── new_high_low/                    # 创新高低系统数据
+│   │   ├── coin_highs_lows_state.json   # 状态文件（4.3KB）
+│   │   └── new_high_low_events_*.jsonl  # 事件日志（按日期）
+│   │
+│   └── price_position/                  # 价格位置数据源
+│       └── price_position_*.jsonl       # 源数据（按日期）
+│
+├── source_code/
+│   └── new_high_low_collector.py        # 采集器脚本
+│
+├── templates/
+│   └── new_high_low_stats.html          # 前端页面
+│
+└── app.py                                # Flask主程序</pre>
+                        
+                        <p><strong>6. 环境变量</strong></p>
+                        <pre style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; color: #e0e0e0;">
+TZ=Asia/Shanghai          # 系统时区（北京时间）
+FLASK_ENV=production      # Flask运行模式
+FLASK_PORT=9002           # Flask监听端口</pre>
+                        
+                        <p><strong>7. 系统要求</strong></p>
+                        <ul>
+                            <li>Python 3.8+</li>
+                            <li>PM2 (Node.js进程管理器)</li>
+                            <li>磁盘空间: ~10MB/天（事件日志增长速度）</li>
+                            <li>内存: 采集器 ~12MB，Flask ~200MB</li>
+                            <li>网络: 需访问OKX API（price-position-collector依赖）</li>
+                        </ul>
+                    </div>
+                </details>
+                
+                <!-- 维护指南 -->
+                <details>
+                    <summary style="color: #10b981; font-weight: 600; margin: 15px 0; cursor: pointer;">🔨 维护指南</summary>
+                    <div style="padding-left: 20px; line-height: 1.8; color: #a0a0a0;">
+                        
+                        <p><strong>查看PM2进程状态</strong></p>
+                        <pre style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; color: #e0e0e0;">
+pm2 list                              # 查看所有进程
+pm2 show new-high-low-collector       # 查看采集器详情
+pm2 logs new-high-low-collector       # 查看实时日志</pre>
+                        
+                        <p><strong>重启服务</strong></p>
+                        <pre style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; color: #e0e0e0;">
+pm2 restart new-high-low-collector    # 重启采集器
+pm2 restart flask-app                 # 重启Flask服务
+pm2 restart all                       # 重启所有服务</pre>
+                        
+                        <p><strong>数据备份</strong></p>
+                        <pre style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; color: #e0e0e0;">
+# 备份状态文件（最重要）
+cp data/new_high_low/coin_highs_lows_state.json ~/backup/
+
+# 备份事件日志
+tar -czf new_high_low_backup_$(date +%Y%m%d).tar.gz data/new_high_low/</pre>
+                        
+                        <p><strong>数据恢复</strong></p>
+                        <pre style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; color: #e0e0e0;">
+# 恢复状态文件
+cp ~/backup/coin_highs_lows_state.json data/new_high_low/
+
+# 重启采集器生效
+pm2 restart new-high-low-collector</pre>
+                        
+                        <p><strong>清理历史数据</strong></p>
+                        <pre style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; color: #e0e0e0;">
+# 删除30天前的事件日志
+find data/new_high_low/ -name "new_high_low_events_*.jsonl" -mtime +30 -delete</pre>
+                        
+                        <p><strong>手动触发采集（测试用）</strong></p>
+                        <pre style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; color: #e0e0e0;">
+python3 source_code/new_high_low_collector.py
+# 按 Ctrl+C 停止</pre>
+                        
+                        <p><strong>API测试</strong></p>
+                        <pre style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; color: #e0e0e0;">
+curl -s http://127.0.0.1:9002/api/price-position/new-high-low-stats | jq</pre>
+                    </div>
+                </details>
+                
+                <!-- Git提交记录 -->
+                <details>
+                    <summary style="color: #10b981; font-weight: 600; margin: 15px 0; cursor: pointer;">📝 Git提交记录</summary>
+                    <div style="padding-left: 20px; color: #a0a0a0;">
+                        <pre style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; overflow-x: auto; color: #e0e0e0; line-height: 1.6;">
+911a42f - feat: Add coin states table with highest/lowest prices and time elapsed
+cb6f097 - Implement correct new high/low statistics system  
+7e30be7 - refactor: Move new high/low calculations to backend collector
+cf6d1dd - feat: Add new high/new low statistics page</pre>
+                    </div>
+                </details>
+                
+            </div>
+        </div>
+        
+        <!-- 🔥 历史峰值数据统计框 -->
+        <div class="stat-card" style="border: 2px solid #667eea; background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.1)); margin-bottom: 30px;">
+            <h2 style="color: #667eea; font-size: 1.5em; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                📊 历史创新高/创新低峰值统计
+            </h2>
+            
+            <!-- 峰值数据网格 -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <!-- 🏆 创新高峰值日 -->
+                <div style="background: rgba(16, 185, 129, 0.1); padding: 20px; border-radius: 12px; border: 2px solid #10b981;">
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <div style="font-size: 1.3em; color: #10b981; font-weight: 700; margin-bottom: 10px;">🏆 创新高峰值日</div>
+                        <div style="font-size: 1.8em; font-weight: 700; color: #10b981; margin-bottom: 5px;" id="peak-high-date">--</div>
+                        <div style="font-size: 0.85em; color: #a0a0a0;">当日数据情况</div>
+                    </div>
+                    
+                    <!-- 创新高峰值日数据卡片 -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div style="background: rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 8px; border-left: 3px solid #10b981;">
+                            <div style="font-size: 0.75em; color: #a0a0a0; margin-bottom: 5px;">创新高</div>
+                            <div style="font-size: 2em; font-weight: 700; color: #10b981; font-family: 'Courier New', monospace;" id="peak-high-new-high">0</div>
+                        </div>
+                        <div style="background: rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 8px; border-left: 3px solid #ef4444;">
+                            <div style="font-size: 0.75em; color: #a0a0a0; margin-bottom: 5px;">创新低</div>
+                            <div style="font-size: 2em; font-weight: 700; color: #ef4444; font-family: 'Courier New', monospace;" id="peak-high-new-low">0</div>
+                        </div>
+                        <div style="background: rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 8px; border-left: 3px solid #667eea; grid-column: 1 / -1;">
+                            <div style="font-size: 0.75em; color: #a0a0a0; margin-bottom: 5px;">总事件数</div>
+                            <div style="font-size: 1.5em; font-weight: 700; color: #667eea; font-family: 'Courier New', monospace;" id="peak-high-total">0</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 币种详情 -->
+                    <details style="margin-top: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 10px;">
+                        <summary style="cursor: pointer; font-size: 0.85em; color: #10b981; font-weight: 600;">币种详情（前10名）</summary>
+                        <div id="peak-high-details" style="margin-top: 10px; font-size: 0.8em; line-height: 1.8; max-height: 150px; overflow-y: auto;">--</div>
+                    </details>
+                </div>
+                
+                <!-- 🎯 创新低峰值日 -->
+                <div style="background: rgba(239, 68, 68, 0.1); padding: 20px; border-radius: 12px; border: 2px solid #ef4444;">
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <div style="font-size: 1.3em; color: #ef4444; font-weight: 700; margin-bottom: 10px;">🎯 创新低峰值日</div>
+                        <div style="font-size: 1.8em; font-weight: 700; color: #ef4444; margin-bottom: 5px;" id="peak-low-date">--</div>
+                        <div style="font-size: 0.85em; color: #a0a0a0;">当日数据情况</div>
+                    </div>
+                    
+                    <!-- 创新低峰值日数据卡片 -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div style="background: rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 8px; border-left: 3px solid #10b981;">
+                            <div style="font-size: 0.75em; color: #a0a0a0; margin-bottom: 5px;">创新高</div>
+                            <div style="font-size: 2em; font-weight: 700; color: #10b981; font-family: 'Courier New', monospace;" id="peak-low-new-high">0</div>
+                        </div>
+                        <div style="background: rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 8px; border-left: 3px solid #ef4444;">
+                            <div style="font-size: 0.75em; color: #a0a0a0; margin-bottom: 5px;">创新低</div>
+                            <div style="font-size: 2em; font-weight: 700; color: #ef4444; font-family: 'Courier New', monospace;" id="peak-low-new-low">0</div>
+                        </div>
+                        <div style="background: rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 8px; border-left: 3px solid #667eea; grid-column: 1 / -1;">
+                            <div style="font-size: 0.75em; color: #a0a0a0; margin-bottom: 5px;">总事件数</div>
+                            <div style="font-size: 1.5em; font-weight: 700; color: #667eea; font-family: 'Courier New', monospace;" id="peak-low-total">0</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 币种详情 -->
+                    <details style="margin-top: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 10px;">
+                        <summary style="cursor: pointer; font-size: 0.85em; color: #ef4444; font-weight: 600;">币种详情（前10名）</summary>
+                        <div id="peak-low-details" style="margin-top: 10px; font-size: 0.8em; line-height: 1.8; max-height: 150px; overflow-y: auto;">--</div>
+                    </details>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h2>📅 今天</h2>
+                <div class="stat-row">
+                    <span class="stat-label">创新高</span>
+                    <span class="stat-value high" id="today-high">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">创新低</span>
+                    <span class="stat-value low" id="today-low">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">总事件</span>
+                    <span class="stat-value" id="today-total">0</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <h2>📊 昨天</h2>
+                <div class="stat-row">
+                    <span class="stat-label">创新高</span>
+                    <span class="stat-value high" id="yesterday-high">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">创新低</span>
+                    <span class="stat-value low" id="yesterday-low">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">总事件</span>
+                    <span class="stat-value" id="yesterday-total">0</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <h2>📈 最近3天</h2>
+                <div class="stat-row">
+                    <span class="stat-label">创新高</span>
+                    <span class="stat-value high" id="3days-high">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">创新低</span>
+                    <span class="stat-value low" id="3days-low">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">总事件</span>
+                    <span class="stat-value" id="3days-total">0</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <h2>📊 最近7天</h2>
+                <div class="stat-row">
+                    <span class="stat-label">创新高</span>
+                    <span class="stat-value high" id="7days-high">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">创新低</span>
+                    <span class="stat-value low" id="7days-low">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">总事件</span>
+                    <span class="stat-value" id="7days-total">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 🔥 峰值日详细数据统计框 -->
+        <div style="margin-bottom: 30px;">
+            <div class="stat-card" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.1)); border: 2px solid #667eea;">
+                <h2 style="color: #667eea; font-size: 1.6em; margin-bottom: 20px; text-align: center;">
+                    📊 历史峰值日数据对比
+                </h2>
+                
+                <!-- 峰值日数据对比 -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <!-- 创新高峰值日数据 -->
+                    <div style="background: rgba(16, 185, 129, 0.08); padding: 20px; border-radius: 12px; border: 2px solid rgba(16, 185, 129, 0.3);">
+                        <h3 style="color: #10b981; font-size: 1.3em; margin-bottom: 15px; text-align: center;">
+                            🏆 创新高峰值日
+                        </h3>
+                        <div style="text-align: center; margin-bottom: 15px;">
+                            <div style="font-size: 1.5em; font-weight: 700; color: #10b981;" id="peak-high-detail-date">--</div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div style="background: rgba(255, 255, 255, 0.5); padding: 12px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 0.85em; color: #065f46; margin-bottom: 5px;">创新高</div>
+                                <div style="font-size: 2em; font-weight: 700; color: #10b981; font-family: 'Courier New', monospace;" id="peak-high-detail-high">0</div>
+                            </div>
+                            <div style="background: rgba(255, 255, 255, 0.5); padding: 12px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 0.85em; color: #991b1b; margin-bottom: 5px;">创新低</div>
+                                <div style="font-size: 2em; font-weight: 700; color: #ef4444; font-family: 'Courier New', monospace;" id="peak-high-detail-low">0</div>
+                            </div>
+                        </div>
+                        
+                        <div style="background: rgba(255, 255, 255, 0.5); padding: 12px; border-radius: 8px; text-align: center; margin-top: 10px;">
+                            <div style="font-size: 0.85em; color: #1e40af; margin-bottom: 5px;">总事件</div>
+                            <div style="font-size: 2.5em; font-weight: 700; color: #667eea; font-family: 'Courier New', monospace;" id="peak-high-detail-total">0</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 创新低峰值日数据 -->
+                    <div style="background: rgba(239, 68, 68, 0.08); padding: 20px; border-radius: 12px; border: 2px solid rgba(239, 68, 68, 0.3);">
+                        <h3 style="color: #ef4444; font-size: 1.3em; margin-bottom: 15px; text-align: center;">
+                            🎯 创新低峰值日
+                        </h3>
+                        <div style="text-align: center; margin-bottom: 15px;">
+                            <div style="font-size: 1.5em; font-weight: 700; color: #ef4444;" id="peak-low-detail-date">--</div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div style="background: rgba(255, 255, 255, 0.5); padding: 12px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 0.85em; color: #065f46; margin-bottom: 5px;">创新高</div>
+                                <div style="font-size: 2em; font-weight: 700; color: #10b981; font-family: 'Courier New', monospace;" id="peak-low-detail-high">0</div>
+                            </div>
+                            <div style="background: rgba(255, 255, 255, 0.5); padding: 12px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 0.85em; color: #991b1b; margin-bottom: 5px;">创新低</div>
+                                <div style="font-size: 2em; font-weight: 700; color: #ef4444; font-family: 'Courier New', monospace;" id="peak-low-detail-low">0</div>
+                            </div>
+                        </div>
+                        
+                        <div style="background: rgba(255, 255, 255, 0.5); padding: 12px; border-radius: 8px; text-align: center; margin-top: 10px;">
+                            <div style="font-size: 0.85em; color: #1e40af; margin-bottom: 5px;">总事件</div>
+                            <div style="font-size: 2.5em; font-weight: 700; color: #667eea; font-family: 'Courier New', monospace;" id="peak-low-detail-total">0</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 数据说明 -->
+                <div style="margin-top: 20px; padding: 15px; background: rgba(102, 126, 234, 0.1); border-radius: 8px; border-left: 4px solid #667eea;">
+                    <div style="font-size: 0.9em; color: #a0a0a0; line-height: 1.8;">
+                        <strong style="color: #667eea;">💡 数据说明：</strong><br>
+                        • 创新高峰值日：历史上单日创新高次数最多的日期<br>
+                        • 创新低峰值日：历史上单日创新低次数最多的日期<br>
+                        • 数据已保存至：<code>peak_days_detail_record.jsonl</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 趋势对比图表 -->
+        <div class="chart-container">
+            <h2 style="color: #667eea; margin-bottom: 20px;">📊 事件趋势对比</h2>
+            <div id="comparison-chart" class="chart"></div>
+        </div>
+        
+        <!-- 币种统计图表 -->
+        <div class="chart-container">
+            <h2 style="color: #667eea; margin-bottom: 20px;">💰 币种事件统计 (Top 15)</h2>
+            <div id="symbol-chart" class="chart"></div>
+        </div>
+        
+        <!-- 所有币种详细信息表 -->
+        <div class="chart-container">
+            <h2 style="color: #667eea; margin-bottom: 20px;">📊 所有币种最高价/最低价详情</h2>
+            <div style="overflow-x: auto;">
+                <table id="coin-states-table">
+                    <thead>
+                        <tr>
+                            <th>币种</th>
+                            <th>历史最高价</th>
+                            <th>最高价时间</th>
+                            <th>距今时长</th>
+                            <th>历史最低价</th>
+                            <th>最低价时间</th>
+                            <th>距今时长</th>
+                        </tr>
+                    </thead>
+                    <tbody id="coin-states-tbody">
+                        <tr><td colspan="7" style="text-align: center;">加载中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- 最近事件列表 -->
+        <div class="chart-container">
+            <h2 style="color: #667eea; margin-bottom: 20px;">🕐 最近事件 (最多100条)</h2>
+            <div style="overflow-x: auto;">
+                <table id="events-table">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>币种</th>
+                            <th>事件类型</th>
+                            <th>价格</th>
+                            <th>前值</th>
+                        </tr>
+                    </thead>
+                    <tbody id="events-tbody">
+                        <tr><td colspan="5" style="text-align: center;">加载中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- 说明信息 -->
+        <div class="info-box">
+            <h3>ℹ️ 统计说明</h3>
+            <ul>
+                <li><strong>创新高</strong>: 当前价格超过该币种的历史最高价</li>
+                <li><strong>创新低</strong>: 当前价格低于该币种的历史最低价</li>
+                <li>每个币种维护独立的历史最高价和最低价记录</li>
+                <li>数据每3分钟更新一次，页面每60秒自动刷新</li>
+                <li>追踪币种包括: BTC, ETH, SOL, BNB, XRP, ADA, DOGE, TRX, DOT, LTC, BCH, LINK, UNI, FIL, ETC, AAVE, CRV, NEAR, APT, STX, LDO, OKB, CRO, HBAR, TON, TAO, SUI, XLM 共28个</li>
+            </ul>
+        </div>
+        
+    </div>
+    
+    <script>
+        const comparisonChart = echarts.init(document.getElementById('comparison-chart'));
+        const symbolChart = echarts.init(document.getElementById('symbol-chart'));
+        
+        // 技术文档折叠控制
+        function toggleTechDoc() {
+            const content = document.getElementById('tech-doc-content');
+            const toggle = document.getElementById('tech-doc-toggle');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                toggle.textContent = '▲ 收起';
+            } else {
+                content.style.display = 'none';
+                toggle.textContent = '▼ 展开';
+            }
+        }
+        
+        // 数据备份功能
+        async function backupData() {
+            const btn = document.getElementById('backup-btn');
+            const status = document.getElementById('backup-status');
+            
+            // 禁用按钮防止重复点击
+            btn.disabled = true;
+            btn.textContent = '⏳ 备份中...';
+            status.textContent = '';
+            
+            try {
+                const response = await fetch('/api/price-position/backup-new-high-low-data', {
+                    method: 'POST',
+                    cache: 'no-store'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    status.style.color = '#10b981';
+                    status.textContent = `✅ ${data.message || '备份成功'}`;
+                    
+                    // 显示备份文件信息
+                    if (data.backup_file) {
+                        setTimeout(() => {
+                            status.textContent = `✅ 已备份: ${data.backup_file} (${data.file_size || '--'})`;
+                        }, 1000);
+                    }
+                } else {
+                    throw new Error(data.error || '备份失败');
+                }
+            } catch (error) {
+                console.error('备份失败:', error);
+                status.style.color = '#ef4444';
+                status.textContent = `❌ 备份失败: ${error.message}`;
+            } finally {
+                // 恢复按钮状态
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.textContent = '💾 备份数据';
+                }, 2000);
+            }
+        }
+        
+        // 加载历史峰值数据
+        async function loadPeakData() {
+            console.log('🔄 [Peak Days] 开始加载历史峰值数据...');
+            
+            try {
+                const url = `/api/price-position/new-high-low-peak-days?_t=${Date.now()}`;
+                const response = await fetch(url, {
+                    cache: 'no-store',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API请求失败: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('✅ [Peak Days] 峰值数据加载成功:', data);
+                
+                if (!data.success) {
+                    throw new Error(data.error || '峰值数据加载失败');
+                }
+                
+                // 更新创新高峰值日
+                const peakHigh = data.peak_new_high_day;
+                document.getElementById('peak-high-date').textContent = peakHigh.date || '--';
+                document.getElementById('peak-high-new-high').textContent = peakHigh.count || 0;
+                document.getElementById('peak-high-new-low').textContent = peakHigh.new_low_count || 0;
+                document.getElementById('peak-high-total').textContent = peakHigh.total_count || 0;
+                
+                // 更新创新高详情
+                const highDetailsEl = document.getElementById('peak-high-details');
+                if (peakHigh.details && Object.keys(peakHigh.details).length > 0) {
+                    const sortedHighDetails = Object.entries(peakHigh.details)
+                        .sort((a, b) => b[1].new_high - a[1].new_high)
+                        .slice(0, 10);  // 只显示前10个
+                    
+                    highDetailsEl.innerHTML = sortedHighDetails.map(([symbol, counts]) => 
+                        `<div style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <span style="color: #667eea; font-weight: 600;">${symbol}</span>
+                            <span style="color: #e0e0e0;">
+                                <span style="color: #10b981;">↑${counts.new_high}</span>
+                                <span style="margin: 0 6px; color: #555;">|</span>
+                                <span style="color: #ef4444;">↓${counts.new_low}</span>
+                            </span>
+                        </div>`
+                    ).join('');
+                } else {
+                    highDetailsEl.textContent = '暂无数据';
+                }
+                
+                // 更新创新低峰值日
+                const peakLow = data.peak_new_low_day;
+                document.getElementById('peak-low-date').textContent = peakLow.date || '--';
+                document.getElementById('peak-low-new-high').textContent = peakLow.new_high_count || 0;
+                document.getElementById('peak-low-new-low').textContent = peakLow.count || 0;
+                document.getElementById('peak-low-total').textContent = peakLow.total_count || 0;
+                
+                // 更新创新低详情
+                const lowDetailsEl = document.getElementById('peak-low-details');
+                if (peakLow.details && Object.keys(peakLow.details).length > 0) {
+                    const sortedLowDetails = Object.entries(peakLow.details)
+                        .sort((a, b) => b[1].new_low - a[1].new_low)
+                        .slice(0, 10);  // 只显示前10个
+                    
+                    lowDetailsEl.innerHTML = sortedLowDetails.map(([symbol, counts]) => 
+                        `<div style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <span style="color: #667eea; font-weight: 600;">${symbol}</span>
+                            <span style="color: #e0e0e0;">
+                                <span style="color: #10b981;">↑${counts.new_high}</span>
+                                <span style="margin: 0 6px; color: #555;">|</span>
+                                <span style="color: #ef4444;">↓${counts.new_low}</span>
+                            </span>
+                        </div>`
+                    ).join('');
+                } else {
+                    lowDetailsEl.textContent = '暂无数据';
+                }
+                
+                console.log('✅ [Peak Days] 峰值数据更新完成');
+                
+            } catch (error) {
+                console.error('❌ [Peak Days] 加载峰值数据失败:', error);
+                document.getElementById('peak-high-date').textContent = '加载失败';
+                document.getElementById('peak-low-date').textContent = '加载失败';
+            }
+        }
+        
+        // 加载数据
+        async function loadData() {
+            console.log('🔄 [New High/Low] 开始加载数据...', new Date().toLocaleString());
+            
+            try {
+                const url = `/api/price-position/new-high-low-stats?_t=${Date.now()}`;
+                console.log('📡 [New High/Low] API URL:', url);
+                
+                const response = await fetch(url, {
+                    cache: 'no-store',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                
+                console.log('📥 [New High/Low] 响应状态:', response.status, response.statusText);
+                
+                if (!response.ok) {
+                    throw new Error(`API请求失败: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('✅ [New High/Low] 数据加载成功:', {
+                    timestamp: data.timestamp,
+                    coin_count: data.coin_count,
+                    today_events: data.today?.total_events,
+                    seven_days_events: data['7days']?.total_events
+                });
+                
+                if (!data.success) {
+                    throw new Error(data.error || '数据加载失败');
+                }
+                
+                // 更新基本信息
+                document.getElementById('update-time').textContent = data.timestamp || '--';
+                document.getElementById('coin-count').textContent = data.coin_count || '--';
+                document.getElementById('status').textContent = '正常';
+                document.getElementById('status').className = 'status-ok';
+                
+                // 更新统计卡片
+                console.log('📊 [New High/Low] 更新统计卡片...');
+                updateStatCard('today', data.today || {});
+                updateStatCard('yesterday', data.yesterday || {});
+                updateStatCard('3days', data['3days'] || {});
+                updateStatCard('7days', data['7days'] || {});
+                
+                // 更新图表
+                console.log('📈 [New High/Low] 更新图表...');
+                updateComparisonChart(data);
+                updateSymbolStatsChart(data['7days'].by_symbol || {});
+                
+                // 更新币种状态表格
+                console.log('📋 [New High/Low] 更新币种状态表格...');
+                updateCoinStatesTable(data.coin_states || {}, data.timestamp);
+                
+                // 更新事件列表
+                console.log('📝 [New High/Low] 更新事件列表...');
+                updateEventsTable(data.today.events || []);
+                
+                console.log('✅ [New High/Low] 页面更新完成');
+                
+                // 🔥 加载历史峰值数据
+                await loadPeakData();
+                
+            } catch (error) {
+                console.error('❌ [New High/Low] 加载数据失败:', error);
+                console.error('❌ [New High/Low] 错误堆栈:', error.stack);
+                document.getElementById('status').textContent = '加载失败';
+                document.getElementById('status').className = 'status-error';
+            }
+        }
+        
+        // 更新统计卡片
+        function updateStatCard(period, stats) {
+            document.getElementById(`${period}-high`).textContent = stats.new_high || 0;
+            document.getElementById(`${period}-low`).textContent = stats.new_low || 0;
+            document.getElementById(`${period}-total`).textContent = stats.total_events || 0;
+        }
+        
+        // 更新趋势对比图表
+        function updateComparisonChart(data) {
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    borderColor: '#667eea',
+                    textStyle: {
+                        color: '#e0e0e0'
+                    }
+                },
+                legend: {
+                    data: ['创新高', '创新低'],
+                    textStyle: {
+                        color: '#e0e0e0'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['今天', '昨天', '最近3天', '最近7天'],
+                    axisLine: {
+                        lineStyle: {
+                            color: 'rgba(255, 255, 255, 0.3)'
+                        }
+                    },
+                    axisLabel: {
+                        color: '#e0e0e0'
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: {
+                        lineStyle: {
+                            color: 'rgba(255, 255, 255, 0.3)'
+                        }
+                    },
+                    axisLabel: {
+                        color: '#e0e0e0'
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    }
+                },
+                series: [
+                    {
+                        name: '创新高',
+                        type: 'bar',
+                        data: [
+                            data.today.new_high || 0,
+                            data.yesterday.new_high || 0,
+                            data['3days'].new_high || 0,
+                            data['7days'].new_high || 0
+                        ],
+                        itemStyle: {
+                            color: '#10b981'
+                        }
+                    },
+                    {
+                        name: '创新低',
+                        type: 'bar',
+                        data: [
+                            data.today.new_low || 0,
+                            data.yesterday.new_low || 0,
+                            data['3days'].new_low || 0,
+                            data['7days'].new_low || 0
+                        ],
+                        itemStyle: {
+                            color: '#ef4444'
+                        }
+                    }
+                ]
+            };
+            
+            comparisonChart.setOption(option);
+        }
+        
+        // 更新币种统计图表
+        function updateSymbolStatsChart(bySymbol) {
+            const symbols = Object.keys(bySymbol);
+            const data = symbols.map(symbol => {
+                const stats = bySymbol[symbol];
+                return {
+                    name: symbol,
+                    value: (stats.new_high || 0) + (stats.new_low || 0)
+                };
+            }).filter(item => item.value > 0).sort((a, b) => b.value - a.value).slice(0, 15);
+            
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    },
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    borderColor: '#667eea',
+                    textStyle: {
+                        color: '#e0e0e0'
+                    },
+                    formatter: function(params) {
+                        const symbol = params[0].name;
+                        const stats = bySymbol[symbol];
+                        return `
+                            <strong>${symbol}</strong><br/>
+                            创新高: <span style="color:#10b981">${stats.new_high || 0}</span><br/>
+                            创新低: <span style="color:#ef4444">${stats.new_low || 0}</span><br/>
+                            总计: ${params[0].value}
+                        `;
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value',
+                    axisLine: {
+                        lineStyle: {
+                            color: 'rgba(255, 255, 255, 0.3)'
+                        }
+                    },
+                    axisLabel: {
+                        color: '#e0e0e0'
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    }
+                },
+                yAxis: {
+                    type: 'category',
+                    data: data.map(item => item.name),
+                    axisLine: {
+                        lineStyle: {
+                            color: 'rgba(255, 255, 255, 0.3)'
+                        }
+                    },
+                    axisLabel: {
+                        color: '#e0e0e0'
+                    }
+                },
+                series: [{
+                    type: 'bar',
+                    data: data.map(item => item.value),
+                    itemStyle: {
+                        color: '#667eea'
+                    }
+                }]
+            };
+            
+            symbolChart.setOption(option);
+        }
+        
+        // 计算时间差
+        function getTimeElapsed(timeStr, currentTimeStr) {
+            try {
+                const targetTime = new Date(timeStr.replace(' ', 'T'));
+                const currentTime = new Date(currentTimeStr.replace(' ', 'T'));
+                const diffMs = currentTime - targetTime;
+                
+                if (diffMs < 0) return '刚刚';
+                
+                const diffMinutes = Math.floor(diffMs / 60000);
+                const diffHours = Math.floor(diffMs / 3600000);
+                const diffDays = Math.floor(diffMs / 86400000);
+                
+                if (diffDays > 0) {
+                    return `${diffDays}天${diffHours % 24}小时前`;
+                } else if (diffHours > 0) {
+                    return `${diffHours}小时${diffMinutes % 60}分钟前`;
+                } else if (diffMinutes > 0) {
+                    return `${diffMinutes}分钟前`;
+                } else {
+                    return '刚刚';
+                }
+            } catch (e) {
+                return '--';
+            }
+        }
+        
+        // 更新币种状态表格
+        function updateCoinStatesTable(coinStates, currentTime) {
+            const tbody = document.getElementById('coin-states-tbody');
+            
+            if (Object.keys(coinStates).length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">暂无数据</td></tr>';
+                return;
+            }
+            
+            // 按币种名称排序
+            const sortedCoins = Object.keys(coinStates).sort();
+            
+            const rows = sortedCoins.map(symbol => {
+                const state = coinStates[symbol];
+                const highElapsed = getTimeElapsed(state.highest_time, currentTime);
+                const lowElapsed = getTimeElapsed(state.lowest_time, currentTime);
+                
+                return `
+                    <tr>
+                        <td><span class="coin-symbol">${symbol}</span></td>
+                        <td class="price-high">$${state.highest_price.toFixed(6)}</td>
+                        <td>${state.highest_time}</td>
+                        <td class="time-elapsed">${highElapsed}</td>
+                        <td class="price-low">$${state.lowest_price.toFixed(6)}</td>
+                        <td>${state.lowest_time}</td>
+                        <td class="time-elapsed">${lowElapsed}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            tbody.innerHTML = rows;
+        }
+        
+        // 更新事件列表
+        function updateEventsTable(events) {
+            const tbody = document.getElementById('events-tbody');
+            
+            if (events.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">暂无事件</td></tr>';
+                return;
+            }
+            
+            const rows = events.slice(0, 100).map(event => {
+                const eventClass = event.type === 'new_high' || event.event_type === 'new_high' ? 'event-new-high' : 'event-new-low';
+                const eventName = event.type === 'new_high' || event.event_type === 'new_high' ? '创新高' : '创新低';
+                const previousLabel = event.type === 'new_high' || event.event_type === 'new_high' ? '前高' : '前低';
+                const previousValue = event.previous_high || event.previous_low || '--';
+                
+                return `
+                    <tr>
+                        <td>${event.time}</td>
+                        <td><strong>${event.symbol}</strong></td>
+                        <td class="${eventClass}">${eventName}</td>
+                        <td>${event.price}</td>
+                        <td>${previousValue}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            tbody.innerHTML = rows;
+        }
+        
+        // 初始加载
+        loadData();
+        
+        // 每60秒自动刷新
+        setInterval(loadData, 60000);
+        
+        // 窗口大小变化时调整图表
+        window.addEventListener('resize', () => {
+            comparisonChart.resize();
+            symbolChart.resize();
+        });
+    </script>
+</body>
+</html>

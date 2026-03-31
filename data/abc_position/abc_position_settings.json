@@ -1,0 +1,36 @@
+{
+  "accounts": {
+    "A": {
+      "name": "主账户",
+      "thresholds": {
+        "A": 35,
+        "B": 70,
+        "C": 85
+      }
+    },
+    "B": {
+      "name": "POIT",
+      "thresholds": {
+        "A": 25,
+        "B": 50,
+        "C": 65
+      }
+    },
+    "C": {
+      "name": "fangfang12",
+      "thresholds": {
+        "A": 35,
+        "B": 70,
+        "C": 95
+      }
+    },
+    "D": {
+      "name": "dadanini",
+      "thresholds": {
+        "A": 45,
+        "B": 90,
+        "C": 125
+      }
+    }
+  }
+}

@@ -1,0 +1,1 @@
+{"timestamp": "2026-02-23T04:34:42.133239", "time": "2026-02-23 04:34:42", "account_id": "account_main", "strategy_type": "bottom8_short", "enabled": false, "rsi_threshold": 1900, "max_order_usdt": 5.0, "position_percent": 1.5, "leverage": 10, "description": "见顶信号+涨幅后8做空策略"}

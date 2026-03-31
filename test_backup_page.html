@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>备份管理器测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; border: 1px solid #bee5eb; }
+    </style>
+</head>
+<body>
+    <h1>🔍 备份管理器功能测试</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function testBackupManager() {
+            const results = document.getElementById('results');
+            
+            // Test 1: Check API status
+            results.innerHTML += '<h2>测试 1: API 状态检查</h2>';
+            try {
+                const response = await fetch('/api/backup/status');
+                const data = await response.json();
+                
+                if (data.success) {
+                    results.innerHTML += `<div class="status success">
+                        ✅ API 正常<br>
+                        备份目录: ${data.backup_dir}<br>
+                        当前备份数: ${data.total_backups}<br>
+                        总大小: ${data.total_size_formatted}<br>
+                        下次备份: ${data.next_backup_time}
+                    </div>`;
+                    
+                    // Test 2: Check backup list
+                    results.innerHTML += '<h2>测试 2: 备份列表</h2>';
+                    if (data.backups && data.backups.length > 0) {
+                        let listHtml = '<table border="1" cellpadding="5" style="border-collapse: collapse; width: 100%;">';
+                        listHtml += '<tr><th>文件名</th><th>大小</th><th>时间</th></tr>';
+                        data.backups.forEach(backup => {
+                            listHtml += `<tr>
+                                <td>${backup.filename}</td>
+                                <td>${backup.size_formatted}</td>
+                                <td>${backup.timestamp}</td>
+                            </tr>`;
+                        });
+                        listHtml += '</table>';
+                        results.innerHTML += `<div class="status success">✅ 找到 ${data.backups.length} 个备份文件<br>${listHtml}</div>`;
+                    } else {
+                        results.innerHTML += '<div class="status error">❌ 备份列表为空</div>';
+                    }
+                    
+                    // Test 3: Check backup history
+                    results.innerHTML += '<h2>测试 3: 备份历史</h2>';
+                    if (data.backup_history && data.backup_history.length > 0) {
+                        const successCount = data.backup_history.filter(h => h.status === 'success').length;
+                        const failedCount = data.backup_history.filter(h => h.status === 'failed').length;
+                        results.innerHTML += `<div class="status info">
+                            📊 历史记录总数: ${data.backup_history.length}<br>
+                            ✅ 成功: ${successCount}<br>
+                            ❌ 失败: ${failedCount}
+                        </div>`;
+                    }
+                } else {
+                    results.innerHTML += '<div class="status error">❌ API 返回失败</div>';
+                }
+            } catch (error) {
+                results.innerHTML += `<div class="status error">❌ 错误: ${error.message}</div>`;
+            }
+            
+            // Test 4: Check page accessibility
+            results.innerHTML += '<h2>测试 4: 页面访问</h2>';
+            results.innerHTML += '<div class="status info">页面已加载，JavaScript 正常运行</div>';
+        }
+        
+        // Run tests when page loads
+        window.addEventListener('DOMContentLoaded', testBackupManager);
+    </script>
+</body>
+</html>

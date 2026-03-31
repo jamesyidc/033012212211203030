@@ -1,0 +1,1 @@
+{"account_id": "account_main", "percentTakeProfitEnabled": true, "percentTakeProfitThreshold": 32.0, "percentStopLossEnabled": false, "percentStopLossThreshold": 7.0, "confirmStructureEnabled": true, "confirmStructureThreshold": 9.0, "last_updated": "2026-03-12 23:04:15", "comment": "百分比止盈止损配置 - 基于总保证金百分比计算 + 确认结构提醒"}

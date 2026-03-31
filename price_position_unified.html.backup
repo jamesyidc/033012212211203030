@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>价格位置预警系统 v2.0 - 统一监控</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            color: #a0a0a0;
+        }
+        
+        /* 日期导航 */
+        .date-nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .date-nav button {
+            background: #2d2d44;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+        
+        .date-nav button:hover:not(:disabled) {
+            background: #3d3d54;
+            border-color: #667eea;
+        }
+        
+        .date-nav button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .date-nav input[type="date"] {
+            background: #2d2d44;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 1em;
+        }
+        
+        /* 预警框区域 - 2x2网格 */
+        .alert-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .alert-box {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 25px;
+            border: 2px solid;
+            min-height: 200px;
+        }
+        
+        .alert-box.green {
+            border-color: #52c41a;
+        }
+        
+        .alert-box.red {
+            border-color: #ff4d4f;
+        }
+        
+        .alert-box h3 {
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .alert-box h3 .icon {
+            font-size: 1.2em;
+        }
+        
+        .alert-box .description {
+            color: #a0a0a0;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .alert-box .timeline {
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .alert-box .timeline-item {
+            background: rgba(0,0,0,0.3);
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border-left: 3px solid;
+        }
+        
+        .alert-box.green .timeline-item {
+            border-left-color: #52c41a;
+        }
+        
+        .alert-box.red .timeline-item {
+            border-left-color: #ff4d4f;
+        }
+        
+        .alert-box .timeline-item .time {
+            font-size: 0.9em;
+            color: #a0a0a0;
+            margin-bottom: 5px;
+        }
+        
+        .alert-box .timeline-item .coins {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .alert-box .timeline-item .coin-tag {
+            background: rgba(255,255,255,0.1);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            border: 1px solid;
+        }
+        
+        .alert-box.green .coin-tag {
+            border-color: #52c41a;
+            color: #52c41a;
+        }
+        
+        .alert-box.red .coin-tag {
+            border-color: #ff4d4f;
+            color: #ff4d4f;
+        }
+        
+        .alert-box .empty {
+            color: #666;
+            font-style: italic;
+            text-align: center;
+            padding: 30px 0;
+        }
+        
+        .alert-box .count {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        /* 信号判定说明区域 */
+        .signal-rules {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 2px solid #667eea;
+        }
+        
+        .signal-rules h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-align: center;
+        }
+        
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .rule-box {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid;
+        }
+        
+        .rule-box.buy {
+            border-left-color: #52c41a;
+        }
+        
+        .rule-box.sell {
+            border-left-color: #ff4d4f;
+        }
+        
+        .rule-box h3 {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .rule-box .formula {
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            line-height: 1.8;
+        }
+        
+        .rule-box .current-data {
+            background: rgba(102,126,234,0.2);
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 0.9em;
+            line-height: 1.8;
+        }
+        
+        .rule-box .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .rule-box .result.triggered {
+            background: rgba(255,77,79,0.2);
+            color: #ff4d4f;
+        }
+        
+        .rule-box .result.not-triggered {
+            background: rgba(160,160,160,0.2);
+            color: #a0a0a0;
+        }
+        
+        /* 统计卡片区域 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: #16213e;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #2d2d44;
+        }
+        
+        .stat-card h3 {
+            font-size: 0.9em;
+            color: #a0a0a0;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-card.green .value {
+            color: #52c41a;
+        }
+        
+        .stat-card.red .value {
+            color: #ff4d4f;
+        }
+        
+        .stat-card.orange .value {
+            color: #faad14;
+        }
+        
+        /* 图表区域 */
+        .charts-row {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-container {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #2d2d44;
+            width: 100%;
+        }
+        
+        .chart-container h2 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .chart-nav {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chart-nav button {
+            background: #2d2d44;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+        
+        .chart-nav button:hover:not(:disabled) {
+            background: #3d3d54;
+            border-color: #667eea;
+        }
+        
+        .chart-nav button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .chart-container .chart {
+            width: 100%;
+            height: 550px;
+        }
+        
+        /* 时间轴区域 */
+        .timeline-section {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid #2d2d44;
+        }
+        
+        .timeline-section h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #fff;
+            text-align: center;
+        }
+        
+        .timeline-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .timeline-box {
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .timeline-box.buy {
+            border-color: #52c41a;
+        }
+        
+        .timeline-box.sell {
+            border-color: #ff4d4f;
+        }
+        
+        .timeline-box h3 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .timeline-box .count-badge {
+            background: rgba(102,126,234,0.3);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            color: #667eea;
+        }
+        
+        .timeline-item {
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border-left: 3px solid;
+        }
+        
+        .timeline-box.buy .timeline-item {
+            border-left-color: #52c41a;
+        }
+        
+        .timeline-box.sell .timeline-item {
+            border-left-color: #ff4d4f;
+        }
+        
+        .timeline-item .time {
+            font-size: 1em;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .timeline-item .time .icon {
+            font-size: 0.9em;
+        }
+        
+        .timeline-item .coins {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        
+        .timeline-item .coin-badge {
+            background: rgba(255,255,255,0.1);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            border: 1px solid;
+            color: #fff;
+        }
+        
+        .timeline-box.buy .coin-badge {
+            border-color: #52c41a;
+        }
+        
+        .timeline-box.sell .coin-badge {
+            border-color: #ff4d4f;
+        }
+        
+        .timeline-item .details {
+            margin-top: 8px;
+            font-size: 0.85em;
+            color: #a0a0a0;
+        }
+        
+        .timeline-box .empty-timeline {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        /* 表格区域 */
+        .table-container {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #2d2d44;
+            overflow-x: auto;
+        }
+        
+        .table-container h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+        
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        th {
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: 600;
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        td {
+            padding: 10px 8px;
+            text-align: center;
+            border-bottom: 1px solid #2d2d44;
+            font-weight: 500;
+        }
+        
+        tbody tr {
+            background: #1a1a2e;
+            transition: background 0.2s;
+        }
+        
+        tbody tr:nth-child(even) {
+            background: #16213e;
+        }
+        
+        tbody tr:hover {
+            background: #2d2d44;
+        }
+        
+        .green-text {
+            color: #52c41a;
+        }
+        
+        .red-text {
+            color: #ff4d4f;
+        }
+        
+        .yellow-text {
+            color: #faad14;
+        }
+        
+        .white-text {
+            color: #fff;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 1200px) {
+            .alert-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .rules-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 页面标题 -->
+        <div class="header">
+            <h1>💰 价格位置预警系统 v2.0</h1>
+            <p>4条线预警 + 逃顶统计 + 27币种实时监控 | 每60秒更新</p>
+        </div>
+
+        <!-- 日期导航 -->
+        <div class="date-nav">
+            <button id="prevDay">← 前一天</button>
+            <input type="date" id="dateInput" />
+            <button id="nextDay">后一天 →</button>
+            <button id="todayBtn">今天</button>
+        </div>
+
+        <!-- 4个预警框（2x2网格）-->
+        <div class="alert-grid">
+            <!-- 48h低位预警 -->
+            <div class="alert-box green">
+                <h3>
+                    <span class="icon">🟢</span>
+                    <span>48h低位预警</span>
+                </h3>
+                <div class="description">
+                    <strong>判定条件：</strong>48h位置 ≤ 5%（接近48小时最低点）<br>
+                    <strong>市场含义：</strong>短期超跌，可能反弹<br>
+                    <strong>操作建议：</strong>关注抄底机会
+                </div>
+                <div id="alert48hLow" class="coins">
+                    <div class="empty">暂无预警</div>
+                </div>
+            </div>
+
+            <!-- 7天低位预警 -->
+            <div class="alert-box green">
+                <h3>
+                    <span class="icon">🔵</span>
+                    <span>7天低位预警</span>
+                </h3>
+                <div class="description">
+                    <strong>判定条件：</strong>7天位置 ≤ 5%（接近7天最低点）<br>
+                    <strong>市场含义：</strong>中期支撑位，强支撑区域<br>
+                    <strong>操作建议：</strong>战略性建仓机会
+                </div>
+                <div id="alert7dLow" class="coins">
+                    <div class="empty">暂无预警</div>
+                </div>
+            </div>
+
+            <!-- 48h高位预警 -->
+            <div class="alert-box red">
+                <h3>
+                    <span class="icon">🟠</span>
+                    <span>48h高位预警</span>
+                </h3>
+                <div class="description">
+                    <strong>判定条件：</strong>48h位置 ≥ 95%（接近48小时最高点）<br>
+                    <strong>市场含义：</strong>短期超买，可能回调<br>
+                    <strong>操作建议：</strong>考虑减仓或止盈
+                </div>
+                <div id="alert48hHigh" class="coins">
+                    <div class="empty">暂无预警</div>
+                </div>
+            </div>
+
+            <!-- 7天高位预警 -->
+            <div class="alert-box red">
+                <h3>
+                    <span class="icon">🔴</span>
+                    <span>7天高位预警</span>
+                </h3>
+                <div class="description">
+                    <strong>判定条件：</strong>7天位置 ≥ 95%（接近7天最高点）<br>
+                    <strong>市场含义：</strong>中期压力位，强压力区域<br>
+                    <strong>操作建议：</strong>重点关注逃顶信号
+                </div>
+                <div id="alert7dHigh" class="coins">
+                    <div class="empty">暂无预警</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 信号判定说明 -->
+        <div class="signal-rules">
+            <h2>📋 信号判定规则与实时计算</h2>
+            <div class="rules-grid">
+                <!-- 抄底信号 -->
+                <div class="rule-box buy">
+                    <h3>🟢 抄底信号（买入）</h3>
+                    <div class="formula">
+                        <strong>判定条件：</strong><br>
+                        1️⃣ 支撑线1（48h≤5%）≥ 1 个币种<br>
+                        2️⃣ 支撑线2（7d≤5%）≥ 1 个币种<br>
+                        3️⃣ 支撑线1 + 支撑线2 ≥ 20<br>
+                        <br>
+                        <strong>公式：</strong><br>
+                        IF (支撑线1 ≥ 1) AND (支撑线2 ≥ 1) AND (支撑线1 + 支撑线2 ≥ 20)<br>
+                        THEN 触发抄底信号
+                    </div>
+                    <div class="current-data" id="buySignalData">
+                        <strong>当前数据：</strong><br>
+                        支撑线1（48h≤5%）= <span id="currentSupport48h">-</span> 个币种<br>
+                        支撑线2（7d≤5%）= <span id="currentSupport7d">-</span> 个币种<br>
+                        总和 = <span id="currentSupportSum">-</span><br>
+                        <br>
+                        <strong>判定结果：</strong>
+                    </div>
+                    <div class="result not-triggered" id="buySignalResult">
+                        未触发
+                    </div>
+                </div>
+
+                <!-- 逃顶信号 -->
+                <div class="rule-box sell">
+                    <h3>🔴 逃顶信号（卖出）</h3>
+                    <div class="formula">
+                        <strong>判定条件：</strong><br>
+                        1️⃣ 压力线1（48h≥95%）≥ 1 个币种<br>
+                        2️⃣ 压力线2（7d≥95%）≥ 1 个币种<br>
+                        3️⃣ 压力线1 + 压力线2 ≥ 8<br>
+                        <br>
+                        <strong>公式：</strong><br>
+                        IF (压力线1 ≥ 1) AND (压力线2 ≥ 1) AND (压力线1 + 压力线2 ≥ 8)<br>
+                        THEN 触发逃顶信号
+                    </div>
+                    <div class="current-data" id="sellSignalData">
+                        <strong>当前数据：</strong><br>
+                        压力线1（48h≥95%）= <span id="currentPressure48h">-</span> 个币种<br>
+                        压力线2（7d≥95%）= <span id="currentPressure7d">-</span> 个币种<br>
+                        总和 = <span id="currentPressureSum">-</span><br>
+                        <br>
+                        <strong>判定结果：</strong>
+                    </div>
+                    <div class="result not-triggered" id="sellSignalResult">
+                        未触发
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card green">
+                <h3>🟢 抄底信号触发次数</h3>
+                <div class="value" id="statBuySignals">-</div>
+            </div>
+            <div class="stat-card red">
+                <h3>🔴 逃顶信号触发次数</h3>
+                <div class="value" id="statSellSignals">-</div>
+            </div>
+            <div class="stat-card orange">
+                <h3>📊 24h逃顶触发次数</h3>
+                <div class="value" id="stat24h">-</div>
+            </div>
+            <div class="stat-card orange">
+                <h3>⚡ 2h逃顶触发次数</h3>
+                <div class="value" id="stat2h">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>💎 当前符合币种</h3>
+                <div class="value" id="statCurrent">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>📈 数据点数</h3>
+                <div class="value" id="statPoints">-</div>
+            </div>
+        </div>
+
+        <!-- 图表区域 -->
+        <div class="charts-row">
+            <div class="chart-container">
+                <h2>📈 图表1：4条线 + 抄底逃顶信号</h2>
+                <div id="chart4Lines" class="chart"></div>
+            </div>
+            <div class="chart-container">
+                <h2>📊 图表2：24h/2h 逃顶统计</h2>
+                <div id="chartEscape" class="chart"></div>
+            </div>
+        </div>
+
+        <!-- 时间轴区域 -->
+        <div class="timeline-section">
+            <h2>⏰ 信号触发时间轴（今日所有触发记录）</h2>
+            <div class="timeline-grid">
+                <!-- 抄底信号时间轴 -->
+                <div class="timeline-box buy">
+                    <h3>
+                        🟢 抄底信号时间轴
+                        <span class="count-badge" id="buyTimelineCount">0次</span>
+                    </h3>
+                    <div id="buyTimeline">
+                        <div class="empty-timeline">今日暂无抄底信号触发</div>
+                    </div>
+                </div>
+
+                <!-- 逃顶信号时间轴 -->
+                <div class="timeline-box sell">
+                    <h3>
+                        🔴 逃顶信号时间轴
+                        <span class="count-badge" id="sellTimelineCount">0次</span>
+                    </h3>
+                    <div id="sellTimeline">
+                        <div class="empty-timeline">今日暂无逃顶信号触发</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 总时间轴区域（无论是否触发都显示）-->
+        <div class="timeline-section">
+            <h2>📅 总时间轴（今日所有采集记录，共 <span id="totalTimelineCount">0</span> 条）</h2>
+            <div class="timeline-box" style="border-color: #667eea; max-height: 600px;">
+                <div id="totalTimeline">
+                    <div class="empty-timeline">加载中...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 27个币种实时位置表格 -->
+        <div class="table-container">
+            <h2>💰 27个币种实时位置</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>币种</th>
+                        <th>当前价格</th>
+                        <th style="color: #52c41a;">支撑线1<br>(7天低位)</th>
+                        <th style="color: #ff4d4f;">压力线1<br>(7天高位)</th>
+                        <th style="color: #52c41a;">7天位置%</th>
+                        <th style="color: #52c41a;">支撑线2<br>(48h低位)</th>
+                        <th style="color: #ff4d4f;">压力线2<br>(48h高位)</th>
+                        <th style="color: #faad14;">48h位置%</th>
+                        <th>预警</th>
+                    </tr>
+                </thead>
+                <tbody id="coinTableBody">
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 30px;">加载中...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // 初始化图表
+        const chart4Lines = echarts.init(document.getElementById('chart4Lines'), 'dark');
+        const chartEscape = echarts.init(document.getElementById('chartEscape'), 'dark');
+        
+        // 当前日期
+        let currentDate = new Date().toISOString().split('T')[0];
+        document.getElementById('dateInput').value = currentDate;
+        
+        // 日期导航事件
+        document.getElementById('prevDay').addEventListener('click', () => {
+            const date = new Date(currentDate);
+            date.setDate(date.getDate() - 1);
+            currentDate = date.toISOString().split('T')[0];
+            document.getElementById('dateInput').value = currentDate;
+            loadAllData();
+        });
+        
+        document.getElementById('nextDay').addEventListener('click', () => {
+            const today = new Date().toISOString().split('T')[0];
+            if (currentDate >= today) return;
+            
+            const date = new Date(currentDate);
+            date.setDate(date.getDate() + 1);
+            currentDate = date.toISOString().split('T')[0];
+            document.getElementById('dateInput').value = currentDate;
+            loadAllData();
+        });
+        
+        document.getElementById('todayBtn').addEventListener('click', () => {
+            currentDate = new Date().toISOString().split('T')[0];
+            document.getElementById('dateInput').value = currentDate;
+            loadAllData();
+        });
+        
+        document.getElementById('dateInput').addEventListener('change', (e) => {
+            currentDate = e.target.value;
+            loadAllData();
+        });
+        
+        // 加载所有数据
+        async function loadAllData() {
+            try {
+                // 加载4条线时间线数据
+                const timelineResp = await fetch(`/api/signal-timeline/data?date=${currentDate}`);
+                const timelineData = await timelineResp.json();
+                
+                // 加载逃顶统计数据
+                const escapeResp = await fetch(`/api/escape-stats/data?date=${currentDate}`);
+                const escapeData = await escapeResp.json();
+                
+                // 加载总时间轴数据（JSONL）
+                const jsonlResp = await fetch(`/api/signal-timeline/jsonl?date=${currentDate}`);
+                const jsonlData = await jsonlResp.json();
+                
+                // 更新图表
+                updateChart4Lines(timelineData);
+                updateChartEscape(escapeData);
+                
+                // 更新统计卡片
+                updateStats(timelineData.data || [], escapeData.data || []);
+                
+                // 更新总时间轴
+                renderTotalTimeline(jsonlData.data || []);
+                
+                // 加载币种详情（仅今天才加载）
+                if (currentDate === new Date().toISOString().split('T')[0]) {
+                    await loadCoinDetails();
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+        
+        // 更新4条线图表
+        function updateChart4Lines(data) {
+            if (!data.success || !data.data || data.data.length === 0) {
+                chart4Lines.setOption({
+                    title: { text: '暂无数据', left: 'center', top: 'center' }
+                });
+                return;
+            }
+            
+            const times = data.data.map(d => d.time);
+            const support48h = data.data.map(d => d.support_48h || 0);
+            const support7d = data.data.map(d => d.support_7d || 0);
+            const pressure48h = data.data.map(d => d.pressure_48h || 0);
+            const pressure7d = data.data.map(d => d.pressure_7d || 0);
+            
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'cross' }
+                },
+                legend: {
+                    data: ['支撑线1 (48h≤5%)', '支撑线2 (7d≤5%)', '压力线1 (48h≥95%)', '压力线2 (7d≥95%)'],
+                    textStyle: { color: '#fff' },
+                    top: 10
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '10%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: times,
+                    axisLabel: { color: '#a0a0a0' },
+                    axisLine: { lineStyle: { color: '#444' } }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '币种数量',
+                    nameTextStyle: { color: '#a0a0a0' },
+                    axisLabel: { color: '#a0a0a0' },
+                    axisLine: { lineStyle: { color: '#444' } },
+                    splitLine: { lineStyle: { color: '#2d2d44' } }
+                },
+                series: [
+                    {
+                        name: '支撑线1 (48h≤5%)',
+                        type: 'line',
+                        data: support48h,
+                        itemStyle: { color: '#52c41a' },
+                        areaStyle: { color: 'rgba(82, 196, 26, 0.1)' }
+                    },
+                    {
+                        name: '支撑线2 (7d≤5%)',
+                        type: 'line',
+                        data: support7d,
+                        itemStyle: { color: '#1890ff' },
+                        areaStyle: { color: 'rgba(24, 144, 255, 0.1)' }
+                    },
+                    {
+                        name: '压力线1 (48h≥95%)',
+                        type: 'line',
+                        data: pressure48h,
+                        itemStyle: { color: '#faad14' },
+                        areaStyle: { color: 'rgba(250, 173, 20, 0.1)' }
+                    },
+                    {
+                        name: '压力线2 (7d≥95%)',
+                        type: 'line',
+                        data: pressure7d,
+                        itemStyle: { color: '#ff4d4f' },
+                        areaStyle: { color: 'rgba(255, 77, 79, 0.1)' }
+                    }
+                ]
+            };
+            
+            chart4Lines.setOption(option);
+        }
+        
+        // 更新逃顶统计图表
+        function updateChartEscape(data) {
+            if (!data.success || !data.data || data.data.length === 0) {
+                chartEscape.setOption({
+                    title: { text: '暂无数据', left: 'center', top: 'center' }
+                });
+                return;
+            }
+            
+            const times = data.data.map(d => d.time);
+            const escape24h = data.data.map(d => d.escape_24h_count || 0);
+            const escape2h = data.data.map(d => d.escape_2h_count || 0);
+            
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'cross' }
+                },
+                legend: {
+                    data: ['24h逃顶', '2h逃顶'],
+                    textStyle: { color: '#fff' },
+                    top: 10
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '10%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: times,
+                    axisLabel: { color: '#a0a0a0' },
+                    axisLine: { lineStyle: { color: '#444' } }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '币种数量',
+                    nameTextStyle: { color: '#a0a0a0' },
+                    axisLabel: { color: '#a0a0a0' },
+                    axisLine: { lineStyle: { color: '#444' } },
+                    splitLine: { lineStyle: { color: '#2d2d44' } }
+                },
+                series: [
+                    {
+                        name: '24h逃顶',
+                        type: 'line',
+                        data: escape24h,
+                        itemStyle: { color: '#ff4d4f' },
+                        areaStyle: { color: 'rgba(255, 77, 79, 0.2)' },
+                        smooth: true
+                    },
+                    {
+                        name: '2h逃顶',
+                        type: 'line',
+                        data: escape2h,
+                        itemStyle: { color: '#faad14' },
+                        areaStyle: { color: 'rgba(250, 173, 20, 0.2)' },
+                        smooth: true
+                    }
+                ]
+            };
+            
+            chartEscape.setOption(option);
+        }
+        
+        // 更新统计卡片和信号判定
+        function updateStats(timelineData, escapeData) {
+            // 获取最新数据点
+            const latest = timelineData[timelineData.length - 1];
+            
+            if (latest) {
+                // 更新当前4条线数据
+                const support48h = latest.support_48h || 0;
+                const support7d = latest.support_7d || 0;
+                const pressure48h = latest.pressure_48h || 0;
+                const pressure7d = latest.pressure_7d || 0;
+                
+                // 更新抄底信号判定
+                document.getElementById('currentSupport48h').textContent = support48h;
+                document.getElementById('currentSupport7d').textContent = support7d;
+                document.getElementById('currentSupportSum').textContent = support48h + support7d;
+                
+                const buyTriggered = (support48h >= 1) && (support7d >= 1) && (support48h + support7d >= 20);
+                const buyResultEl = document.getElementById('buySignalResult');
+                if (buyTriggered) {
+                    buyResultEl.textContent = '✅ 已触发抄底信号！';
+                    buyResultEl.className = 'result triggered';
+                    buyResultEl.style.background = 'rgba(82, 196, 26, 0.2)';
+                    buyResultEl.style.color = '#52c41a';
+                } else {
+                    buyResultEl.textContent = '❌ 未触发（需同时满足3个条件）';
+                    buyResultEl.className = 'result not-triggered';
+                }
+                
+                // 更新逃顶信号判定
+                document.getElementById('currentPressure48h').textContent = pressure48h;
+                document.getElementById('currentPressure7d').textContent = pressure7d;
+                document.getElementById('currentPressureSum').textContent = pressure48h + pressure7d;
+                
+                const sellTriggered = (pressure48h >= 1) && (pressure7d >= 1) && (pressure48h + pressure7d >= 8);
+                const sellResultEl = document.getElementById('sellSignalResult');
+                if (sellTriggered) {
+                    sellResultEl.textContent = '✅ 已触发逃顶信号！';
+                    sellResultEl.className = 'result triggered';
+                } else {
+                    sellResultEl.textContent = '❌ 未触发（需同时满足3个条件）';
+                    sellResultEl.className = 'result not-triggered';
+                }
+            }
+            
+            // 统计抄底和逃顶信号触发次数
+            const buySignals = timelineData.filter(d => d.signal_type === 'buy').length;
+            const sellSignals = timelineData.filter(d => d.signal_type === 'sell').length;
+            
+            document.getElementById('statBuySignals').textContent = buySignals;
+            document.getElementById('statSellSignals').textContent = sellSignals;
+            
+            // 统计24h和2h逃顶触发次数
+            const escape24hCount = escapeData.filter(d => d.escape_24h_count > 0).length;
+            const escape2hCount = escapeData.filter(d => d.escape_2h_count > 0).length;
+            
+            document.getElementById('stat24h').textContent = escape24hCount;
+            document.getElementById('stat2h').textContent = escape2hCount;
+            
+            // 当前符合币种
+            const latestEscape = escapeData[escapeData.length - 1];
+            if (latestEscape) {
+                const currentSymbols = new Set([
+                    ...(latestEscape.escape_24h_symbols || []),
+                    ...(latestEscape.escape_2h_symbols || [])
+                ]);
+                document.getElementById('statCurrent').textContent = currentSymbols.size;
+            } else {
+                document.getElementById('statCurrent').textContent = 0;
+            }
+            
+            // 数据点数
+            document.getElementById('statPoints').textContent = timelineData.length;
+            
+            // 更新时间轴
+            renderBuyTimeline(timelineData);
+            renderSellTimeline(timelineData);
+        }
+        
+        // 渲染抄底信号时间轴
+        function renderBuyTimeline(timelineData) {
+            const buySignals = timelineData.filter(d => d.signal_type === 'buy');
+            const container = document.getElementById('buyTimeline');
+            const countBadge = document.getElementById('buyTimelineCount');
+            
+            countBadge.textContent = `${buySignals.length}次`;
+            
+            if (buySignals.length === 0) {
+                container.innerHTML = '<div class="empty-timeline">今日暂无抄底信号触发</div>';
+                return;
+            }
+            
+            const html = buySignals.map((signal, index) => {
+                const detailData = signal.detail_data ? JSON.parse(signal.detail_data) : {};
+                const coins = detailData.symbols || [];
+                
+                const coinsHtml = coins.map(coin => 
+                    `<span class="coin-badge">${coin}</span>`
+                ).join('');
+                
+                return `
+                    <div class="timeline-item">
+                        <div class="time">
+                            <span class="icon">🕐</span>
+                            <span>${signal.time}</span>
+                        </div>
+                        <div class="details">
+                            支撑线1: ${signal.support_48h || 0} 个币种 | 
+                            支撑线2: ${signal.support_7d || 0} 个币种 | 
+                            总和: ${(signal.support_48h || 0) + (signal.support_7d || 0)}
+                        </div>
+                        ${coinsHtml ? `<div class="coins">${coinsHtml}</div>` : ''}
+                        ${signal.trigger_reason ? `<div class="details">${signal.trigger_reason}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        }
+        
+        // 渲染逃顶信号时间轴
+        function renderSellTimeline(timelineData) {
+            const sellSignals = timelineData.filter(d => d.signal_type === 'sell');
+            const container = document.getElementById('sellTimeline');
+            const countBadge = document.getElementById('sellTimelineCount');
+            
+            countBadge.textContent = `${sellSignals.length}次`;
+            
+            if (sellSignals.length === 0) {
+                container.innerHTML = '<div class="empty-timeline">今日暂无逃顶信号触发</div>';
+                return;
+            }
+            
+            const html = sellSignals.map((signal, index) => {
+                const detailData = signal.detail_data ? JSON.parse(signal.detail_data) : {};
+                const coins = detailData.symbols || [];
+                
+                const coinsHtml = coins.map(coin => 
+                    `<span class="coin-badge">${coin}</span>`
+                ).join('');
+                
+                return `
+                    <div class="timeline-item">
+                        <div class="time">
+                            <span class="icon">🕐</span>
+                            <span>${signal.time}</span>
+                        </div>
+                        <div class="details">
+                            压力线1: ${signal.pressure_48h || 0} 个币种 | 
+                            压力线2: ${signal.pressure_7d || 0} 个币种 | 
+                            总和: ${(signal.pressure_48h || 0) + (signal.pressure_7d || 0)}
+                        </div>
+                        ${coinsHtml ? `<div class="coins">${coinsHtml}</div>` : ''}
+                        ${signal.trigger_reason ? `<div class="details">${signal.trigger_reason}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        }
+        
+        // 渲染总时间轴（所有记录）
+        function renderTotalTimeline(data) {
+            const container = document.getElementById('totalTimeline');
+            const countEl = document.getElementById('totalTimelineCount');
+            
+            countEl.textContent = data.length;
+            
+            if (data.length === 0) {
+                container.innerHTML = '<div class="empty-timeline">今日暂无数据采集</div>';
+                return;
+            }
+            
+            const html = data.map((record, index) => {
+                const detailData = record.detail_data || {};
+                
+                // 信号类型标记
+                let signalIcon = '⚪';
+                let signalText = '无信号';
+                let signalColor = '#666';
+                
+                if (record.signal_type === 'buy') {
+                    signalIcon = '🟢';
+                    signalText = '抄底信号';
+                    signalColor = '#52c41a';
+                } else if (record.signal_type === 'sell') {
+                    signalIcon = '🔴';
+                    signalText = '逃顶信号';
+                    signalColor = '#ff4d4f';
+                }
+                
+                // 构建币种标签
+                const allSymbols = [
+                    ...(detailData.support_48h_symbols || []),
+                    ...(detailData.support_7d_symbols || []),
+                    ...(detailData.pressure_48h_symbols || []),
+                    ...(detailData.pressure_7d_symbols || [])
+                ];
+                const uniqueSymbols = [...new Set(allSymbols)];
+                
+                const coinsHtml = uniqueSymbols.length > 0 ? 
+                    uniqueSymbols.map(coin => `<span class="coin-badge" style="border-color: ${signalColor};">${coin}</span>`).join('') :
+                    '';
+                
+                return `
+                    <div class="timeline-item" style="border-left-color: ${signalColor};">
+                        <div class="time">
+                            <span class="icon">${signalIcon}</span>
+                            <span>${record.time}</span>
+                            <span style="color: ${signalColor}; margin-left: 10px;">${signalText}</span>
+                        </div>
+                        <div class="details">
+                            🟢 支撑线1: ${record.support_48h} 个 | 
+                            🟢 支撑线2: ${record.support_7d} 个 | 
+                            🔴 压力线1: ${record.pressure_48h} 个 | 
+                            🔴 压力线2: ${record.pressure_7d} 个
+                        </div>
+                        ${coinsHtml ? `<div class="coins" style="margin-top: 8px;">${coinsHtml}</div>` : ''}
+                        ${record.trigger_reason ? `<div class="details" style="margin-top: 5px; color: ${signalColor};">${record.trigger_reason}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        }
+        
+        // 加载币种详情（仅今天）
+        async function loadCoinDetails() {
+            try {
+                const resp = await fetch('/api/price-position/list-detailed');
+                const result = await resp.json();
+                
+                if (result.success && result.data) {
+                    renderCoinTable(result.data);
+                    updateAlertBoxes(result.data);
+                }
+            } catch (error) {
+                console.error('Error loading coin details:', error);
+            }
+        }
+        
+        // 更新4个预警框
+        function updateAlertBoxes(coins) {
+            const alert48hLow = coins.filter(c => c.position_48h <= 5);
+            const alert7dLow = coins.filter(c => c.position_7d <= 5);
+            const alert48hHigh = coins.filter(c => c.position_48h >= 95);
+            const alert7dHigh = coins.filter(c => c.position_7d >= 95);
+            
+            renderAlertBox('alert48hLow', alert48hLow);
+            renderAlertBox('alert7dLow', alert7dLow);
+            renderAlertBox('alert48hHigh', alert48hHigh);
+            renderAlertBox('alert7dHigh', alert7dHigh);
+        }
+        
+        // 渲染预警框
+        function renderAlertBox(elementId, coins) {
+            const element = document.getElementById(elementId);
+            
+            if (coins.length === 0) {
+                element.innerHTML = '<div class="empty">暂无预警</div>';
+                return;
+            }
+            
+            const html = coins.map(coin => {
+                const symbol = coin.symbol || coin.inst_id.replace('-USDT-SWAP', '');
+                return `<span class="coin-tag">${symbol}</span>`;
+            }).join('');
+            
+            element.innerHTML = html;
+        }
+        
+        // 渲染币种表格
+        function renderCoinTable(coins) {
+            if (!coins || coins.length === 0) {
+                document.getElementById('coinTableBody').innerHTML = 
+                    '<tr><td colspan="9" style="text-align: center; padding: 30px;">暂无数据</td></tr>';
+                return;
+            }
+            
+            // 按48h位置降序排序
+            coins.sort((a, b) => (b.position_48h || 0) - (a.position_48h || 0));
+            
+            const html = coins.map(coin => {
+                // 格式化价格
+                const formatPrice = (price) => {
+                    if (price < 0.01) return price.toFixed(6);
+                    if (price < 1) return price.toFixed(4);
+                    return price.toFixed(2);
+                };
+                
+                // 币种名称
+                const symbol = coin.symbol || coin.inst_id.replace('-USDT-SWAP', '');
+                
+                // 当前价格
+                const currentPrice = formatPrice(coin.current_price);
+                
+                // 7天低位和高位
+                const low7d = formatPrice(coin.low_7d);
+                const high7d = formatPrice(coin.high_7d);
+                const pos7d = coin.position_7d.toFixed(1) + '%';
+                
+                // 48h低位和高位
+                const low48h = formatPrice(coin.low_48h);
+                const high48h = formatPrice(coin.high_48h);
+                const pos48h = coin.position_48h.toFixed(1) + '%';
+                
+                // 预警状态
+                let alertText = '-';
+                if (coin.position_48h >= 95) {
+                    alertText = '48h高位';
+                } else if (coin.position_48h <= 5) {
+                    alertText = '48h低位';
+                } else if (coin.position_7d >= 95) {
+                    alertText = '7d高位';
+                } else if (coin.position_7d <= 5) {
+                    alertText = '7d低位';
+                }
+                
+                return `
+                    <tr>
+                        <td class="white-text"><strong>${symbol}</strong></td>
+                        <td class="green-text"><strong>${currentPrice}</strong></td>
+                        <td class="green-text">${low7d}</td>
+                        <td class="red-text">${high7d}</td>
+                        <td class="green-text">${pos7d}</td>
+                        <td class="green-text">${low48h}</td>
+                        <td class="red-text">${high48h}</td>
+                        <td class="yellow-text">${pos48h}</td>
+                        <td class="white-text">${alertText}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            document.getElementById('coinTableBody').innerHTML = html;
+        }
+        
+        // 窗口大小改变时重绘图表
+        window.addEventListener('resize', () => {
+            chart4Lines.resize();
+            chartEscape.resize();
+        });
+        
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAllData();
+            
+            // 仅对今天的数据启用自动刷新（每60秒）
+            setInterval(() => {
+                const today = new Date().toISOString().split('T')[0];
+                if (currentDate === today) {
+                    loadAllData();
+                }
+            }, 60000);
+        });
+    </script>
+</body>
+</html>

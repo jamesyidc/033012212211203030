@@ -1,0 +1,580 @@
+[
+  {
+    "time": "2026-03-20 00:02:15",
+    "type": "turn_bullish",
+    "from_ratio": 0.0,
+    "to_ratio": 0.0,
+    "from_status": "bearish",
+    "to_status": "bullish",
+    "threshold": -20.0,
+    "max_ratio": 0.0,
+    "data": {
+      "ratio": 0.0,
+      "positive_count": 0,
+      "total_count": 2,
+      "date": "20260320",
+      "positive_duration": 0.0
+    }
+  },
+  {
+    "time": "2026-03-21 00:08:28",
+    "type": "turn_bearish",
+    "from_ratio": 66.67,
+    "to_ratio": 57.14,
+    "from_status": "bullish",
+    "to_status": "bearish",
+    "threshold": 60.0,
+    "max_ratio": 80.0,
+    "data": {
+      "ratio": 57.14,
+      "positive_count": 4,
+      "total_count": 7,
+      "date": "20260321",
+      "positive_duration": 5.0
+    }
+  },
+  {
+    "time": "2026-03-21 00:12:32",
+    "type": "turn_bullish",
+    "from_ratio": 55.56,
+    "to_ratio": 60.0,
+    "from_status": "bearish",
+    "to_status": "bullish",
+    "threshold": 60.0,
+    "max_ratio": 80.0,
+    "data": {
+      "ratio": 60.0,
+      "positive_count": 6,
+      "total_count": 10,
+      "date": "20260321",
+      "positive_duration": 7.5
+    }
+  },
+  {
+    "time": "2026-03-21 00:14:36",
+    "type": "turn_bearish",
+    "from_ratio": 63.64,
+    "to_ratio": 58.33,
+    "from_status": "bullish",
+    "to_status": "bearish",
+    "threshold": 60.0,
+    "max_ratio": 80.0,
+    "data": {
+      "ratio": 58.33,
+      "positive_count": 7,
+      "total_count": 12,
+      "date": "20260321",
+      "positive_duration": 8.8
+    }
+  },
+  {
+    "time": "2026-03-21 00:24:40",
+    "type": "turn_bullish",
+    "from_ratio": 57.89,
+    "to_ratio": 60.0,
+    "from_status": "bearish",
+    "to_status": "bullish",
+    "threshold": 60.0,
+    "max_ratio": 80.0,
+    "data": {
+      "ratio": 60.0,
+      "positive_count": 12,
+      "total_count": 20,
+      "date": "20260321",
+      "positive_duration": 15.0
+    }
+  },
+  {
+    "time": "2026-03-21 00:27:43",
+    "type": "turn_bearish",
+    "from_ratio": 61.9,
+    "to_ratio": 59.09,
+    "from_status": "bullish",
+    "to_status": "bearish",
+    "threshold": 60.0,
+    "max_ratio": 80.0,
+    "data": {
+      "ratio": 59.09,
+      "positive_count": 13,
+      "total_count": 22,
+      "date": "20260321",
+      "positive_duration": 16.2
+    }
+  },
+  {
+    "time": "2026-03-21 00:28:47",
+    "type": "turn_bullish",
+    "from_ratio": 59.09,
+    "to_ratio": 60.87,
+    "from_status": "bearish",
+    "to_status": "bullish",
+    "threshold": 60.0,
+    "max_ratio": 80.0,
+    "data": {
+      "ratio": 60.87,
+      "positive_count": 14,
+      "total_count": 23,
+      "date": "20260321",
+      "positive_duration": 17.5
+    }
+  },
+  {
+    "time": "2026-03-21 00:33:51",
+    "type": "turn_bearish",
+    "from_ratio": 61.54,
+    "to_ratio": 59.26,
+    "from_status": "bullish",
+    "to_status": "bearish",
+    "threshold": 60.0,
+    "max_ratio": 80.0,
+    "data": {
+      "ratio": 59.26,
+      "positive_count": 16,
+      "total_count": 27,
+      "date": "20260321",
+      "positive_duration": 20.0
+    }
+  },
+  {
+    "time": "2026-03-21 10:54:15",
+    "type": "turn_bullish",
+    "from_ratio": 59.96,
+    "to_ratio": 60.04,
+    "from_status": "bearish",
+    "to_status": "bullish",
+    "threshold": 60.0,
+    "max_ratio": 80.0,
+    "data": {
+      "ratio": 60.04,
+      "positive_count": 314,
+      "total_count": 523,
+      "date": "20260321",
+      "positive_duration": 392.5
+    }
+  },
+  {
+    "time": "2026-03-22 00:20:26",
+    "type": "turn_bearish",
+    "from_ratio": 13.33,
+    "to_ratio": 12.5,
+    "from_status": "bullish",
+    "to_status": "bearish",
+    "threshold": 13.329999999999998,
+    "max_ratio": 33.33,
+    "data": {
+      "ratio": 12.5,
+      "positive_count": 2,
+      "total_count": 16,
+      "date": "20260322",
+      "positive_duration": 2.5
+    }
+  },
+  {
+    "time": "2026-03-23 00:00:58",
+    "type": "turn_bullish",
+    "from_ratio": 0.17,
+    "to_ratio": 0.0,
+    "from_status": "bearish",
+    "to_status": "bullish",
+    "threshold": -20.0,
+    "max_ratio": 0.0,
+    "data": {
+      "ratio": 0.0,
+      "positive_count": 0,
+      "total_count": 1,
+      "date": "20260323",
+      "positive_duration": 0.0
+    }
+  },
+  {
+    "time": "2026-03-24 00:30:15",
+    "type": "turn_bearish",
+    "from_ratio": 82.61,
+    "to_ratio": 79.17,
+    "from_status": "bullish",
+    "to_status": "bearish",
+    "threshold": 80.0,
+    "max_ratio": 100.0,
+    "data": {
+      "ratio": 79.17,
+      "positive_count": 19,
+      "total_count": 24,
+      "date": "20260324",
+      "positive_duration": 23.8
+    }
+  },
+  {
+    "time": "2026-03-24 01:09:20",
+    "type": "turn_bullish",
+    "from_ratio": 79.63,
+    "to_ratio": 80.0,
+    "from_status": "bearish",
+    "to_status": "bullish",
+    "threshold": 80.0,
+    "max_ratio": 100.0,
+    "data": {
+      "ratio": 80.0,
+      "positive_count": 44,
+      "total_count": 55,
+      "date": "20260324",
+      "positive_duration": 55.0
+    }
+  },
+  {
+    "time": "2026-03-25 00:49:38",
+    "type": "turn_bearish",
+    "from_ratio": 67.57,
+    "to_ratio": 65.79,
+    "from_status": "bullish",
+    "to_status": "bearish",
+    "threshold": 66.21,
+    "max_ratio": 86.21,
+    "data": {
+      "ratio": 65.79,
+      "positive_count": 25,
+      "total_count": 38,
+      "date": "20260325",
+      "positive_duration": 31.2
+    }
+  },
+  {
+    "time": "2026-03-25 09:53:32",
+    "type": "turn_bullish",
+    "from_ratio": 66.17,
+    "to_ratio": 66.24,
+    "from_status": "bearish",
+    "to_status": "bullish",
+    "threshold": 66.21,
+    "max_ratio": 86.21,
+    "data": {
+      "ratio": 66.24,
+      "positive_count": 312,
+      "total_count": 471,
+      "date": "20260325",
+      "positive_duration": 390.0
+    }
+  },
+  {
+    "time": "2026-03-26 00:06:41",
+    "type": "turn_bearish",
+    "from_ratio": 50.0,
+    "to_ratio": 40.0,
+    "from_status": "bullish",
+    "to_status": "bearish",
+    "threshold": 46.67,
+    "max_ratio": 66.67,
+    "data": {
+      "ratio": 40.0,
+      "positive_count": 2,
+      "total_count": 5,
+      "date": "20260326",
+      "positive_duration": 2.5
+    }
+  },
+  {
+    "time": "2026-03-26 00:26:46",
+    "type": "turn_bullish",
+    "from_ratio": 45.0,
+    "to_ratio": 47.62,
+    "from_status": "bearish",
+    "to_status": "bullish",
+    "threshold": 46.67,
+    "max_ratio": 66.67,
+    "data": {
+      "ratio": 47.62,
+      "positive_count": 10,
+      "total_count": 21,
+      "date": "20260326",
+      "positive_duration": 12.5
+    }
+  },
+  {
+    "time": "2026-03-26 01:43:52",
+    "type": "turn_bearish",
+    "from_ratio": 86.42,
+    "to_ratio": 38.89,
+    "from_status": "bullish",
+    "to_status": "bearish",
+    "threshold": 46.67,
+    "max_ratio": 66.67,
+    "data": {
+      "ratio": 38.89,
+      "positive_count": 7,
+      "total_count": 18,
+      "date": "20260326",
+      "positive_duration": 8.8
+    }
+  },
+  {
+    "time": "2026-03-26 01:44:55",
+    "type": "turn_bullish",
+    "from_ratio": 38.89,
+    "to_ratio": 84.93,
+    "from_status": "bearish",
+    "to_status": "bullish",
+    "threshold": 64.93,
+    "max_ratio": 84.93,
+    "data": {
+      "ratio": 84.93,
+      "positive_count": 62,
+      "total_count": 73,
+      "date": "20260326",
+      "positive_duration": 77.5
+    }
+  },
+  {
+    "time": "2026-03-26 04:58:34",
+    "type": "turn_bearish",
+    "from_ratio": 72.4,
+    "to_ratio": 72.07,
+    "from_status": "bullish",
+    "to_status": "bearish",
+    "threshold": 72.4,
+    "max_ratio": 92.4,
+    "data": {
+      "ratio": 72.07,
+      "positive_count": 160,
+      "total_count": 222,
+      "date": "20260326",
+      "positive_duration": 200.0
+    }
+  },
+  {
+    "time": "2026-03-27 00:02:12",
+    "type": "turn_bullish",
+    "from_ratio": 0.0,
+    "to_ratio": 0.0,
+    "from_status": "bearish",
+    "to_status": "bullish",
+    "threshold": -20.0,
+    "max_ratio": 0.0,
+    "data": {
+      "ratio": 0.0,
+      "positive_count": 0,
+      "total_count": 2,
+      "date": "20260327",
+      "positive_duration": 0.0
+    }
+  },
+  {
+    "time": "2026-03-27 00:04:16",
+    "type": "turn_bearish",
+    "from_ratio": 33.33,
+    "to_ratio": 25.0,
+    "from_status": "bullish",
+    "to_status": "bearish",
+    "threshold": 30.0,
+    "max_ratio": 50.0,
+    "data": {
+      "ratio": 25.0,
+      "positive_count": 1,
+      "total_count": 4,
+      "date": "20260327",
+      "positive_duration": 1.2
+    }
+  },
+  {
+    "time": "2026-03-27 00:06:20",
+    "type": "turn_bullish",
+    "from_ratio": 25.0,
+    "to_ratio": 40.0,
+    "from_status": "bearish",
+    "to_status": "bullish",
+    "threshold": 30.0,
+    "max_ratio": 50.0,
+    "data": {
+      "ratio": 40.0,
+      "positive_count": 2,
+      "total_count": 5,
+      "date": "20260327",
+      "positive_duration": 2.5
+    }
+  },
+  {
+    "time": "2026-03-27 00:32:24",
+    "type": "turn_bearish",
+    "from_ratio": 64.0,
+    "to_ratio": 61.54,
+    "from_status": "bullish",
+    "to_status": "bearish",
+    "threshold": 63.33,
+    "max_ratio": 83.33,
+    "data": {
+      "ratio": 61.54,
+      "positive_count": 16,
+      "total_count": 26,
+      "date": "20260327",
+      "positive_duration": 20.0
+    }
+  },
+  {
+    "time": "2026-03-28 00:01:48",
+    "type": "turn_bullish",
+    "from_ratio": 31.88,
+    "to_ratio": 0.0,
+    "from_status": "bearish",
+    "to_status": "bullish",
+    "threshold": -20.0,
+    "max_ratio": 0.0,
+    "data": {
+      "ratio": 0.0,
+      "positive_count": 0,
+      "total_count": 1,
+      "date": "20260328",
+      "positive_duration": 0.0
+    }
+  },
+  {
+    "time": "2026-03-29 00:03:58",
+    "type": "turn_bearish",
+    "from_ratio": 100.0,
+    "to_ratio": 66.67,
+    "from_status": "bullish",
+    "to_status": "bearish",
+    "threshold": 80.0,
+    "max_ratio": 100.0,
+    "data": {
+      "ratio": 66.67,
+      "positive_count": 2,
+      "total_count": 3,
+      "date": "20260329",
+      "positive_duration": 2.5
+    }
+  },
+  {
+    "time": "2026-03-29 00:07:01",
+    "type": "turn_bullish",
+    "from_ratio": 75.0,
+    "to_ratio": 80.0,
+    "from_status": "bearish",
+    "to_status": "bullish",
+    "threshold": 80.0,
+    "max_ratio": 100.0,
+    "data": {
+      "ratio": 80.0,
+      "positive_count": 4,
+      "total_count": 5,
+      "date": "20260329",
+      "positive_duration": 5.0
+    }
+  },
+  {
+    "time": "2026-03-29 01:38:07",
+    "type": "turn_bearish",
+    "from_ratio": 80.39,
+    "to_ratio": 78.85,
+    "from_status": "bullish",
+    "to_status": "bearish",
+    "threshold": 80.0,
+    "max_ratio": 100.0,
+    "data": {
+      "ratio": 78.85,
+      "positive_count": 41,
+      "total_count": 52,
+      "date": "20260329",
+      "positive_duration": 51.2
+    }
+  },
+  {
+    "time": "2026-03-30 00:01:21",
+    "type": "turn_bullish",
+    "from_ratio": 6.65,
+    "to_ratio": 0.0,
+    "from_status": "bearish",
+    "to_status": "bullish",
+    "threshold": -20.0,
+    "max_ratio": 0.0,
+    "data": {
+      "ratio": 0.0,
+      "positive_count": 0,
+      "total_count": 1,
+      "date": "20260330",
+      "positive_duration": 0.0
+    }
+  },
+  {
+    "time": "2026-03-30 01:04:26",
+    "type": "turn_bearish",
+    "from_ratio": 38.0,
+    "to_ratio": 37.25,
+    "from_status": "bullish",
+    "to_status": "bearish",
+    "threshold": 37.58,
+    "max_ratio": 57.58,
+    "data": {
+      "ratio": 37.25,
+      "positive_count": 19,
+      "total_count": 51,
+      "date": "20260330",
+      "positive_duration": 23.8
+    }
+  },
+  {
+    "time": "2026-03-30 05:57:01",
+    "type": "turn_bullish",
+    "from_ratio": 37.41,
+    "to_ratio": 37.63,
+    "from_status": "bearish",
+    "to_status": "bullish",
+    "threshold": 37.58,
+    "max_ratio": 57.58,
+    "data": {
+      "ratio": 37.63,
+      "positive_count": 108,
+      "total_count": 287,
+      "date": "20260330",
+      "positive_duration": 135.0
+    }
+  },
+  {
+    "time": "2026-03-30 06:58:20",
+    "type": "turn_bearish",
+    "from_ratio": 37.61,
+    "to_ratio": 37.5,
+    "from_status": "bullish",
+    "to_status": "bearish",
+    "threshold": 37.58,
+    "max_ratio": 57.58,
+    "data": {
+      "ratio": 37.5,
+      "positive_count": 126,
+      "total_count": 336,
+      "date": "20260330",
+      "positive_duration": 157.5
+    }
+  },
+  {
+    "time": "2026-03-30 09:07:41",
+    "type": "turn_bullish",
+    "from_ratio": 37.5,
+    "to_ratio": 37.64,
+    "from_status": "bearish",
+    "to_status": "bullish",
+    "threshold": 37.58,
+    "max_ratio": 57.58,
+    "data": {
+      "ratio": 37.64,
+      "positive_count": 166,
+      "total_count": 441,
+      "date": "20260330",
+      "positive_duration": 207.5
+    }
+  },
+  {
+    "time": "2026-03-31 00:56:24",
+    "type": "turn_bearish",
+    "from_ratio": 10.0,
+    "to_ratio": 9.76,
+    "from_status": "bullish",
+    "to_status": "bearish",
+    "threshold": 10.0,
+    "max_ratio": 30.0,
+    "data": {
+      "ratio": 9.76,
+      "positive_count": 4,
+      "total_count": 41,
+      "date": "20260331",
+      "positive_duration": 5.0
+    }
+  }
+]

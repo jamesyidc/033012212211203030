@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>逃顶信号系统统计 - 历史数据明细</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: #ffffff;
+            color: #000;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 2px solid rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 36px;
+            margin-bottom: 15px;
+            text-shadow: none;
+            color: #000;
+        }
+        
+        .home-btn {
+            padding: 12px 24px;
+            background: #f3f4f6;
+            backdrop-filter: blur(10px);
+            border: 2px solid #d1d5db;
+            border-radius: 12px;
+            color: #000;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .home-btn:hover {
+            background: #e5e7eb;
+            border-color: #9ca3af;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: #f9fafb;
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #4ade80;
+        }
+        
+        .stat-card.danger .value {
+            color: #ef4444;
+        }
+        
+        .stat-card.warning .value {
+            color: #f59e0b;
+        }
+        
+        .chart-container {
+            background: #f9fafb;
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 30px;
+        }
+        
+        .chart-container h2 {
+            margin-bottom: 20px;
+            font-size: 20px;
+            color: #000;
+        }
+        
+        #trendChart {
+            width: 100%;
+            height: 400px;
+        }
+        
+        #coinPriceChart {
+            width: 100%;
+            height: 400px;
+        }
+        
+        .table-container {
+            background: #f9fafb;
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+            color: #000;
+        }
+        
+        th {
+            background: #f3f4f6;
+            font-weight: 600;
+            color: #000;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        tr:hover {
+            background: #f3f4f6;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+        }
+        
+        .chart-loading {
+            text-align: center;
+            padding: 180px 20px;
+            font-size: 16px;
+            color: #666;
+        }
+        
+        .status-normal {
+            color: #4ade80;
+        }
+        
+        .status-rising {
+            color: #f59e0b;
+        }
+        
+        .status-danger {
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <a href="/" class="home-btn">
+                <span>🏠</span>
+                <span>返回首页</span>
+            </a>
+            <a href="/support-resistance" class="home-btn">
+                <span>📊</span>
+                <span>支撑压力线系统</span>
+            </a>
+        </div>
+        
+        <div class="header">
+            <h1>📊 逃顶信号系统统计 - 历史数据明细</h1>
+            <div id="pageLoadingIndicator" style="margin-top: 15px; padding: 10px; background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; display: none;">
+                <span style="font-size: 16px;">⏳ 页面正在加载数据，请稍候...</span>
+            </div>
+        </div>
+        
+        <div class="stats-cards">
+            <div class="stat-card">
+                <h3>总记录数</h3>
+                <div class="value" id="totalRecords">0</div>
+            </div>
+            <div class="stat-card danger">
+                <h3>24小时历史极大值</h3>
+                <div class="value" id="max24h">0</div>
+            </div>
+            <div class="stat-card warning">
+                <h3>24小时即时次高</h3>
+                <div class="value" id="max2h">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>24小时样本数</h3>
+                <div class="value" id="sample24h">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>24小时样本中位</h3>
+                <div class="value" id="median24h">0</div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <h2>📈 27币涨跌幅 & 逃顶信号综合趋势图 <span style="font-size: 14px; color: #666; font-weight: normal;">(时间轴对齐)</span></h2>
+            <div id="combinedChart" style="height: 500px;">
+                <div class="chart-loading">⏳ 正在加载数据...</div>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <h2>📋 历史极值统计明细 <span style="font-size: 14px; color: #666; font-weight: normal;">(最近100条)</span></h2>
+            <div id="loading" class="loading">正在加载数据...</div>
+            <table id="dataTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>记录时间</th>
+                        <th>24小时信号数</th>
+                        <th>2小时信号数</th>
+                        <th>OKX 27币涨跌%</th>
+                        <th>下跌强度</th>
+                        <th>上涨强度</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        let combinedChart = null;
+        
+        // 带超时的fetch函数
+        function fetchWithTimeout(url, timeout = 60000) {
+            return new Promise((resolve, reject) => {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => {
+                    controller.abort();
+                    reject(new Error('请求超时'));
+                }, timeout);
+                
+                fetch(url, { signal: controller.signal })
+                    .then(response => {
+                        clearTimeout(timeoutId);
+                        resolve(response);
+                    })
+                    .catch(error => {
+                        clearTimeout(timeoutId);
+                        reject(error);
+                    });
+            });
+        }
+        
+        // 初始化合并图表
+        function initCombinedChart() {
+            const chartDom = document.getElementById('combinedChart');
+            // 清除加载提示
+            chartDom.innerHTML = '';
+            combinedChart = echarts.init(chartDom);
+            
+            const option = {
+                backgroundColor: '#ffffff',
+                title: {
+                    text: '数据点: 0',
+                    left: 'center',
+                    textStyle: { fontSize: 14, color: '#000' }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    borderColor: 'rgba(0,0,0,0.2)',
+                    textStyle: { color: '#fff' },
+                    formatter: function(params) {
+                        let result = `<div style="padding:10px;">
+                            <div style="margin-bottom:5px; font-weight:bold;">${params[0].axisValue}</div>`;
+                        
+                        params.forEach(param => {
+                            if (param.seriesName === '27币涨跌幅总和') {
+                                const value = parseFloat(param.value);
+                                const color = value >= 0 ? '#10b981' : '#ef4444';
+                                result += `<div style="color:${color}; font-size:14px;">
+                                    ${param.marker} ${param.seriesName}: ${value >= 0 ? '+' : ''}${value}%
+                                </div>`;
+                            } else {
+                                result += `<div style="font-size:14px;">
+                                    ${param.marker} ${param.seriesName}: ${param.value}
+                                </div>`;
+                            }
+                        });
+                        
+                        result += '</div>';
+                        return result;
+                    }
+                },
+                legend: {
+                    data: ['27币涨跌幅总和', '24小时信号数', '2小时信号数'],
+                    textStyle: { color: '#000' },
+                    top: 10
+                },
+                grid: {
+                    left: '3%',
+                    right: '6%',
+                    bottom: '10%',
+                    top: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: [],
+                    axisLabel: {
+                        rotate: 45,
+                        interval: 'auto',
+                        color: '#000'
+                    },
+                    name: '时间（北京时间 UTC+8）',
+                    nameLocation: 'middle',
+                    nameGap: 50,
+                    nameTextStyle: { color: '#000' },
+                    axisLine: { lineStyle: { color: 'rgba(0,0,0,0.3)' } }
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '27币涨跌幅总和（%）',
+                        nameTextStyle: { color: '#667eea' },
+                        position: 'left',
+                        axisLabel: {
+                            formatter: '{value}%',
+                            color: '#667eea'
+                        },
+                        axisLine: { lineStyle: { color: '#667eea' } },
+                        splitLine: {
+                            lineStyle: {
+                                type: 'dashed',
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        }
+                    },
+                    {
+                        type: 'value',
+                        name: '信号数量',
+                        nameTextStyle: { color: '#ef4444' },
+                        position: 'right',
+                        axisLabel: {
+                            formatter: '{value}',
+                            color: '#ef4444'
+                        },
+                        axisLine: { lineStyle: { color: '#ef4444' } },
+                        splitLine: { show: false }
+                    }
+                ],
+                series: [
+                    {
+                        name: '27币涨跌幅总和',
+                        type: 'line',
+                        yAxisIndex: 0,
+                        smooth: true,
+                        data: [],
+                        lineStyle: { color: '#667eea', width: 2 },
+                        itemStyle: { color: '#667eea' },
+                        areaStyle: {
+                            color: {
+                                type: 'linear',
+                                x: 0, y: 0, x2: 0, y2: 1,
+                                colorStops: [
+                                    { offset: 0, color: 'rgba(102, 126, 234, 0.3)' },
+                                    { offset: 1, color: 'rgba(102, 126, 234, 0.05)' }
+                                ]
+                            }
+                        },
+                        markLine: {
+                            silent: true,
+                            data: [{ yAxis: 0 }],
+                            lineStyle: {
+                                type: 'dashed',
+                                color: '#999',
+                                width: 1
+                            },
+                            label: {
+                                formatter: '0%'
+                            }
+                        }
+                    },
+                    {
+                        name: '24小时信号数',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        smooth: true,
+                        data: [],
+                        lineStyle: { color: '#ef4444', width: 2 },
+                        itemStyle: { color: '#ef4444' }
+                    },
+                    {
+                        name: '2小时信号数',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        smooth: true,
+                        data: [],
+                        lineStyle: { color: '#f59e0b', width: 2 },
+                        itemStyle: { color: '#f59e0b' }
+                    }
+                ]
+            };
+            
+            combinedChart.setOption(option);
+        }
+        
+        // 更新27币涨跌幅图表数据
+        async function loadCoinPriceData() {
+            try {
+                console.log('📡 开始加载27币数据（最近3天）...');
+                // 只加载最近3天的数据，更快
+                const response = await fetchWithTimeout('/api/coin-price-tracker/history?days=3&t=' + Date.now(), 10000);
+                const result = await response.json();
+                
+                if (!result.success || !result.data || result.data.length === 0) {
+                    console.error('27币数据加载失败');
+                    return;
+                }
+                
+                const times = [];
+                const values = [];
+                
+                result.data.forEach(record => {
+                    const time = record.collect_time.substring(5, 16); // MM-DD HH:MM
+                    times.push(time);
+                    
+                    let totalSum = record.total_change;
+                    if (totalSum === null || totalSum === undefined) {
+                        totalSum = 0;
+                        const changes = record.day_changes || record.coins || {};
+                        Object.values(changes).forEach(coin => {
+                            totalSum += (coin.change_pct || 0);
+                        });
+                    }
+                    
+                    values.push(totalSum.toFixed(2));
+                });
+                
+                coinPriceChart.setOption({
+                    title: {
+                        text: `数据点: ${result.data.length}`
+                    },
+                    xAxis: {
+                        data: times,
+                        axisLabel: {
+                            interval: Math.floor(times.length / 20)
+                        }
+                    },
+                    series: [{
+                        data: values
+                    }]
+                });
+                
+                console.log('✅ 27币涨跌幅图表数据加载完成，共', result.data.length, '条');
+                
+            } catch (error) {
+                console.error('❌ 加载27币数据失败:', error);
+                const errorMsg = error.message === '请求超时' ? '27币数据加载超时，数据量较大' : error.message;
+                // 在图表区域显示错误
+                const chartDom = document.getElementById('coinPriceChart');
+                if (chartDom) {
+                    chartDom.innerHTML = `
+                        <div class="chart-loading" style="color: #ef4444;">
+                            ❌ ${errorMsg}
+                            <br><br>
+                            <button onclick="loadCoinPriceData()" style="padding: 8px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                                🔄 重试
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        // 初始化图表
+        function initChart() {
+            const chartDom = document.getElementById('trendChart');
+            // 清除加载提示
+            chartDom.innerHTML = '';
+            chart = echarts.init(chartDom);
+            
+            const option = {
+                backgroundColor: '#ffffff',
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    borderColor: 'rgba(0,0,0,0.2)',
+                    textStyle: { color: '#fff' }
+                },
+                legend: {
+                    data: ['24小时信号数', '2小时信号数'],
+                    textStyle: { color: '#000' },
+                    top: 10
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: [],
+                    axisLine: { lineStyle: { color: 'rgba(0,0,0,0.3)' } },
+                    axisLabel: { color: '#000', rotate: 45 }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '信号数量',
+                    nameTextStyle: { color: '#000' },
+                    axisLine: { lineStyle: { color: 'rgba(0,0,0,0.3)' } },
+                    axisLabel: { color: '#000' },
+                    splitLine: { lineStyle: { color: 'rgba(0,0,0,0.1)' } }
+                },
+                series: [
+                    {
+                        name: '24小时信号数',
+                        type: 'line',
+                        data: [],
+                        smooth: true,
+                        lineStyle: { color: '#ef4444', width: 2 },
+                        itemStyle: { color: '#ef4444' },
+                        areaStyle: { color: 'rgba(239, 68, 68, 0.2)' }
+                    },
+                    {
+                        name: '2小时信号数',
+                        type: 'line',
+                        data: [],
+                        smooth: true,
+                        lineStyle: { color: '#f59e0b', width: 2 },
+                        itemStyle: { color: '#f59e0b' },
+                        areaStyle: { color: 'rgba(245, 158, 11, 0.2)' }
+                    }
+                ]
+            };
+            
+            chart.setOption(option);
+        }
+        
+        // 加载数据
+        function loadData() {
+            console.log('🔍 开始加载数据（最近100条）...');
+            
+            // 同时获取逃顶信号数据、空单盈利数据和OKX涨跌数据
+            // 只加载最近100条记录，大幅提升速度
+            Promise.all([
+                fetchWithTimeout('/api/escape-signal-stats?limit=100&v=' + Date.now(), 10000).then(r => r.json()),
+                fetchWithTimeout('/api/anchor-profit/latest', 10000).then(r => r.json()),
+                fetchWithTimeout('/api/okx-day-change/latest?limit=200&v=' + Date.now(), 10000).then(r => r.json())
+            ])
+            .then(([escapeResult, profitResult, okxResult]) => {
+                console.log('📊 解析逃顶信号数据:', escapeResult);
+                console.log('💰 解析空单盈利数据:', profitResult);
+                console.log('📈 解析OKX涨跌数据:', okxResult);
+                
+                if (!escapeResult.success) {
+                    throw new Error('获取逃顶信号数据失败');
+                }
+                
+                const result = escapeResult;
+                const profitData = profitResult.data || [];
+                
+                // 更新统计卡片
+                document.getElementById('totalRecords').textContent = result.total_count;
+                document.getElementById('max24h').textContent = result.max_signal_24h;
+                document.getElementById('max2h').textContent = result.max_signal_2h;
+                document.getElementById('sample24h').textContent = result.sample_24h_count;
+                document.getElementById('median24h').textContent = result.median_24h;
+                        
+                        // 更新图表
+                        const times = result.recent_data.map(d => d.stat_time.substring(5, 16)); // MM-DD HH:MM
+                        const signal24h = result.recent_data.map(d => d.signal_24h_count);
+                        const signal2h = result.recent_data.map(d => d.signal_2h_count);
+                        
+                        // 计算每个自然日的2h最高点（仅标记>50的）
+                        const dailyPeaks = {};
+                        result.recent_data.forEach((d, index) => {
+                            const date = d.stat_time.substring(0, 10); // YYYY-MM-DD
+                            const value = d.signal_2h_count;
+                            
+                            if (value > 50) {
+                                if (!dailyPeaks[date] || value > dailyPeaks[date].value) {
+                                    dailyPeaks[date] = {
+                                        index: index,
+                                        value: value,
+                                        time: d.stat_time
+                                    };
+                                }
+                            }
+                        });
+                        
+                        // 计算24小时信号的48小时窗口最大值（仅标记>200的）
+                        const window48hPeaks = [];
+                        const windowSize = 48 * 60; // 48小时，假设每分钟一个数据点
+                        
+                        for (let i = 0; i < result.recent_data.length; i++) {
+                            // 找到当前位置前后48小时内的最大值
+                            const startIndex = Math.max(0, i - windowSize / 2);
+                            const endIndex = Math.min(result.recent_data.length - 1, i + windowSize / 2);
+                            
+                            let maxValue = 0;
+                            let maxIndex = i;
+                            
+                            for (let j = startIndex; j <= endIndex; j++) {
+                                const value = result.recent_data[j].signal_24h_count;
+                                if (value > maxValue) {
+                                    maxValue = value;
+                                    maxIndex = j;
+                                }
+                            }
+                            
+                            // 如果当前点是窗口内的最大值，且大于200，则标记
+                            if (maxIndex === i && maxValue > 200) {
+                                // 检查是否已经在附近标记过（避免重复标记）
+                                const isDuplicate = window48hPeaks.some(p => Math.abs(p.index - i) < windowSize / 4);
+                                if (!isDuplicate) {
+                                    window48hPeaks.push({
+                                        index: i,
+                                        value: maxValue,
+                                        time: result.recent_data[i].stat_time
+                                    });
+                                }
+                            }
+                        }
+                        
+                        // 构建2h信号标记点数据（红色小标记）
+                        const markPointData2h = Object.values(dailyPeaks).map(peak => ({
+                            coord: [peak.index, peak.value],
+                            value: peak.value,
+                            itemStyle: {
+                                color: '#ff4444',
+                                borderColor: '#fff',
+                                borderWidth: 2
+                            },
+                            label: {
+                                show: true,
+                                formatter: '🔥 {c}',
+                                position: 'top',
+                                color: '#ff4444',
+                                fontSize: 12,
+                                fontWeight: 'bold'
+                            }
+                        }));
+                        
+                        // 构建24h信号48小时峰值标记点数据（紫色大标记）
+                        const markPointData24h = window48hPeaks.map(peak => ({
+                            coord: [peak.index, peak.value],
+                            value: peak.value,
+                            itemStyle: {
+                                color: '#9333ea',
+                                borderColor: '#fff',
+                                borderWidth: 3
+                            },
+                            label: {
+                                show: true,
+                                formatter: '⭐ {c}',
+                                position: 'top',
+                                color: '#9333ea',
+                                fontSize: 14,
+                                fontWeight: 'bold'
+                            }
+                        }));
+                        
+                        // 🆕 添加空单盈利≥120%和空单亏损的标记（每小时只标记一次）
+                        const shortProfitMarks = [];  // 空单盈利≥120%标记（绿色）
+                        const shortLossMarks = [];    // 空单亏损标记（红色）
+                        
+                        // 创建时间戳映射表（逃顶信号数据的时间 -> 索引）
+                        const timeToIndexMap = {};
+                        result.recent_data.forEach((d, index) => {
+                            const timestamp = new Date(d.stat_time).getTime();
+                            timeToIndexMap[timestamp] = index;
+                        });
+                        
+                        // 追踪上次标记的小时（避免重复标记）
+                        let lastShortProfitHour = null;
+                        let lastShortLossHour = null;
+                        
+                        // 遍历空单盈利数据，添加标记
+                        profitData.forEach(pd => {
+                            const pdTime = new Date(pd.datetime);
+                            const pdHour = pdTime.getFullYear() + '-' + 
+                                         String(pdTime.getMonth() + 1).padStart(2, '0') + '-' + 
+                                         String(pdTime.getDate()).padStart(2, '0') + ' ' +
+                                         String(pdTime.getHours()).padStart(2, '0');
+                            
+                            const stats = pd.stats?.short || {};
+                            const shortProfit120 = stats.gte_120 || 0;
+                            const shortLoss = stats.loss || 0;
+                            
+                            // 空单盈利≥120% 且 数量≥3，每小时只标记一次
+                            if (shortProfit120 >= 3 && pdHour !== lastShortProfitHour) {
+                                // 找到最接近的逃顶信号数据点
+                                const pdTimestamp = pdTime.getTime();
+                                let closestIndex = -1;
+                                let minDiff = Infinity;
+                                
+                                result.recent_data.forEach((d, index) => {
+                                    const diff = Math.abs(new Date(d.stat_time).getTime() - pdTimestamp);
+                                    if (diff < minDiff) {
+                                        minDiff = diff;
+                                        closestIndex = index;
+                                    }
+                                });
+                                
+                                if (closestIndex >= 0 && minDiff < 3600000) { // 1小时内
+                                    const chartData = signal24h[closestIndex] || signal2h[closestIndex] || 0;
+                                    shortProfitMarks.push({
+                                        coord: [closestIndex, chartData],
+                                        value: shortProfit120,
+                                        itemStyle: {
+                                            color: '#10b981',
+                                            borderColor: '#fff',
+                                            borderWidth: 2
+                                        },
+                                        label: {
+                                            show: true,
+                                            formatter: '🟢 ' + shortProfit120,
+                                            position: 'bottom',
+                                            color: '#10b981',
+                                            fontSize: 13,
+                                            fontWeight: 'bold'
+                                        }
+                                    });
+                                    lastShortProfitHour = pdHour;
+                                }
+                            }
+                            
+                            // 空单亏损 且 数量≥3，每小时只标记一次
+                            if (shortLoss >= 3 && pdHour !== lastShortLossHour) {
+                                // 找到最接近的逃顶信号数据点
+                                const pdTimestamp = pdTime.getTime();
+                                let closestIndex = -1;
+                                let minDiff = Infinity;
+                                
+                                result.recent_data.forEach((d, index) => {
+                                    const diff = Math.abs(new Date(d.stat_time).getTime() - pdTimestamp);
+                                    if (diff < minDiff) {
+                                        minDiff = diff;
+                                        closestIndex = index;
+                                    }
+                                });
+                                
+                                if (closestIndex >= 0 && minDiff < 3600000) { // 1小时内
+                                    const chartData = signal24h[closestIndex] || signal2h[closestIndex] || 0;
+                                    shortLossMarks.push({
+                                        coord: [closestIndex, chartData],
+                                        value: shortLoss,
+                                        itemStyle: {
+                                            color: '#ef4444',
+                                            borderColor: '#fff',
+                                            borderWidth: 2
+                                        },
+                                        label: {
+                                            show: true,
+                                            formatter: '🔴 ' + shortLoss,
+                                            position: 'bottom',
+                                            color: '#ef4444',
+                                            fontSize: 13,
+                                            fontWeight: 'bold'
+                                        }
+                                    });
+                                    lastShortLossHour = pdHour;
+                                }
+                            }
+                        });
+                        
+                        console.log('🟢 空单盈利≥120%标记:', shortProfitMarks.length, '个');
+                        console.log('🔴 空单亏损标记:', shortLossMarks.length, '个');
+                        
+                        // 处理OKX涨跌数据 - 使用最近邻插值
+                        let okxChangeData = [];
+                        if (okxResult && okxResult.success && okxResult.data && okxResult.data.length > 0) {
+                            // 将OKX数据转换为带时间戳的数组
+                            const okxDataArray = okxResult.data.map(d => ({
+                                timestamp: new Date(d.record_time).getTime(),
+                                value: d.total_change
+                            })).sort((a, b) => a.timestamp - b.timestamp);
+                            
+                            // 对每个逃顶信号时间点，找到最近的OKX数据
+                            result.recent_data.forEach(d => {
+                                const targetTime = new Date(d.stat_time).getTime();
+                                
+                                // 找到最近的OKX数据点（使用最近邻插值）
+                                let closestData = null;
+                                let minDiff = Infinity;
+                                
+                                for (const okxPoint of okxDataArray) {
+                                    const diff = Math.abs(okxPoint.timestamp - targetTime);
+                                    // 只使用30分钟内的数据点
+                                    if (diff < 30 * 60 * 1000 && diff < minDiff) {
+                                        minDiff = diff;
+                                        closestData = okxPoint.value;
+                                    }
+                                }
+                                
+                                okxChangeData.push(closestData);
+                            });
+                            
+                            console.log('📈 OKX涨跌数据已对齐:', okxChangeData.filter(v => v !== null).length, '个点');
+                        }
+                        
+                        console.log('📍 每日2h最高点标记:', markPointData2h.length, '个');
+                        console.log('⭐ 24h信号48小时峰值标记:', markPointData24h.length, '个');
+                        
+                        const series = [
+                            { 
+                                name: '24小时信号数',
+                                data: signal24h,
+                                markPoint: {
+                                    symbol: 'pin',
+                                    symbolSize: 60,
+                                    data: [...markPointData24h, ...shortProfitMarks, ...shortLossMarks]
+                                }
+                            },
+                            { 
+                                name: '2小时信号数',
+                                data: signal2h,
+                                markPoint: {
+                                    symbol: 'pin',
+                                    symbolSize: 50,
+                                    data: markPointData2h
+                                }
+                            }
+                        ];
+                        
+                        // 如果有OKX数据,添加第三条曲线
+                        if (okxChangeData.length > 0 && okxChangeData.some(v => v !== null)) {
+                            series.push({
+                                name: 'OKX 27币种总涨跌%',
+                                type: 'line',
+                                yAxisIndex: 1,  // 使用右Y轴
+                                data: okxChangeData,
+                                smooth: true,
+                                itemStyle: { color: '#8b5cf6' },
+                                lineStyle: { width: 3, color: '#8b5cf6' },
+                                symbol: 'circle',
+                                symbolSize: 6
+                            });
+                        }
+                        
+                        // 计算OKX数据的实际范围
+                        const validOkxData = okxChangeData.filter(v => v !== null && !isNaN(v));
+                        let okxMin = 0, okxMax = 0;
+                        if (validOkxData.length > 0) {
+                            okxMin = Math.min(...validOkxData);
+                            okxMax = Math.max(...validOkxData);
+                            // 添加10%的边距
+                            const margin = Math.abs(okxMax - okxMin) * 0.1 || 5;
+                            okxMin = okxMin - margin;
+                            okxMax = okxMax + margin;
+                        }
+                        
+                        console.log('📊 OKX数据范围:', { min: okxMin.toFixed(2), max: okxMax.toFixed(2), count: validOkxData.length });
+                        
+                        chart.setOption({
+                            xAxis: { data: times },
+                            legend: {
+                                data: okxChangeData.length > 0 && okxChangeData.some(v => v !== null) 
+                                    ? ['24小时信号数', '2小时信号数', 'OKX 27币种总涨跌%'] 
+                                    : ['24小时信号数', '2小时信号数'],
+                                textStyle: { color: '#000' },
+                                top: 10
+                            },
+                            yAxis: [
+                                {
+                                    type: 'value',
+                                    name: '信号数量',
+                                    nameTextStyle: { color: '#000' },
+                                    axisLine: { lineStyle: { color: 'rgba(0,0,0,0.3)' } },
+                                    axisLabel: { color: '#000' },
+                                    splitLine: { lineStyle: { color: 'rgba(0,0,0,0.1)' } }
+                                },
+                                {
+                                    type: 'value',
+                                    name: 'OKX总涨跌%',
+                                    nameTextStyle: { color: '#8b5cf6' },
+                                    position: 'right',
+                                    min: validOkxData.length > 0 ? okxMin : undefined,
+                                    max: validOkxData.length > 0 ? okxMax : undefined,
+                                    axisLine: { 
+                                        show: okxChangeData.length > 0 && okxChangeData.some(v => v !== null),
+                                        lineStyle: { color: '#8b5cf6' } 
+                                    },
+                                    axisLabel: { 
+                                        color: '#8b5cf6',
+                                        formatter: '{value}%'
+                                    },
+                                    splitLine: { show: false }
+                                }
+                            ],
+                            series: series
+                        });
+                        
+                        // 创建OKX数据的时间映射表（用于表格查询）
+                        const okxDataMap = new Map();
+                        if (okxResult && okxResult.success && okxResult.data && okxResult.data.length > 0) {
+                            okxResult.data.forEach(d => {
+                                const timestamp = new Date(d.record_time).getTime();
+                                okxDataMap.set(timestamp, d.total_change);
+                            });
+                        }
+                        
+                        // 更新表格
+                        const tbody = document.getElementById('tableBody');
+                        tbody.innerHTML = '';
+                        
+                        console.log('🔢 开始渲染表格，记录数:', result.history_data.length);
+                        
+                        result.history_data.forEach(record => {
+                            const row = document.createElement('tr');
+                            
+                            // 判断状态
+                            let status = '正常';
+                            let statusClass = 'status-normal';
+                            if (record.signal_24h_count > 600) {
+                                status = '极端逃顶';
+                                statusClass = 'status-danger';
+                            } else if (record.signal_24h_count > 400) {
+                                status = '上涨预警';
+                                statusClass = 'status-rising';
+                            }
+                            
+                            // 查找匹配的OKX数据（30分钟内）
+                            const targetTime = new Date(record.stat_time).getTime();
+                            let okxValue = null;
+                            let minDiff = Infinity;
+                            
+                            for (const [timestamp, value] of okxDataMap) {
+                                const diff = Math.abs(timestamp - targetTime);
+                                if (diff < 30 * 60 * 1000 && diff < minDiff) {
+                                    minDiff = diff;
+                                    okxValue = value;
+                                }
+                            }
+                            
+                            // 格式化OKX显示（添加颜色）
+                            let okxDisplay = '-';
+                            let okxClass = '';
+                            if (okxValue !== null) {
+                                const formattedValue = okxValue.toFixed(2);
+                                if (okxValue > 0) {
+                                    okxDisplay = `<span style="color: #10b981; font-weight: bold;">+${formattedValue}%</span>`;
+                                } else if (okxValue < 0) {
+                                    okxDisplay = `<span style="color: #ef4444; font-weight: bold;">${formattedValue}%</span>`;
+                                } else {
+                                    okxDisplay = `<span style="color: #6b7280;">${formattedValue}%</span>`;
+                                }
+                            }
+                            
+                            row.innerHTML = `
+                                <td>${record.stat_time}</td>
+                                <td>${record.signal_24h_count}</td>
+                                <td>${record.signal_2h_count}</td>
+                                <td>${okxDisplay}</td>
+                                <td>${record.decline_strength_level || '-'}</td>
+                                <td>${record.rise_strength_level || '-'}</td>
+                                <td class="${statusClass}">${status}</td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                        
+                        console.log('✅ 表格渲染完成，共 ' + result.history_data.length + ' 行');
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('dataTable').style.display = 'table';
+                        console.log('📋 表格已显示');
+                })
+                .catch(error => {
+                    console.error('❌ 请求错误:', error);
+                    const errorMsg = error.name === 'AbortError' ? '请求超时，数据量较大，请稍后重试' : error.message || error.toString();
+                    document.getElementById('loading').innerHTML = `
+                        <div style="color: #ef4444; font-weight: bold;">数据加载失败</div>
+                        <div style="margin-top: 10px; font-size: 14px;">${errorMsg}</div>
+                        <button onclick="location.reload()" style="margin-top: 15px; padding: 8px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            🔄 重新加载
+                        </button>
+                    `;
+                });
+        }
+        
+        // 表格数据加载函数
+        async function loadTableData(escapeResult, profitResult, okxResult) {
+            // 创建OKX数据的时间映射表（用于表格查询）
+            const okxDataMap = new Map();
+            if (okxResult && okxResult.success && okxResult.data && okxResult.data.length > 0) {
+                okxResult.data.forEach(d => {
+                    const timestamp = new Date(d.record_time).getTime();
+                    okxDataMap.set(timestamp, d.total_change);
+                });
+            }
+            
+            // 更新表格
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            console.log('🔢 开始渲染表格，记录数:', escapeResult.history_data.length);
+            
+            escapeResult.history_data.forEach(record => {
+                const row = document.createElement('tr');
+                
+                // 判断状态
+                let status = '正常';
+                let statusClass = 'status-normal';
+                if (record.signal_24h_count > 600) {
+                    status = '极端逃顶';
+                    statusClass = 'status-danger';
+                } else if (record.signal_24h_count > 400) {
+                    status = '上涨预警';
+                    statusClass = 'status-rising';
+                }
+                
+                // 查找匹配的OKX数据（30分钟内）
+                const targetTime = new Date(record.stat_time).getTime();
+                let okxValue = null;
+                let minDiff = Infinity;
+                
+                for (const [timestamp, value] of okxDataMap) {
+                    const diff = Math.abs(timestamp - targetTime);
+                    if (diff < 30 * 60 * 1000 && diff < minDiff) {
+                        minDiff = diff;
+                        okxValue = value;
+                    }
+                }
+                
+                // 格式化OKX显示（添加颜色）
+                let okxDisplay = '-';
+                if (okxValue !== null) {
+                    const formattedValue = okxValue.toFixed(2);
+                    if (okxValue > 0) {
+                        okxDisplay = `<span style="color: #10b981; font-weight: bold;">+${formattedValue}%</span>`;
+                    } else if (okxValue < 0) {
+                        okxDisplay = `<span style="color: #ef4444; font-weight: bold;">${formattedValue}%</span>`;
+                    } else {
+                        okxDisplay = `<span style="color: #6b7280;">${formattedValue}%</span>`;
+                    }
+                }
+                
+                row.innerHTML = `
+                    <td>${record.stat_time}</td>
+                    <td>${record.signal_24h_count}</td>
+                    <td>${record.signal_2h_count}</td>
+                    <td>${okxDisplay}</td>
+                    <td>${record.decline_strength_level || '-'}</td>
+                    <td>${record.rise_strength_level || '-'}</td>
+                    <td class="${statusClass}">${status}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            console.log('✅ 表格渲染完成，共 ' + escapeResult.history_data.length + ' 行');
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('dataTable').style.display = 'table';
+            console.log('📋 表格已显示');
+        }
+        
+        // 合并数据加载函数
+        async function loadCombinedData() {
+            try {
+                console.log('🔍 开始加载合并数据...');
+                
+                // 同时加载27币和逃顶信号数据
+                const [coinResult, escapeResult, profitResult, okxResult] = await Promise.all([
+                    fetchWithTimeout('/api/coin-price-tracker/history?days=3&t=' + Date.now(), 10000).then(r => r.json()),
+                    fetchWithTimeout('/api/escape-signal-stats?limit=200&v=' + Date.now(), 10000).then(r => r.json()),
+                    fetchWithTimeout('/api/anchor-profit/latest', 10000).then(r => r.json()),
+                    fetchWithTimeout('/api/okx-day-change/latest?limit=200&v=' + Date.now(), 10000).then(r => r.json())
+                ]);
+                
+                if (!coinResult.success || !escapeResult.success) {
+                    throw new Error('数据加载失败');
+                }
+                
+                // 更新统计卡片
+                document.getElementById('totalRecords').textContent = escapeResult.total_count;
+                document.getElementById('max24h').textContent = escapeResult.max_signal_24h;
+                document.getElementById('max2h').textContent = escapeResult.max_signal_2h;
+                document.getElementById('sample24h').textContent = escapeResult.sample_24h_count;
+                document.getElementById('median24h').textContent = escapeResult.median_24h;
+                
+                // 创建时间映射 - 使用27币数据的时间轴作为主轴
+                const timeMap = new Map();
+                const allTimes = [];
+                
+                // 先添加27币数据
+                coinResult.data.forEach(record => {
+                    const time = record.collect_time.substring(5, 16); // MM-DD HH:MM
+                    const timestamp = new Date(record.collect_time).getTime();
+                    
+                    let totalSum = record.total_change;
+                    if (totalSum === null || totalSum === undefined) {
+                        totalSum = 0;
+                        const changes = record.day_changes || record.coins || {};
+                        Object.values(changes).forEach(coin => {
+                            totalSum += (coin.change_pct || 0);
+                        });
+                    }
+                    
+                    timeMap.set(timestamp, {
+                        time: time,
+                        coinChange: parseFloat(totalSum.toFixed(2)),
+                        signal24h: null,
+                        signal2h: null
+                    });
+                    allTimes.push(timestamp);
+                });
+                
+                // 填充逃顶信号数据（最近邻插值）
+                escapeResult.recent_data.forEach(record => {
+                    const timestamp = new Date(record.stat_time).getTime();
+                    
+                    // 找到最近的27币时间点
+                    let closestTime = allTimes[0];
+                    let minDiff = Math.abs(timestamp - closestTime);
+                    
+                    for (const t of allTimes) {
+                        const diff = Math.abs(timestamp - t);
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            closestTime = t;
+                        }
+                    }
+                    
+                    // 如果在30分钟内，认为是同一个时间点
+                    if (minDiff < 30 * 60 * 1000 && timeMap.has(closestTime)) {
+                        const data = timeMap.get(closestTime);
+                        data.signal24h = record.signal_24h_count;
+                        data.signal2h = record.signal_2h_count;
+                    }
+                });
+                
+                // 按时间排序
+                allTimes.sort((a, b) => a - b);
+                
+                // 准备图表数据
+                const times = [];
+                const coinChanges = [];
+                const signal24h = [];
+                const signal2h = [];
+                
+                allTimes.forEach(timestamp => {
+                    const data = timeMap.get(timestamp);
+                    times.push(data.time);
+                    coinChanges.push(data.coinChange);
+                    signal24h.push(data.signal24h);
+                    signal2h.push(data.signal2h);
+                });
+                
+                // 更新图表
+                combinedChart.setOption({
+                    title: {
+                        text: `数据点: ${times.length}`
+                    },
+                    xAxis: {
+                        data: times,
+                        axisLabel: {
+                            interval: Math.floor(times.length / 20)
+                        }
+                    },
+                    series: [
+                        { data: coinChanges },  // 27币涨跌幅
+                        { data: signal24h },    // 24小时信号
+                        { data: signal2h }      // 2小时信号
+                    ]
+                });
+                
+                console.log('✅ 合并图表数据加载完成，共', times.length, '个数据点');
+                console.log('   27币数据:', coinResult.data.length, '条');
+                console.log('   逃顶信号数据:', escapeResult.recent_data.length, '条');
+                
+                // 加载表格数据（保持原有逻辑）
+                await loadTableData(escapeResult, profitResult, okxResult);
+                
+            } catch (error) {
+                console.error('❌ 加载合并数据失败:', error);
+                const chartDom = document.getElementById('combinedChart');
+                if (chartDom) {
+                    chartDom.innerHTML = `
+                        <div class="chart-loading" style="color: #ef4444;">
+                            ❌ ${error.message}
+                            <br><br>
+                            <button onclick="loadCombinedData()" style="padding: 8px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                                🔄 重试
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 显示加载提示
+            const loadingIndicator = document.getElementById('pageLoadingIndicator');
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'block';
+            }
+            
+            // 初始化合并图表
+            initCombinedChart();
+            
+            // 加载合并数据
+            loadCombinedData().then(() => {
+                // 所有数据加载完成，隐藏提示
+                if (loadingIndicator) {
+                    loadingIndicator.style.display = 'none';
+                }
+                console.log('✅ 页面加载完成');
+            }).catch(error => {
+                console.error('❌ 页面加载失败:', error);
+                if (loadingIndicator) {
+                    loadingIndicator.innerHTML = '<span style="color: #ef4444;">❌ 数据加载失败，请刷新页面重试</span>';
+                }
+            });
+            
+            // 每5分钟自动刷新
+            setInterval(loadCombinedData, 300000);
+        });
+        
+        // 窗口大小改变时重新调整图表
+        window.addEventListener('resize', function() {
+            if (combinedChart) {
+                combinedChart.resize();
+            }
+        });
+    </script>
+</body>
+</html>

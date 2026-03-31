@@ -1,0 +1,1 @@
+{"id": "cond_order_e789273d", "enabled": true, "order_type": "open_short", "trigger_condition": "above", "trigger_value": 50.0, "target_strategy_code": "STG_SHORT_TOP8", "allow_trigger": false, "triggered_count": 1, "last_triggered_at": "2026-03-02 15:08:25", "created_at": "2026-03-02 22:32:54", "updated_at": "2026-03-02 15:08:25"}

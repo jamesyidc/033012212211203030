@@ -1,0 +1,41 @@
+{
+  "current_role": "master",
+  "description": "主副系统角色配置，主系统发送TG通知，副系统不发送",
+  "last_updated": "2026-02-03T16:00:00+08:00",
+  "master_system": {
+    "name": "主系统",
+    "url": "https://5000-iehbqwjte74vmohs308jg-d0b9e1e2.sandbox.novita.ai",
+    "enable_telegram_notifications": true,
+    "description": "主要交易系统，发送所有TG通知"
+  },
+  "backup_systems": [
+    {
+      "name": "副系统1",
+      "url": "",
+      "enable_telegram_notifications": false,
+      "enabled": false,
+      "description": "备用系统1，不发送TG通知"
+    },
+    {
+      "name": "副系统2",
+      "url": "",
+      "enable_telegram_notifications": false,
+      "enabled": false,
+      "description": "备用系统2，不发送TG通知"
+    },
+    {
+      "name": "副系统3",
+      "url": "",
+      "enable_telegram_notifications": false,
+      "enabled": false,
+      "description": "备用系统3，不发送TG通知"
+    }
+  ],
+  "health_check": {
+    "check_interval_seconds": 180,
+    "timeout_seconds": 30,
+    "consecutive_failures_alert": 2,
+    "health_check_path": "/api/health",
+    "enabled": true
+  }
+}

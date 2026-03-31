@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>SAR偏向趋势图 - 24小时分页 v2.3-calendar</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script>
+        // 版本检查与缓存清除
+        const CURRENT_VERSION = '2.3-calendar';
+        const STORED_VERSION = localStorage.getItem('sar_bias_trend_version');
+        
+        if (STORED_VERSION !== CURRENT_VERSION) {
+            console.log('🔄 检测到新版本，清除缓存...');
+            console.log('旧版本:', STORED_VERSION, '→ 新版本:', CURRENT_VERSION);
+            localStorage.setItem('sar_bias_trend_version', CURRENT_VERSION);
+            
+            // 如果之前有版本记录，说明是更新，需要刷新
+            if (STORED_VERSION) {
+                console.log('🔄 强制刷新页面以加载新版本...');
+                location.reload(true);
+            }
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: #1e2139;
+            color: #fff;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            color: #00d4ff;
+        }
+        
+        .back-btn {
+            background: rgba(59, 125, 255, 0.2);
+            border: 1px solid rgba(59, 125, 255, 0.4);
+            color: #00d4ff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: rgba(59, 125, 255, 0.3);
+            border-color: rgba(59, 125, 255, 0.6);
+        }
+        
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            background: rgba(42, 45, 71, 0.8);
+            border: 1px solid rgba(59, 125, 255, 0.3);
+            border-radius: 8px;
+            padding: 15px 25px;
+        }
+        
+        .page-btn {
+            background: #3b7dff;
+            border: none;
+            color: #ffffff;
+            padding: 8px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            min-width: 90px;
+        }
+        
+        .page-btn:hover:not(:disabled) {
+            background: #5a92ff;
+            transform: translateY(-1px);
+        }
+        
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: #4a5273;
+        }
+        
+        .page-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 20px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .page-date {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .page-time-range {
+            font-size: 12px;
+            color: #8b92b8;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding-left: 12px;
+        }
+        
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(42, 45, 71, 0.8);
+            border: 1px solid rgba(59, 125, 255, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #8b92b8;
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+        
+        .stat-value.bullish {
+            color: #26d639;
+        }
+        
+        .stat-value.bearish {
+            color: #ff4757;
+        }
+        
+        .stat-trend {
+            font-size: 12px;
+            color: #8b92b8;
+            margin-top: 5px;
+        }
+        
+        .chart-container {
+            background: rgba(42, 45, 71, 0.8);
+            border: 1px solid rgba(59, 125, 255, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            color: #00d4ff;
+            margin-bottom: 15px;
+        }
+        
+        #trendChart {
+            width: 100%;
+            height: 600px;
+            min-height: 600px;
+        }
+        
+        .symbol-lists {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .symbol-list {
+            background: rgba(42, 45, 71, 0.8);
+            border: 1px solid rgba(59, 125, 255, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .list-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .list-title.bullish {
+            color: #26d639;
+        }
+        
+        .list-title.bearish {
+            color: #ff4757;
+        }
+        
+        .symbol-item {
+            background: rgba(30, 33, 57, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .symbol-name {
+            font-weight: bold;
+            color: #00d4ff;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #8b92b8;
+        }
+        
+        .update-info {
+            text-align: center;
+            color: #8b92b8;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+        
+        /* 日历选择器样式 */
+        .date-picker-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            backdrop-filter: blur(4px);
+        }
+        
+        .date-picker-content {
+            background: #2a2d47;
+            border: 2px solid rgba(59, 125, 255, 0.4);
+            border-radius: 12px;
+            padding: 24px;
+            min-width: 360px;
+            max-width: 420px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+        
+        .date-picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 12px;
+        }
+        
+        .month-nav-btn {
+            background: rgba(59, 125, 255, 0.2);
+            border: 1px solid rgba(59, 125, 255, 0.4);
+            color: #5a92ff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .month-nav-btn:hover {
+            background: rgba(59, 125, 255, 0.4);
+            border-color: #5a92ff;
+            transform: scale(1.05);
+        }
+        
+        .month-year-selector {
+            display: flex;
+            gap: 8px;
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .month-year-selector select {
+            background: rgba(30, 33, 57, 0.8);
+            border: 1px solid rgba(59, 125, 255, 0.3);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .month-year-selector select:hover {
+            border-color: #5a92ff;
+            background: rgba(59, 125, 255, 0.1);
+        }
+        
+        #yearSelect {
+            width: 90px;
+        }
+        
+        #monthSelect {
+            width: 80px;
+        }
+        
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 8px;
+            text-align: center;
+            color: #8b92b8;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            background: rgba(30, 33, 57, 0.5);
+            color: #8b92b8;
+        }
+        
+        .calendar-day.other-month {
+            opacity: 0.3;
+            cursor: default;
+        }
+        
+        .calendar-day.available {
+            color: #fff;
+            background: rgba(59, 125, 255, 0.15);
+            border-color: rgba(59, 125, 255, 0.3);
+            cursor: pointer;
+        }
+        
+        .calendar-day.available:hover {
+            background: rgba(59, 125, 255, 0.3);
+            border-color: #5a92ff;
+            transform: scale(1.05);
+        }
+        
+        .calendar-day.today {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: #00d4ff;
+            color: #00d4ff;
+            font-weight: bold;
+        }
+        
+        .calendar-day.selected {
+            background: #5a92ff;
+            border-color: #5a92ff;
+            color: #fff;
+            font-weight: bold;
+        }
+        
+        .date-picker-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .date-picker-btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .date-picker-btn.cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: #8b92b8;
+        }
+        
+        .date-picker-btn.cancel:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+        
+        .date-picker-btn.today {
+            background: #5a92ff;
+            color: #fff;
+        }
+        
+        .date-picker-btn.today:hover {
+            background: #4a82ef;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(90, 146, 255, 0.4);
+        }
+        
+        .timezone-badge {
+            display: inline-block;
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid rgba(0, 212, 255, 0.4);
+            color: #00d4ff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        
+        /* 加载进度条样式 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(30, 33, 57, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+        }
+        
+        .loading-content {
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .loading-title {
+            font-size: 24px;
+            color: #00d4ff;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(59, 125, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3b7dff, #00d4ff);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+        
+        .progress-text {
+            font-size: 16px;
+            color: #8b92b8;
+            margin-bottom: 10px;
+        }
+        
+        .progress-percent {
+            font-size: 28px;
+            color: #00d4ff;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .loading-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .loading-step {
+            flex: 1;
+            padding: 10px;
+            margin: 0 5px;
+            background: rgba(59, 125, 255, 0.1);
+            border: 1px solid rgba(59, 125, 255, 0.3);
+            border-radius: 4px;
+            font-size: 12px;
+            color: #8b92b8;
+            transition: all 0.3s;
+        }
+        
+        .loading-step.active {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: #00d4ff;
+            color: #00d4ff;
+            transform: translateY(-2px);
+        }
+        
+        .loading-step.completed {
+            background: rgba(38, 214, 57, 0.2);
+            border-color: #26d639;
+            color: #26d639;
+        }
+    </style>
+</head>
+<body>
+    <!-- 加载进度覆盖层 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-title">📊 SAR偏向趋势系统加载中</div>
+            <div class="progress-percent" id="loadingPercent">0%</div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+            <div class="progress-text" id="loadingText">正在初始化...</div>
+            <div class="loading-steps">
+                <div class="loading-step" id="step1">1. 初始化图表</div>
+                <div class="loading-step" id="step2">2. 加载趋势数据</div>
+                <div class="loading-step" id="step3">3. 加载当前统计</div>
+                <div class="loading-step" id="step4">4. 渲染图表</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>
+                SAR偏向趋势图 - 24小时分页
+                <span class="timezone-badge">🕐 北京时间 (UTC+8)</span>
+            </h1>
+            <a href="/sar-slope" class="back-btn">← 返回列表</a>
+        </div>
+        
+        <!-- 系统说明面板 -->
+        <div style="margin: 20px 0;">
+            <button onclick="toggleSystemDocs()" style="
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: bold;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+                transition: all 0.3s ease;
+                width: 100%;
+                text-align: left;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(0,0,0,0.3)'">
+                <span>📚 SAR偏向趋势系统 - 完整说明文档</span>
+                <span id="docsToggleIcon">▼</span>
+            </button>
+            
+            <div id="systemDocsPanel" style="
+                display: none;
+                background: rgba(30, 33, 57, 0.95);
+                border: 1px solid rgba(102, 126, 234, 0.3);
+                border-radius: 8px;
+                padding: 30px;
+                margin-top: 15px;
+                max-height: 600px;
+                overflow-y: auto;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                color: #e0e0e0;
+                line-height: 1.8;
+                font-size: 14px;
+            ">
+                <h2 style="color: #667eea; margin-top: 0;">📚 SAR偏向趋势系统 - 完整说明文档</h2>
+                
+                <div style="background: rgba(102, 126, 234, 0.1); padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                    <p style="margin: 5px 0;"><strong>📅 创建时间</strong>: 2026-02-12 08:45</p>
+                    <p style="margin: 5px 0;"><strong>🔖 版本</strong>: v1.0</p>
+                    <p style="margin: 5px 0;"><strong>✅ 状态</strong>: 已完成 - 采集器运行中，趋势图正常显示</p>
+                </div>
+                
+                <h3 style="color: #26d639; border-left: 4px solid #26d639; padding-left: 10px;">🎯 系统概述</h3>
+                <p><strong>核心功能</strong>：SAR偏向趋势系统监控29种主流加密货币的SAR（抛物线转向指标）偏多/偏空状态。</p>
+                <ul style="line-height: 2;">
+                    <li>📊 <strong>实时统计</strong>：每5分钟统计偏多/偏空币种数量</li>
+                    <li>📈 <strong>趋势图表</strong>：显示历史变化趋势（双曲线）</li>
+                    <li>🎯 <strong>精准筛选</strong>：仅统计"2小时周期占比>80%"的币种</li>
+                    <li>🔄 <strong>自动更新</strong>：每5分钟自动采集，页面60秒刷新</li>
+                </ul>
+                
+                <!-- 🎉 V2.0 更新说明 (2026-02-16) - 后端计算迁移 -->
+                <div style="background: linear-gradient(135deg, rgba(147, 51, 234, 0.15), rgba(59, 130, 246, 0.15)); padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 2px solid rgba(147, 51, 234, 0.3);">
+                    <h3 style="color: #a78bfa; border-left: 4px solid #a78bfa; padding-left: 10px; margin-bottom: 15px;">
+                        🎉 V2.0 更新说明 - 后端计算迁移 (2026-02-16)
+                    </h3>
+                    
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #ef4444;">
+                        <h4 style="color: #ef4444; margin-bottom: 8px;">❌ 问题根源</h4>
+                        <p style="margin-bottom: 8px;">用户反馈：依赖前端计算，关闭浏览器后数据丢失。</p>
+                        <ul style="line-height: 2; margin-left: 20px;">
+                            <li><strong>表象：</strong>前端JavaScript、采集器、后端API三处重复>80%筛选逻辑</li>
+                            <li><strong>问题：</strong>违反单一职责原则，数据一致性无法保证</li>
+                            <li><strong>影响：</strong>维护成本高，逻辑不一致导致统计结果差异</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #10b981;">
+                        <h4 style="color: #10b981; margin-bottom: 8px;">✅ 解决方案</h4>
+                        <p style="margin-bottom: 8px;"><strong>1. 后端API改进：</strong></p>
+                        <ul style="line-height: 2; margin-left: 20px;">
+                            <li>API <code>/api/sar-slope/bias-ratios</code> 直接返回筛选后的 <code>bullish_symbols</code> 和 <code>bearish_symbols</code></li>
+                            <li>添加 <code>bullish_count</code>、<code>bearish_count</code>、<code>threshold: 80</code> 字段</li>
+                            <li>结果按 ratio 降序排序</li>
+                            <li>添加防缓存响应头</li>
+                        </ul>
+                        <p style="margin-top: 10px; margin-bottom: 8px;"><strong>2. 前端简化：</strong></p>
+                        <ul style="line-height: 2; margin-left: 20px;">
+                            <li>移除所有 <code>if (ratio > 80%)</code> 筛选逻辑</li>
+                            <li>直接显示后端返回的 <code>bullish_symbols</code> 和 <code>bearish_symbols</code></li>
+                            <li>添加 <code>cache: 'no-store'</code> 和时间戳参数</li>
+                        </ul>
+                        <p style="margin-top: 10px; margin-bottom: 8px;"><strong>3. 采集器优化：</strong></p>
+                        <ul style="line-height: 2; margin-left: 20px;">
+                            <li>移除重复的筛选逻辑</li>
+                            <li>直接使用后端API返回的结果</li>
+                            <li>数据中添加 <code>_computed_by: 'backend'</code> 标记</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #3b82f6;">
+                        <h4 style="color: #3b82f6; margin-bottom: 8px;">📊 改进效果</h4>
+                        <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px;">
+                            <thead>
+                                <tr style="background: rgba(59, 130, 246, 0.2);">
+                                    <th style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">指标</th>
+                                    <th style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">V1.0</th>
+                                    <th style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">V2.0</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">前端代码行数</td>
+                                    <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1); color: #ef4444;">47行（含计算）</td>
+                                    <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1); color: #10b981;">25行（仅展示）↓47%</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">采集器代码行数</td>
+                                    <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1); color: #ef4444;">47行（含筛选）</td>
+                                    <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1); color: #10b981;">35行（调API）↓26%</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">维护点数量</td>
+                                    <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1); color: #ef4444;">3处（重复逻辑）</td>
+                                    <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1); color: #10b981;">1处（后端统一）</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">数据一致性</td>
+                                    <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1); color: #ef4444;">❌ 可能不一致</td>
+                                    <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1); color: #10b981;">✓ 100%一致</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">前端计算时间</td>
+                                    <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1); color: #ef4444;">~50ms</td>
+                                    <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1); color: #10b981;">0ms（后端缓存30s）</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="background: rgba(59, 130, 246, 0.1); padding: 12px; border-radius: 6px;">
+                        <p style="margin-bottom: 8px;"><strong style="color: #60a5fa;">💡 技术架构保证：</strong></p>
+                        <ul style="line-height: 2; margin-left: 20px;">
+                            <li>所有业务逻辑（>80%筛选、排序）在后端 API 完成</li>
+                            <li>前端仅负责展示，零业务计算</li>
+                            <li>采集器依赖后端 API，确保数据来源一致</li>
+                            <li>Git提交记录：<code>8413205</code>, <code>d921727</code></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <h3 style="color: #26d639; border-left: 4px solid #26d639; padding-left: 10px;">💡 核心概念："2小时周期占比>80%"</h3>
+                <div style="background: rgba(38, 214, 57, 0.1); padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                    <p><strong>统计方法</strong>：</p>
+                    <ol style="line-height: 2;">
+                        <li>每5分钟采集一次SAR数据</li>
+                        <li>统计最近24条记录（24条 × 5分钟 = 2小时）</li>
+                        <li>计算 <code style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px;">position=bullish</code>（多头）的数量</li>
+                        <li>计算占比：<code style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px;">bullish_ratio = count / 24 × 100%</code></li>
+                        <li>如果 <code style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px;">bullish_ratio > 80%</code>，标记为"偏多"</li>
+                    </ol>
+                    <p><strong>物理含义</strong>：在最近2小时内，至少有1小时36分钟（80%）处于同一趋势方向。</p>
+                    <p><strong>为什么选择80%</strong>：强趋势确认，避免频繁多空切换导致的误判。</p>
+                </div>
+                
+                <h3 style="color: #26d639; border-left: 4px solid #26d639; padding-left: 10px;">⚙️ 系统架构（5层）</h3>
+                <pre style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 6px; overflow-x: auto; font-size: 12px; line-height: 1.5;">
+┌─────────────────────────────────────────────────────┐
+│         SAR偏向趋势系统 - 数据流程图                 │
+└─────────────────────────────────────────────────────┘
+
+【第1层：基础数据采集】
+  PM2进程: sar-jsonl-collector
+  ├─ 每5分钟采集29种币的SAR数据
+  ├─ 数据源: OKX交易所15分钟K线
+  ├─ 计算SAR指标值和差值
+  └─ 存储: data/sar_jsonl/{SYMBOL}.jsonl
+          ↓
+【第2层：偏向统计采集】
+  PM2进程: sar-bias-stats-collector
+  ├─ 读取29种币最近24条SAR数据
+  ├─ 计算bullish/bearish占比
+  ├─ 筛选占比>80%的币种
+  └─ 存储: data/sar_bias_stats/bias_stats_YYYYMMDD.jsonl
+          ↓
+【第3层：API服务】
+  Flask API (端口5000)
+  ├─ /api/sar-slope/bias-ratios (批量API，顶部统计)
+  ├─ /api/sar-slope/bias-stats (趋势图历史数据)
+  └─ /api/sar-slope/current-cycle/{symbol} (单币详情)
+          ↓
+【第4层：前端展示】
+  页面: /sar-bias-trend
+  ├─ 顶部统计卡片：当前偏多/偏空数量
+  ├─ ECharts趋势图：双曲线（绿色/红色）
+  ├─ 币种列表：显示具体币种和占比
+  └─ 分页控制：按日期查看历史数据
+                </pre>
+                
+                <h3 style="color: #26d639; border-left: 4px solid #26d639; padding-left: 10px;">💾 数据存储格式</h3>
+                
+                <h4 style="color: #8b92b8;">1. SAR基础数据（JSONL格式）</h4>
+                <p><strong>文件路径</strong>: <code style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px;">data/sar_jsonl/{SYMBOL}.jsonl</code></p>
+                <p><strong>示例</strong>（BTC.jsonl）：</p>
+                <pre style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 11px;">{"beijing_time":"2026-02-12 08:40:00","price":67345.2,"sar":66100.78,"position":"bullish","sar_diff_abs":1244.42,"sar_diff_pct":1.85}</pre>
+                
+                <table style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13px;">
+                    <thead>
+                        <tr style="background: rgba(102, 126, 234, 0.2);">
+                            <th style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">字段名</th>
+                            <th style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">类型</th>
+                            <th style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">说明</th>
+                            <th style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">示例值</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">beijing_time</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">string</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">北京时间</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">2026-02-12 08:40:00</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">price</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">float</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">当前价格</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">67345.2</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">sar</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">float</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">SAR指标值</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">66100.78</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">position</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">string</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">周期类型</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">bullish / bearish</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">sar_diff_pct</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">float</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">差值百分比</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">1.85</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h4 style="color: #8b92b8;">2. 偏向统计数据（JSONL格式）</h4>
+                <p><strong>文件路径</strong>: <code style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px;">data/sar_bias_stats/bias_stats_YYYYMMDD.jsonl</code></p>
+                <p><strong>示例</strong>（bias_stats_20260212.jsonl）：</p>
+                <pre style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 11px;">{"timestamp":1707696600,"beijing_time":"2026-02-12 08:30:00","bullish_count":7,"bearish_count":0,"bullish_symbols":[{"symbol":"CFX","ratio":83.3},{"symbol":"DOGE","ratio":83.3}],"bearish_symbols":[],"total_monitored":28}</pre>
+                
+                <p><strong>数据量统计</strong>：每5分钟1条 × 每天288条 = 约144 KB/天</p>
+                
+                <h3 style="color: #26d639; border-left: 4px solid #26d639; padding-left: 10px;">🔧 系统依赖</h3>
+                
+                <h4 style="color: #8b92b8;">PM2进程（3个）</h4>
+                <table style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13px;">
+                    <thead>
+                        <tr style="background: rgba(102, 126, 234, 0.2);">
+                            <th style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">进程名</th>
+                            <th style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">脚本</th>
+                            <th style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">功能</th>
+                            <th style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">频率</th>
+                            <th style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">内存</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">sar-jsonl-collector</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">source_code/sar_jsonl_collector.py</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">SAR基础数据采集</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">5分钟</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">~47MB</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">sar-bias-stats-collector</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">source_code/sar_bias_stats_collector.py</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">偏向统计采集</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">5分钟</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">~30MB</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">flask-app</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">code/python/app.py</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">Web服务器</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">常驻</td>
+                            <td style="padding: 8px; border: 1px solid rgba(255,255,255,0.1);">~200MB</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h4 style="color: #8b92b8;">Flask API路由（4个）</h4>
+                <ul style="line-height: 2;">
+                    <li><code style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px;">/sar-bias-trend</code> - 趋势图页面</li>
+                    <li><code style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px;">/api/sar-slope/bias-ratios</code> - 批量获取29种币2h占比</li>
+                    <li><code style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px;">/api/sar-slope/bias-stats</code> - 趋势图历史数据</li>
+                    <li><code style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px;">/api/sar-slope/current-cycle/{symbol}</code> - 单币详细数据</li>
+                </ul>
+                
+                <h4 style="color: #8b92b8;">Python依赖包（核心）</h4>
+                <ul style="line-height: 2;">
+                    <li>Flask 2.3.2 - Web框架</li>
+                    <li>pandas 2.0.3 - 数据分析</li>
+                    <li>pytz 2023.3 - 时区转换</li>
+                    <li>requests 2.31.0 - HTTP请求</li>
+                </ul>
+                
+                <h3 style="color: #26d639; border-left: 4px solid #26d639; padding-left: 10px;">📊 监控币种（29种）</h3>
+                <p>BTC, ETH, BNB, XRP, ADA, DOGE, SOL, DOT, LTC, LINK, HBAR, TAO, CFX, TRX, TON, NEAR, LDO, CRO, ETC, XLM, BCH, UNI, SUI, FIL, STX, CRV, AAVE, APT, OKB</p>
+                
+                <h3 style="color: #26d639; border-left: 4px solid #26d639; padding-left: 10px;">🛠️ 常用命令速查</h3>
+                <pre style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 6px; overflow-x: auto; font-size: 12px; line-height: 1.8;">
+# PM2管理
+pm2 status                              # 查看所有进程
+pm2 logs sar-bias-stats-collector      # 查看采集器日志
+pm2 restart sar-bias-stats-collector   # 重启采集器
+
+# 数据查看
+ls -lh data/sar_bias_stats/            # 查看统计文件
+tail -f logs/sar-bias-stats-out.log    # 实时日志
+
+# API测试
+curl localhost:5000/api/sar-slope/bias-stats?page=1
+curl localhost:5000/api/sar-slope/bias-ratios
+                </pre>
+                
+                <h3 style="color: #26d639; border-left: 4px solid #26d639; padding-left: 10px;">📈 性能指标</h3>
+                <ul style="line-height: 2;">
+                    <li><strong>API响应时间</strong>: < 200ms（无缓存）、< 50ms（有缓存）</li>
+                    <li><strong>页面加载时间</strong>: < 1s</li>
+                    <li><strong>采集器CPU占用</strong>: 0-1%（待机）、3-10%（采集时）</li>
+                    <li><strong>数据量</strong>: 1.2 MB/天（29种币）</li>
+                </ul>
+                
+                <div style="background: rgba(102, 126, 234, 0.15); padding: 20px; border-radius: 8px; margin-top: 30px; text-align: center;">
+                    <p style="font-size: 16px; margin: 0;"><strong>📝 完整文档</strong></p>
+                    <p style="margin: 10px 0; color: #8b92b8;">查看完整的系统文档（包含详细的数据流程、API规范、故障排查等）</p>
+                    <a href="/static/SAR_BIAS_TREND_SYSTEM_DOCS.md" download style="
+                        background: #667eea;
+                        color: white;
+                        padding: 10px 20px;
+                        border-radius: 6px;
+                        text-decoration: none;
+                        font-size: 14px;
+                        display: inline-block;
+                        margin-top: 10px;
+                        transition: background 0.3s ease;
+                    " onmouseover="this.style.background='#764ba2'" onmouseout="this.style.background='#667eea'">
+                        📥 下载完整Markdown文档 (26 KB)
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            function toggleSystemDocs() {
+                const panel = document.getElementById('systemDocsPanel');
+                const icon = document.getElementById('docsToggleIcon');
+                if (panel.style.display === 'none') {
+                    panel.style.display = 'block';
+                    icon.textContent = '▲';
+                } else {
+                    panel.style.display = 'none';
+                    icon.textContent = '▼';
+                }
+            }
+        </script>
+        
+        <div class="pagination-container">
+            <button class="page-btn" id="prevBtn" onclick="previousPage()">
+                ← 前一天
+            </button>
+            
+            <div class="page-info">
+                <div class="page-date" id="currentDate" onclick="showDatePicker()" style="cursor: pointer; user-select: none;" title="点击选择日期">
+                    加载中...
+                </div>
+                <div class="page-time-range" id="timeRangeDisplay">
+                    加载中...
+                </div>
+            </div>
+            
+            <button class="page-btn" id="nextBtn" onclick="nextPage()">
+                后一天 →
+            </button>
+        </div>
+        
+        <!-- 日历选择器弹窗 -->
+        <div id="datePickerModal" class="date-picker-modal" style="display: none;" onclick="hideDatePickerIfClickedOutside(event)">
+            <div class="date-picker-content" onclick="event.stopPropagation();">
+                <div class="date-picker-header">
+                    <button class="month-nav-btn" onclick="changeMonth(-1)">◀</button>
+                    <div class="month-year-selector">
+                        <select id="yearSelect" onchange="renderCalendar()"></select>
+                        <select id="monthSelect" onchange="renderCalendar()">
+                            <option value="1">1月</option>
+                            <option value="2">2月</option>
+                            <option value="3">3月</option>
+                            <option value="4">4月</option>
+                            <option value="5">5月</option>
+                            <option value="6">6月</option>
+                            <option value="7">7月</option>
+                            <option value="8">8月</option>
+                            <option value="9">9月</option>
+                            <option value="10">10月</option>
+                            <option value="11">11月</option>
+                            <option value="12">12月</option>
+                        </select>
+                    </div>
+                    <button class="month-nav-btn" onclick="changeMonth(1)">▶</button>
+                </div>
+                <div class="calendar-weekdays">
+                    <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
+                </div>
+                <div id="calendarDays" class="calendar-days"></div>
+                <div class="date-picker-footer">
+                    <button class="date-picker-btn cancel" onclick="hideDatePicker()">取消</button>
+                    <button class="date-picker-btn today" onclick="selectToday()">今天</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-label">当前偏多币种 (>80%)</div>
+                <div class="stat-subtitle" style="font-size: 11px; color: #8b92b8; margin-top: 4px;">最近2小时处于多头周期时间 >80%</div>
+                <div class="stat-value bullish" id="currentBullish">-</div>
+                <div class="stat-trend" id="bullishTrend">加载中...</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">当前偏空币种 (>80%)</div>
+                <div class="stat-subtitle" style="font-size: 11px; color: #8b92b8; margin-top: 4px;">最近2小时处于空头周期时间 >80%</div>
+                <div class="stat-value bearish" id="currentBearish">-</div>
+                <div class="stat-trend" id="bearishTrend">加载中...</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">总监控币种</div>
+                <div class="stat-value" id="totalSymbols">27</div>
+                <div class="stat-trend">实时更新中</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">数据点数</div>
+                <div class="stat-value" id="dataPoints">-</div>
+                <div class="stat-trend" id="timeRange">加载中...</div>
+            </div>
+        </div>
+        
+        <!-- 当天统计面板（紧凑版） -->
+        <div style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(30, 33, 57, 0.6);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 6px;
+            padding: 8px 15px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        ">
+            <div style="color: #8b92b8;">
+                📊 当天统计信息
+            </div>
+            <div style="display: flex; gap: 30px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #4caf50; font-weight: bold; font-size: 18px;" id="totalBullishPoints">-</span>
+                    <span style="color: #a8dadc;">看多点数（偏多 >80%）</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #f44336; font-weight: bold; font-size: 18px;" id="totalBearishPoints">-</span>
+                    <span style="color: #a8dadc;">看空点数（偏空 >80%）</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">📊 偏多/偏空 >80% 数量趋势（实时采集数据）</div>
+            <div style="color: #8b92b8; font-size: 12px; margin-bottom: 10px;">
+                💡 说明：图表显示"2小时周期占比>80%"的币种数量变化趋势，数据每5分钟采集一次，从2026-02-12开始记录
+            </div>
+            <div id="trendChart"></div>
+        </div>
+        
+        <div class="symbol-lists">
+            <div class="symbol-list">
+                <div class="list-title bullish">
+                    ⬆️ 当前偏多币种 (>80%)
+                </div>
+                <div id="bullishList">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+            
+            <div class="symbol-list">
+                <div class="list-title bearish">
+                    ⬇️ 当前偏空币种 (>80%)
+                </div>
+                <div id="bearishList">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="update-info">
+            最后更新: <span id="lastUpdate">-</span> (北京时间) | 
+            <span id="autoRefreshText">数据每5分钟自动更新，每页显示24小时（一天）数据</span>
+        </div>
+    </div>
+    
+    <script>
+        let chart = null;
+        let currentPage = 1;
+        let totalPages = 1;
+        let updateInterval = null;
+        let countdownInterval = null;
+        let nextUpdateTime = null;
+        
+        // 日历选择器相关变量
+        let availableDates = new Set(); // 存储可用日期
+        let selectedYear = new Date().getFullYear();
+        let selectedMonth = new Date().getMonth() + 1;
+        let currentDisplayDate = null; // 当前显示的日期（字符串格式：YYYY-MM-DD）
+        
+        // 初始化图表
+        function initChart() {
+            const chartDom = document.getElementById('trendChart');
+            chart = echarts.init(chartDom);
+            
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(30, 33, 57, 0.9)',
+                    borderColor: 'rgba(59, 125, 255, 0.4)',
+                    textStyle: {
+                        color: '#fff'
+                    },
+                    formatter: function(params) {
+                        let result = params[0].axisValue + '<br/>';
+                        params.forEach(item => {
+                            const color = item.seriesName.includes('偏多') ? '#26d639' : '#ff4757';
+                            result += `<span style="color:${color}">● ${item.seriesName}: ${item.value}</span><br/>`;
+                        });
+                        return result;
+                    }
+                },
+                legend: {
+                    data: ['偏多币种 (>80%)', '偏空币种 (>80%)'],
+                    textStyle: {
+                        color: '#8b92b8'
+                    },
+                    top: 10
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '10%',
+                    top: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: [],
+                    axisLabel: {
+                        color: '#8b92b8',
+                        rotate: 45
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: 'rgba(59, 125, 255, 0.3)'
+                        }
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '币种数量',
+                    nameTextStyle: {
+                        color: '#8b92b8'
+                    },
+                    axisLabel: {
+                        color: '#8b92b8'
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: 'rgba(59, 125, 255, 0.3)'
+                        }
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: 'rgba(59, 125, 255, 0.1)'
+                        }
+                    }
+                },
+                series: [
+                    {
+                        name: '偏多币种 (>80%)',
+                        type: 'line',
+                        smooth: true,
+                        symbol: 'circle',
+                        symbolSize: 6,
+                        lineStyle: {
+                            color: '#26d639',
+                            width: 2
+                        },
+                        itemStyle: {
+                            color: '#26d639'
+                        },
+                        areaStyle: {
+                            color: {
+                                type: 'linear',
+                                x: 0,
+                                y: 0,
+                                x2: 0,
+                                y2: 1,
+                                colorStops: [
+                                    { offset: 0, color: 'rgba(38, 214, 57, 0.3)' },
+                                    { offset: 1, color: 'rgba(38, 214, 57, 0.05)' }
+                                ]
+                            }
+                        },
+                        data: []
+                    },
+                    {
+                        name: '偏空币种 (>80%)',
+                        type: 'line',
+                        smooth: true,
+                        symbol: 'circle',
+                        symbolSize: 6,
+                        lineStyle: {
+                            color: '#ff4757',
+                            width: 2
+                        },
+                        itemStyle: {
+                            color: '#ff4757'
+                        },
+                        areaStyle: {
+                            color: {
+                                type: 'linear',
+                                x: 0,
+                                y: 0,
+                                x2: 0,
+                                y2: 1,
+                                colorStops: [
+                                    { offset: 0, color: 'rgba(255, 71, 87, 0.3)' },
+                                    { offset: 1, color: 'rgba(255, 71, 87, 0.05)' }
+                                ]
+                            }
+                        },
+                        data: []
+                    }
+                ]
+            };
+            
+            chart.setOption(option);
+            
+            // 初始化后强制调整大小
+            setTimeout(() => chart.resize(), 100);
+            
+            // 响应式
+            window.addEventListener('resize', () => {
+                chart.resize();
+            });
+        }
+        
+        // 加载当前偏多/偏空 >80% 的统计（后端已计算，前端直接使用）
+        
+        // 更新倒计时显示
+        function updateCountdown() {
+            if (!nextUpdateTime || currentPage !== 1) {
+                document.getElementById('autoRefreshText').textContent = '数据每5分钟自动更新，每页显示24小时（一天）数据';
+                return;
+            }
+            
+            const now = Date.now();
+            const remaining = Math.max(0, Math.floor((nextUpdateTime - now) / 1000));
+            
+            if (remaining === 0) {
+                document.getElementById('autoRefreshText').textContent = '正在刷新数据...';
+            } else {
+                const minutes = Math.floor(remaining / 60);
+                const seconds = remaining % 60;
+                document.getElementById('autoRefreshText').textContent = 
+                    `下次自动刷新: ${minutes}分${seconds}秒 | 数据每5分钟自动更新`;
+            }
+        }
+        
+        // 启动倒计时
+        function startCountdown() {
+            // 清除旧的倒计时
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            
+            // 设置下次更新时间（5分钟后）
+            nextUpdateTime = Date.now() + 300000;
+            
+            // 立即更新一次
+            updateCountdown();
+            
+            // 每秒更新倒计时
+            countdownInterval = setInterval(updateCountdown, 1000);
+        }
+        
+        async function loadCurrentBiasStats() {
+            try {
+                // 调用批量API获取所有币种的2小时周期占比（后端已筛选 >80%）
+                const response = await fetch('/api/sar-slope/bias-ratios?_t=' + Date.now(), {
+                    cache: 'no-store',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
+                const data = await response.json();
+                
+                if (!data.success) {
+                    console.error('❌ 加载偏向统计失败');
+                    return;
+                }
+                
+                // 后端已经计算好了 >80% 的币种列表，前端直接使用
+                const bullishSymbols = data.bullish_symbols || [];
+                const bearishSymbols = data.bearish_symbols || [];
+                
+                console.log(`✅ [后端计算] 偏多 >80%: ${bullishSymbols.length}个, 偏空 >80%: ${bearishSymbols.length}个`);
+                
+                // 打印详细信息
+                bullishSymbols.forEach(item => {
+                    console.log(`[Bias] ✓ ${item.symbol} 偏多 ${item.ratio.toFixed(1)}%`);
+                });
+                bearishSymbols.forEach(item => {
+                    console.log(`[Bias] ✓ ${item.symbol} 偏空 ${item.ratio.toFixed(1)}%`);
+                });
+                
+                // 更新顶部统计卡片
+                document.getElementById('currentBullish').textContent = data.bullish_count || 0;
+                document.getElementById('currentBearish').textContent = data.bearish_count || 0;
+                
+                // 更新币种列表（数据已按比例排序）
+                updateSymbolLists(bullishSymbols, bearishSymbols);
+                
+            } catch (error) {
+                console.error('❌ 加载偏向统计失败:', error);
+            }
+        }
+        
+        // 加载趋势数据
+        async function loadTrendData(page = 1) {
+            try {
+                const response = await fetch(`/api/sar-slope/bias-stats?page=${page}&_t=${Date.now()}`, {
+                    cache: 'no-store',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentPage = data.page;
+                    totalPages = data.total_pages;
+                    
+                    // 更新日期显示 - 使用API返回的日期
+                    if (data.date) {
+                        // 格式化日期显示 (YYYY-MM-DD → YYYY/MM/DD)
+                        document.getElementById('currentDate').textContent = data.date.replace(/-/g, '/');
+                    } else if (data.time_range && data.time_range.date) {
+                        // 备用：从time_range提取日期
+                        document.getElementById('currentDate').textContent = data.time_range.date.replace(/-/g, '/');
+                    }
+                    
+                    // 更新按钮状态
+                    document.getElementById('prevBtn').disabled = !data.has_prev;
+                    document.getElementById('nextBtn').disabled = !data.has_next;
+                    
+                    // 更新时间范围显示
+                    if (data.time_range.start && data.time_range.end) {
+                        const startTime = data.time_range.start.substring(11, 16); // HH:MM
+                        const endTime = data.time_range.end.substring(11, 16); // HH:MM
+                        document.getElementById('timeRangeDisplay').textContent = 
+                            `${startTime} ~ ${endTime}`;
+                    }
+                    
+                    if (data.data.length > 0) {
+                        // 准备图表数据
+                        const times = [];
+                        const bullishData = [];
+                        const bearishData = [];
+                        
+                        data.data.forEach(item => {
+                            // 使用完整时间 (北京时间已在后端处理)
+                            times.push(item.timestamp);
+                            bullishData.push(item.bullish_count);
+                            bearishData.push(item.bearish_count);
+                        });
+                        
+                        // 更新图表
+                        chart.setOption({
+                            xAxis: {
+                                data: times
+                            },
+                            series: [
+                                { data: bullishData },
+                                { data: bearishData }
+                            ]
+                        });
+                        
+                        // 强制调整图表大小
+                        setTimeout(() => chart.resize(), 100);
+                        
+                        // 更新数据点数和时间范围
+                        document.getElementById('dataPoints').textContent = data.data.length;
+                        const startTime = data.data[0].timestamp;
+                        const endTime = data.data[data.data.length - 1].timestamp;
+                        document.getElementById('timeRange').textContent = 
+                            `${startTime.substring(5)} - ${endTime.substring(5)}`;
+                        
+                        // 更新时间（北京时间）
+                        const now = new Date();
+                        const beijingTime = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+                        document.getElementById('lastUpdate').textContent = 
+                            beijingTime.toISOString().substring(0, 19).replace('T', ' ');
+                        
+                        console.log(`✅ 趋势数据已更新: 第${currentPage}页, ${data.data.length} 个数据点`);
+                        
+                        // 启动倒计时（仅第1页）
+                        if (page === 1) {
+                            startCountdown();
+                        }
+                        
+                        // 更新当天统计（从API返回的daily_stats字段）
+                        if (data.daily_stats) {
+                            document.getElementById('totalBullishPoints').textContent = data.daily_stats.total_bullish;
+                            document.getElementById('totalBearishPoints').textContent = data.daily_stats.total_bearish;
+                        } else {
+                            // 历史页面：显示N/A
+                            document.getElementById('totalBullishPoints').textContent = 'N/A';
+                            document.getElementById('totalBearishPoints').textContent = 'N/A';
+                        }
+                    } else {
+                        console.log('⚠️  本页暂无数据');
+                        // 清空图表
+                        chart.setOption({
+                            xAxis: { data: [] },
+                            series: [{ data: [] }, { data: [] }]
+                        });
+                        
+                        // 清空统计显示
+                        document.getElementById('totalBullishPoints').textContent = '0';
+                        document.getElementById('totalBearishPoints').textContent = '0';
+                    }
+                    
+                    // 如果是第1页（今天），加载当前的偏多/偏空 >80% 统计
+                    if (page === 1) {
+                        await loadCurrentBiasStats();
+                    } else {
+                        // 历史页面：清空当前统计，显示N/A
+                        document.getElementById('currentBullish').textContent = 'N/A';
+                        document.getElementById('currentBearish').textContent = 'N/A';
+                        document.getElementById('bullishList').innerHTML = '<div class="loading">仅第1页显示当前统计</div>';
+                        document.getElementById('bearishList').innerHTML = '<div class="loading">仅第1页显示当前统计</div>';
+                    }
+                } else {
+                    console.error('❌ API返回错误:', data.error);
+                }
+            } catch (error) {
+                console.error('❌ 加载数据失败:', error);
+            }
+        }
+        
+        // 更新币种列表
+        function updateSymbolLists(bullishSymbols, bearishSymbols) {
+            // 偏多列表
+            const bullishList = document.getElementById('bullishList');
+            if (bullishSymbols && bullishSymbols.length > 0) {
+                bullishList.innerHTML = bullishSymbols.map(item => {
+                    // 兼容两种格式：字符串 或 {symbol, ratio}
+                    const symbol = typeof item === 'string' ? item : item.symbol;
+                    const ratio = typeof item === 'object' ? item.ratio : '';
+                    return `
+                        <div class="symbol-item">
+                            <span class="symbol-name">${symbol}</span>
+                            ${ratio ? `<span style="color: #26d639; font-size: 12px;">${ratio.toFixed(1)}%</span>` : ''}
+                            <span style="color: #26d639;">⬆️</span>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                bullishList.innerHTML = '<div class="loading">暂无币种</div>';
+            }
+            
+            // 偏空列表
+            const bearishList = document.getElementById('bearishList');
+            if (bearishSymbols && bearishSymbols.length > 0) {
+                bearishList.innerHTML = bearishSymbols.map(item => {
+                    // 兼容两种格式：字符串 或 {symbol, ratio}
+                    const symbol = typeof item === 'string' ? item : item.symbol;
+                    const ratio = typeof item === 'object' ? item.ratio : '';
+                    return `
+                        <div class="symbol-item">
+                            <span class="symbol-name">${symbol}</span>
+                            ${ratio ? `<span style="color: #ff4757; font-size: 12px;">${ratio.toFixed(1)}%</span>` : ''}
+                            <span style="color: #ff4757;">⬇️</span>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                bearishList.innerHTML = '<div class="loading">暂无币种</div>';
+            }
+        }
+        
+        // 上一页 (更早的数据)
+        function previousPage() {
+            if (currentPage < totalPages) {
+                // 停止自动更新和倒计时
+                if (updateInterval) {
+                    clearInterval(updateInterval);
+                    updateInterval = null;
+                }
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                }
+                loadTrendData(currentPage + 1);
+            }
+        }
+        
+        // 下一页 (更新的数据)
+        function nextPage() {
+            if (currentPage > 1) {
+                loadTrendData(currentPage - 1);
+                
+                // 如果回到第1页，重新开启自动更新
+                if (currentPage - 1 === 1 && !updateInterval) {
+                    updateInterval = setInterval(() => loadTrendData(1), 300000); // 改为300秒（5分钟）
+                }
+            }
+        }
+        
+        // 加载进度控制
+        const loadingProgress = {
+            current: 0,
+            
+            updateProgress(percent, text, step) {
+                this.current = percent;
+                document.getElementById('progressBar').style.width = percent + '%';
+                document.getElementById('loadingPercent').textContent = percent + '%';
+                document.getElementById('loadingText').textContent = text;
+                
+                // 更新步骤状态
+                if (step) {
+                    // 标记之前的步骤为完成
+                    for (let i = 1; i < step; i++) {
+                        const stepEl = document.getElementById('step' + i);
+                        if (stepEl) {
+                            stepEl.classList.remove('active');
+                            stepEl.classList.add('completed');
+                        }
+                    }
+                    // 标记当前步骤为活动
+                    const currentStepEl = document.getElementById('step' + step);
+                    if (currentStepEl) {
+                        currentStepEl.classList.add('active');
+                    }
+                }
+            },
+            
+            hide() {
+                // 标记所有步骤为完成
+                for (let i = 1; i <= 4; i++) {
+                    const stepEl = document.getElementById('step' + i);
+                    if (stepEl) {
+                        stepEl.classList.remove('active');
+                        stepEl.classList.add('completed');
+                    }
+                }
+                
+                setTimeout(() => {
+                    const overlay = document.getElementById('loadingOverlay');
+                    if (overlay) {
+                        overlay.style.opacity = '0';
+                        setTimeout(() => {
+                            overlay.style.display = 'none';
+                        }, 300);
+                    }
+                }, 500);
+            }
+        };
+        
+        // 页面加载完成
+        window.addEventListener('DOMContentLoaded', async () => {
+            console.log('📊 SAR偏向趋势图加载中...');
+            
+            try {
+                // 步骤1: 初始化图表 (0-25%)
+                loadingProgress.updateProgress(0, '正在初始化图表...', 1);
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                initChart();
+                loadingProgress.updateProgress(25, '图表初始化完成', 1);
+                await new Promise(resolve => setTimeout(resolve, 200));
+                
+                // 步骤2: 加载趋势数据 (25-60%)
+                loadingProgress.updateProgress(30, '正在加载趋势数据...', 2);
+                await loadTrendData(1);
+                loadingProgress.updateProgress(60, '趋势数据加载完成', 2);
+                await new Promise(resolve => setTimeout(resolve, 200));
+                
+                // 步骤3: 加载当前统计 (60-85%)
+                loadingProgress.updateProgress(65, '正在加载当前统计...', 3);
+                await loadCurrentBiasStats();
+                loadingProgress.updateProgress(85, '当前统计加载完成', 3);
+                await new Promise(resolve => setTimeout(resolve, 200));
+                
+                // 步骤4: 渲染图表 (85-100%)
+                loadingProgress.updateProgress(90, '正在渲染图表...', 4);
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                chart.resize();
+                loadingProgress.updateProgress(100, '加载完成！', 4);
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                // 隐藏加载界面
+                loadingProgress.hide();
+                
+                // 只在第1页时自动更新（改为5分钟）
+                updateInterval = setInterval(() => {
+                    if (currentPage === 1) {
+                        console.log('⏰ 5分钟定时刷新，开始加载数据...');
+                        loadTrendData(1);
+                    }
+                }, 300000); // 改为300秒（5分钟）
+                
+                console.log('✅ 页面初始化完成，第1页每5分钟自动更新');
+                
+            } catch (error) {
+                console.error('❌ 页面加载失败:', error);
+                loadingProgress.updateProgress(100, '加载失败，请刷新重试', null);
+                setTimeout(() => loadingProgress.hide(), 2000);
+            }
+        });
+        
+        // 页面卸载时清理
+        window.addEventListener('beforeunload', () => {
+            if (updateInterval) {
+                clearInterval(updateInterval);
+            }
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            if (chart) {
+                chart.dispose();
+            }
+        });
+        
+        // ==================== 日历选择器功能 ====================
+        
+        // 显示日历选择器
+        function showDatePicker() {
+            const modal = document.getElementById('datePickerModal');
+            modal.style.display = 'flex';
+            
+            // 初始化年份选择器（2024-当前年+1）
+            const yearSelect = document.getElementById('yearSelect');
+            yearSelect.innerHTML = '';
+            const currentYear = new Date().getFullYear();
+            for (let year = 2024; year <= currentYear + 1; year++) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year + '年';
+                if (year === selectedYear) option.selected = true;
+                yearSelect.appendChild(option);
+            }
+            
+            // 设置月份选择器
+            document.getElementById('monthSelect').value = selectedMonth;
+            
+            // 渲染日历
+            renderCalendar();
+        }
+        
+        // 隐藏日历选择器
+        function hideDatePicker() {
+            document.getElementById('datePickerModal').style.display = 'none';
+        }
+        
+        // 点击遮罩层隐藏
+        function hideDatePickerIfClickedOutside(event) {
+            if (event.target.id === 'datePickerModal') {
+                hideDatePicker();
+            }
+        }
+        
+        // 渲染日历
+        function renderCalendar() {
+            selectedYear = parseInt(document.getElementById('yearSelect').value);
+            selectedMonth = parseInt(document.getElementById('monthSelect').value);
+            
+            const calendarDays = document.getElementById('calendarDays');
+            calendarDays.innerHTML = '';
+            
+            // 获取当月第一天和最后一天
+            const firstDay = new Date(selectedYear, selectedMonth - 1, 1);
+            const lastDay = new Date(selectedYear, selectedMonth, 0);
+            const firstDayOfWeek = firstDay.getDay(); // 0=周日
+            const daysInMonth = lastDay.getDate();
+            
+            // 获取上个月的最后几天
+            const prevMonthLastDay = new Date(selectedYear, selectedMonth - 1, 0).getDate();
+            
+            // 今天的日期
+            const today = new Date();
+            const todayStr = formatDate(today);
+            
+            // 填充上个月的日期
+            for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+                const day = prevMonthLastDay - i;
+                const dayEl = createDayElement(day, true, null);
+                calendarDays.appendChild(dayEl);
+            }
+            
+            // 填充当月日期
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isToday = dateStr === todayStr;
+                const isSelected = dateStr === currentDisplayDate;
+                const isAvailable = availableDates.has(dateStr);
+                
+                const dayEl = createDayElement(day, false, dateStr, isToday, isSelected, isAvailable);
+                calendarDays.appendChild(dayEl);
+            }
+            
+            // 填充下个月的日期（补足6行）
+            const totalCells = calendarDays.children.length;
+            const remainingCells = 42 - totalCells; // 6行 x 7列 = 42格
+            for (let day = 1; day <= remainingCells; day++) {
+                const dayEl = createDayElement(day, true, null);
+                calendarDays.appendChild(dayEl);
+            }
+        }
+        
+        // 创建日期元素
+        function createDayElement(day, isOtherMonth, dateStr, isToday = false, isSelected = false, isAvailable = false) {
+            const dayEl = document.createElement('div');
+            dayEl.className = 'calendar-day';
+            dayEl.textContent = day;
+            
+            if (isOtherMonth) {
+                dayEl.classList.add('other-month');
+            } else {
+                if (isToday) dayEl.classList.add('today');
+                if (isSelected) dayEl.classList.add('selected');
+                if (isAvailable) {
+                    dayEl.classList.add('available');
+                    dayEl.onclick = () => selectDate(dateStr);
+                    dayEl.title = `选择 ${dateStr}`;
+                } else {
+                    dayEl.style.cursor = 'default';
+                    dayEl.title = `${dateStr} - 无数据`;
+                }
+            }
+            
+            return dayEl;
+        }
+        
+        // 选择日期
+        function selectDate(dateStr) {
+            console.log('📅 选择日期:', dateStr);
+            currentDisplayDate = dateStr;
+            
+            // 调用API加载该日期的数据
+            // 由于当前API是基于page的，我们需要找到对应的page
+            // 暂时使用简单的方法：根据日期计算page（假设每天1个page，从今天往前推）
+            const today = new Date();
+            const selectedDate = new Date(dateStr);
+            const daysDiff = Math.floor((today - selectedDate) / (1000 * 60 * 60 * 24));
+            const targetPage = daysDiff + 1;
+            
+            hideDatePicker();
+            loadTrendData(targetPage);
+        }
+        
+        // 选择今天
+        function selectToday() {
+            const todayStr = formatDate(new Date());
+            selectDate(todayStr);
+        }
+        
+        // 切换月份
+        function changeMonth(delta) {
+            selectedMonth += delta;
+            if (selectedMonth < 1) {
+                selectedMonth = 12;
+                selectedYear--;
+            } else if (selectedMonth > 12) {
+                selectedMonth = 1;
+                selectedYear++;
+            }
+            
+            document.getElementById('yearSelect').value = selectedYear;
+            document.getElementById('monthSelect').value = selectedMonth;
+            renderCalendar();
+        }
+        
+        // 格式化日期为 YYYY-MM-DD
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        // 加载可用日期列表
+        async function loadAvailableDates() {
+            try {
+                console.log('📅 正在加载可用日期列表...');
+                
+                // 从API获取所有有数据的日期
+                const response = await fetch('/api/sar-slope/available-dates');
+                const data = await response.json();
+                
+                if (data.success && data.dates) {
+                    availableDates = new Set(data.dates);
+                    console.log('✅ 已加载可用日期数量:', data.count, '| 范围:', data.dates[data.dates.length - 1], '→', data.dates[0]);
+                } else {
+                    // Fallback: 假设最近60天都有数据
+                    console.warn('⚠️ API返回失败，使用fallback方法');
+                    const dates = new Set();
+                    const today = new Date();
+                    for (let i = 0; i < 60; i++) {
+                        const date = new Date(today);
+                        date.setDate(date.getDate() - i);
+                        dates.add(formatDate(date));
+                    }
+                    availableDates = dates;
+                    console.log('✅ Fallback: 已加载可用日期数量:', dates.size);
+                }
+            } catch (error) {
+                console.error('❌ 加载可用日期失败:', error);
+                // Fallback
+                const dates = new Set();
+                const today = new Date();
+                for (let i = 0; i < 60; i++) {
+                    const date = new Date(today);
+                    date.setDate(date.getDate() - i);
+                    dates.add(formatDate(date));
+                }
+                availableDates = dates;
+                console.log('✅ 异常后Fallback: 已加载可用日期数量:', dates.size);
+            }
+        }
+        
+        // 页面加载时初始化可用日期
+        (async function initDatePicker() {
+            await loadAvailableDates();
+            
+            // 设置当前显示的日期
+            const todayStr = formatDate(new Date());
+            currentDisplayDate = todayStr;
+            selectedYear = new Date().getFullYear();
+            selectedMonth = new Date().getMonth() + 1;
+        })();
+    </script>
+</body>
+</html>

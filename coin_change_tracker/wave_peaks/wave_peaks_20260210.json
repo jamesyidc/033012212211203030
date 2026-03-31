@@ -1,0 +1,78 @@
+{
+  "date": "20260210",
+  "data_points": 992,
+  "peaks_count": 3,
+  "false_breakout": null,
+  "peaks": [
+    {
+      "b_point": {
+        "index": 14,
+        "timestamp": "2026-02-10T00:14:00.266530+08:00",
+        "beijing_time": "2026-02-10 00:14:00",
+        "value": -18.8
+      },
+      "a_point": {
+        "index": 49,
+        "timestamp": "2026-02-10T00:49:00.259170+08:00",
+        "beijing_time": "2026-02-10 00:49:00",
+        "value": 37.78
+      },
+      "c_point": {
+        "index": 69,
+        "timestamp": "2026-02-10T01:09:00.275852+08:00",
+        "beijing_time": "2026-02-10 01:09:00",
+        "value": 8.18
+      },
+      "amplitude": 56.58,
+      "decline": 29.6,
+      "decline_ratio": 52.31530576175327
+    },
+    {
+      "b_point": {
+        "index": 86,
+        "timestamp": "2026-02-10T01:26:00.285513+08:00",
+        "beijing_time": "2026-02-10 01:26:00",
+        "value": 6.25
+      },
+      "a_point": {
+        "index": 105,
+        "timestamp": "2026-02-10T01:45:00.285694+08:00",
+        "beijing_time": "2026-02-10 01:45:00",
+        "value": 51.88
+      },
+      "c_point": {
+        "index": 147,
+        "timestamp": "2026-02-10T02:27:00.295538+08:00",
+        "beijing_time": "2026-02-10 02:27:00",
+        "value": 24.46
+      },
+      "amplitude": 45.63,
+      "decline": 27.42,
+      "decline_ratio": 60.092044707429324
+    },
+    {
+      "b_point": {
+        "index": 147,
+        "timestamp": "2026-02-10T02:27:00.295538+08:00",
+        "beijing_time": "2026-02-10 02:27:00",
+        "value": 24.46
+      },
+      "a_point": {
+        "index": 249,
+        "timestamp": "2026-02-10T04:09:00.310306+08:00",
+        "beijing_time": "2026-02-10 04:09:00",
+        "value": 59.78
+      },
+      "c_point": {
+        "index": 267,
+        "timestamp": "2026-02-10T04:27:00.323361+08:00",
+        "beijing_time": "2026-02-10 04:27:00",
+        "value": 34.65
+      },
+      "amplitude": 35.32,
+      "decline": 25.130000000000003,
+      "decline_ratio": 71.14949037372594
+    }
+  ],
+  "processed_at": "2026-02-18T09:45:44.614766"
+}

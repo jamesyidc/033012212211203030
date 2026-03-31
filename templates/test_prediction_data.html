@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>预测数据测试</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>预测数据测试</h1>
+    <div id="result"></div>
+    
+    <script>
+        async function testPrediction() {
+            const date = '2026-03-02';
+            const response = await fetch(`/api/coin-change-tracker/daily-prediction?date=${date}`);
+            const data = await response.json();
+            
+            document.getElementById('result').innerHTML = `
+                <h2>API Response for ${date}:</h2>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+                
+                <h2>Decoded:</h2>
+                <p><strong>Signal:</strong> ${data.data.signal}</p>
+                <p><strong>Description:</strong> ${data.data.description}</p>
+                <p><strong>Color Counts:</strong></p>
+                <ul>
+                    <li>Green: ${data.data.color_counts.green}</li>
+                    <li>Red: ${data.data.color_counts.red}</li>
+                    <li>Yellow: ${data.data.color_counts.yellow}</li>
+                    <li>Blank: ${data.data.color_counts.blank}</li>
+                </ul>
+                
+                <h2>Second Trigger:</h2>
+                <p>${data.data.second_trigger ? JSON.stringify(data.data.second_trigger, null, 2) : 'No second trigger data'}</p>
+            `;
+        }
+        
+        testPrediction();
+    </script>
+</body>
+</html>

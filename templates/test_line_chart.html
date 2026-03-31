@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>线条测试</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+</head>
+<body>
+    <h2>测试：27币涨跌幅之和线条</h2>
+    <div id="chart" style="width: 100%; height: 500px; border: 1px solid #ccc;"></div>
+    
+    <script>
+        console.log('🎯 开始测试...');
+        
+        // 获取真实数据
+        fetch('/api/coin-change-tracker/history?limit=100')
+            .then(res => res.json())
+            .then(result => {
+                console.log('✅ API返回:', result);
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    const data = result.data;
+                    
+                    // 提取时间和涨跌幅
+                    const times = data.map(d => d.beijing_time.split(' ')[1]);
+                    const changes = data.map(d => d.total_change);
+                    
+                    console.log('📊 数据处理:');
+                    console.log('  时间数量:', times.length);
+                    console.log('  涨跌幅数量:', changes.length);
+                    console.log('  涨跌幅范围:', Math.min(...changes), '~', Math.max(...changes));
+                    console.log('  前5个涨跌幅:', changes.slice(0, 5));
+                    
+                    // 初始化图表
+                    const chart = echarts.init(document.getElementById('chart'));
+                    
+                    // 设置选项
+                    const option = {
+                        title: {
+                            text: '27币涨跌幅之和'
+                        },
+                        tooltip: {
+                            trigger: 'axis'
+                        },
+                        xAxis: {
+                            type: 'category',
+                            data: times
+                        },
+                        yAxis: {
+                            type: 'value',
+                            name: '涨跌幅 (%)'
+                        },
+                        series: [{
+                            name: '27币涨跌幅之和',
+                            type: 'line',
+                            data: changes,
+                            lineStyle: {
+                                color: '#3B82F6',
+                                width: 2
+                            },
+                            areaStyle: {
+                                color: 'rgba(59, 130, 246, 0.3)'
+                            }
+                        }]
+                    };
+                    
+                    console.log('📈 设置图表...');
+                    chart.setOption(option);
+                    console.log('✅ 完成！');
+                    
+                    // 检查series
+                    const currentOption = chart.getOption();
+                    console.log('🔍 当前series配置:', currentOption.series);
+                } else {
+                    console.error('❌ 数据错误:', result);
+                }
+            })
+            .catch(error => {
+                console.error('❌ 请求失败:', error);
+            });
+    </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+{"timestamp": "2026-03-07 14:31:16", "action": "config_update", "long_enabled": true, "short_enabled": false, "max_velocity_threshold": 20.0, "min_velocity_threshold": -15.0}
+{"timestamp": "2026-03-07 14:38:20", "action": "config_update", "long_enabled": true, "short_enabled": false, "max_velocity_threshold": 8, "min_velocity_threshold": -15}
+{"timestamp": "2026-03-07 20:50:30", "action": "config_update", "long_enabled": true, "short_enabled": true, "max_velocity_threshold": 8, "min_velocity_threshold": -12}
+{"timestamp": "2026-03-07 20:50:30", "action": "config_update", "long_enabled": true, "short_enabled": true, "max_velocity_threshold": 8, "min_velocity_threshold": -12}
+{"timestamp": "2026-03-07 22:15:44", "action": "config_update", "long_enabled": true, "short_enabled": true, "max_velocity_threshold": 10, "min_velocity_threshold": -12}
+{"timestamp": "2026-03-08 02:26:05", "action": "config_update", "long_enabled": true, "short_enabled": true, "max_velocity_threshold": 8, "min_velocity_threshold": -12}
+{"timestamp": "2026-03-12 02:14:52", "action": "config_update", "long_enabled": true, "short_enabled": true, "max_velocity_threshold": 13, "min_velocity_threshold": -12}

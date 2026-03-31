@@ -1,0 +1,16 @@
+{
+  "date": "2026-02-18",
+  "total_bullish": 6,
+  "total_bearish": 4,
+  "total_points": 293,
+  "unique_bullish_symbols": [
+    "TON",
+    "TRX"
+  ],
+  "unique_bearish_symbols": [
+    "XRP"
+  ],
+  "unique_bullish_count": 2,
+  "unique_bearish_count": 1,
+  "generated_at": "2026-02-28 22:15:29"
+}

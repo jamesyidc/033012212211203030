@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自动备份管理系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .collapsible-content.active {
+            max-height: 2000px;
+            transition: max-height 0.5s ease-in;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <!-- 顶部导航 -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-800">
+                <i class="fas fa-database text-blue-600"></i> 
+                自动备份管理系统
+            </h1>
+            <a href="/" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg shadow transition">
+                <i class="fas fa-home mr-2"></i>
+                返回首页
+            </a>
+        </div>
+
+        <p class="text-gray-600 mb-6">完整项目备份 · 12小时自动备份 · 保留最近3次</p>
+
+        <!-- 可折叠的系统文档 -->
+        <div class="bg-blue-50 border-l-4 border-blue-600 mb-8 rounded-r-lg shadow">
+            <button onclick="toggleDocumentation()" class="w-full text-left px-6 py-4 flex justify-between items-center hover:bg-blue-100 transition">
+                <h3 class="text-lg font-bold text-blue-800">
+                    <i class="fas fa-book"></i> 系统完整文档
+                </h3>
+                <i id="docToggleIcon" class="fas fa-chevron-down text-blue-600"></i>
+            </button>
+            
+            <div id="documentationContent" class="collapsible-content">
+                <div class="px-6 pb-6">
+                    <!-- 快速导航 -->
+                    <div class="bg-white rounded-lg p-4 mb-4">
+                        <h4 class="font-bold text-blue-800 mb-3">📚 快速导航</h4>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                            <a href="#system-overview" class="text-blue-600 hover:underline">• 系统概述</a>
+                            <a href="#architecture" class="text-blue-600 hover:underline">• 系统架构</a>
+                            <a href="#data-tables" class="text-blue-600 hover:underline">• 数据表结构</a>
+                            <a href="#features" class="text-blue-600 hover:underline">• 功能详解</a>
+                            <a href="#dependencies" class="text-blue-600 hover:underline">• 系统依赖</a>
+                            <a href="#backup-system" class="text-blue-600 hover:underline">• 备份系统</a>
+                            <a href="#api-docs" class="text-blue-600 hover:underline">• API接口</a>
+                            <a href="#troubleshooting" class="text-blue-600 hover:underline">• 故障排查</a>
+                        </div>
+                    </div>
+
+                    <!-- 系统概述 -->
+                    <div id="system-overview" class="bg-white rounded-lg p-4 mb-4">
+                        <h4 class="font-bold text-blue-800 mb-3">
+                            <i class="fas fa-info-circle"></i> 系统概述
+                        </h4>
+                        <p class="text-sm text-gray-700 mb-3">
+                            这是一个完整的加密货币交易分析系统，集成了多个子系统用于数据采集、分析和交易信号生成。
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                            <div class="bg-blue-50 p-3 rounded">
+                                <strong>🔄 实时数据采集</strong>
+                                <p class="text-gray-600">18个数据采集器并行运行</p>
+                            </div>
+                            <div class="bg-green-50 p-3 rounded">
+                                <strong>📊 多维度分析</strong>
+                                <p class="text-gray-600">SAR、恐慌指标、支撑压力等</p>
+                            </div>
+                            <div class="bg-purple-50 p-3 rounded">
+                                <strong>🎯 交易信号</strong>
+                                <p class="text-gray-600">自动生成买卖信号</p>
+                            </div>
+                            <div class="bg-orange-50 p-3 rounded">
+                                <strong>💾 自动备份</strong>
+                                <p class="text-gray-600">12小时自动备份，保留最近3次</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 系统架构 -->
+                    <div id="architecture" class="bg-white rounded-lg p-4 mb-4">
+                        <h4 class="font-bold text-blue-800 mb-3">
+                            <i class="fas fa-sitemap"></i> 系统架构
+                        </h4>
+                        <div class="text-sm">
+                            <pre class="bg-gray-100 p-3 rounded overflow-x-auto text-xs">
+Flask Web Server (端口9002)
+    ├── 数据采集器 (18个PM2进程)
+    │   ├── coin-price-tracker (币价追踪)
+    │   ├── sar-jsonl-collector (SAR指标)
+    │   ├── market-sentiment-collector (市场情绪)
+    │   └── ... (其他15个)
+    ├── 分析系统
+    │   ├── SAR Bias统计
+    │   ├── 支撑压力分析
+    │   └── 恐慌指标分析
+    ├── 监控系统
+    │   ├── data-health-monitor (数据健康)
+    │   └── system-health-monitor (系统健康)
+    └── JSONL数据库 (~3.6GB)</pre>
+                        </div>
+                    </div>
+
+                    <!-- 数据表结构 -->
+                    <div id="data-tables" class="bg-white rounded-lg p-4 mb-4">
+                        <h4 class="font-bold text-blue-800 mb-3">
+                            <i class="fas fa-table"></i> 核心数据表结构
+                        </h4>
+                        <div class="space-y-3 text-sm">
+                            <!-- SAR指标 -->
+                            <details class="bg-gray-50 p-3 rounded">
+                                <summary class="cursor-pointer font-semibold text-blue-700">
+                                    1. SAR指标数据 (data/sar_jsonl/*.jsonl)
+                                </summary>
+                                <div class="mt-2 pl-4">
+                                    <p class="text-gray-600 mb-2">每个币种一个文件，如 BTC.jsonl</p>
+                                    <pre class="bg-white p-2 rounded text-xs overflow-x-auto">{
+  "timestamp": "2026-03-15T10:30:00+08:00",
+  "coin": "BTC",
+  "price": 65432.10,
+  "sar": 64500.00,
+  "sar_direction": "bull"
+}</pre>
+                                </div>
+                            </details>
+
+                            <!-- 支撑压力 -->
+                            <details class="bg-gray-50 p-3 rounded">
+                                <summary class="cursor-pointer font-semibold text-blue-700">
+                                    2. 支撑压力数据 (support_resistance_levels.jsonl) - 697MB
+                                </summary>
+                                <div class="mt-2 pl-4">
+                                    <p class="text-gray-600 mb-2">最大文件，记录所有支撑压力位</p>
+                                    <pre class="bg-white p-2 rounded text-xs overflow-x-auto">{
+  "timestamp": "2026-03-15T10:30:00+08:00",
+  "coin": "BTC",
+  "support_levels": [64000, 63500, 63000],
+  "resistance_levels": [66000, 66500, 67000],
+  "strength": "strong"
+}</pre>
+                                </div>
+                            </details>
+
+                            <!-- 市场情绪 -->
+                            <details class="bg-gray-50 p-3 rounded">
+                                <summary class="cursor-pointer font-semibold text-blue-700">
+                                    3. 市场情绪 (market_sentiment_*.jsonl)
+                                </summary>
+                                <div class="mt-2 pl-4">
+                                    <pre class="bg-white p-2 rounded text-xs overflow-x-auto">{
+  "timestamp": "2026-03-15T10:30:00+08:00",
+  "sentiment_score": 6.5,
+  "fear_greed_index": 45,
+  "market_mood": "neutral"
+}</pre>
+                                </div>
+                            </details>
+
+                            <!-- 更多数据表 -->
+                            <div class="text-xs text-gray-600">
+                                <strong>其他数据表:</strong>
+                                恐慌清洗指标 (panic_wash_index.jsonl)、
+                                锚点数据 (anchor_daily/*.jsonl, 191MB)、
+                                价格速度 (price_speed_jsonl/*.jsonl, 173MB)、
+                                OKX交易日志 (okx_trading_logs/*.jsonl)、
+                                SAR Bias统计 (sar_bias_stats/*.jsonl)
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 核心功能 -->
+                    <div id="features" class="bg-white rounded-lg p-4 mb-4">
+                        <h4 class="font-bold text-blue-800 mb-3">
+                            <i class="fas fa-cogs"></i> 核心功能
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <strong class="text-blue-700">📡 数据采集</strong>
+                                <ul class="list-disc list-inside text-xs text-gray-600 ml-2">
+                                    <li>币价实时追踪</li>
+                                    <li>SAR指标计算</li>
+                                    <li>支撑压力位识别</li>
+                                    <li>市场情绪分析</li>
+                                    <li>清算数据监控</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <strong class="text-green-700">📊 技术分析</strong>
+                                <ul class="list-disc list-inside text-xs text-gray-600 ml-2">
+                                    <li>SAR Bias统计</li>
+                                    <li>恐慌指标分析</li>
+                                    <li>锚点偏离分析</li>
+                                    <li>价格速度计算</li>
+                                    <li>新高新低记录</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 系统依赖 -->
+                    <div id="dependencies" class="bg-white rounded-lg p-4 mb-4">
+                        <h4 class="font-bold text-blue-800 mb-3">
+                            <i class="fas fa-puzzle-piece"></i> 系统依赖
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <!-- Python包 -->
+                            <div>
+                                <strong class="text-blue-700">Python包:</strong>
+                                <ul class="list-disc list-inside text-xs text-gray-600 ml-2 mt-1">
+                                    <li>Flask 3.0.0 (Web框架)</li>
+                                    <li>pandas 2.1.4 (数据处理)</li>
+                                    <li>numpy 1.26.2 (数值计算)</li>
+                                    <li>ccxt 4.2.0 (交易API)</li>
+                                    <li>requests 2.31.0 (HTTP)</li>
+                                </ul>
+                            </div>
+                            <!-- PM2进程 -->
+                            <div>
+                                <strong class="text-green-700">PM2进程 (18个):</strong>
+                                <ul class="list-disc list-inside text-xs text-gray-600 ml-2 mt-1">
+                                    <li>flask-app (主应用)</li>
+                                    <li>coin-price-tracker (币价)</li>
+                                    <li>sar-jsonl-collector (SAR)</li>
+                                    <li>market-sentiment (情绪)</li>
+                                    <li>...及其他14个进程</li>
+                                </ul>
+                            </div>
+                            <!-- 数据目录 -->
+                            <div>
+                                <strong class="text-purple-700">数据目录 (~3.6GB):</strong>
+                                <ul class="list-disc list-inside text-xs text-gray-600 ml-2 mt-1">
+                                    <li>support_resistance_daily (977MB)</li>
+                                    <li>support_resistance_jsonl (740MB)</li>
+                                    <li>anchor_daily (191MB)</li>
+                                    <li>price_speed_jsonl (173MB)</li>
+                                    <li>anchor_profit_stats (163MB)</li>
+                                </ul>
+                            </div>
+                            <!-- 环境变量 -->
+                            <div>
+                                <strong class="text-orange-700">环境变量:</strong>
+                                <ul class="list-disc list-inside text-xs text-gray-600 ml-2 mt-1">
+                                    <li>FLASK_PORT=9002</li>
+                                    <li>DATA_DIR=/home/user/webapp/data</li>
+                                    <li>BACKUP_INTERVAL=43200</li>
+                                    <li>MAX_BACKUPS=3</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 备份系统 -->
+                    <div id="backup-system" class="bg-white rounded-lg p-4 mb-4">
+                        <h4 class="font-bold text-blue-800 mb-3">
+                            <i class="fas fa-save"></i> 备份系统
+                        </h4>
+                        <div class="text-sm space-y-2">
+                            <div class="bg-blue-50 p-3 rounded">
+                                <strong>自动备份策略:</strong>
+                                <p class="text-gray-600 text-xs mt-1">
+                                    • 频率: 12小时自动执行<br>
+                                    • 保留: 最近3次备份<br>
+                                    • 位置: /tmp/webapp_backup_YYYYMMDD_N.tar.gz<br>
+                                    • 压缩比: ~12:1 (3.16GB → 265MB)
+                                </p>
+                            </div>
+                            <div class="bg-green-50 p-3 rounded">
+                                <strong>备份内容 (3,325个文件):</strong>
+                                <div class="grid grid-cols-2 gap-2 text-xs text-gray-600 mt-1">
+                                    <div>• Python: 401文件 (5.38MB)</div>
+                                    <div>• HTML: 289文件 (14.02MB)</div>
+                                    <div>• 配置: 290文件 (3.20MB)</div>
+                                    <div>• 数据: 931文件 (2.97GB)</div>
+                                    <div>• 日志: 38文件 (1.52MB)</div>
+                                    <div>• 其他: 1,359文件 (167.30MB)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- API接口 -->
+                    <div id="api-docs" class="bg-white rounded-lg p-4 mb-4">
+                        <h4 class="font-bold text-blue-800 mb-3">
+                            <i class="fas fa-plug"></i> API接口
+                        </h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="bg-gray-50 p-2 rounded">
+                                <code class="text-blue-600">GET /api/backup/status</code>
+                                <p class="text-xs text-gray-600">获取备份状态和下次备份时间</p>
+                            </div>
+                            <div class="bg-gray-50 p-2 rounded">
+                                <code class="text-green-600">POST /api/backup/trigger</code>
+                                <p class="text-xs text-gray-600">手动触发备份任务</p>
+                            </div>
+                            <div class="bg-gray-50 p-2 rounded">
+                                <code class="text-purple-600">GET /backup-manager</code>
+                                <p class="text-xs text-gray-600">备份管理Web界面</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 故障排查 -->
+                    <div id="troubleshooting" class="bg-white rounded-lg p-4">
+                        <h4 class="font-bold text-blue-800 mb-3">
+                            <i class="fas fa-wrench"></i> 故障排查
+                        </h4>
+                        <div class="space-y-2 text-xs">
+                            <details class="bg-gray-50 p-2 rounded">
+                                <summary class="cursor-pointer font-semibold">Flask应用无法访问</summary>
+                                <pre class="mt-2 bg-white p-2 rounded">pm2 list | grep flask-app
+pm2 logs flask-app --lines 50
+pm2 restart flask-app</pre>
+                            </details>
+                            <details class="bg-gray-50 p-2 rounded">
+                                <summary class="cursor-pointer font-semibold">数据未更新</summary>
+                                <pre class="mt-2 bg-white p-2 rounded">pm2 list
+pm2 logs coin-price-tracker
+pm2 restart coin-price-tracker</pre>
+                            </details>
+                            <details class="bg-gray-50 p-2 rounded">
+                                <summary class="cursor-pointer font-semibold">备份失败</summary>
+                                <pre class="mt-2 bg-white p-2 rounded">df -h /tmp
+cd /home/user/webapp
+python3 auto_backup_system.py</pre>
+                            </details>
+                        </div>
+                    </div>
+
+                    <!-- 查看完整文档链接 -->
+                    <div class="bg-yellow-50 border border-yellow-300 rounded p-3 text-sm">
+                        <i class="fas fa-book-open text-yellow-600"></i>
+                        <strong>完整文档:</strong> 
+                        <code class="text-xs bg-white px-2 py-1 rounded">/home/user/webapp/SYSTEM_DOCUMENTATION.md</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 下次备份时间卡片 -->
+        <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 mb-8 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-xl font-bold mb-2">
+                        <i class="fas fa-clock"></i> 下次备份时间
+                    </h3>
+                    <p class="text-2xl font-bold" id="nextBackupTime">计算中...</p>
+                    <p class="text-sm opacity-90 mt-1" id="nextBackupCountdown">-</p>
+                </div>
+                <div class="text-6xl opacity-50">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <!-- 总备份数 -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">总备份数</p>
+                        <p class="text-3xl font-bold text-blue-600" id="totalBackups">-</p>
+                    </div>
+                    <div class="bg-blue-100 rounded-full p-3">
+                        <i class="fas fa-archive text-blue-600 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 总大小 -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">总大小</p>
+                        <p class="text-3xl font-bold text-green-600" id="totalSize">-</p>
+                    </div>
+                    <div class="bg-green-100 rounded-full p-3">
+                        <i class="fas fa-hdd text-green-600 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 最新备份 -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">最新备份</p>
+                        <p class="text-lg font-bold text-purple-600" id="latestBackup">-</p>
+                    </div>
+                    <div class="bg-purple-100 rounded-full p-3">
+                        <i class="fas fa-clock text-purple-600 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 备份状态 -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">系统状态</p>
+                        <p class="text-lg font-bold text-green-600">
+                            <i class="fas fa-check-circle"></i> 正常运行
+                        </p>
+                    </div>
+                    <div class="bg-green-100 rounded-full p-3">
+                        <i class="fas fa-heartbeat text-green-600 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="mb-8">
+            <button onclick="triggerBackup()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow transition">
+                <i class="fas fa-play-circle mr-2"></i>
+                立即备份
+            </button>
+            <button onclick="refreshData()" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg shadow ml-4 transition">
+                <i class="fas fa-sync-alt mr-2"></i>
+                刷新数据
+            </button>
+        </div>
+
+        <!-- 备份列表 -->
+        <div class="bg-white rounded-lg shadow mb-8">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-xl font-bold text-gray-800">
+                    <i class="fas fa-list text-blue-600"></i>
+                    备份文件列表
+                </h2>
+            </div>
+            <div class="p-6">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    序号
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    文件名
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    大小
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    备份时间
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    状态
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="backupList">
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i>
+                                    加载中...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 备份内容统计 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <!-- 文件类型分布 -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-xl font-bold text-gray-800">
+                        <i class="fas fa-chart-pie text-green-600"></i>
+                        文件类型分布
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div id="fileTypeChart" style="width: 100%; height: 300px;"></div>
+                </div>
+            </div>
+
+            <!-- 备份历史趋势 -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-xl font-bold text-gray-800">
+                        <i class="fas fa-chart-line text-purple-600"></i>
+                        备份大小趋势
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div id="backupTrendChart" style="width: 100%; height: 300px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 备份历史记录 -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-xl font-bold text-gray-800">
+                    <i class="fas fa-history text-orange-600"></i>
+                    备份历史记录
+                </h2>
+            </div>
+            <div class="p-6">
+                <div class="space-y-4" id="backupHistory">
+                    <div class="text-center text-gray-500 py-8">
+                        <i class="fas fa-spinner fa-spin mr-2"></i>
+                        加载中...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let fileTypeChart = null;
+        let backupTrendChart = null;
+
+        // 页面加载时初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            loadBackupStatus();
+        });
+
+        // 切换文档显示
+        function toggleDocumentation() {
+            const content = document.getElementById('documentationContent');
+            const icon = document.getElementById('docToggleIcon');
+            
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            } else {
+                content.classList.add('active');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            }
+        }
+
+        // 初始化图表
+        function initCharts() {
+            fileTypeChart = echarts.init(document.getElementById('fileTypeChart'));
+            backupTrendChart = echarts.init(document.getElementById('backupTrendChart'));
+        }
+
+        // 加载备份状态
+        async function loadBackupStatus() {
+            try {
+                const response = await fetch('/api/backup/status');
+                const data = await response.json();
+
+                if (data.success) {
+                    updateStatistics(data);
+                    updateNextBackupTime(data);
+                    updateBackupList(data.backups);
+                    updateBackupHistory(data.backup_history);
+                    updateCharts(data);
+                }
+            } catch (error) {
+                console.error('加载备份状态失败:', error);
+            }
+        }
+
+        // 更新下次备份时间
+        function updateNextBackupTime(data) {
+            const timeElement = document.getElementById('nextBackupTime');
+            const countdownElement = document.getElementById('nextBackupCountdown');
+            
+            if (data.next_backup_time) {
+                timeElement.textContent = data.next_backup_time;
+                countdownElement.textContent = `距离下次备份还有 ${data.next_backup_countdown}`;
+            } else {
+                timeElement.textContent = '暂无计划';
+                countdownElement.textContent = '请先执行首次备份';
+            }
+        }
+
+        // 更新统计数据
+        function updateStatistics(data) {
+            document.getElementById('totalBackups').textContent = data.total_backups;
+            document.getElementById('totalSize').textContent = data.total_size_formatted;
+
+            if (data.backups && data.backups.length > 0) {
+                const latest = data.backups[0];
+                // 显示时间，不需要再转换
+                document.getElementById('latestBackup').textContent = latest.timestamp;
+            }
+        }
+
+        // 更新备份列表
+        function updateBackupList(backups) {
+            const tbody = document.getElementById('backupList');
+            
+            if (!backups || backups.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                            暂无备份文件
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = backups.map((backup, index) => {
+                return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ${index + 1}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            <i class="fas fa-file-archive text-blue-600 mr-2"></i>
+                            ${backup.filename}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ${backup.size_formatted}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ${backup.timestamp}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                <i class="fas fa-check-circle mr-1"></i>
+                                完成
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 更新备份历史
+        function updateBackupHistory(history) {
+            const container = document.getElementById('backupHistory');
+            
+            if (!history || history.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        暂无备份历史记录
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = history.slice().reverse().map(record => {
+                const isSuccess = record.status === 'success';
+                
+                return `
+                    <div class="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-${isSuccess ? 'check-circle text-green-600' : 'times-circle text-red-600'} text-2xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="text-sm font-semibold text-gray-900">
+                                    ${record.filename}
+                                </h4>
+                                <span class="text-xs text-gray-500">${record.timestamp}</span>
+                            </div>
+                            ${isSuccess ? `
+                                <div class="text-sm text-gray-600 space-y-1">
+                                    <div>大小: ${record.size_formatted}</div>
+                                    ${record.file_stats ? `
+                                        <div class="grid grid-cols-2 gap-2 mt-2 text-xs">
+                                            <div>Python: ${record.file_stats.python.count} 文件 (${record.file_stats.python.size})</div>
+                                            <div>HTML: ${record.file_stats.html.count} 文件 (${record.file_stats.html.size})</div>
+                                            <div>Markdown: ${record.file_stats.markdown.count} 文件 (${record.file_stats.markdown.size})</div>
+                                            <div>数据: ${record.file_stats.data.count} 文件 (${record.file_stats.data.size})</div>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            ` : `
+                                <div class="text-sm text-red-600">
+                                    错误: ${record.error}
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 更新图表
+        function updateCharts(data) {
+            // 文件类型分布图
+            if (data.backup_history && data.backup_history.length > 0) {
+                const latest = data.backup_history[data.backup_history.length - 1];
+                if (latest.file_stats) {
+                    const pieData = [
+                        {value: latest.file_stats.python.count, name: 'Python'},
+                        {value: latest.file_stats.html.count, name: 'HTML'},
+                        {value: latest.file_stats.markdown.count, name: 'Markdown'},
+                        {value: latest.file_stats.config.count, name: '配置'},
+                        {value: latest.file_stats.data.count, name: '数据'},
+                        {value: latest.file_stats.other.count, name: '其他'}
+                    ];
+
+                    fileTypeChart.setOption({
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: '{b}: {c} 文件 ({d}%)'
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            left: 'left'
+                        },
+                        series: [{
+                            name: '文件类型',
+                            type: 'pie',
+                            radius: '70%',
+                            data: pieData,
+                            emphasis: {
+                                itemStyle: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }]
+                    });
+                }
+            }
+
+            // 备份大小趋势图
+            if (data.backups && data.backups.length > 0) {
+                const dates = data.backups.slice().reverse().map(b => {
+                    return b.timestamp.substring(5, 16); // 显示 MM-DD HH:MM
+                });
+                
+                const sizes = data.backups.slice().reverse().map(b => (b.size / 1024 / 1024).toFixed(2));
+
+                backupTrendChart.setOption({
+                    tooltip: {
+                        trigger: 'axis',
+                        formatter: '{b}<br/>大小: {c} MB'
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: dates,
+                        axisLabel: {
+                            rotate: 45
+                        }
+                    },
+                    yAxis: {
+                        type: 'value',
+                        name: '大小 (MB)'
+                    },
+                    series: [{
+                        data: sizes,
+                        type: 'line',
+                        smooth: true,
+                        areaStyle: {
+                            color: 'rgba(59, 130, 246, 0.2)'
+                        },
+                        lineStyle: {
+                            color: '#3B82F6'
+                        },
+                        itemStyle: {
+                            color: '#3B82F6'
+                        }
+                    }]
+                });
+            }
+        }
+
+        // 触发备份
+        async function triggerBackup() {
+            if (!confirm('确定要立即执行备份吗？\n备份过程可能需要几分钟时间。')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/backup/trigger', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ 备份任务已启动！\n请等待几分钟后刷新页面查看结果。');
+                    // 30秒后自动刷新
+                    setTimeout(refreshData, 30000);
+                } else {
+                    alert('❌ 启动备份失败: ' + data.error);
+                }
+            } catch (error) {
+                alert('❌ 启动备份失败: ' + error.message);
+            }
+        }
+
+        // 刷新数据
+        function refreshData() {
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>

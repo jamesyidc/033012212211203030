@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTC vs ETH 强弱对比曲线</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        
+        .chart-container {
+            width: 100%;
+            height: 500px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 8px 0;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+        
+        .ratio-high {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .ratio-medium {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .ratio-low {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="max-w-7xl mx-auto">
+        <!-- 标题 -->
+        <div class="card mb-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">
+                        🔥 BTC vs ETH 强弱对比曲线
+                    </h1>
+                    <p class="text-gray-600">
+                        实时追踪BTC涨跌幅大于ETH的比例变化
+                    </p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <input 
+                        type="date" 
+                        id="datePicker" 
+                        class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                    <button 
+                        onclick="refreshData()" 
+                        class="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition"
+                    >
+                        🔄 刷新
+                    </button>
+                    <a 
+                        href="/coin-change-tracker" 
+                        class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+                    >
+                        ← 返回
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="stat-card">
+                <div class="stat-label">当前比例</div>
+                <div class="stat-value" id="currentRatio">--</div>
+                <div class="stat-label">BTC强度</div>
+            </div>
+            <div class="stat-card ratio-high">
+                <div class="stat-label">最高比例</div>
+                <div class="stat-value" id="maxRatio">--</div>
+                <div class="stat-label">峰值</div>
+            </div>
+            <div class="stat-card ratio-medium">
+                <div class="stat-label">平均比例</div>
+                <div class="stat-value" id="avgRatio">--</div>
+                <div class="stat-label">全天均值</div>
+            </div>
+            <div class="stat-card ratio-low">
+                <div class="stat-label">BTC领先次数</div>
+                <div class="stat-value" id="btcGreaterCount">--</div>
+                <div class="stat-label">/ <span id="totalCount">--</span> 次</div>
+            </div>
+        </div>
+
+        <!-- 主图表 -->
+        <div class="card">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                📈 BTC vs ETH 强弱比例曲线
+            </h2>
+            <div id="mainChart" class="chart-container"></div>
+        </div>
+
+        <!-- 涨跌幅对比图 -->
+        <div class="card">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                📊 BTC与ETH涨跌幅对比
+            </h2>
+            <div id="changeChart" class="chart-container"></div>
+        </div>
+
+        <!-- 说明 -->
+        <div class="card">
+            <h3 class="text-lg font-bold text-gray-800 mb-3">📖 指标说明</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
+                <div>
+                    <p class="mb-2"><strong>🔴 当前比例：</strong>当前时刻BTC涨跌幅 > ETH涨跌幅的累计占比</p>
+                    <p class="mb-2"><strong>🟢 最高比例：</strong>全天BTC领先的最高占比（峰值）</p>
+                    <p><strong>🔵 平均比例：</strong>全天BTC领先占比的平均值</p>
+                </div>
+                <div>
+                    <p class="mb-2"><strong>💡 解读：</strong></p>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>比例 > 60%：BTC明显强于ETH</li>
+                        <li>比例 40%-60%：BTC与ETH表现相近</li>
+                        <li>比例 < 40%：ETH相对强势</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化图表
+        const mainChart = echarts.init(document.getElementById('mainChart'));
+        const changeChart = echarts.init(document.getElementById('changeChart'));
+
+        // 当前日期
+        let currentDate = new Date().toISOString().split('T')[0];
+        document.getElementById('datePicker').value = currentDate;
+
+        // 加载数据
+        async function loadData(date = null) {
+            try {
+                const dateParam = date || currentDate;
+                const dateStr = dateParam.replace(/-/g, '');
+                
+                const response = await fetch(`/api/btc-eth-ratio/chart-data?date=${dateStr}`);
+                const result = await response.json();
+
+                if (!result.success) {
+                    alert('加载数据失败: ' + result.error);
+                    return;
+                }
+
+                // 更新统计卡片
+                updateStats(result.stats);
+
+                // 更新图表
+                updateMainChart(result.chart_data);
+                updateChangeChart(result.chart_data);
+
+            } catch (error) {
+                console.error('加载数据出错:', error);
+                alert('加载数据出错: ' + error.message);
+            }
+        }
+
+        // 更新统计卡片
+        function updateStats(stats) {
+            document.getElementById('currentRatio').textContent = stats.current_ratio + '%';
+            document.getElementById('maxRatio').textContent = stats.max_ratio + '%';
+            document.getElementById('avgRatio').textContent = stats.avg_ratio + '%';
+            document.getElementById('btcGreaterCount').textContent = stats.btc_greater_count;
+            document.getElementById('totalCount').textContent = stats.total_count;
+        }
+
+        // 更新主图表（比例曲线）
+        function updateMainChart(chartData) {
+            const option = {
+                title: {
+                    text: 'BTC强弱比例走势',
+                    left: 'center',
+                    textStyle: {
+                        fontSize: 16,
+                        fontWeight: 'normal'
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: function(params) {
+                        const time = params[0].axisValue;
+                        const ratio = params[0].data;
+                        return `${time}<br/>BTC领先比例: <strong>${ratio}%</strong>`;
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '10%',
+                    top: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: chartData.times,
+                    boundaryGap: false,
+                    axisLabel: {
+                        rotate: 45,
+                        interval: Math.floor(chartData.times.length / 20)
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '比例 (%)',
+                    min: 0,
+                    max: 100,
+                    axisLabel: {
+                        formatter: '{value}%'
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            type: 'dashed'
+                        }
+                    }
+                },
+                series: [{
+                    name: 'BTC领先比例',
+                    type: 'line',
+                    data: chartData.ratios,
+                    smooth: true,
+                    lineStyle: {
+                        width: 3,
+                        color: {
+                            type: 'linear',
+                            x: 0, y: 0, x2: 1, y2: 0,
+                            colorStops: [
+                                { offset: 0, color: '#667eea' },
+                                { offset: 1, color: '#764ba2' }
+                            ]
+                        }
+                    },
+                    areaStyle: {
+                        color: {
+                            type: 'linear',
+                            x: 0, y: 0, x2: 0, y2: 1,
+                            colorStops: [
+                                { offset: 0, color: 'rgba(102, 126, 234, 0.5)' },
+                                { offset: 1, color: 'rgba(102, 126, 234, 0.1)' }
+                            ]
+                        }
+                    },
+                    markLine: {
+                        silent: true,
+                        lineStyle: {
+                            color: '#ff6b6b',
+                            type: 'dashed'
+                        },
+                        data: [
+                            { yAxis: 50, label: { formatter: '50% 平衡线' } },
+                            { yAxis: 60, label: { formatter: '60% BTC强势' } },
+                            { yAxis: 40, label: { formatter: '40% ETH强势' } }
+                        ]
+                    }
+                }],
+                dataZoom: [
+                    {
+                        type: 'inside',
+                        start: 0,
+                        end: 100
+                    },
+                    {
+                        start: 0,
+                        end: 100,
+                        height: 30,
+                        bottom: 20
+                    }
+                ]
+            };
+
+            mainChart.setOption(option);
+        }
+
+        // 更新涨跌幅对比图
+        function updateChangeChart(chartData) {
+            const option = {
+                title: {
+                    text: 'BTC与ETH涨跌幅对比',
+                    left: 'center',
+                    textStyle: {
+                        fontSize: 16,
+                        fontWeight: 'normal'
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: function(params) {
+                        const time = params[0].axisValue;
+                        let result = `<strong>${time}</strong><br/>`;
+                        params.forEach(param => {
+                            const color = param.seriesName === 'BTC涨跌幅' ? '#f59e0b' : '#3b82f6';
+                            result += `<span style="color:${color}">●</span> ${param.seriesName}: <strong>${param.data}%</strong><br/>`;
+                        });
+                        return result;
+                    }
+                },
+                legend: {
+                    data: ['BTC涨跌幅', 'ETH涨跌幅'],
+                    top: 30
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '10%',
+                    top: '20%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: chartData.times,
+                    boundaryGap: false,
+                    axisLabel: {
+                        rotate: 45,
+                        interval: Math.floor(chartData.times.length / 20)
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '涨跌幅 (%)',
+                    axisLabel: {
+                        formatter: '{value}%'
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            type: 'dashed'
+                        }
+                    }
+                },
+                series: [
+                    {
+                        name: 'BTC涨跌幅',
+                        type: 'line',
+                        data: chartData.btc_changes,
+                        smooth: true,
+                        lineStyle: {
+                            width: 2,
+                            color: '#f59e0b'
+                        },
+                        itemStyle: {
+                            color: '#f59e0b'
+                        }
+                    },
+                    {
+                        name: 'ETH涨跌幅',
+                        type: 'line',
+                        data: chartData.eth_changes,
+                        smooth: true,
+                        lineStyle: {
+                            width: 2,
+                            color: '#3b82f6'
+                        },
+                        itemStyle: {
+                            color: '#3b82f6'
+                        }
+                    }
+                ],
+                dataZoom: [
+                    {
+                        type: 'inside',
+                        start: 0,
+                        end: 100
+                    },
+                    {
+                        start: 0,
+                        end: 100,
+                        height: 30,
+                        bottom: 20
+                    }
+                ]
+            };
+
+            changeChart.setOption(option);
+        }
+
+        // 刷新数据
+        function refreshData() {
+            const selectedDate = document.getElementById('datePicker').value;
+            currentDate = selectedDate;
+            loadData(selectedDate);
+        }
+
+        // 日期选择器变化
+        document.getElementById('datePicker').addEventListener('change', function() {
+            currentDate = this.value;
+            loadData(currentDate);
+        });
+
+        // 窗口大小变化时重新调整图表
+        window.addEventListener('resize', function() {
+            mainChart.resize();
+            changeChart.resize();
+        });
+
+        // 页面加载时加载数据
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+        });
+    </script>
+</body>
+</html>

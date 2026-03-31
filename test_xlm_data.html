@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>XLM数据测试页</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a1d2e;
+            color: #fff;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .section {
+            background: #2a2d47;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #3b7dff;
+            border-bottom: 2px solid #3b7dff;
+            padding-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #3a3d5c;
+        }
+        th {
+            background: #3a3d5c;
+            font-weight: bold;
+        }
+        .value {
+            font-family: 'Courier New', monospace;
+        }
+        .good {
+            color: #67C23A;
+        }
+        .error {
+            color: #F56C6C;
+        }
+        pre {
+            background: #1a1d2e;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 XLM K线数据诊断</h1>
+        
+        <div class="section">
+            <h2>1. API原始响应测试</h2>
+            <p>URL: <code id="api-url"></code></p>
+            <p>状态: <span id="api-status"></span></p>
+            <p>数据条数: <span id="data-count"></span></p>
+            
+            <h3>最后5条K线OHLC数据</h3>
+            <table id="ohlc-table">
+                <thead>
+                    <tr>
+                        <th>时间戳</th>
+                        <th>开盘(Open)</th>
+                        <th>最高(High)</th>
+                        <th>最低(Low)</th>
+                        <th>收盘(Close)</th>
+                        <th>成交量</th>
+                    </tr>
+                </thead>
+                <tbody id="ohlc-tbody"></tbody>
+            </table>
+        </div>
+        
+        <div class="section">
+            <h2>2. 数据字段完整性检查</h2>
+            <table>
+                <tr>
+                    <td>✅ data字段存在</td>
+                    <td id="has-data-field" class="value"></td>
+                </tr>
+                <tr>
+                    <td>✅ data是数组</td>
+                    <td id="data-is-array" class="value"></td>
+                </tr>
+                <tr>
+                    <td>✅ data长度为4 (OHLC)</td>
+                    <td id="data-length-4" class="value"></td>
+                </tr>
+                <tr>
+                    <td>✅ markers字段存在</td>
+                    <td id="has-markers" class="value"></td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="section">
+            <h2>3. 完整JSON (最后1条)</h2>
+            <pre id="full-json"></pre>
+        </div>
+        
+        <div class="section">
+            <h2>4. 价格统计</h2>
+            <table>
+                <tr>
+                    <td>开盘价范围</td>
+                    <td id="open-range" class="value"></td>
+                </tr>
+                <tr>
+                    <td>最高价范围</td>
+                    <td id="high-range" class="value"></td>
+                </tr>
+                <tr>
+                    <td>最低价范围</td>
+                    <td id="low-range" class="value"></td>
+                </tr>
+                <tr>
+                    <td>收盘价范围</td>
+                    <td id="close-range" class="value"></td>
+                </tr>
+                <tr>
+                    <td>❌ 是否有0.22异常</td>
+                    <td id="has-022" class="value"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        const symbol = 'XLM-USDT-SWAP';
+        const timeframe = '5m';
+        const apiUrl = `/api/symbol/${symbol}/kline?timeframe=${timeframe}&_=${Date.now()}`;
+        
+        document.getElementById('api-url').textContent = apiUrl;
+        
+        async function loadAndTestData() {
+            try {
+                console.log('📊 开始获取API数据...');
+                const response = await fetch(apiUrl);
+                const result = await response.json();
+                
+                if (!result.success || !result.data || result.data.length === 0) {
+                    document.getElementById('api-status').innerHTML = '<span class="error">❌ 失败</span>';
+                    return;
+                }
+                
+                const data = result.data;
+                document.getElementById('api-status').innerHTML = '<span class="good">✅ 成功</span>';
+                document.getElementById('data-count').innerHTML = `<span class="good">${data.length}</span>`;
+                
+                // 显示最后5条OHLC
+                const tbody = document.getElementById('ohlc-tbody');
+                const last5 = data.slice(-5);
+                
+                last5.forEach(item => {
+                    const row = tbody.insertRow();
+                    const ohlc = item.data || [];
+                    const ts = new Date(parseInt(item.timestamp)).toLocaleString('zh-CN', {
+                        timeZone: 'Asia/Shanghai',
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    row.innerHTML = `
+                        <td>${ts}</td>
+                        <td class="value ${ohlc[0] ? 'good' : 'error'}">${ohlc[0] ? ohlc[0].toFixed(6) : 'null'}</td>
+                        <td class="value ${ohlc[1] ? 'good' : 'error'}">${ohlc[1] ? ohlc[1].toFixed(6) : 'null'}</td>
+                        <td class="value ${ohlc[2] ? 'good' : 'error'}">${ohlc[2] ? ohlc[2].toFixed(6) : 'null'}</td>
+                        <td class="value ${ohlc[3] ? 'good' : 'error'}">${ohlc[3] ? ohlc[3].toFixed(6) : 'null'}</td>
+                        <td class="value">${item.volume ? item.volume.toFixed(2) : '-'}</td>
+                    `;
+                });
+                
+                // 字段完整性检查
+                const lastItem = data[data.length - 1];
+                document.getElementById('has-data-field').innerHTML = 
+                    lastItem.data !== undefined ? '<span class="good">✅ 存在</span>' : '<span class="error">❌ 不存在</span>';
+                document.getElementById('data-is-array').innerHTML = 
+                    Array.isArray(lastItem.data) ? '<span class="good">✅ 是数组</span>' : '<span class="error">❌ 不是数组</span>';
+                document.getElementById('data-length-4').innerHTML = 
+                    lastItem.data && lastItem.data.length === 4 ? '<span class="good">✅ 长度为4</span>' : `<span class="error">❌ 长度为${lastItem.data ? lastItem.data.length : 0}</span>`;
+                document.getElementById('has-markers').innerHTML = 
+                    lastItem.markers ? '<span class="good">✅ 存在</span>' : '<span class="error">❌ 不存在</span>';
+                
+                // 完整JSON
+                document.getElementById('full-json').textContent = JSON.stringify(lastItem, null, 2);
+                
+                // 价格统计
+                const opens = data.filter(d => d.data && d.data[0]).map(d => d.data[0]);
+                const highs = data.filter(d => d.data && d.data[1]).map(d => d.data[1]);
+                const lows = data.filter(d => d.data && d.data[2]).map(d => d.data[2]);
+                const closes = data.filter(d => d.data && d.data[3]).map(d => d.data[3]);
+                
+                if (opens.length > 0) {
+                    document.getElementById('open-range').textContent = 
+                        `${Math.min(...opens).toFixed(6)} ~ ${Math.max(...opens).toFixed(6)}`;
+                    document.getElementById('high-range').textContent = 
+                        `${Math.min(...highs).toFixed(6)} ~ ${Math.max(...highs).toFixed(6)}`;
+                    document.getElementById('low-range').textContent = 
+                        `${Math.min(...lows).toFixed(6)} ~ ${Math.max(...lows).toFixed(6)}`;
+                    document.getElementById('close-range').textContent = 
+                        `${Math.min(...closes).toFixed(6)} ~ ${Math.max(...closes).toFixed(6)}`;
+                    
+                    // 检查是否有0.22的异常值
+                    const has022 = [...opens, ...highs, ...lows, ...closes].some(v => Math.abs(v - 0.22) < 0.00001);
+                    document.getElementById('has-022').innerHTML = has022 ? 
+                        '<span class="error">❌ 发现0.22异常值</span>' : 
+                        '<span class="good">✅ 无0.22异常</span>';
+                } else {
+                    document.getElementById('open-range').innerHTML = '<span class="error">无数据</span>';
+                }
+                
+                console.log('✅ 数据测试完成');
+                
+            } catch (err) {
+                console.error('❌ 错误:', err);
+                document.getElementById('api-status').innerHTML = `<span class="error">❌ ${err.message}</span>`;
+            }
+        }
+        
+        // 页面加载时自动执行
+        loadAndTestData();
+    </script>
+</body>
+</html>

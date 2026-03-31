@@ -1,0 +1,1 @@
+{"date": "2026-03-01", "timestamp": "2026-03-01 02:00:00", "analysis_time": "02:00:00", "color_counts": {"green": 3, "red": 8, "yellow": 1, "blank": 0, "blank_ratio": 0.0}, "signal": "低吸", "description": "🟢🔴🟡 绿色3根+红色8根+黄色1根（绿色>=3根为主导，红+黄共9根），红色区间为低吸机会。操作提示：低点做多", "is_temp": false, "is_final": true}

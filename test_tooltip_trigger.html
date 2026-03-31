@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tooltip触发测试</title>
+</head>
+<body>
+    <h1>Tooltip触发测试工具</h1>
+    <p>在浏览器控制台粘贴以下代码来手动触发tooltip并检查正数占比显示：</p>
+    
+    <pre style="background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto;">
+// ========== 步骤1: 检查数据加载状态 ==========
+console.log('\n========== 数据加载检查 ==========');
+console.log('positiveRatioHistory是否存在:', !!window.positiveRatioHistory);
+console.log('数据点数量:', window.positiveRatioHistory ? Object.keys(window.positiveRatioHistory).length : 0);
+console.log('前5个时间点:', window.positiveRatioHistory ? Object.keys(window.positiveRatioHistory).slice(0, 5) : []);
+console.log('historyData是否存在:', !!window.historyData);
+console.log('historyData数据点数量:', window.historyData ? window.historyData.length : 0);
+
+// ========== 步骤2: 手动测试tooltip formatter ==========
+console.log('\n========== 手动触发Tooltip Formatter ==========');
+
+if (typeof trendChart !== 'undefined') {
+    const option = trendChart.getOption();
+    const formatter = option.tooltip[0].formatter;
+    
+    // 获取当前图表数据
+    const xAxisData = option.xAxis[0].data;
+    const seriesData = option.series;
+    
+    console.log('图表X轴数据（时间）:', xAxisData.slice(0, 10));
+    console.log('图表系列数量:', seriesData.length);
+    
+    if (xAxisData.length > 0) {
+        // 选择第一个时间点
+        const testTime = xAxisData[0];
+        const testIndex = 0;
+        
+        // 构造params参数（模拟ECharts传递的参数）
+        const mockParams = [];
+        seriesData.forEach(series => {
+            if (series.data && series.data.length > testIndex) {
+                mockParams.push({
+                    seriesName: series.name,
+                    marker: '<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:' + (series.itemStyle?.color || series.lineStyle?.color || '#000') + ';"></span>',
+                    value: series.data[testIndex],
+                    dataIndex: testIndex,
+                    axisValue: testTime
+                });
+            }
+        });
+        
+        console.log('测试时间:', testTime);
+        console.log('构造的params:', mockParams);
+        
+        // 调用formatter
+        console.log('\n========== 调用Tooltip Formatter ==========');
+        try {
+            const tooltipHTML = formatter(mockParams);
+            console.log('Tooltip HTML生成成功！');
+            console.log('HTML长度:', tooltipHTML.length);
+            console.log('是否包含"正数时段占比":', tooltipHTML.includes('正数时段占比'));
+            console.log('\n完整HTML:');
+            console.log(tooltipHTML);
+            
+            // 检查HTML内容
+            if (tooltipHTML.includes('正数时段占比')) {
+                console.log('\n✅✅✅ 成功：Tooltip包含正数占比！');
+            } else {
+                console.log('\n❌❌❌ 失败：Tooltip不包含正数占比');
+                console.log('可能原因：');
+                console.log('1. window.positiveRatioHistory未定义或为空');
+                console.log('2. 时间格式不匹配');
+                console.log('3. 代码逻辑问题');
+            }
+        } catch (error) {
+            console.error('Formatter调用失败:', error);
+        }
+    } else {
+        console.error('❌ X轴数据为空，无法测试');
+    }
+} else {
+    console.error('❌ trendChart未定义，请等待图表加载完成');
+}
+
+// ========== 步骤3: 测试时间匹配逻辑 ==========
+console.log('\n========== 测试时间匹配逻辑 ==========');
+
+if (window.positiveRatioHistory && typeof trendChart !== 'undefined') {
+    const option = trendChart.getOption();
+    const xAxisData = option.xAxis[0].data;
+    
+    if (xAxisData.length > 0) {
+        const testTime = xAxisData[0];  // 获取第一个时间点
+        const testMinute = testTime.substring(0, 5);
+        
+        console.log('测试时间:', testTime);
+        console.log('提取分钟:', testMinute);
+        
+        // 精确匹配
+        let found = false;
+        if (window.positiveRatioHistory[testTime]) {
+            console.log('✅ 精确匹配成功:', window.positiveRatioHistory[testTime]);
+            found = true;
+        } else {
+            console.log('❌ 精确匹配失败');
+            
+            // 分钟匹配
+            const matchingKey = Object.keys(window.positiveRatioHistory).find(key => key.startsWith(testMinute));
+            if (matchingKey) {
+                console.log('✅ 分钟匹配成功，匹配的key:', matchingKey);
+                console.log('   数据:', window.positiveRatioHistory[matchingKey]);
+                found = true;
+            } else {
+                console.log('❌ 分钟匹配也失败');
+                console.log('   可用的前10个时间点:', Object.keys(window.positiveRatioHistory).slice(0, 10));
+            }
+        }
+        
+        if (!found) {
+            console.log('\n⚠️ 可能的问题：');
+            console.log('1. 时间格式不匹配');
+            console.log('2. 数据时间范围不同');
+            console.log('3. 数据未正确加载');
+        }
+    }
+}
+
+console.log('\n========== 测试完成 ==========');
+    </pre>
+    
+    <h2>使用说明</h2>
+    <ol>
+        <li>打开 coin-change-tracker 页面</li>
+        <li>等待页面完全加载（15-20秒）</li>
+        <li>按F12打开控制台</li>
+        <li>复制上面的代码并粘贴到控制台</li>
+        <li>按回车执行</li>
+        <li>查看输出结果</li>
+    </ol>
+    
+    <h2>预期结果</h2>
+    <ul>
+        <li>✅ positiveRatioHistory存在且有数据（100+个时间点）</li>
+        <li>✅ Tooltip HTML包含"正数时段占比"</li>
+        <li>✅ 时间匹配成功（精确或分钟匹配）</li>
+    </ul>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "date": "2026-02-09",
+  "timestamp": "2026-02-09 02:00:00",
+  "analysis_time": "02:00:00",
+  "color_counts": {
+    "green": 1,
+    "red": 8,
+    "yellow": 1,
+    "blank": 2,
+    "blank_ratio": 16.666666666666664
+  },
+  "signal": "等待新低",
+  "description": "🟢🔴🟡 有绿有红有黄，红色+黄色共9根(>=3根)，可能还有新低，建议等待。操作提示：高点做空",
+  "is_temp": false
+}

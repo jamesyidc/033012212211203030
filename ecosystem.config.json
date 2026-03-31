@@ -1,0 +1,331 @@
+{
+  "apps": [
+    {
+      "name": "signal-collector",
+      "script": "/home/user/webapp/source_code/signal_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/signal-collector-out.log",
+      "error_file": "/home/user/webapp/logs/signal-collector-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "liquidation-1h-collector",
+      "script": "/home/user/webapp/source_code/liquidation_1h_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/liquidation-1h-collector-out.log",
+      "error_file": "/home/user/webapp/logs/liquidation-1h-collector-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "crypto-index-collector",
+      "script": "/home/user/webapp/source_code/crypto_index_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/crypto-index-collector-out.log",
+      "error_file": "/home/user/webapp/logs/crypto-index-collector-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "v1v2-collector",
+      "script": "/home/user/webapp/source_code/v1v2_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/v1v2-collector-out.log",
+      "error_file": "/home/user/webapp/logs/v1v2-collector-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "price-speed-collector",
+      "script": "/home/user/webapp/source_code/price_speed_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/price-speed-collector-out.log",
+      "error_file": "/home/user/webapp/logs/price-speed-collector-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "sar-slope-collector",
+      "script": "/home/user/webapp/source_code/sar_slope_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/sar-slope-collector-out.log",
+      "error_file": "/home/user/webapp/logs/sar-slope-collector-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "price-comparison-collector",
+      "script": "/home/user/webapp/source_code/price_comparison_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/price-comparison-collector-out.log",
+      "error_file": "/home/user/webapp/logs/price-comparison-collector-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "financial-indicators-collector",
+      "script": "/home/user/webapp/source_code/financial_indicators_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/financial-indicators-collector-out.log",
+      "error_file": "/home/user/webapp/logs/financial-indicators-collector-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "okx-day-change-collector",
+      "script": "/home/user/webapp/source_code/okx_day_change_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/okx-day-change-collector-out.log",
+      "error_file": "/home/user/webapp/logs/okx-day-change-collector-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "price-baseline-collector",
+      "script": "/home/user/webapp/source_code/price_baseline_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/price-baseline-collector-out.log",
+      "error_file": "/home/user/webapp/logs/price-baseline-collector-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "sar-bias-stats-collector",
+      "script": "/home/user/webapp/source_code/sar_bias_stats_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/sar-bias-stats-collector-out.log",
+      "error_file": "/home/user/webapp/logs/sar-bias-stats-collector-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "panic-wash-collector",
+      "script": "/home/user/webapp/source_code/panic_wash_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/panic-wash-collector-out.log",
+      "error_file": "/home/user/webapp/logs/panic-wash-collector-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "coin-change-tracker",
+      "script": "/home/user/webapp/source_code/coin_change_tracker_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/coin-change-tracker-out.log",
+      "error_file": "/home/user/webapp/logs/coin-change-tracker-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "coin-price-tracker",
+      "script": "/home/user/webapp/source_code/coin_price_tracker_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/coin-price-tracker-out.log",
+      "error_file": "/home/user/webapp/logs/coin-price-tracker-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "data-health-monitor",
+      "script": "/home/user/webapp/source_code/data_health_monitor.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/data-health-monitor-out.log",
+      "error_file": "/home/user/webapp/logs/data-health-monitor-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "system-health-monitor",
+      "script": "/home/user/webapp/source_code/system_health_monitor.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/system-health-monitor-out.log",
+      "error_file": "/home/user/webapp/logs/system-health-monitor-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "flask-app",
+      "script": "/home/user/webapp/core_code/app.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "1G",
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "FLASK_APP": "app.py",
+        "FLASK_ENV": "production"
+      },
+      "out_file": "/home/user/webapp/logs/flask-app-out.log",
+      "error_file": "/home/user/webapp/logs/flask-app-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "abc-position-tracker",
+      "script": "/home/user/webapp/source_code/abc_position_tracker.py",
+      "args": "--continuous --interval 60",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/abc-position-tracker-out.log",
+      "error_file": "/home/user/webapp/logs/abc-position-tracker-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "liquidation-alert-monitor",
+      "script": "/home/user/webapp/python/liquidation_alert_monitor.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/liquidation-alert-monitor-out.log",
+      "error_file": "/home/user/webapp/logs/liquidation-alert-monitor-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "dashboard-jsonl-manager",
+      "script": "/home/user/webapp/source_code/dashboard_jsonl_manager.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/dashboard-jsonl-manager-out.log",
+      "error_file": "/home/user/webapp/logs/dashboard-jsonl-manager-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "gdrive-jsonl-manager",
+      "script": "/home/user/webapp/source_code/gdrive_jsonl_manager.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/gdrive-jsonl-manager-out.log",
+      "error_file": "/home/user/webapp/logs/gdrive-jsonl-manager-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "okx-tpsl-monitor",
+      "script": "/home/user/webapp/source_code/okx_tpsl_monitor.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/okx-tpsl-monitor-out.log",
+      "error_file": "/home/user/webapp/logs/okx-tpsl-monitor-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "sar-bias-monitor",
+      "script": "/home/user/webapp/sar_bias_monitor.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "200M",
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "TELEGRAM_BOT_TOKEN": "8437045462:AAFePnwdC21cqeWhZISMQHGGgjmroVqE2H0",
+        "TELEGRAM_CHAT_ID": "-1003227444260"
+      },
+      "out_file": "/home/user/webapp/logs/sar-bias-monitor-out.log",
+      "error_file": "/home/user/webapp/logs/sar-bias-monitor-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    }
+  ]
+}

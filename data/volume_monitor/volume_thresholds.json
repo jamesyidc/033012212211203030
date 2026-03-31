@@ -1,0 +1,16 @@
+{
+  "BTC-USDT-SWAP": {
+    "enabled": true,
+    "threshold_v1": 250000000,
+    "threshold_v2_min": 180000000,
+    "threshold_v2_max": 249000000,
+    "name": "BTC永续"
+  },
+  "ETH-USDT-SWAP": {
+    "enabled": true,
+    "threshold_v1": 300000000,
+    "threshold_v2_min": 130000000,
+    "threshold_v2_max": 299000000,
+    "name": "ETH永续"
+  }
+}

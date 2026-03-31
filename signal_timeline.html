@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>价格位置预警系统 v2.0 - 信号时间线</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 { color: #667eea; font-size: 28px; margin-bottom: 10px; }
+        .header .meta { color: #666; font-size: 14px; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card .label { color: #999; font-size: 12px; text-transform: uppercase; margin-bottom: 8px; }
+        .stat-card .value { color: #333; font-size: 24px; font-weight: bold; }
+        .stat-card .subvalue { color: #666; font-size: 14px; margin-top: 5px; }
+        
+        .chart-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        
+        .chart-panel h3 {
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .date-nav {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .date-nav button {
+            padding: 8px 16px;
+            border: none;
+            background: #667eea;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .date-nav button:hover { background: #5568d3; }
+        .date-nav .current-date { font-size: 16px; font-weight: bold; color: #667eea; }
+        
+        .chart-container { height: 500px; }
+        .legend { margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px; }
+        .legend-item { display: inline-block; margin-right: 20px; font-size: 14px; }
+        .legend-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 5px; }
+        
+        .loading { text-align: center; padding: 40px; color: #999; }
+        .error { background: #fee; color: #c33; padding: 15px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>📊 价格位置预警系统 v2.0 - 信号时间线</h1>
+            <div class="meta">
+                <span>🕐 数据频率: 3分钟/次</span>
+                <span style="margin-left: 20px;">📈 监控: 27个币种</span>
+                <span style="margin-left: 20px;">⏰ 更新: <span id="lastUpdate">--</span></span>
+            </div>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">24小时 抄底信号</div>
+                <div class="value" id="buy24h">--</div>
+                <div class="subvalue">次</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">24小时 逃顶信号</div>
+                <div class="value" id="sell24h">--</div>
+                <div class="subvalue">次</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">2小时 抄底信号</div>
+                <div class="value" id="buy2h">--</div>
+                <div class="subvalue">次</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">2小时 逃顶信号</div>
+                <div class="value" id="sell2h">--</div>
+                <div class="subvalue">次</div>
+            </div>
+        </div>
+
+        <!-- 图表面板 -->
+        <div class="chart-panel">
+            <h3>
+                <span>📈 四条线趋势图</span>
+                <div class="date-nav">
+                    <button onclick="prevDay()">← 前一天</button>
+                    <span class="current-date" id="currentDate">--</span>
+                    <button onclick="nextDay()">后一天 →</button>
+                    <button onclick="today()" style="background: #48bb78;">今天</button>
+                </div>
+            </h3>
+            
+            <div id="loadingDiv" class="loading">⏳ 正在加载数据...</div>
+            <div id="errorDiv" class="error" style="display: none;"></div>
+            <div id="chartContainer" class="chart-container" style="display: none;"></div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <span class="legend-dot" style="background: #48bb78;"></span>
+                    <span>支撑线1 (48h≤5%)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-dot" style="background: #38a169;"></span>
+                    <span>支撑线2 (7d≤5%)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-dot" style="background: #f56565;"></span>
+                    <span>压力线1 (48h≥95%)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-dot" style="background: #e53e3e;"></span>
+                    <span>压力线2 (7d≥95%)</span>
+                </div>
+                <div class="legend-item">
+                    <span style="font-weight: bold; color: #48bb78;">🟢 抄底信号</span>
+                    <span style="color: #666;"> (支撑1+2≥20且≥1)</span>
+                </div>
+                <div class="legend-item">
+                    <span style="font-weight: bold; color: #f56565;">🔴 逃顶信号</span>
+                    <span style="color: #666;"> (压力1+2≥8且≥1)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let chart = null;
+        let currentDate = new Date().toISOString().split('T')[0];
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+            loadChart(currentDate);
+            startAutoRefresh();
+        });
+
+        // 加载统计数据
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/signal-timeline/stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('buy24h').textContent = data.stats_24h.buy_signals;
+                    document.getElementById('sell24h').textContent = data.stats_24h.sell_signals;
+                    document.getElementById('buy2h').textContent = data.stats_2h.buy_signals;
+                    document.getElementById('sell2h').textContent = data.stats_2h.sell_signals;
+                    
+                    if (data.latest) {
+                        document.getElementById('lastUpdate').textContent = data.latest.time;
+                    }
+                }
+            } catch (error) {
+                console.error('加载统计失败:', error);
+            }
+        }
+
+        // 加载图表
+        async function loadChart(date) {
+            const loadingDiv = document.getElementById('loadingDiv');
+            const errorDiv = document.getElementById('errorDiv');
+            const chartContainer = document.getElementById('chartContainer');
+            
+            loadingDiv.style.display = 'block';
+            errorDiv.style.display = 'none';
+            chartContainer.style.display = 'none';
+            
+            document.getElementById('currentDate').textContent = date;
+            
+            try {
+                const response = await fetch(`/api/signal-timeline/data?date=${date}`);
+                const data = await response.json();
+                
+                if (!data.success || data.count === 0) {
+                    throw new Error('暂无数据');
+                }
+                
+                // 准备数据
+                const times = data.data.map(d => d.time.substring(11, 16));
+                const support48h = data.data.map(d => d.support_48h);
+                const support7d = data.data.map(d => d.support_7d);
+                const pressure48h = data.data.map(d => d.pressure_48h);
+                const pressure7d = data.data.map(d => d.pressure_7d);
+                
+                // 信号标记
+                const buySignals = [];
+                const sellSignals = [];
+                
+                data.data.forEach((d, idx) => {
+                    if (d.signal_triggered === 1) {
+                        buySignals.push([times[idx], 25, d.trigger_reason]);
+                    } else if (d.signal_triggered === 2) {
+                        sellSignals.push([times[idx], 25, d.trigger_reason]);
+                    }
+                });
+                
+                // 绘制图表
+                drawChart(times, support48h, support7d, pressure48h, pressure7d, buySignals, sellSignals);
+                
+                loadingDiv.style.display = 'none';
+                chartContainer.style.display = 'block';
+                
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = '❌ ' + error.message;
+            }
+        }
+
+        // 绘制图表
+        function drawChart(times, support48h, support7d, pressure48h, pressure7d, buySignals, sellSignals) {
+            if (!chart) {
+                chart = echarts.init(document.getElementById('chartContainer'));
+            }
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'cross' }
+                },
+                legend: {
+                    data: ['支撑线1 (48h)', '支撑线2 (7d)', '压力线1 (48h)', '压力线2 (7d)', '抄底信号', '逃顶信号'],
+                    top: 10
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: times,
+                    boundaryGap: false
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '币种数量',
+                    min: 0,
+                    max: 27
+                },
+                series: [
+                    {
+                        name: '支撑线1 (48h)',
+                        type: 'line',
+                        data: support48h,
+                        smooth: true,
+                        lineStyle: { color: '#48bb78', width: 2 },
+                        itemStyle: { color: '#48bb78' }
+                    },
+                    {
+                        name: '支撑线2 (7d)',
+                        type: 'line',
+                        data: support7d,
+                        smooth: true,
+                        lineStyle: { color: '#38a169', width: 2, type: 'dashed' },
+                        itemStyle: { color: '#38a169' }
+                    },
+                    {
+                        name: '压力线1 (48h)',
+                        type: 'line',
+                        data: pressure48h,
+                        smooth: true,
+                        lineStyle: { color: '#f56565', width: 2 },
+                        itemStyle: { color: '#f56565' }
+                    },
+                    {
+                        name: '压力线2 (7d)',
+                        type: 'line',
+                        data: pressure7d,
+                        smooth: true,
+                        lineStyle: { color: '#e53e3e', width: 2, type: 'dashed' },
+                        itemStyle: { color: '#e53e3e' }
+                    },
+                    {
+                        name: '抄底信号',
+                        type: 'scatter',
+                        data: buySignals.map(s => [s[0], s[1]]),
+                        symbolSize: 20,
+                        itemStyle: { color: '#48bb78' },
+                        label: {
+                            show: true,
+                            formatter: '🟢',
+                            fontSize: 16
+                        }
+                    },
+                    {
+                        name: '逃顶信号',
+                        type: 'scatter',
+                        data: sellSignals.map(s => [s[0], s[1]]),
+                        symbolSize: 20,
+                        itemStyle: { color: '#f56565' },
+                        label: {
+                            show: true,
+                            formatter: '🔴',
+                            fontSize: 16
+                        }
+                    }
+                ]
+            };
+            
+            chart.setOption(option);
+        }
+
+        // 日期导航
+        function prevDay() {
+            const date = new Date(currentDate);
+            date.setDate(date.getDate() - 1);
+            currentDate = date.toISOString().split('T')[0];
+            loadChart(currentDate);
+        }
+
+        function nextDay() {
+            const date = new Date(currentDate);
+            date.setDate(date.getDate() + 1);
+            currentDate = date.toISOString().split('T')[0];
+            loadChart(currentDate);
+        }
+
+        function today() {
+            currentDate = new Date().toISOString().split('T')[0];
+            loadChart(currentDate);
+        }
+
+        // 自动刷新
+        function startAutoRefresh() {
+            setInterval(() => {
+                const today_date = new Date().toISOString().split('T')[0];
+                if (currentDate === today_date) {
+                    loadStats();
+                    loadChart(currentDate);
+                }
+            }, 180000); // 3分钟刷新一次
+        }
+
+        // 窗口大小改变
+        window.addEventListener('resize', function() {
+            if (chart) {
+                chart.resize();
+            }
+        });
+    </script>
+</body>
+</html>

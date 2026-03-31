@@ -1,0 +1,21 @@
+{
+  "last_check_date": "2026-03-09",
+  "last_signal_sent": "2026-03-09T02:30:41.528396+08:00",
+  "check_points": {
+    "02:10": {
+      "time": "02:10",
+      "ratio": 22.2,
+      "is_green": false
+    },
+    "02:20": {
+      "time": "02:20",
+      "ratio": 18.5,
+      "is_green": false
+    },
+    "02:30": {
+      "time": "02:30",
+      "ratio": 18.5,
+      "is_green": false
+    }
+  }
+}

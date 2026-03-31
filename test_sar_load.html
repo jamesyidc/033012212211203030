@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test SAR Load</title>
+</head>
+<body>
+    <div id="sarBullishCount">-</div>
+    <div id="sarBearishCount">-</div>
+    <div id="sarDataPoints">-</div>
+    <div id="sarUpdateTime">-</div>
+    
+    <script>
+        async function loadSARBiasStats(date = null) {
+            console.log('🔄 开始加载SAR偏向统计...');
+            try {
+                let url = `/api/sar-slope/bias-stats?_t=${Date.now()}`;
+                console.log('📡 SAR统计API请求:', url);
+                
+                const response = await fetch(url);
+                const result = await response.json();
+                console.log('📊 SAR统计API响应:', result);
+                
+                if (result.success && result.daily_stats) {
+                    const stats = result.daily_stats;
+                    
+                    document.getElementById('sarBullishCount').textContent = stats.total_bullish || 0;
+                    document.getElementById('sarBearishCount').textContent = stats.total_bearish || 0;
+                    document.getElementById('sarDataPoints').textContent = result.total || 0;
+                    
+                    if (result.data && result.data.length > 0) {
+                        const lastItem = result.data[result.data.length - 1];
+                        const timestamp = lastItem.timestamp;
+                        const timePart = timestamp.split(' ')[1];
+                        const shortTime = timePart.substring(0, 5);
+                        document.getElementById('sarUpdateTime').textContent = shortTime;
+                    }
+                    
+                    console.log('✅ SAR偏向统计更新成功');
+                }
+            } catch (error) {
+                console.error('❌ 加载SAR统计异常:', error);
+            }
+        }
+        
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM已加载，开始测试...');
+            loadSARBiasStats();
+        });
+    </script>
+</body>
+</html>

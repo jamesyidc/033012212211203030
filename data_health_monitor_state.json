@@ -1,0 +1,90 @@
+{
+  "27币涨跌幅追踪": {
+    "last_check_time": "2026-02-10T16:31:04.427754+08:00",
+    "status": "healthy",
+    "delay_minutes": 0.06481416666666667,
+    "consecutive_failures": 0,
+    "last_restart_time": "2026-02-01T10:00:00.385320+08:00"
+  },
+  "1小时爆仓金额": {
+    "last_check_time": "2026-02-10T16:31:04.852483+08:00",
+    "status": "healthy",
+    "delay_minutes": 1.8641836,
+    "consecutive_failures": 0
+  },
+  "恐慌清洗指数": {
+    "last_check_time": "2026-02-07T08:38:15.066550+08:00",
+    "status": "healthy",
+    "delay_minutes": 0.25110333333333335,
+    "consecutive_failures": 0
+  },
+  "锚点盈利统计": {
+    "last_check_time": "2026-02-07T08:38:19.497122+08:00",
+    "status": "healthy",
+    "delay_minutes": 0.57494375,
+    "consecutive_failures": 0,
+    "last_restart_time": "2026-02-01T10:01:03.145651+08:00"
+  },
+  "逃顶信号统计": {
+    "last_check_time": "2026-02-07T08:38:19.904685+08:00",
+    "status": "healthy",
+    "delay_minutes": 0.49840093333333335,
+    "consecutive_failures": 0,
+    "last_restart_time": "2026-02-05T14:51:38.104314+08:00"
+  },
+  "支撑压力线系统": {
+    "last_check_time": "2026-02-02T12:02:04.427015+08:00",
+    "status": "healthy",
+    "delay_minutes": null,
+    "pm2_status": "online",
+    "consecutive_failures": 0
+  },
+  "Google Drive监控": {
+    "last_check_time": "2026-02-08T00:09:10.742615+08:00",
+    "status": "healthy",
+    "delay_minutes": 20.179035783333333,
+    "consecutive_failures": 0,
+    "last_restart_time": "2026-02-01T19:50:36.081499+08:00"
+  },
+  "SAR斜率系统": {
+    "last_check_time": "2026-02-02T12:02:04.713905+08:00",
+    "status": "healthy",
+    "delay_minutes": 12.078562033333332,
+    "consecutive_failures": 0,
+    "last_restart_time": "2026-02-01T17:34:48.152319+08:00"
+  },
+  "SAR偏向统计": {
+    "last_check_time": "2026-02-10T16:31:06.770271+08:00",
+    "status": "healthy",
+    "delay_minutes": 2.996157783333333,
+    "consecutive_failures": 0,
+    "last_restart_time": "2026-02-10T16:27:51.712872+08:00"
+  },
+  "透明标签快照": {
+    "last_check_time": "2026-02-10T16:31:07.721288+08:00",
+    "status": "unhealthy",
+    "delay_minutes": 3882.1286800000003,
+    "consecutive_failures": 3452
+  },
+  "历史极值记录": {
+    "last_check_time": "2026-02-01T23:59:03.746447+08:00",
+    "status": "unhealthy",
+    "delay_minutes": 609.01243635,
+    "consecutive_failures": 1,
+    "last_restart_time": "2026-02-01T23:57:56.418463+08:00"
+  },
+  "重大事件监控系统": {
+    "last_check_time": "2026-02-10T16:31:08.450556+08:00",
+    "status": "healthy",
+    "delay_minutes": 3.7483333333333334e-05,
+    "consecutive_failures": 0,
+    "last_restart_time": "2026-02-06T14:03:41.709997+08:00"
+  },
+  "价格位置预警系统": {
+    "last_check_time": "2026-02-10T16:31:08.811152+08:00",
+    "status": "unhealthy",
+    "delay_minutes": 990.7635109,
+    "consecutive_failures": 1,
+    "last_restart_time": "2026-02-10T16:30:04.164184+08:00"
+  }
+}

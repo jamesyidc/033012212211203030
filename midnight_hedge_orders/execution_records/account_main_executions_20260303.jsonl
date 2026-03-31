@@ -1,0 +1,1 @@
+{"account_id": "account_main", "timestamp": "2026-03-03 00:00:15", "beijing_date": "20260303", "long_order": {"success": true, "strategy_code": "STG_LONG_BOTTOM8", "order_id": "LONG_TEST_001", "entry_price": 68000, "quantity": 0.1}, "short_order": {"success": true, "strategy_code": "STG_SHORT_TOP8", "order_id": "SHORT_TEST_001", "entry_price": 68000, "quantity": 0.1}}

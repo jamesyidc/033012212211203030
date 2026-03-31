@@ -1,0 +1,159 @@
+{
+  "timestamp": "2026-02-25 13:16:26",
+  "summary": {
+    "total": 25,
+    "passed": 15,
+    "warnings": 0,
+    "issues": 10
+  },
+  "issues": [
+    {
+      "category": "API",
+      "title": "日内模式检测API HTTP错误",
+      "description": "状态码: 404",
+      "severity": "HIGH",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "API",
+      "title": "市场情绪API HTTP错误",
+      "description": "状态码: 404",
+      "severity": "HIGH",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "API",
+      "title": "OKX账户配置API HTTP错误",
+      "description": "状态码: 404",
+      "severity": "HIGH",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "API",
+      "title": "OKX持仓API HTTP错误",
+      "description": "状态码: 405",
+      "severity": "HIGH",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "数据文件",
+      "title": "止损系统状态 不存在",
+      "description": "路径: data/stop_loss_system/stop_loss_state.json",
+      "severity": "MEDIUM",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "OKX配置",
+      "title": "account_main 缺失",
+      "description": "一键平仓可能无法作用于该账户",
+      "severity": "HIGH",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "OKX配置",
+      "title": "account_fangfang12 缺失",
+      "description": "一键平仓可能无法作用于该账户",
+      "severity": "HIGH",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "OKX配置",
+      "title": "account_anchor 缺失",
+      "description": "一键平仓可能无法作用于该账户",
+      "severity": "HIGH",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "OKX配置",
+      "title": "account_poit 缺失",
+      "description": "一键平仓可能无法作用于该账户",
+      "severity": "HIGH",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "OKX配置",
+      "title": "读取配置文件失败",
+      "description": "'str' object has no attribute 'get'",
+      "severity": "HIGH",
+      "timestamp": "2026-02-25 13:16:26"
+    }
+  ],
+  "warnings": [],
+  "passed": [
+    {
+      "category": "API",
+      "title": "日常预判API 正常",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "数据文件",
+      "title": "今日币价数据 存在且有数据",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "数据文件",
+      "title": "今日预判数据 存在且有数据",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "数据文件",
+      "title": "OKX账户配置 存在且有数据",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "预判逻辑",
+      "title": "情况2: 红+黄>=3根判断",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "预判逻辑",
+      "title": "情况1: 红+黄<3根判断",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "预判逻辑",
+      "title": "情况8: 只有绿+黄判断",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "止损系统",
+      "title": "健壮止损脚本 存在",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "止损系统",
+      "title": "账户诊断页面 存在",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "止损系统",
+      "title": "账户配置测试 存在",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "止损系统",
+      "title": "前端调用closeAllAccountsPositions()",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "日内模式",
+      "title": "时间窗口过滤函数",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "日内模式",
+      "title": "开仓点时间计算函数",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "日内模式",
+      "title": "开仓点时间字段",
+      "timestamp": "2026-02-25 13:16:26"
+    },
+    {
+      "category": "日内模式",
+      "title": "可伸缩功能",
+      "timestamp": "2026-02-25 13:16:26"
+    }
+  ]
+}

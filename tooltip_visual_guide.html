@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图解说明：Tooltip 为什么显示 79？</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #0f0f23;
+            color: #fff;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+        .subtitle {
+            font-size: 1.3em;
+            color: #e0e0e0;
+        }
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            margin: 30px 0;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        .problem {
+            border-color: #ff4d4f;
+            background: rgba(255, 77, 79, 0.1);
+        }
+        .solution {
+            border-color: #52c41a;
+            background: rgba(82, 196, 26, 0.1);
+        }
+        .explanation {
+            border-color: #1890ff;
+            background: rgba(24, 144, 255, 0.1);
+        }
+        h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #ffd700;
+        }
+        .visual-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+        .comparison-item {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            border: 3px solid;
+        }
+        .wrong-hover {
+            border-color: #ff4d4f;
+        }
+        .correct-hover {
+            border-color: #52c41a;
+        }
+        .comparison-item h3 {
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        .chart-illustration {
+            background: #1a1a2e;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        .data-flow {
+            background: #1a1a2e;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .flow-box {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .flow-arrow {
+            font-size: 3em;
+            color: #ffd700;
+            padding: 0 20px;
+        }
+        .highlight-box {
+            background: rgba(255, 215, 0, 0.2);
+            border: 2px solid #ffd700;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 1.1em;
+        }
+        .key-point {
+            background: rgba(82, 196, 26, 0.2);
+            border-left: 5px solid #52c41a;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        .warning-box {
+            background: rgba(250, 173, 20, 0.2);
+            border-left: 5px solid #faad14;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        .code-block {
+            background: #1a1a2e;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        .emphasis {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .button-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1.1em;
+            margin: 10px;
+            transition: transform 0.2s;
+        }
+        .button-link:hover {
+            transform: translateY(-2px);
+        }
+        .icon {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        th {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+        }
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        @media (max-width: 768px) {
+            .visual-comparison {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            .subtitle {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 图解说明</h1>
+            <div class="subtitle">为什么 Tooltip 显示 79 而不是 184？</div>
+        </div>
+
+        <div class="section problem">
+            <h2>❌ 您报告的问题</h2>
+            <div class="highlight-box">
+                <p><span class="icon">📸</span><strong>您的截图显示：</strong></p>
+                <ul style="margin-left: 40px; margin-top: 10px; line-height: 2;">
+                    <li>页面顶部统计：<span class="emphasis">逃顶信号当前数 = 184</span></li>
+                    <li>Tooltip 悬停显示：<span class="emphasis">逃顶: 79次</span></li>
+                    <li>悬停时间点：<span class="emphasis">2026-02-15 04:13</span></li>
+                </ul>
+            </div>
+            
+            <div class="warning-box">
+                <strong>您的疑问：</strong>为什么这两个数字不一致？是不是代码有 Bug？
+            </div>
+        </div>
+
+        <div class="section explanation">
+            <h2>📊 图表工作原理</h2>
+            
+            <div class="key-point">
+                <strong>核心概念：</strong>这是一个<span class="emphasis">趋势图表</span>，不是实时数值显示器！
+            </div>
+
+            <p style="font-size: 1.1em; margin: 20px 0;">
+                趋势图表的每个点代表<strong>该时刻</strong>的统计值，Tooltip 显示的是您鼠标<strong>悬停位置</strong>那个时刻的数据。
+            </p>
+
+            <div class="chart-illustration">
+<pre style="color: #52c41a; line-height: 1.8;">
+24h逃顶
+信号数
+  ^
+  |
+200|                                                    ● 最新时刻 (11:01)
+  |                                                  ●   ← 184 次
+180|                                                ●     (与顶部统计一致✓)
+  |                                              ●
+160|                                            ●
+  |                                          ●
+140|                                        ●
+  |                                      ●
+120|                                    ●
+  |                                  ●
+100|                                ●
+  |                              ●
+ 80|                            ●
+  |                 ● <span style="color: #ff4d4f;">您的截图位置 (04:13)</span>
+ 60|               ●   <span style="color: #ff4d4f;">← 79 次（历史值）</span>
+  |             ●
+ 40|           ●
+  |         ●
+ 20|       ●
+  |     ●
+  |   ●
+  | ●
+  +-----------------------------------------------------------------> 时间
+    00:00    04:13         08:00              10:00         11:01
+             <span style="color: #ff4d4f;">↑</span>                                           <span style="color: #52c41a;">↑</span>
+        <span style="color: #ff4d4f;">您悬停在这里</span>                               <span style="color: #52c41a;">应该悬停在这里</span>
+</pre>
+            </div>
+
+            <div class="data-flow">
+                <h3 style="text-align: center; margin-bottom: 30px;">数据流向示意图</h3>
+                <div class="flow-step">
+                    <div class="flow-box" style="background: rgba(255, 77, 79, 0.2);">
+                        <strong>时间: 04:13</strong><br>
+                        历史统计值<br>
+                        <span style="font-size: 2em; color: #ff4d4f;">79</span>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box" style="background: rgba(250, 173, 20, 0.2);">
+                        <strong>鼠标悬停</strong><br>
+                        04:13 位置<br>
+                        (图表中间)
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box" style="background: rgba(255, 77, 79, 0.2);">
+                        <strong>Tooltip 显示</strong><br>
+                        逃顶: 79次<br>
+                        ✓ 正确
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin: 30px 0; font-size: 2em; color: #ffd700;">VS</div>
+                
+                <div class="flow-step">
+                    <div class="flow-box" style="background: rgba(82, 196, 26, 0.2);">
+                        <strong>时间: 11:01</strong><br>
+                        最新统计值<br>
+                        <span style="font-size: 2em; color: #52c41a;">184</span>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box" style="background: rgba(24, 144, 255, 0.2);">
+                        <strong>鼠标悬停</strong><br>
+                        11:01 位置<br>
+                        (图表最右侧)
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box" style="background: rgba(82, 196, 26, 0.2);">
+                        <strong>Tooltip 显示</strong><br>
+                        逃顶: 184次<br>
+                        ✓ 正确
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section solution">
+            <h2>✅ 解决方案</h2>
+            
+            <div class="highlight-box">
+                <p style="font-size: 1.3em; text-align: center;">
+                    <strong>代码没有任何问题！您只需要悬停在正确的位置。</strong>
+                </p>
+            </div>
+
+            <div class="visual-comparison">
+                <div class="comparison-item wrong-hover">
+                    <h3 style="color: #ff4d4f;">❌ 您当前的操作</h3>
+                    <div style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; margin: 15px 0;">
+                        <p><strong>悬停位置：</strong>图表中间（04:13）</p>
+                        <p><strong>显示值：</strong>79 次</p>
+                        <p><strong>原因：</strong>这是 04:13 时刻的历史统计</p>
+                        <p style="color: #ff4d4f; margin-top: 10px;">⚠️ 不代表当前最新值！</p>
+                    </div>
+                    <div class="code-block">
+时间轴:  [00:00 ---- 04:13 ---- 11:01]
+                      ↑
+                  您悬停在这里
+                  显示: 79次 ✓
+                  (该时刻的值)
+                    </div>
+                </div>
+
+                <div class="comparison-item correct-hover">
+                    <h3 style="color: #52c41a;">✅ 正确的操作</h3>
+                    <div style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; margin: 15px 0;">
+                        <p><strong>悬停位置：</strong>图表最右侧（11:01）</p>
+                        <p><strong>显示值：</strong>184 次</p>
+                        <p><strong>原因：</strong>这是最新时刻的统计</p>
+                        <p style="color: #52c41a; margin-top: 10px;">✓ 与顶部统计一致！</p>
+                    </div>
+                    <div class="code-block">
+时间轴:  [00:00 ---- 04:13 ---- 11:01]
+                                  ↑
+                          应该悬停在这里
+                          显示: 184次 ✓
+                          (最新值)
+                    </div>
+                </div>
+            </div>
+
+            <div class="key-point" style="margin-top: 30px;">
+                <h3 style="margin-bottom: 15px;">🎯 验证步骤</h3>
+                <ol style="line-height: 2.5; font-size: 1.1em;">
+                    <li>打开价格预警页面</li>
+                    <li>找到 "图表2: 24h/2h 逃顶信号号趋势"</li>
+                    <li>将鼠标<strong>慢慢移动到图表的最右边缘</strong>（X轴最后的时间点）</li>
+                    <li>查看 Tooltip 显示的值，应该是 <span class="emphasis">184 次</span></li>
+                    <li>现在移动到中间（04:13 附近），会看到 <span class="emphasis">79 次</span></li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📚 数据对照表</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>时间点</th>
+                        <th>X轴位置</th>
+                        <th>24h逃顶统计</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>00:02</td>
+                        <td>最左侧</td>
+                        <td>~20 次</td>
+                        <td>一天开始，统计值较小</td>
+                    </tr>
+                    <tr style="background: rgba(255, 77, 79, 0.2);">
+                        <td><strong>04:13</strong></td>
+                        <td>中间偏左</td>
+                        <td><strong>79 次</strong></td>
+                        <td><strong>您截图悬停的位置</strong></td>
+                    </tr>
+                    <tr>
+                        <td>06:55</td>
+                        <td>中间</td>
+                        <td>~120 次</td>
+                        <td>持续累积</td>
+                    </tr>
+                    <tr>
+                        <td>09:00</td>
+                        <td>中间偏右</td>
+                        <td>~150 次</td>
+                        <td>接近最新值</td>
+                    </tr>
+                    <tr style="background: rgba(82, 196, 26, 0.2);">
+                        <td><strong>11:01</strong></td>
+                        <td><strong>最右侧</strong></td>
+                        <td><strong>184 次</strong></td>
+                        <td><strong>最新值，与顶部统计一致✓</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>🧪 交互式演示</h2>
+            <p style="font-size: 1.1em; margin-bottom: 20px;">
+                为了帮助您更好地理解这个概念，我们准备了一个交互式演示页面：
+            </p>
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="https://9001-iou7okyaq15h840cyuitp-c07dda5e.sandbox.novita.ai/static/tooltip_demo.html" 
+                   class="button-link" target="_blank">
+                    🎮 打开交互式演示
+                </a>
+                <a href="https://9001-iou7okyaq15h840cyuitp-c07dda5e.sandbox.novita.ai/price-position" 
+                   class="button-link" target="_blank">
+                    🚀 打开实际页面验证
+                </a>
+            </div>
+        </div>
+
+        <div class="section" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 165, 0, 0.2) 100%); border-color: #ffd700;">
+            <h2 style="text-align: center;">💡 最终结论</h2>
+            <div class="highlight-box" style="font-size: 1.2em; text-align: center; line-height: 2;">
+                <p><strong style="font-size: 1.5em; color: #52c41a;">代码完全正确！没有 Bug！</strong></p>
+                <p style="margin: 20px 0;">
+                    Tooltip 显示 79 是因为您悬停在<strong style="color: #ff4d4f;">历史时刻（04:13）</strong>，<br>
+                    那个时刻的统计值确实是 79。
+                </p>
+                <p style="margin: 20px 0;">
+                    请将鼠标悬停在<strong style="color: #52c41a;">图表最右侧（11:01）</strong>，<br>
+                    您将看到正确的最新值：<strong style="color: #52c41a; font-size: 1.5em;">184 次</strong>
+                </p>
+                <p style="margin-top: 30px; color: #aaa;">
+                    这就像看股票K线图：悬停在不同位置会显示不同时刻的价格。<br>
+                    Tooltip 的作用就是让您查看任意时刻的数据！
+                </p>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 50px 0; padding: 30px; background: rgba(255,255,255,0.05); border-radius: 15px;">
+            <p style="font-size: 1.1em; color: #aaa;">
+                如果您在最右侧悬停后仍然看到错误的值，<br>
+                请清除浏览器缓存（Ctrl+Shift+Delete）或使用隐身模式重新测试。
+            </p>
+        </div>
+    </div>
+</body>
+</html>

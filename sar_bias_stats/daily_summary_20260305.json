@@ -1,0 +1,16 @@
+{
+  "date": "2026-03-05",
+  "total_bullish": 14,
+  "total_bearish": 5,
+  "total_points": 292,
+  "unique_bullish_symbols": [
+    "TRX"
+  ],
+  "unique_bearish_symbols": [
+    "BCH",
+    "CRO"
+  ],
+  "unique_bullish_count": 1,
+  "unique_bearish_count": 2,
+  "generated_at": "2026-03-06 00:46:19"
+}

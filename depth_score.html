@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深度图得分页面 - 加密货币分析系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1e2139 0%, #2a2d47 100%);
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #3b7dff 0%, #5a4ff3 100%);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 24px rgba(59, 125, 255, 0.3);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .header-icon {
+            font-size: 32px;
+        }
+        
+        .header-desc {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 8px;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            background: #2a2d47;
+            border: 2px solid #3b7dff;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .nav-btn:hover {
+            background: #3b7dff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 125, 255, 0.4);
+        }
+        
+        .nav-btn.active {
+            background: #3b7dff;
+            border-color: #5a9dff;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: rgba(42, 45, 71, 0.8);
+            border: 1px solid rgba(59, 125, 255, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            border-color: #3b7dff;
+            box-shadow: 0 4px 16px rgba(59, 125, 255, 0.3);
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #00d4ff;
+        }
+        
+        .stat-sublabel {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 4px;
+        }
+        
+        .score-table-container {
+            background: rgba(42, 45, 71, 0.8);
+            border: 1px solid rgba(59, 125, 255, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            overflow-x: auto;
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .table-title {
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .refresh-btn {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%);
+            border: none;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.4);
+        }
+        
+        .score-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+        
+        .score-table th {
+            background: rgba(59, 125, 255, 0.2);
+            padding: 12px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(59, 125, 255, 0.5);
+        }
+        
+        .score-table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+        }
+        
+        .score-table tr:hover {
+            background: rgba(59, 125, 255, 0.1);
+        }
+        
+        .rank-badge {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
+            text-align: center;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        .rank-1 { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #000; }
+        .rank-2 { background: linear-gradient(135deg, #C0C0C0 0%, #808080 100%); color: #000; }
+        .rank-3 { background: linear-gradient(135deg, #CD7F32 0%, #8B4513 100%); color: #fff; }
+        .rank-other { background: rgba(59, 125, 255, 0.3); color: #fff; }
+        
+        .symbol-cell {
+            font-weight: 600;
+            font-size: 15px;
+            color: #00d4ff;
+        }
+        
+        .score-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .score-s { background: linear-gradient(135deg, #ff0844 0%, #ff6b9d 100%); }
+        .score-a { background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); }
+        .score-b { background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%); }
+        .score-c { background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%); }
+        .score-d { background: linear-gradient(135deg, #9E9E9E 0%, #607D8B 100%); }
+        
+        .depth-level {
+            font-size: 13px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            display: inline-block;
+        }
+        
+        .confidence-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff 0%, #0099ff 100%);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        .confidence-text {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 4px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(59, 125, 255, 0.3);
+            border-top-color: #3b7dff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .details-btn {
+            background: rgba(59, 125, 255, 0.3);
+            border: 1px solid #3b7dff;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .details-btn:hover {
+            background: #3b7dff;
+        }
+        
+        .filter-controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-select {
+            background: #2a2d47;
+            border: 1px solid rgba(59, 125, 255, 0.3);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: #3b7dff;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .score-table {
+                font-size: 12px;
+            }
+            
+            .score-table th,
+            .score-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 页面头部 -->
+        <div class="header">
+            <h1>
+                <span class="header-icon">📊</span>
+                深度图得分页面
+            </h1>
+            <div class="header-desc">
+                实时监控加密货币市场深度，智能评分系统助您把握投资机会
+            </div>
+        </div>
+        
+        <!-- 导航按钮 -->
+        <div class="nav-buttons">
+            <a href="/" class="nav-btn">🏠 首页</a>
+            <a href="/depth-score" class="nav-btn active">📊 深度图得分</a>
+            <a href="/depth-chart" class="nav-btn">📈 深度图可视化</a>
+            <a href="/score-overview" class="nav-btn">📋 平均分页面</a>
+            <a href="/crypto-index" class="nav-btn">🔥 OKEX加密指数</a>
+        </div>
+        
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">总监控币种</div>
+                <div class="stat-value" id="totalCoins">-</div>
+                <div class="stat-sublabel">实时更新</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">市场平均得分</div>
+                <div class="stat-value" id="avgScore">-</div>
+                <div class="stat-sublabel">市场活跃度指标</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">S级币种数量</div>
+                <div class="stat-value" id="sLevelCount">-</div>
+                <div class="stat-sublabel">极深度币种</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">最高得分</div>
+                <div class="stat-value" id="topScore">-</div>
+                <div class="stat-sublabel" id="topScoreSymbol">-</div>
+            </div>
+        </div>
+        
+        <!-- 得分表格 -->
+        <div class="score-table-container">
+            <div class="table-header">
+                <div class="table-title">
+                    <span>🏆</span>
+                    <span>币种深度得分排行</span>
+                </div>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <div class="filter-controls">
+                        <select class="filter-select" id="timeframeSelect">
+                            <option value="1">1小时</option>
+                            <option value="6">6小时</option>
+                            <option value="24" selected>24小时</option>
+                            <option value="168">7天</option>
+                        </select>
+                        <select class="filter-select" id="levelFilter">
+                            <option value="all">所有等级</option>
+                            <option value="S">S级 (极深)</option>
+                            <option value="A">A级 (深)</option>
+                            <option value="B">B级 (中等)</option>
+                            <option value="C">C级 (浅)</option>
+                            <option value="D">D级 (极浅)</option>
+                        </select>
+                    </div>
+                    <button class="refresh-btn" onclick="loadScores()">
+                        🔄 刷新数据
+                    </button>
+                </div>
+            </div>
+            
+            <div id="tableContent">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div>正在加载深度得分数据...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 加载深度得分数据
+        async function loadScores() {
+            const timeframe = document.getElementById('timeframeSelect').value;
+            const levelFilter = document.getElementById('levelFilter').value;
+            
+            try {
+                document.getElementById('tableContent').innerHTML = `
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <div>正在加载数据...</div>
+                    </div>
+                `;
+                
+                const response = await fetch(`/api/depth-scores?timeframe=${timeframe}&limit=50`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayScores(data.data, levelFilter);
+                    updateStats(data.data);
+                } else {
+                    document.getElementById('tableContent').innerHTML = `
+                        <div class="loading">数据加载失败: ${data.error}</div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading scores:', error);
+                document.getElementById('tableContent').innerHTML = `
+                    <div class="loading">网络错误，请稍后重试</div>
+                `;
+            }
+        }
+        
+        // 显示得分数据
+        function displayScores(scores, levelFilter) {
+            // 筛选数据
+            let filteredScores = scores.scores;
+            if (levelFilter !== 'all') {
+                filteredScores = filteredScores.filter(score => {
+                    return score.depth_level.includes(`${levelFilter}级`);
+                });
+            }
+            
+            if (filteredScores.length === 0) {
+                document.getElementById('tableContent').innerHTML = `
+                    <div class="loading">暂无符合条件的数据</div>
+                `;
+                return;
+            }
+            
+            let html = `
+                <table class="score-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>币种</th>
+                            <th>综合得分</th>
+                            <th>深度等级</th>
+                            <th>置信度</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            filteredScores.forEach((score, index) => {
+                const rank = index + 1;
+                const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
+                
+                let scoreClass = 'score-d';
+                if (score.score >= 80) scoreClass = 'score-s';
+                else if (score.score >= 60) scoreClass = 'score-a';
+                else if (score.score >= 40) scoreClass = 'score-b';
+                else if (score.score >= 20) scoreClass = 'score-c';
+                
+                html += `
+                    <tr>
+                        <td>
+                            <span class="rank-badge ${rankClass}">${rank}</span>
+                        </td>
+                        <td class="symbol-cell">${score.symbol}</td>
+                        <td>
+                            <span class="score-badge ${scoreClass}">${score.score.toFixed(2)}</span>
+                        </td>
+                        <td>
+                            <span class="depth-level">${score.depth_level}</span>
+                        </td>
+                        <td>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" style="width: ${score.confidence}%"></div>
+                            </div>
+                            <div class="confidence-text">${score.confidence}%</div>
+                        </td>
+                        <td>
+                            <button class="details-btn" onclick="showDetails('${score.symbol}')">
+                                查看详情
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                    </tbody>
+                </table>
+            `;
+            
+            document.getElementById('tableContent').innerHTML = html;
+        }
+        
+        // 更新统计数据
+        function updateStats(data) {
+            document.getElementById('totalCoins').textContent = data.total_coins;
+            document.getElementById('avgScore').textContent = data.average_score.toFixed(2);
+            
+            // S级币种数量
+            const sLevelCount = data.scores.filter(s => s.score >= 80).length;
+            document.getElementById('sLevelCount').textContent = sLevelCount;
+            
+            // 最高得分
+            if (data.scores.length > 0) {
+                document.getElementById('topScore').textContent = data.scores[0].score.toFixed(2);
+                document.getElementById('topScoreSymbol').textContent = data.scores[0].symbol;
+            }
+        }
+        
+        // 显示详情 (可以扩展为弹窗)
+        function showDetails(symbol) {
+            alert(`正在查看 ${symbol} 的详细信息...\n(此功能可扩展为详情页面)`);
+        }
+        
+        // 监听筛选器变化
+        document.getElementById('timeframeSelect').addEventListener('change', loadScores);
+        document.getElementById('levelFilter').addEventListener('change', loadScores);
+        
+        // 页面加载时获取数据
+        loadScores();
+        
+        // 每30秒自动刷新
+        setInterval(loadScores, 30000);
+    </script>
+</body>
+</html>

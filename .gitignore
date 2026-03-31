@@ -1,0 +1,54 @@
+# Large data files (> 100MB)
+sar_slope_jsonl/sar_slope_data.jsonl
+v1v2_jsonl/v1v2_history.jsonl
+support_resistance_jsonl/support_resistance_levels.jsonl
+anchor_profit_stats/anchor_profit_stats.jsonl
+anchor_unified/anchor_unified_data.jsonl
+price_speed_jsonl/price_speed_history.jsonl
+
+# All large JSONL data directories
+sar_slope_jsonl/
+v1v2_jsonl/
+support_resistance_jsonl/
+anchor_profit_stats/
+anchor_unified/
+price_speed_jsonl/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+dist/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# PM2
+.pm2/
+
+# Node modules (if any)
+node_modules/

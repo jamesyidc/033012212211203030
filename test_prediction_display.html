@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>预测信号显示测试</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">预测信号显示测试</h1>
+        
+        <div class="mb-4">
+            <label class="block mb-2">选择日期：</label>
+            <input type="date" id="dateInput" value="2026-02-27" class="px-4 py-2 border rounded">
+            <button onclick="loadPrediction()" class="ml-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">加载预测</button>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">API 响应数据</h2>
+            <pre id="apiResponse" class="bg-gray-100 p-4 rounded text-sm overflow-auto max-h-96">等待加载...</pre>
+        </div>
+        
+        <div class="bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 rounded-lg shadow-lg p-6 mb-6 border-2 border-indigo-200">
+            <h2 class="text-xl font-bold mb-4 text-indigo-800">预测卡片渲染测试</h2>
+            
+            <div class="grid grid-cols-5 gap-4 mb-4">
+                <div class="bg-white rounded-lg p-4 shadow-md">
+                    <div class="text-xs mb-1">🟢 绿色</div>
+                    <div id="greenCount" class="text-2xl font-bold text-green-600">--</div>
+                </div>
+                <div class="bg-white rounded-lg p-4 shadow-md">
+                    <div class="text-xs mb-1">🔴 红色</div>
+                    <div id="redCount" class="text-2xl font-bold text-red-600">--</div>
+                </div>
+                <div class="bg-white rounded-lg p-4 shadow-md">
+                    <div class="text-xs mb-1">🟡 黄色</div>
+                    <div id="yellowCount" class="text-2xl font-bold text-yellow-600">--</div>
+                </div>
+                <div class="bg-white rounded-lg p-4 shadow-md">
+                    <div class="text-xs mb-1">⚪ 灰色</div>
+                    <div id="blankCount" class="text-2xl font-bold text-gray-600">--</div>
+                </div>
+                <div class="bg-white rounded-lg p-4 shadow-md">
+                    <div class="text-xs mb-1">🎯 预测</div>
+                    <div id="predictionSignal" class="text-2xl font-bold text-indigo-600">--</div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg p-4 shadow-md">
+                <div id="predictionDescription" class="text-sm text-gray-700">等待数据...</div>
+                <div id="predictionTime" class="text-xs text-gray-500 mt-2">--</div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg p-6 shadow-lg">
+            <h2 class="text-xl font-bold mb-4">控制台日志</h2>
+            <div id="consoleLog" class="bg-gray-900 text-green-400 p-4 rounded font-mono text-sm h-64 overflow-auto"></div>
+        </div>
+    </div>
+    
+    <script>
+        function log(message) {
+            const logDiv = document.getElementById('consoleLog');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${timestamp}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        async function loadPrediction() {
+            const date = document.getElementById('dateInput').value;
+            log(`📅 加载日期: ${date}`);
+            
+            try {
+                const url = `/api/coin-change-tracker/daily-prediction?date=${date}&_t=${Date.now()}`;
+                log(`🔗 请求URL: ${url}`);
+                
+                const response = await fetch(url, {
+                    cache: 'no-store',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
+                
+                log(`✅ HTTP状态: ${response.status}`);
+                
+                const result = await response.json();
+                log(`📊 收到数据: success=${result.success}, source=${result.source}`);
+                
+                // 显示API响应
+                document.getElementById('apiResponse').textContent = JSON.stringify(result, null, 2);
+                
+                if (result.success && result.data) {
+                    const data = result.data;
+                    log(`🎯 信号: ${data.signal}`);
+                    log(`🟢 绿: ${data.color_counts.green}, 🔴 红: ${data.color_counts.red}, 🟡 黄: ${data.color_counts.yellow}`);
+                    
+                    // 更新UI
+                    document.getElementById('greenCount').textContent = data.color_counts.green || 0;
+                    document.getElementById('redCount').textContent = data.color_counts.red || 0;
+                    document.getElementById('yellowCount').textContent = data.color_counts.yellow || 0;
+                    document.getElementById('blankCount').textContent = data.color_counts.blank || 0;
+                    
+                    const signalEl = document.getElementById('predictionSignal');
+                    signalEl.textContent = data.signal;
+                    
+                    // 根据信号设置颜色
+                    if (data.signal === '低吸') {
+                        signalEl.className = 'text-2xl font-bold text-green-600';
+                    } else if (data.signal === '做空') {
+                        signalEl.className = 'text-2xl font-bold text-red-600';
+                    } else if (data.signal === '等待新低') {
+                        signalEl.className = 'text-2xl font-bold text-orange-600';
+                    } else {
+                        signalEl.className = 'text-2xl font-bold text-indigo-600';
+                    }
+                    
+                    document.getElementById('predictionDescription').textContent = data.description || '无描述';
+                    document.getElementById('predictionTime').textContent = `分析时间: ${data.timestamp || data.analysis_time || '--'}`;
+                    
+                    log('✅ UI更新完成');
+                } else {
+                    log('❌ 无数据或失败');
+                    document.getElementById('predictionSignal').textContent = '暂无数据';
+                    document.getElementById('predictionDescription').textContent = result.error || '该日期暂无预判数据';
+                }
+            } catch (error) {
+                log(`❌ 错误: ${error.message}`);
+                document.getElementById('apiResponse').textContent = error.toString();
+            }
+        }
+        
+        // 页面加载时自动加载
+        window.addEventListener('DOMContentLoaded', () => {
+            log('🚀 页面加载完成');
+            loadPrediction();
+        });
+    </script>
+</body>
+</html>

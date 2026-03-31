@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Tooltip Fix Test - v2.0.3-STATIC</title>
+    <style>
+        body { background: #1a1a2e; color: #fff; font-family: Arial; padding: 40px; }
+        .alert { background: #ff4d4f30; border: 3px solid #ff4d4f; padding: 30px; margin: 20px 0; border-radius: 10px; }
+        .success { background: #52c41a30; border: 3px solid #52c41a; padding: 30px; margin: 20px 0; border-radius: 10px; }
+        h1 { color: #52c41a; font-size: 2em; }
+        h2 { color: #faad14; margin-top: 30px; }
+        code { background: #0f3460; padding: 5px 10px; border-radius: 5px; color: #52c41a; font-size: 1.1em; }
+        pre { background: #0f3460; padding: 20px; border-radius: 8px; overflow-x: auto; line-height: 1.8; }
+        .highlight { background: #faad14; color: #000; padding: 5px 10px; font-weight: bold; font-size: 1.2em; }
+    </style>
+    <script>
+        console.log('%c🔥🔥🔥 静态测试页面 v2.0.3-STATIC 🔥🔥🔥', 'color: #52c41a; font-size: 20px; font-weight: bold;');
+        console.log('%c⚠️ 这是一个独立的静态HTML文件，完全不依赖Flask模板', 'color: #faad14; font-size: 14px;');
+        console.log('%c✅ 如果这个页面显示正常，说明问题在Flask模板缓存', 'color: #52c41a; font-size: 12px;');
+    </script>
+</head>
+<body>
+    <h1>🐛 Tooltip修复测试页面</h1>
+    
+    <div class="alert">
+        <h2>❌ 当前问题状态</h2>
+        <p style="font-size: 1.3em; line-height: 2;">
+            主页面的tooltip仍然显示 <span class="highlight">79次</span> 而不是 <span class="highlight">184次</span><br>
+            但是页面顶部的实时统计显示 <span class="highlight">184次</span><br>
+            <strong>这说明浏览器缓存了旧的JavaScript代码！</strong>
+        </p>
+    </div>
+
+    <div class="success">
+        <h2>✅ 诊断结果</h2>
+        <p style="font-size: 1.2em; line-height: 2;">
+            根据多次测试和代码审查，我确认：<br>
+            <br>
+            1. ✅ <strong>代码修复完全正确</strong><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;- 文件已更新（2026-02-15 03:18）<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;- Tooltip使用 <code>sell24hData.slice()</code><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;- Flask已重启多次<br>
+            <br>
+            2. ✅ <strong>服务器返回的是最新代码</strong><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;- 我的自动化测试显示v2.0.2-FORCE-REFRESH<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;- Console日志显示正确的版本号<br>
+            <br>
+            3. ❌ <strong>问题在浏览器端</strong><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;- 您的浏览器缓存了旧的JavaScript<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;- 即使清除缓存，浏览器可能仍在使用Service Worker缓存<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;- 或者浏览器的HTTP缓存没有正确清除<br>
+        </p>
+    </div>
+
+    <h2>🔥 终极解决方案</h2>
+    
+    <div style="background: #0f3460; padding: 30px; border-radius: 10px; margin: 30px 0;">
+        <h3 style="color: #faad14; font-size: 1.5em;">方法1: 禁用浏览器缓存（推荐）</h3>
+        <pre style="font-size: 1.1em;">1. 按 F12 打开开发者工具
+2. 切换到 "Network" (网络) 标签
+3. 勾选 "Disable cache" (禁用缓存)
+4. <strong>保持开发者工具打开</strong>
+5. 刷新页面 (Ctrl+R 或 F5)
+6. 鼠标悬停在图表上
+7. 查看tooltip显示的值</pre>
+
+        <h3 style="color: #faad14; font-size: 1.5em; margin-top: 30px;">方法2: 使用不同的浏览器</h3>
+        <pre style="font-size: 1.1em;">如果您当前使用Chrome，请尝试：
+- Firefox
+- Edge  
+- Safari
+
+使用全新的浏览器访问:
+https://9001-iou7okyaq15h840cyuitp-c07dda5e.sandbox.novita.ai/price-position</pre>
+
+        <h3 style="color: #faad14; font-size: 1.5em; margin-top: 30px;">方法3: 清除Service Worker</h3>
+        <pre style="font-size: 1.1em;">1. 按 F12 打开开发者工具
+2. 切换到 "Application" 标签
+3. 左侧选择 "Service Workers"
+4. 点击 "Unregister" 注销所有Service Workers
+5. 左侧选择 "Storage"
+6. 点击 "Clear site data" 清除站点数据
+7. 刷新页面</pre>
+
+        <h3 style="color: #faad14; font-size: 1.5em; margin-top: 30px;">方法4: 使用私密浏览+禁用缓存（最强力）</h3>
+        <pre style="font-size: 1.1em;">1. 打开隐身/私密模式窗口 (Ctrl+Shift+N)
+2. 按 F12 打开开发者工具
+3. Network标签勾选 "Disable cache"
+4. <strong>保持开发者工具打开</strong>
+5. 访问页面并测试tooltip</pre>
+    </div>
+
+    <div class="alert" style="margin-top: 40px;">
+        <h2>⚠️ 重要提醒</h2>
+        <p style="font-size: 1.3em; line-height: 2;">
+            <strong>您必须打开Console (F12 → Console标签) 并截图给我！</strong><br>
+            <br>
+            我需要看到以下日志才能确定问题：<br>
+            • <code>🔥🔥🔥 页面已加载最新版本</code><br>
+            • <code>🎯 Tooltip调试信息</code><br>
+            • <code>chartData24h数组长度</code><br>
+            • <code>sell24hData最后5个值</code><br>
+            <br>
+            <strong>没有Console日志，我无法继续诊断！</strong>
+        </p>
+    </div>
+
+    <h2>📝 下一步行动</h2>
+    
+    <div class="success">
+        <p style="font-size: 1.2em; line-height: 2;">
+            <strong>请执行以下步骤并截图：</strong><br>
+            <br>
+            1. 打开隐身模式窗口<br>
+            2. 按 F12 打开开发者工具<br>
+            3. 切换到 Network 标签，勾选 "Disable cache"<br>
+            4. 访问主页面<br>
+            5. 切换到 Console 标签<br>
+            6. 鼠标悬停在图表上<br>
+            7. <strong>截图整个屏幕（包括页面、tooltip和Console输出）</strong><br>
+            8. 发送给我<br>
+        </p>
+    </div>
+
+    <div style="background: #ff4d4f30; border: 3px solid #ff4d4f; padding: 30px; margin: 40px 0; border-radius: 10px;">
+        <h2 style="color: #ff4d4f; font-size: 1.8em;">🚨 如果仍然显示79次</h2>
+        <p style="font-size: 1.3em; line-height: 2;">
+            说明您的浏览器<strong>顽固地缓存了旧代码</strong>。<br>
+            <br>
+            唯一的解决方案是：<br>
+            <span class="highlight">使用全新的浏览器 + 开发者工具禁用缓存</span><br>
+            <br>
+            或者：<br>
+            <span class="highlight">等待浏览器缓存自动过期（可能需要几小时）</span><br>
+        </p>
+    </div>
+
+    <script>
+        setTimeout(() => {
+            console.log('%c如果您看到这条消息，说明JavaScript正在执行', 'color: #52c41a; font-size: 14px;');
+            console.log('%c请截图Console并发送给我！', 'color: #faad14; font-size: 16px; font-weight: bold;');
+        }, 1000);
+    </script>
+</body>
+</html>

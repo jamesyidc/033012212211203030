@@ -1,0 +1,7 @@
+{
+  "takeProfitThreshold": 10.0,
+  "stopLossThreshold": -10.0,
+  "takeProfitEnabled": true,
+  "stopLossEnabled": true,
+  "lastUpdated": "2026-02-13 04:11:26"
+}

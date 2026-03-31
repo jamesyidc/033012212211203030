@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>对齐数据可视化 - Coin Tracker & Escape Signal</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card .label {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .value {
+            color: #333;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-title {
+            color: #333;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 500px;
+        }
+
+        .home-button {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+            margin-top: 15px;
+        }
+
+        .home-button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 18px;
+        }
+
+        .error {
+            background: #fee;
+            border: 1px solid #fcc;
+            border-radius: 8px;
+            padding: 20px;
+            color: #c33;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 数据对齐可视化</h1>
+            <div class="subtitle">Coin Price Tracker + Escape Signal History（30分钟对齐）</div>
+            <a href="/" class="home-button">🏠 返回首页</a>
+        </div>
+
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="label">总记录数</div>
+                <div class="value" id="totalRecords">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">对齐记录数</div>
+                <div class="value" id="alignedRecords">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">对齐率</div>
+                <div class="value" id="alignmentRate">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">时间范围</div>
+                <div class="value" style="font-size: 14px;" id="timeRange">-</div>
+            </div>
+        </div>
+
+        <div id="errorMessage"></div>
+
+        <!-- 双轴图表：27币涨跌幅 + 逃顶信号 -->
+        <div class="chart-card">
+            <div class="chart-title">📈 27币涨跌幅总和 vs 24小时逃顶信号数</div>
+            <div id="mainChart" class="chart-container"></div>
+        </div>
+
+        <!-- 2小时信号图表 -->
+        <div class="chart-card">
+            <div class="chart-title">📊 27币涨跌幅总和 vs 2小时逃顶信号数</div>
+            <div id="signal2hChart" class="chart-container"></div>
+        </div>
+
+        <!-- 相关性分析图表 -->
+        <div class="chart-card">
+            <div class="chart-title">🔗 散点图：币价涨跌幅 vs 逃顶信号（相关性分析）</div>
+            <div id="correlationChart" class="chart-container"></div>
+        </div>
+    </div>
+
+    <script>
+        let allData = [];
+        let mainChart = null;
+        let signal2hChart = null;
+        let correlationChart = null;
+
+        // 加载数据
+        async function loadData() {
+            try {
+                console.log('📊 开始加载对齐数据...');
+                
+                const response = await fetch('/api/aligned-data/history');
+                const result = await response.json();
+                
+                console.log('📦 API响应:', result);
+                
+                if (!result.success || !result.data || result.data.length === 0) {
+                    showError('数据加载失败或无数据');
+                    return;
+                }
+
+                allData = result.data;
+                console.log(`✅ 成功加载 ${allData.length} 条记录`);
+                
+                // 更新统计信息
+                updateStats();
+                
+                // 渲染图表
+                renderCharts();
+                
+            } catch (error) {
+                console.error('❌ 加载数据出错:', error);
+                showError(`数据加载失败: ${error.message}`);
+            }
+        }
+
+        // 更新统计信息
+        function updateStats() {
+            const totalRecords = allData.length;
+            const alignedRecords = allData.filter(r => r.is_aligned).length;
+            const alignmentRate = totalRecords > 0 ? (alignedRecords / totalRecords * 100).toFixed(1) : 0;
+            
+            document.getElementById('totalRecords').textContent = totalRecords;
+            document.getElementById('alignedRecords').textContent = alignedRecords;
+            document.getElementById('alignmentRate').textContent = alignmentRate + '%';
+            
+            if (allData.length > 0) {
+                const firstTime = allData[0].time.substring(0, 10);
+                const lastTime = allData[allData.length - 1].time.substring(0, 10);
+                document.getElementById('timeRange').textContent = `${firstTime} ~ ${lastTime}`;
+            }
+        }
+
+        // 渲染主图表（27币涨跌幅 vs 24h信号）
+        function renderMainChart() {
+            const times = [];
+            const coinChanges = [];
+            const signal24h = [];
+            
+            allData.forEach(record => {
+                const time = record.time.substring(5, 16); // MM-DD HH:MM
+                times.push(time);
+                
+                // 币价涨跌幅
+                const coinChange = record.coin_tracker ? record.coin_tracker.total_change : null;
+                coinChanges.push(coinChange);
+                
+                // 24小时信号数
+                const signal = record.escape_signal ? record.escape_signal.signal_24h_count_avg : null;
+                signal24h.push(signal);
+            });
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross'
+                    }
+                },
+                legend: {
+                    data: ['27币涨跌幅总和', '24h逃顶信号数'],
+                    top: 10
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: times,
+                    axisLabel: {
+                        rotate: 45,
+                        fontSize: 10
+                    }
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '27币涨跌幅(%)',
+                        position: 'left',
+                        axisLabel: {
+                            formatter: '{value}%'
+                        }
+                    },
+                    {
+                        type: 'value',
+                        name: '信号数',
+                        position: 'right',
+                        axisLabel: {
+                            formatter: '{value}'
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: '27币涨跌幅总和',
+                        type: 'line',
+                        yAxisIndex: 0,
+                        data: coinChanges,
+                        smooth: true,
+                        lineStyle: {
+                            width: 2,
+                            color: '#667eea'
+                        },
+                        itemStyle: {
+                            color: '#667eea'
+                        }
+                    },
+                    {
+                        name: '24h逃顶信号数',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        data: signal24h,
+                        smooth: true,
+                        lineStyle: {
+                            width: 2,
+                            color: '#f56565'
+                        },
+                        itemStyle: {
+                            color: '#f56565'
+                        }
+                    }
+                ]
+            };
+            
+            if (!mainChart) {
+                mainChart = echarts.init(document.getElementById('mainChart'));
+            }
+            mainChart.setOption(option);
+        }
+
+        // 渲染2小时信号图表
+        function renderSignal2hChart() {
+            const times = [];
+            const coinChanges = [];
+            const signal2h = [];
+            
+            allData.forEach(record => {
+                const time = record.time.substring(5, 16);
+                times.push(time);
+                
+                const coinChange = record.coin_tracker ? record.coin_tracker.total_change : null;
+                coinChanges.push(coinChange);
+                
+                const signal = record.escape_signal ? record.escape_signal.signal_2h_count_avg : null;
+                signal2h.push(signal);
+            });
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross'
+                    }
+                },
+                legend: {
+                    data: ['27币涨跌幅总和', '2h逃顶信号数'],
+                    top: 10
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: times,
+                    axisLabel: {
+                        rotate: 45,
+                        fontSize: 10
+                    }
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '27币涨跌幅(%)',
+                        position: 'left',
+                        axisLabel: {
+                            formatter: '{value}%'
+                        }
+                    },
+                    {
+                        type: 'value',
+                        name: '信号数',
+                        position: 'right',
+                        axisLabel: {
+                            formatter: '{value}'
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: '27币涨跌幅总和',
+                        type: 'line',
+                        yAxisIndex: 0,
+                        data: coinChanges,
+                        smooth: true,
+                        lineStyle: {
+                            width: 2,
+                            color: '#667eea'
+                        },
+                        itemStyle: {
+                            color: '#667eea'
+                        }
+                    },
+                    {
+                        name: '2h逃顶信号数',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        data: signal2h,
+                        smooth: true,
+                        lineStyle: {
+                            width: 2,
+                            color: '#48bb78'
+                        },
+                        itemStyle: {
+                            color: '#48bb78'
+                        }
+                    }
+                ]
+            };
+            
+            if (!signal2hChart) {
+                signal2hChart = echarts.init(document.getElementById('signal2hChart'));
+            }
+            signal2hChart.setOption(option);
+        }
+
+        // 渲染相关性散点图
+        function renderCorrelationChart() {
+            const scatterData = [];
+            
+            allData.forEach(record => {
+                if (record.is_aligned && record.coin_tracker && record.escape_signal) {
+                    const coinChange = record.coin_tracker.total_change;
+                    const signal24h = record.escape_signal.signal_24h_count_avg;
+                    scatterData.push([coinChange, signal24h, record.time]);
+                }
+            });
+            
+            const option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: function(params) {
+                        return `时间: ${params.data[2]}<br/>
+                                27币涨跌幅: ${params.data[0].toFixed(2)}%<br/>
+                                24h信号数: ${params.data[1].toFixed(1)}`;
+                    }
+                },
+                xAxis: {
+                    name: '27币涨跌幅总和(%)',
+                    nameLocation: 'middle',
+                    nameGap: 30
+                },
+                yAxis: {
+                    name: '24h逃顶信号数',
+                    nameLocation: 'middle',
+                    nameGap: 40
+                },
+                series: [{
+                    type: 'scatter',
+                    data: scatterData,
+                    symbolSize: 8,
+                    itemStyle: {
+                        color: '#667eea',
+                        opacity: 0.6
+                    }
+                }]
+            };
+            
+            if (!correlationChart) {
+                correlationChart = echarts.init(document.getElementById('correlationChart'));
+            }
+            correlationChart.setOption(option);
+        }
+
+        // 渲染所有图表
+        function renderCharts() {
+            renderMainChart();
+            renderSignal2hChart();
+            renderCorrelationChart();
+        }
+
+        // 显示错误
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.innerHTML = `<div class="error">❌ ${message}</div>`;
+        }
+
+        // 响应式调整
+        window.addEventListener('resize', () => {
+            if (mainChart) mainChart.resize();
+            if (signal2hChart) signal2hChart.resize();
+            if (correlationChart) correlationChart.resize();
+        });
+
+        // 页面加载时执行
+        window.onload = () => {
+            loadData();
+        };
+    </script>
+</body>
+</html>

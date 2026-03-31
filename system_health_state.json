@@ -1,0 +1,9 @@
+{
+  "systems": {
+    "主系统": {
+      "consecutive_failures": 0,
+      "last_check_time": "2026-02-07 00:36:57",
+      "last_status": "正常 (0.06秒)"
+    }
+  }
+}

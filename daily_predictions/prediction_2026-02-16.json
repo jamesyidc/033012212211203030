@@ -1,0 +1,15 @@
+{
+  "date": "2026-02-16",
+  "timestamp": "2026-02-16 02:00:00",
+  "analysis_time": "02:00:00",
+  "color_counts": {
+    "green": 0,
+    "red": 11,
+    "yellow": 0,
+    "blank": 1,
+    "blank_ratio": 8.333333333333332
+  },
+  "signal": "诱空试盘抄底",
+  "description": "⚪🔴 只有红色和空白（空白占比8.3%<25%），诱空行情，可以试盘抄底。操作提示：低点做多",
+  "is_temp": false
+}

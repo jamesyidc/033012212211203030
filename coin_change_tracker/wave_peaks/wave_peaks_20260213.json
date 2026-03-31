@@ -1,0 +1,55 @@
+{
+  "date": "20260213",
+  "data_points": 1205,
+  "peaks_count": 2,
+  "false_breakout": null,
+  "peaks": [
+    {
+      "b_point": {
+        "index": 45,
+        "timestamp": 1770915275057,
+        "beijing_time": "2026-02-13 00:54:24",
+        "value": -51.73
+      },
+      "a_point": {
+        "index": 182,
+        "timestamp": 1770925037226,
+        "beijing_time": "2026-02-13 03:37:06",
+        "value": 14.61
+      },
+      "c_point": {
+        "index": 211,
+        "timestamp": 1770927111579,
+        "beijing_time": "2026-02-13 04:11:41",
+        "value": -27.72
+      },
+      "amplitude": 66.34,
+      "decline": 42.33,
+      "decline_ratio": 63.807657521857095
+    },
+    {
+      "b_point": {
+        "index": 245,
+        "timestamp": 1770929552144,
+        "beijing_time": "2026-02-13 04:52:21",
+        "value": -41.17
+      },
+      "a_point": {
+        "index": 373,
+        "timestamp": 1770938793181,
+        "beijing_time": "2026-02-13 07:26:22",
+        "value": 21.55
+      },
+      "c_point": {
+        "index": 659,
+        "timestamp": 1770959251772,
+        "beijing_time": "2026-02-13 13:07:21",
+        "value": -12.01
+      },
+      "amplitude": 62.72,
+      "decline": 33.56,
+      "decline_ratio": 53.50765306122449
+    }
+  ],
+  "processed_at": "2026-02-18T09:45:44.752948"
+}

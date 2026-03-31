@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交易信号分发系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-content {
+            flex: 1;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            color: #718096;
+            font-size: 14px;
+        }
+        
+        .home-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .stat-card h3 {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 8px;
+        }
+        
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1a202c;
+        }
+        
+        .signals-container {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .signals-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .signals-header h2 {
+            font-size: 24px;
+            color: #1a202c;
+        }
+        
+        .refresh-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .refresh-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+        
+        .signal-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+        
+        .signal-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+        }
+        
+        .signal-card.executed {
+            opacity: 0.6;
+            background: #f7fafc;
+        }
+        
+        .signal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .signal-title {
+            flex: 1;
+        }
+        
+        .signal-title h3 {
+            font-size: 20px;
+            color: #1a202c;
+            margin-bottom: 4px;
+        }
+        
+        .signal-title p {
+            color: #718096;
+            font-size: 13px;
+        }
+        
+        .signal-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-long {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .badge-short {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        
+        .badge-pending {
+            background: #fef5e7;
+            color: #744210;
+        }
+        
+        .badge-executed {
+            background: #e6f7ff;
+            color: #003a8c;
+        }
+        
+        .signal-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .info-group {
+            background: #f7fafc;
+            padding: 16px;
+            border-radius: 8px;
+        }
+        
+        .info-group h4 {
+            font-size: 13px;
+            color: #718096;
+            margin-bottom: 8px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .info-label {
+            color: #4a5568;
+        }
+        
+        .info-value {
+            font-weight: 600;
+            color: #1a202c;
+        }
+        
+        .check-points {
+            background: #f7fafc;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .check-points h4 {
+            font-size: 13px;
+            color: #718096;
+            margin-bottom: 12px;
+        }
+        
+        .check-point {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+        
+        .check-point:last-child {
+            margin-bottom: 0;
+        }
+        
+        .signal-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .execute-btn {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .execute-btn:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+        }
+        
+        .cancel-btn {
+            background: #f56565;
+            color: white;
+        }
+        
+        .cancel-btn:hover {
+            background: #e53e3e;
+            transform: translateY(-2px);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+        }
+        
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>🚀 交易信号分发系统</h1>
+                <p>6大交易模型 · 智能买点监控 · 自动信号分发</p>
+            </div>
+            <a href="/" class="home-btn">
+                <span>🏠</span>
+                <span>返回首页</span>
+            </a>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>待执行信号</h3>
+                <div class="value" id="pendingCount">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>今日信号</h3>
+                <div class="value" id="todayCount">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>历史信号</h3>
+                <div class="value" id="historyCount">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>激活模型</h3>
+                <div class="value" id="activeModels">1/6</div>
+            </div>
+        </div>
+        
+        <!-- 副系统控制面板 -->
+        <div class="subsystems-container" style="margin-bottom: 30px;">
+            <div class="subsystems-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0;">🤖 交易副系统控制台</h2>
+                <button class="refresh-btn" onclick="loadSubsystems()" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">🔄 刷新</button>
+            </div>
+            
+            <div id="subsystemsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+        
+        <div class="signals-container">
+            <div class="signals-header">
+                <h2>待执行信号队列</h2>
+                <button class="refresh-btn" onclick="loadSignals()">🔄 刷新</button>
+            </div>
+            
+            <div id="signalsContent">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        async function loadSignals() {
+            try {
+                const response = await fetch('/api/trading-signals-system/pending');
+                const data = await response.json();
+                
+                // 更新统计数据
+                document.getElementById('pendingCount').textContent = data.pending_count || 0;
+                document.getElementById('todayCount').textContent = data.today_count || 0;
+                document.getElementById('historyCount').textContent = data.history_count || 0;
+                
+                // 渲染信号列表
+                const container = document.getElementById('signalsContent');
+                
+                if (!data.signals || data.signals.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                            </svg>
+                            <h3>暂无待执行信号</h3>
+                            <p>系统正在监控中，有新信号时会自动显示</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = data.signals.map(signal => renderSignalCard(signal)).join('');
+                
+            } catch (error) {
+                console.error('加载信号失败:', error);
+                document.getElementById('signalsContent').innerHTML = `
+                    <div class="empty-state">
+                        <h3>加载失败</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function renderSignalCard(signal) {
+            const isExecuted = signal.executed;
+            const direction = signal.direction === 'long' ? 'long' : 'short';
+            const directionText = signal.direction === 'long' ? '做多' : '做空';
+            const directionBadge = signal.direction === 'long' ? 'badge-long' : 'badge-short';
+            
+            // 判断信号子类型
+            function getSignalSubType(signal) {
+                const signalType = signal.signal_type || '';
+                const afterCutoff = signal.entry_condition?.after_cutoff || false;
+                const velocity = signal.entry_condition?.velocity || 0;
+                const positiveRatio = signal.market_data?.positive_ratio || 0;
+                const btcChange = signal.entry_condition?.btc_change || 0;
+                const currentPR = signal.entry_condition?.positive_ratio_current;
+                const previousPR = signal.entry_condition?.positive_ratio_previous;
+                
+                // 02:30全红K信号（优先判断）
+                if (signalType === '02:30全红K' || signalType.includes('02:30')) {
+                    return '2:30分做空确认';
+                }
+                
+                // 低吸2:30信号（3红柱信号）
+                if (signalType.includes('低吸') && !afterCutoff) {
+                    return '低吸2:30信号';
+                }
+                
+                // 做多A信号：涨速<-15% && 正数占比>40%
+                if (direction === 'long' && velocity < -15 && positiveRatio > 40) {
+                    return '做多-A信号';
+                }
+                
+                // 做多B信号：其他做多条件
+                if (direction === 'long') {
+                    return '做多-B信号';
+                }
+                
+                // 做空A信号（02:30后）：涨速>8% && 正数占比<40% && BTC跌幅≥1%
+                if (direction === 'short' && afterCutoff && velocity > 8 && positiveRatio < 40 && btcChange <= -1) {
+                    return '做空-A信号';
+                }
+                
+                // 做空B信号（02:30后）：正数占比从>40%降到<40%
+                // 检查历史数据中是否真的有>40%的记录
+                if (direction === 'short' && afterCutoff) {
+                    // 使用后端计算的正数占比历史数据
+                    if (previousPR && previousPR > 40 && currentPR && currentPR < 40) {
+                        return '做空-B信号';
+                    }
+                }
+                
+                // 原始做空信号（任何时间）：涨速>8% && 正数占比<40%
+                if (direction === 'short' && velocity > 8 && positiveRatio < 40) {
+                    return '原始做空信号';
+                }
+                
+                return '';
+            }
+            
+            const signalSubType = getSignalSubType(signal);
+            
+            // 确定显示的主标题
+            // 对于特定信号类型，优先显示信号类型作为主标题
+            let displayTitle = signal.model_name;
+            let showSubTypeLabel = true;
+            
+            if (signal.signal_type === '02:30全红K' || signal.signal_type?.includes('02:30')) {
+                displayTitle = '2:30分做空确认';
+                showSubTypeLabel = false; // 主标题已经是信号类型，不需要重复显示徽章
+            } else if (signalSubType) {
+                displayTitle = signalSubType;
+                showSubTypeLabel = false;
+            }
+            
+            return `
+                <div class="signal-card ${isExecuted ? 'executed' : ''}">
+                    <div class="signal-header">
+                        <div class="signal-title">
+                            <h3>${displayTitle}</h3>
+                            <p>触发时间: ${new Date(signal.trigger_time).toLocaleString('zh-CN')}</p>
+                        </div>
+                        <div class="signal-badges">
+                            ${showSubTypeLabel && signalSubType ? `<span class="badge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold; font-size: 14px; padding: 6px 16px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);">🎯 ${signalSubType}</span>` : ''}
+                            <span class="badge ${directionBadge}">${directionText}</span>
+                            <span class="badge ${isExecuted ? 'badge-executed' : 'badge-pending'}">
+                                ${isExecuted ? '已执行' : '待执行'}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    ${signal.entry_condition?.reason ? `
+                    <div style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 12px 16px; margin: 12px 0; border-radius: 8px; border-left: 4px solid #667eea;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 20px;">✅</span>
+                            <div>
+                                <div style="font-weight: 600; color: #2d3748; margin-bottom: 4px;">触发条件</div>
+                                <div style="color: #4a5568; font-size: 14px;">${signal.entry_condition.reason}</div>
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    ${signal.market_data && signal.market_data.check_points ? `
+                    <div class="check-points">
+                        <h4>📊 检查点数据</h4>
+                        ${signal.market_data.check_points.map(cp => `
+                            <div class="check-point">
+                                <span>${cp.time}</span>
+                                <span>${cp.ratio.toFixed(2)}% ${cp.is_green ? '🟢' : '🔴'}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ` : ''}
+                    
+                    <div class="signal-content">
+                        <div class="info-group">
+                            <h4>📈 市场信息</h4>
+                            ${signal.entry_condition?.positive_ratio_current !== undefined && signal.entry_condition?.positive_ratio_current !== null ? `
+                            <div class="info-item">
+                                <span class="info-label">正数占比（本次）</span>
+                                <span class="info-value" style="font-weight: 600;">${signal.entry_condition.positive_ratio_current.toFixed(2)}%</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">正数占比（上次）</span>
+                                <span class="info-value">${signal.entry_condition.positive_ratio_previous?.toFixed(2) || '无'}%</span>
+                            </div>
+                            ` : `
+                            <div class="info-item">
+                                <span class="info-label">正数占比</span>
+                                <span class="info-value">${signal.market_data?.positive_ratio?.toFixed(2)}%</span>
+                            </div>
+                            `}
+                            <div class="info-item">
+                                <span class="info-label">市场趋势</span>
+                                <span class="info-value">${signal.market_trend || '未知'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">信号类型</span>
+                                <span class="info-value">${signal.signal_type}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-group">
+                            <h4>🔍 入场条件</h4>
+                            <div class="info-item">
+                                <span class="info-label">入场条件</span>
+                                <span class="info-value">${signal.entry_condition ? (signal.entry_condition.met ? '✅ 已满足' : '⏳ 待满足') : '❌ 无检查'}</span>
+                            </div>
+                            ${signal.entry_condition?.velocity !== undefined ? `
+                            <div class="info-item">
+                                <span class="info-label">📈 5分钟涨速</span>
+                                <span class="info-value">${signal.entry_condition.velocity?.toFixed(2)}%</span>
+                            </div>
+                            ` : ''}
+                            ${signal.entry_condition?.btc_change !== undefined && signal.entry_condition?.btc_change !== null ? `
+                            <div class="info-item">
+                                <span class="info-label">₿ BTC涨跌幅</span>
+                                <span class="info-value" style="color: ${signal.entry_condition.btc_change >= 0 ? '#10b981' : '#ef4444'}">${signal.entry_condition.btc_change >= 0 ? '+' : ''}${signal.entry_condition.btc_change?.toFixed(2)}%</span>
+                            </div>
+                            ` : ''}
+                            ${signal.entry_condition?.after_cutoff !== undefined ? `
+                            <div class="info-item">
+                                <span class="info-label">⏰ 02:30后新条件</span>
+                                <span class="info-value">${signal.entry_condition.after_cutoff ? '✅ 生效' : '❌ 未生效'}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="info-group">
+                            <h4>💰 交易参数</h4>
+                            <div class="info-item">
+                                <span class="info-label">标的数量</span>
+                                <span class="info-value">${signal.trading_params?.symbols_count}个</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">单币仓位</span>
+                                <span class="info-value">${signal.trading_params?.position_per_symbol}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">杠杆倍数</span>
+                                <span class="info-value">${signal.trading_params?.leverage}倍</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">单币上限</span>
+                                <span class="info-value">${signal.trading_params?.max_position_per_symbol}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-group">
+                            <h4>⚙️ 执行状态</h4>
+                            <div class="info-item">
+                                <span class="info-label">执行状态</span>
+                                <span class="info-value">${isExecuted ? '✅ 已执行' : '⏳ 待执行'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">执行子系统</span>
+                                <span class="info-value">${signal.execution_subsystem || '未分配'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">最大仓位</span>
+                                <span class="info-value">${signal.trading_params?.max_position_per_symbol}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${!isExecuted ? `
+                    <div class="signal-actions">
+                        <button class="action-btn execute-btn" onclick="executeSignal('${signal.model_id}', '${signal.trigger_time}')">
+                            ✅ 执行信号
+                        </button>
+                        <button class="action-btn cancel-btn" onclick="cancelSignal('${signal.model_id}', '${signal.trigger_time}')">
+                            ❌ 取消信号
+                        </button>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+        
+        async function executeSignal(modelId, triggerTime) {
+            if (!confirm('确认执行此信号？')) return;
+            
+            try {
+                const response = await fetch('/api/trading-signals-system/execute', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({model_id: modelId, trigger_time: triggerTime})
+                });
+                
+                const result = await response.json();
+                alert(result.message);
+                loadSignals();
+            } catch (error) {
+                alert('执行失败: ' + error.message);
+            }
+        }
+        
+        async function cancelSignal(modelId, triggerTime) {
+            if (!confirm('确认取消此信号？')) return;
+            
+            try {
+                const response = await fetch('/api/trading-signals-system/cancel', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({model_id: modelId, trigger_time: triggerTime})
+                });
+                
+                const result = await response.json();
+                alert(result.message);
+                loadSignals();
+            } catch (error) {
+                alert('取消失败: ' + error.message);
+            }
+        }
+        
+        // 加载副系统状态
+        async function loadSubsystems() {
+            try {
+                const response = await fetch('/api/subsystems/list');
+                const data = await response.json();
+                
+                const container = document.getElementById('subsystemsGrid');
+                
+                if (!data.success || !data.subsystems || data.subsystems.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <p>暂无副系统</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // 渲染副系统卡片
+                container.innerHTML = data.subsystems.map(subsystem => {
+                    const enabled = subsystem.enabled;
+                    const utilizationPercent = subsystem.max_total_position > 0 
+                        ? (subsystem.current_position / subsystem.max_total_position * 100).toFixed(1)
+                        : 0;
+                    
+                    return `
+                        <div class="subsystem-card" style="
+                            background: white;
+                            border-radius: 12px;
+                            padding: 20px;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                            border: 2px solid ${enabled ? '#48bb78' : '#cbd5e0'};
+                            transition: all 0.3s;
+                        ">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                <h3 style="margin: 0; font-size: 16px; color: #2d3748;">${subsystem.subsystem_name}</h3>
+                                <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 26px;">
+                                    <input type="checkbox" ${enabled ? 'checked' : ''} 
+                                           onchange="toggleSubsystem('${subsystem.subsystem_id}')"
+                                           style="opacity: 0; width: 0; height: 0;">
+                                    <span style="
+                                        position: absolute;
+                                        cursor: pointer;
+                                        top: 0;
+                                        left: 0;
+                                        right: 0;
+                                        bottom: 0;
+                                        background-color: ${enabled ? '#48bb78' : '#cbd5e0'};
+                                        transition: .4s;
+                                        border-radius: 26px;
+                                    ">
+                                        <span style="
+                                            position: absolute;
+                                            content: '';
+                                            height: 20px;
+                                            width: 20px;
+                                            left: ${enabled ? '27px' : '3px'};
+                                            bottom: 3px;
+                                            background-color: white;
+                                            transition: .4s;
+                                            border-radius: 50%;
+                                        "></span>
+                                    </span>
+                                </label>
+                            </div>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: #718096;">状态</span>
+                                    <span style="font-weight: 600; color: ${enabled ? '#48bb78' : '#a0aec0'};">
+                                        ${enabled ? '✅ 运行中' : '⏸ 已暂停'}
+                                    </span>
+                                </div>
+                                
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: #718096;">今日执行</span>
+                                    <span style="font-weight: 600; color: #667eea;">${subsystem.today_executed_count} 单</span>
+                                </div>
+                                
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: #718096;">仓位上限</span>
+                                    <span style="font-weight: 600; color: #2d3748;">${subsystem.max_total_position}U</span>
+                                </div>
+                                
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: #718096;">单币上限</span>
+                                    <span style="font-weight: 600; color: #2d3748;">${subsystem.max_position_per_symbol}U</span>
+                                </div>
+                                
+                                <div style="margin-top: 8px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                                        <span style="color: #718096; font-size: 12px;">仓位使用率</span>
+                                        <span style="font-weight: 600; font-size: 12px; color: ${utilizationPercent > 80 ? '#f56565' : '#48bb78'};">
+                                            ${utilizationPercent}%
+                                        </span>
+                                    </div>
+                                    <div style="width: 100%; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                                        <div style="
+                                            height: 100%;
+                                            width: ${utilizationPercent}%;
+                                            background: ${utilizationPercent > 80 ? 'linear-gradient(90deg, #f56565, #fc8181)' : 'linear-gradient(90deg, #48bb78, #68d391)'};
+                                            transition: width 0.3s;
+                                        "></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('加载副系统失败:', error);
+                document.getElementById('subsystemsGrid').innerHTML = `
+                    <div class="error-state">
+                        <h3>加载失败</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // 切换副系统启用/禁用状态
+        async function toggleSubsystem(subsystemId) {
+            try {
+                const response = await fetch(`/api/subsystems/${subsystemId}/toggle`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // 重新加载副系统列表
+                    await loadSubsystems();
+                    
+                    // 显示通知
+                    const message = data.enabled ? '已启用' : '已禁用';
+                    alert(`副系统 ${subsystemId} ${message}`);
+                } else {
+                    alert(`操作失败: ${data.error}`);
+                }
+            } catch (error) {
+                console.error('切换副系统状态失败:', error);
+                alert(`操作失败: ${error.message}`);
+            }
+        }
+        
+        // 页面加载时初始化
+        loadSubsystems();
+        loadSignals();
+        
+        // 每30秒自动刷新
+        setInterval(() => {
+            loadSubsystems();
+            loadSignals();
+        }, 30000);
+    </script>
+</body>
+</html>

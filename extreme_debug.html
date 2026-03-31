@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Extreme Tracking Debug</title>
+</head>
+<body>
+    <h1>Extreme Tracking API Test</h1>
+    <div id="result"></div>
+    <div id="snapshots"></div>
+    
+    <script>
+        console.log('Script started');
+        
+        fetch('/api/extreme-tracking/snapshots?limit=5')
+            .then(res => {
+                console.log('Response received:', res);
+                return res.json();
+            })
+            .then(data => {
+                console.log('Data parsed:', data);
+                document.getElementById('result').innerHTML = `
+                    <p>Success: ${data.success}</p>
+                    <p>Count: ${data.count}</p>
+                    <p>Data length: ${data.data ? data.data.length : 0}</p>
+                `;
+                
+                if (data.data && data.data.length > 0) {
+                    const list = data.data.map(s => `
+                        <li>${s.snapshot_id} - ${s.trigger_datetime}</li>
+                    `).join('');
+                    document.getElementById('snapshots').innerHTML = `<ul>${list}</ul>`;
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                document.getElementById('result').innerHTML = '<p style="color:red;">Error: ' + err.message + '</p>';
+            });
+    </script>
+</body>
+</html>

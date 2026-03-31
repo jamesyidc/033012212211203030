@@ -1,0 +1,19 @@
+{
+  "alerts": [
+    {
+      "time": "2026-03-09 06:03:48",
+      "five_min_speed": -33.34,
+      "threshold": -30.0
+    },
+    {
+      "time": "2026-03-09 06:33:52",
+      "five_min_speed": -41.89,
+      "threshold": -30.0
+    },
+    {
+      "time": "2026-03-09 07:03:55",
+      "five_min_speed": -41.89,
+      "threshold": -30.0
+    }
+  ]
+}

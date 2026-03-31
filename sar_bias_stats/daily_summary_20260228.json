@@ -1,0 +1,18 @@
+{
+  "date": "2026-02-28",
+  "total_bullish": 2,
+  "total_bearish": 20,
+  "total_points": 287,
+  "unique_bullish_symbols": [
+    "ETC"
+  ],
+  "unique_bearish_symbols": [
+    "BCH",
+    "CFX",
+    "TAO",
+    "TRX"
+  ],
+  "unique_bullish_count": 1,
+  "unique_bearish_count": 4,
+  "generated_at": "2026-03-01 00:05:03"
+}

@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>市场深度图 - 统计分析系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #0a0e27;
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* 左侧深度图区域 */
+        .depth-chart-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            border-right: 2px solid #1a1f3a;
+        }
+
+        .chart-header {
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .symbol-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .symbol-btn {
+            padding: 8px 16px;
+            background: #1a1f3a;
+            border: 1px solid #2a3558;
+            border-radius: 6px;
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .symbol-btn:hover {
+            background: #2a3558;
+            border-color: #3a4578;
+        }
+
+        .symbol-btn.active {
+            background: #2962ff;
+            border-color: #2962ff;
+            color: #fff;
+        }
+
+        /* 价格信息栏 */
+        .price-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1229 100%);
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .price-item {
+            text-align: center;
+        }
+
+        .price-label {
+            font-size: 12px;
+            color: #8b8fa4;
+            margin-bottom: 5px;
+        }
+
+        .price-value {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .price-value.bid {
+            color: #00ff88;
+        }
+
+        .price-value.ask {
+            color: #ff4d4f;
+        }
+
+        .price-value.spread {
+            color: #ffa726;
+        }
+
+        /* Canvas深度图 */
+        .chart-canvas-wrapper {
+            flex: 1;
+            background: #0f1229;
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #depthCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* 右侧统计分析区域 */
+        .statistics-area {
+            width: 400px;
+            padding: 20px;
+            background: #0a0e27;
+            overflow-y: auto;
+        }
+
+        .stats-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #1a1f3a;
+        }
+
+        /* 统计卡片 */
+        .stat-card {
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1229 100%);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #2a3558;
+        }
+
+        .stat-card-title {
+            font-size: 14px;
+            color: #8b8fa4;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-card-title .icon {
+            font-size: 16px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #1a1f3a;
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #8b8fa4;
+        }
+
+        .stat-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+
+        .stat-value.bullish {
+            color: #00ff88;
+        }
+
+        .stat-value.bearish {
+            color: #ff4d4f;
+        }
+
+        .stat-value.neutral {
+            color: #ffa726;
+        }
+
+        /* 买卖盘量条形图 */
+        .volume-bar-chart {
+            margin-top: 10px;
+        }
+
+        .volume-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .volume-bar-label {
+            width: 60px;
+            font-size: 12px;
+            color: #8b8fa4;
+            text-align: right;
+        }
+
+        .volume-bar-container {
+            flex: 1;
+            height: 20px;
+            background: #0a0e27;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .volume-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .volume-bar-fill.bid {
+            background: linear-gradient(90deg, #00ff88 0%, #00cc66 100%);
+        }
+
+        .volume-bar-fill.ask {
+            background: linear-gradient(90deg, #ff4d4f 0%, #cc0000 100%);
+        }
+
+        .volume-bar-value {
+            width: 80px;
+            font-size: 12px;
+            color: #e0e0e0;
+            text-align: right;
+        }
+
+        /* 订单簿列表 */
+        .orderbook-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .orderbook-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #2a3558;
+            font-size: 12px;
+            color: #8b8fa4;
+        }
+
+        .orderbook-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            padding: 6px 0;
+            font-size: 12px;
+            border-bottom: 1px solid #1a1f3a;
+        }
+
+        .orderbook-row:hover {
+            background: #1a1f3a;
+        }
+
+        .orderbook-row.ask {
+            color: #ff6b6b;
+        }
+
+        .orderbook-row.bid {
+            color: #00ff88;
+        }
+
+        /* 滚动条样式 */
+        .statistics-area::-webkit-scrollbar,
+        .orderbook-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .statistics-area::-webkit-scrollbar-track,
+        .orderbook-list::-webkit-scrollbar-track {
+            background: #0a0e27;
+        }
+
+        .statistics-area::-webkit-scrollbar-thumb,
+        .orderbook-list::-webkit-scrollbar-thumb {
+            background: #2a3558;
+            border-radius: 3px;
+        }
+
+        /* 加载状态 */
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 14px;
+            color: #8b8fa4;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        /* 更新时间 */
+        .update-time {
+            font-size: 12px;
+            color: #8b8fa4;
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        /* 压力指示器 */
+        .pressure-indicator {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .pressure-indicator.bullish {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+
+        .pressure-indicator.bearish {
+            background: rgba(255, 77, 79, 0.2);
+            color: #ff4d4f;
+        }
+
+        .pressure-indicator.neutral {
+            background: rgba(255, 167, 38, 0.2);
+            color: #ffa726;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 左侧：深度图区域 -->
+        <div class="depth-chart-area">
+            <div class="chart-header">
+                <div class="chart-title">📊 市场深度图 - 多币种监控</div>
+                <div class="symbol-selector">
+                    <button class="symbol-btn" data-symbol="BTC-USDT-SWAP">BTC</button>
+                    <button class="symbol-btn active" data-symbol="ETH-USDT-SWAP">ETH</button>
+                    <button class="symbol-btn" data-symbol="XRP-USDT-SWAP">XRP</button>
+                    <button class="symbol-btn" data-symbol="BNB-USDT-SWAP">BNB</button>
+                    <button class="symbol-btn" data-symbol="SOL-USDT-SWAP">SOL</button>
+                    <button class="symbol-btn" data-symbol="LTC-USDT-SWAP">LTC</button>
+                    <button class="symbol-btn" data-symbol="DOGE-USDT-SWAP">DOGE</button>
+                    <button class="symbol-btn" data-symbol="SUI-USDT-SWAP">SUI</button>
+                    <button class="symbol-btn" data-symbol="TRX-USDT-SWAP">TRX</button>
+                    <button class="symbol-btn" data-symbol="TON-USDT-SWAP">TON</button>
+                    <button class="symbol-btn" data-symbol="ETC-USDT-SWAP">ETC</button>
+                    <button class="symbol-btn" data-symbol="BCH-USDT-SWAP">BCH</button>
+                    <button class="symbol-btn" data-symbol="HBAR-USDT-SWAP">HBAR</button>
+                    <button class="symbol-btn" data-symbol="XLM-USDT-SWAP">XLM</button>
+                    <button class="symbol-btn" data-symbol="FIL-USDT-SWAP">FIL</button>
+                    <button class="symbol-btn" data-symbol="LINK-USDT-SWAP">LINK</button>
+                    <button class="symbol-btn" data-symbol="CRO-USDT-SWAP">CRO</button>
+                    <button class="symbol-btn" data-symbol="DOT-USDT-SWAP">DOT</button>
+                    <button class="symbol-btn" data-symbol="AAVE-USDT-SWAP">AAVE</button>
+                    <button class="symbol-btn" data-symbol="UNI-USDT-SWAP">UNI</button>
+                    <button class="symbol-btn" data-symbol="NEAR-USDT-SWAP">NEAR</button>
+                    <button class="symbol-btn" data-symbol="APT-USDT-SWAP">APT</button>
+                    <button class="symbol-btn" data-symbol="CFX-USDT-SWAP">CFX</button>
+                    <button class="symbol-btn" data-symbol="CRV-USDT-SWAP">CRV</button>
+                    <button class="symbol-btn" data-symbol="STX-USDT-SWAP">STX</button>
+                    <button class="symbol-btn" data-symbol="LDO-USDT-SWAP">LDO</button>
+                    <button class="symbol-btn" data-symbol="TAO-USDT-SWAP">TAO</button>
+                </div>
+            </div>
+
+            <!-- 价格信息栏 -->
+            <div class="price-info">
+                <div class="price-item">
+                    <div class="price-label">买一价</div>
+                    <div class="price-value bid" id="bestBid">--</div>
+                </div>
+                <div class="price-item">
+                    <div class="price-label">中间价</div>
+                    <div class="price-value" id="midPrice">--</div>
+                </div>
+                <div class="price-item">
+                    <div class="price-label">卖一价</div>
+                    <div class="price-value ask" id="bestAsk">--</div>
+                </div>
+                <div class="price-item">
+                    <div class="price-label">价差</div>
+                    <div class="price-value spread" id="spread">--</div>
+                </div>
+                <div class="price-item">
+                    <div class="price-label">价差%</div>
+                    <div class="price-value spread" id="spreadPct">--</div>
+                </div>
+            </div>
+
+            <!-- 深度图Canvas -->
+            <div class="chart-canvas-wrapper">
+                <canvas id="depthCanvas"></canvas>
+                <div class="loading" id="chartLoading">加载中</div>
+            </div>
+        </div>
+
+        <!-- 右侧：统计分析区域 -->
+        <div class="statistics-area">
+            <div class="stats-title">📈 统计分析</div>
+
+            <!-- 市场压力分析 -->
+            <div class="stat-card">
+                <div class="stat-card-title">
+                    <span class="icon">⚖️</span>
+                    <span>市场压力分析</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">买卖比</span>
+                    <span class="stat-value" id="bidAskRatio">--</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">压力方向</span>
+                    <span class="stat-value" id="pressure">--</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">压力强度</span>
+                    <span class="stat-value" id="strength">--</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">流动性</span>
+                    <span class="stat-value" id="liquidity">--</span>
+                </div>
+            </div>
+
+            <!-- 买卖盘总量 -->
+            <div class="stat-card">
+                <div class="stat-card-title">
+                    <span class="icon">💰</span>
+                    <span>买卖盘总量</span>
+                </div>
+                <div class="volume-bar-chart">
+                    <div class="volume-bar-row">
+                        <div class="volume-bar-label">买盘</div>
+                        <div class="volume-bar-container">
+                            <div class="volume-bar-fill bid" id="bidVolumeBar"></div>
+                        </div>
+                        <div class="volume-bar-value" id="bidVolumeText">0</div>
+                    </div>
+                    <div class="volume-bar-row">
+                        <div class="volume-bar-label">卖盘</div>
+                        <div class="volume-bar-container">
+                            <div class="volume-bar-fill ask" id="askVolumeBar"></div>
+                        </div>
+                        <div class="volume-bar-value" id="askVolumeText">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 深度统计 -->
+            <div class="stat-card">
+                <div class="stat-card-title">
+                    <span class="icon">📊</span>
+                    <span>深度统计</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">买单档位</span>
+                    <span class="stat-value" id="bidLevels">--</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">卖单档位</span>
+                    <span class="stat-value" id="askLevels">--</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">最大买量</span>
+                    <span class="stat-value" id="maxBidAmount">--</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">最大卖量</span>
+                    <span class="stat-value" id="maxAskAmount">--</span>
+                </div>
+            </div>
+
+            <!-- 订单簿前5档 -->
+            <div class="stat-card">
+                <div class="stat-card-title">
+                    <span class="icon">📋</span>
+                    <span>订单簿（前5档）</span>
+                </div>
+                <div class="orderbook-list" id="orderbookList">
+                    <div class="orderbook-header">
+                        <span>价格</span>
+                        <span>数量</span>
+                        <span>累计</span>
+                    </div>
+                    <!-- 动态填充 -->
+                </div>
+            </div>
+
+            <div class="update-time" id="updateTime">最后更新: --</div>
+        </div>
+    </div>
+
+    <script>
+        // 配置 - 自动构建API URL
+        const API_BASE_URL = (() => {
+            const hostname = window.location.hostname;
+            const protocol = window.location.protocol;
+            if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                return 'http://localhost:5009';
+            }
+            // 从 3000-xxx.e2b.dev 转换为 5009-xxx.e2b.dev
+            const parts = hostname.split('-');
+            parts[0] = '5009';
+            return `${protocol}//${parts.join('-')}`;
+        })();
+        
+        console.log('API Base URL:', API_BASE_URL);
+        let currentSymbol = 'ETH-USDT-SWAP';
+        let depthData = null;
+        let canvas, ctx;
+        let animationFrameId;
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            canvas = document.getElementById('depthCanvas');
+            ctx = canvas.getContext('2d');
+            
+            // 设置canvas尺寸
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            // 币种选择
+            document.querySelectorAll('.symbol-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.symbol-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentSymbol = btn.dataset.symbol;
+                    fetchDepthData();
+                });
+            });
+
+            // 首次加载
+            fetchDepthData();
+            
+            // 定时刷新（每3秒）
+            setInterval(fetchDepthData, 3000);
+        });
+
+        function resizeCanvas() {
+            const wrapper = canvas.parentElement;
+            canvas.width = wrapper.clientWidth - 40;
+            canvas.height = wrapper.clientHeight - 40;
+            if (depthData) {
+                drawDepthChart();
+            }
+        }
+
+        async function fetchDepthData() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/depth/${currentSymbol}?depth=50`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    depthData = data;
+                    updatePriceInfo();
+                    drawDepthChart();
+                    await fetchAnalysis();
+                    document.getElementById('chartLoading').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('获取深度数据失败:', error);
+            }
+        }
+
+        async function fetchAnalysis() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/depth/${currentSymbol}/analysis`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateStatistics(data.analysis);
+                }
+            } catch (error) {
+                console.error('获取分析数据失败:', error);
+            }
+        }
+
+        function updatePriceInfo() {
+            const stats = depthData.depth_stats;
+            
+            document.getElementById('bestBid').textContent = stats.best_bid?.toFixed(4) || '--';
+            document.getElementById('bestAsk').textContent = stats.best_ask?.toFixed(4) || '--';
+            document.getElementById('midPrice').textContent = stats.mid_price?.toFixed(4) || '--';
+            document.getElementById('spread').textContent = stats.spread?.toFixed(4) || '--';
+            document.getElementById('spreadPct').textContent = stats.spread_pct ? `${stats.spread_pct.toFixed(3)}%` : '--';
+        }
+
+        function updateStatistics(analysis) {
+            // 市场压力分析
+            document.getElementById('bidAskRatio').textContent = analysis.bid_ask_ratio?.toFixed(3) || '--';
+            
+            const pressureEl = document.getElementById('pressure');
+            const pressureMap = {
+                'bullish': { text: '看多', class: 'bullish' },
+                'bearish': { text: '看空', class: 'bearish' },
+                'neutral': { text: '中性', class: 'neutral' }
+            };
+            const pressureInfo = pressureMap[analysis.pressure] || { text: '--', class: '' };
+            pressureEl.innerHTML = `<span class="pressure-indicator ${pressureInfo.class}">${pressureInfo.text}</span>`;
+            
+            const strengthMap = {
+                'strong': '强',
+                'moderate': '中',
+                'weak': '弱'
+            };
+            document.getElementById('strength').textContent = strengthMap[analysis.strength] || '--';
+            
+            const liquidityMap = {
+                'high': '高',
+                'medium': '中',
+                'low': '低'
+            };
+            document.getElementById('liquidity').textContent = liquidityMap[analysis.liquidity] || '--';
+
+            // 买卖盘总量
+            const totalBid = analysis.total_bid_volume;
+            const totalAsk = analysis.total_ask_volume;
+            const maxVolume = Math.max(totalBid, totalAsk);
+            
+            const bidPct = maxVolume > 0 ? (totalBid / maxVolume) * 100 : 0;
+            const askPct = maxVolume > 0 ? (totalAsk / maxVolume) * 100 : 0;
+            
+            document.getElementById('bidVolumeBar').style.width = `${bidPct}%`;
+            document.getElementById('askVolumeBar').style.width = `${askPct}%`;
+            document.getElementById('bidVolumeText').textContent = formatNumber(totalBid);
+            document.getElementById('askVolumeText').textContent = formatNumber(totalAsk);
+
+            // 深度统计
+            const stats = depthData.depth_stats;
+            document.getElementById('bidLevels').textContent = stats.bid_levels;
+            document.getElementById('askLevels').textContent = stats.ask_levels;
+
+            // 计算最大买卖量
+            const maxBid = Math.max(...depthData.bids.map(b => b[1]), 0);
+            const maxAsk = Math.max(...depthData.asks.map(a => a[1]), 0);
+            document.getElementById('maxBidAmount').textContent = formatNumber(maxBid);
+            document.getElementById('maxAskAmount').textContent = formatNumber(maxAsk);
+
+            // 订单簿前5档
+            updateOrderbook();
+
+            // 更新时间
+            const now = new Date();
+            document.getElementById('updateTime').textContent = `最后更新: ${now.toLocaleTimeString()}`;
+        }
+
+        function updateOrderbook() {
+            const listEl = document.getElementById('orderbookList');
+            const headerHTML = `
+                <div class="orderbook-header">
+                    <span>价格</span>
+                    <span>数量</span>
+                    <span>累计</span>
+                </div>
+            `;
+            
+            let rowsHTML = '';
+            
+            // 卖单（前5档，反序显示）
+            const asks = depthData.asks_cumulative.slice(0, 5).reverse();
+            asks.forEach(([price, amount, cumulative]) => {
+                rowsHTML += `
+                    <div class="orderbook-row ask">
+                        <span>${price.toFixed(4)}</span>
+                        <span>${formatNumber(amount)}</span>
+                        <span>${formatNumber(cumulative)}</span>
+                    </div>
+                `;
+            });
+            
+            // 分隔线
+            rowsHTML += `<div class="orderbook-row" style="border-top: 2px solid #ffa726; border-bottom: 2px solid #ffa726;"><span style="color: #ffa726;">---</span><span style="color: #ffa726;">---</span><span style="color: #ffa726;">---</span></div>`;
+            
+            // 买单（前5档）
+            const bids = depthData.bids_cumulative.slice(0, 5);
+            bids.forEach(([price, amount, cumulative]) => {
+                rowsHTML += `
+                    <div class="orderbook-row bid">
+                        <span>${price.toFixed(4)}</span>
+                        <span>${formatNumber(amount)}</span>
+                        <span>${formatNumber(cumulative)}</span>
+                    </div>
+                `;
+            });
+            
+            listEl.innerHTML = headerHTML + rowsHTML;
+        }
+
+        function drawDepthChart() {
+            if (!depthData || !canvas || !ctx) return;
+
+            const width = canvas.width;
+            const height = canvas.height;
+            const padding = { top: 30, right: 50, bottom: 40, left: 50 };
+            const chartWidth = width - padding.left - padding.right;
+            const chartHeight = height - padding.top - padding.bottom;
+
+            // 清空画布
+            ctx.clearRect(0, 0, width, height);
+
+            // 背景
+            ctx.fillStyle = '#0f1229';
+            ctx.fillRect(0, 0, width, height);
+
+            // 获取数据
+            const bids = depthData.bids_cumulative;
+            const asks = depthData.asks_cumulative;
+            
+            if (!bids.length || !asks.length) return;
+
+            // 计算价格范围
+            const minBidPrice = bids[bids.length - 1][0];
+            const maxBidPrice = bids[0][0];
+            const minAskPrice = asks[0][0];
+            const maxAskPrice = asks[asks.length - 1][0];
+            
+            const minPrice = minBidPrice;
+            const maxPrice = maxAskPrice;
+            const priceRange = maxPrice - minPrice;
+
+            // 计算量范围
+            const maxBidVolume = bids[bids.length - 1][2];
+            const maxAskVolume = asks[asks.length - 1][2];
+            const maxVolume = Math.max(maxBidVolume, maxAskVolume);
+
+            // 绘制网格
+            drawGrid(ctx, padding, chartWidth, chartHeight, maxVolume);
+
+            // 绘制买盘深度（左侧绿色）
+            drawDepthArea(ctx, bids, padding, chartWidth, chartHeight, minPrice, priceRange, maxVolume, '#00ff88', 'left');
+
+            // 绘制卖盘深度（右侧红色）
+            drawDepthArea(ctx, asks, padding, chartWidth, chartHeight, minPrice, priceRange, maxVolume, '#ff4d4f', 'right');
+
+            // 绘制中间价线
+            const midPrice = depthData.depth_stats.mid_price;
+            const midX = padding.left + ((midPrice - minPrice) / priceRange) * chartWidth;
+            ctx.strokeStyle = '#ffa726';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(midX, padding.top);
+            ctx.lineTo(midX, height - padding.bottom);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 绘制坐标轴标签
+            drawAxes(ctx, padding, width, height, chartWidth, minPrice, maxPrice, maxVolume);
+        }
+
+        function drawGrid(ctx, padding, chartWidth, chartHeight, maxVolume) {
+            ctx.strokeStyle = '#1a1f3a';
+            ctx.lineWidth = 1;
+
+            // 水平网格线（5条）
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (chartHeight / 5) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(padding.left + chartWidth, y);
+                ctx.stroke();
+            }
+
+            // 垂直网格线（10条）
+            for (let i = 0; i <= 10; i++) {
+                const x = padding.left + (chartWidth / 10) * i;
+                ctx.beginPath();
+                ctx.moveTo(x, padding.top);
+                ctx.lineTo(x, padding.top + chartHeight);
+                ctx.stroke();
+            }
+        }
+
+        function drawDepthArea(ctx, data, padding, chartWidth, chartHeight, minPrice, priceRange, maxVolume, color, side) {
+            if (!data.length) return;
+
+            ctx.beginPath();
+            
+            // 起始点
+            const startPrice = data[0][0];
+            const startX = padding.left + ((startPrice - minPrice) / priceRange) * chartWidth;
+            ctx.moveTo(startX, padding.top + chartHeight);
+
+            // 绘制累积量曲线
+            data.forEach(([price, amount, cumulative]) => {
+                const x = padding.left + ((price - minPrice) / priceRange) * chartWidth;
+                const y = padding.top + chartHeight - (cumulative / maxVolume) * chartHeight;
+                ctx.lineTo(x, y);
+            });
+
+            // 闭合路径到底部
+            const endPrice = data[data.length - 1][0];
+            const endX = padding.left + ((endPrice - minPrice) / priceRange) * chartWidth;
+            ctx.lineTo(endX, padding.top + chartHeight);
+            ctx.closePath();
+
+            // 填充渐变
+            const gradient = ctx.createLinearGradient(0, padding.top, 0, padding.top + chartHeight);
+            gradient.addColorStop(0, color + '40');
+            gradient.addColorStop(1, color + '10');
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            // 描边
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function drawAxes(ctx, padding, width, height, chartWidth, minPrice, maxPrice, maxVolume) {
+            ctx.fillStyle = '#8b8fa4';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+
+            // X轴（价格）标签
+            for (let i = 0; i <= 5; i++) {
+                const price = minPrice + (maxPrice - minPrice) * (i / 5);
+                const x = padding.left + (chartWidth / 5) * i;
+                ctx.fillText(price.toFixed(2), x, height - padding.bottom + 20);
+            }
+
+            // Y轴（累积量）标签
+            ctx.textAlign = 'right';
+            for (let i = 0; i <= 5; i++) {
+                const volume = maxVolume * (i / 5);
+                const y = height - padding.bottom - (chartWidth / 5) * i;
+                ctx.fillText(formatNumber(volume), padding.left - 10, y + 4);
+            }
+
+            // 轴标题
+            ctx.fillStyle = '#e0e0e0';
+            ctx.font = '14px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('价格 (USDT)', width / 2, height - 5);
+            
+            ctx.save();
+            ctx.translate(15, height / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText('累积量', 0, 0);
+            ctx.restore();
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(2) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(2) + 'K';
+            }
+            return num.toFixed(2);
+        }
+    </script>
+</body>
+</html>

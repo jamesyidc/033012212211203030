@@ -1,0 +1,14 @@
+{
+  "BTC-USDT-SWAP": {
+    "enabled": true,
+    "threshold": 0.0005,
+    "min_consecutive": 3,
+    "name": "BTC永续合约"
+  },
+  "ETH-USDT-SWAP": {
+    "enabled": true,
+    "threshold": 0.0005,
+    "min_consecutive": 3,
+    "name": "ETH永续合约"
+  }
+}

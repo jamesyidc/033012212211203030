@@ -1,0 +1,134 @@
+{
+  "date": "20260220",
+  "check_time": "2026-02-23 15:32:59",
+  "has_warning": true,
+  "warning_count": 3,
+  "warnings": [
+    {
+      "pattern_type": "A点递减_3波",
+      "peak_indices": "1-2-3",
+      "detection_time": "2026-02-23 15:32:59",
+      "warning_level": "high",
+      "signal": "即将暴跌",
+      "operation_tip": "逢高做空",
+      "peaks": [
+        {
+          "index": 1,
+          "a_point_time": "2026-02-20 06:00:00",
+          "a_point_value": -23.5,
+          "label": "A1"
+        },
+        {
+          "index": 2,
+          "a_point_time": "2026-02-20 10:00:00",
+          "a_point_value": -35.8,
+          "label": "A2"
+        },
+        {
+          "index": 3,
+          "a_point_time": "2026-02-20 14:00:00",
+          "a_point_value": -48.3,
+          "label": "A3"
+        }
+      ],
+      "comparisons": {
+        "A2_vs_A1": {
+          "values": "-35.80 vs -23.50",
+          "decline_rate": "52.34%",
+          "is_declining": true
+        },
+        "A3_vs_A2": {
+          "values": "-48.30 vs -35.80",
+          "decline_rate": "34.92%",
+          "is_declining": true
+        }
+      },
+      "description": "连续3个A点RSI总和递减：A1(-23.50) > A2(-35.80) > A3(-48.30)",
+      "warning_message": "🚨 暴跌预警！连续3个A点递减，市场可能接跌"
+    },
+    {
+      "pattern_type": "A点递减_3波",
+      "peak_indices": "2-3-4",
+      "detection_time": "2026-02-23 15:32:59",
+      "warning_level": "high",
+      "signal": "即将暴跌",
+      "operation_tip": "逢高做空",
+      "peaks": [
+        {
+          "index": 2,
+          "a_point_time": "2026-02-20 10:00:00",
+          "a_point_value": -35.8,
+          "label": "A1"
+        },
+        {
+          "index": 3,
+          "a_point_time": "2026-02-20 14:00:00",
+          "a_point_value": -48.3,
+          "label": "A2"
+        },
+        {
+          "index": 4,
+          "a_point_time": "2026-02-20 18:00:00",
+          "a_point_value": -58.7,
+          "label": "A3"
+        }
+      ],
+      "comparisons": {
+        "A2_vs_A1": {
+          "values": "-48.30 vs -35.80",
+          "decline_rate": "34.92%",
+          "is_declining": true
+        },
+        "A3_vs_A2": {
+          "values": "-58.70 vs -48.30",
+          "decline_rate": "21.53%",
+          "is_declining": true
+        }
+      },
+      "description": "连续3个A点RSI总和递减：A1(-35.80) > A2(-48.30) > A3(-58.70)",
+      "warning_message": "🚨 暴跌预警！连续3个A点递减，市场可能接跌"
+    },
+    {
+      "pattern_type": "A点递减_后3波",
+      "peak_indices": "2-3-4",
+      "detection_time": "2026-02-23 15:32:59",
+      "warning_level": "high",
+      "signal": "即将暴跌",
+      "operation_tip": "逢高做空",
+      "peaks": [
+        {
+          "index": 2,
+          "a_point_time": "2026-02-20 10:00:00",
+          "a_point_value": -35.8,
+          "label": "A2"
+        },
+        {
+          "index": 3,
+          "a_point_time": "2026-02-20 14:00:00",
+          "a_point_value": -48.3,
+          "label": "A3"
+        },
+        {
+          "index": 4,
+          "a_point_time": "2026-02-20 18:00:00",
+          "a_point_value": -58.7,
+          "label": "A4"
+        }
+      ],
+      "comparisons": {
+        "A3_vs_A2": {
+          "values": "-48.30 vs -35.80",
+          "decline_rate": "34.92%",
+          "is_declining": true
+        },
+        "A4_vs_A3": {
+          "values": "-58.70 vs -48.30",
+          "decline_rate": "21.53%",
+          "is_declining": true
+        }
+      },
+      "description": "后3个A点RSI总和递减：A2(-35.80) > A3(-48.30) > A4(-58.70)",
+      "warning_message": "🚨 暴跌预警！后3个A点递减，市场可能接跌"
+    }
+  ]
+}

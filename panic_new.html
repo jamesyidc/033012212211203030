@@ -1,0 +1,2071 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>恐慌清洗指数 - 加密货币数据分析 v2.9-自定义标签</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #1e2139;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0;
+        }
+        
+        /* 顶部导航栏 */
+        .top-nav {
+            background: #2a2d47;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            justify-content: space-between;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .home-btn {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%);
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+        
+        .home-btn:hover {
+            background: linear-gradient(135deg, #0099ff 0%, #00d4ff 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.4);
+        }
+        
+        .nav-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: #fff;
+        }
+        
+        /* 当前数据统计栏 */
+        .stats-bar {
+            background: #2a2d47;
+            padding: 15px 20px;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #3a3d5c;
+            font-size: 13px;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .stat-label {
+            color: #8b92b8;
+            font-size: 12px;
+        }
+        
+        .stat-value {
+            color: #fff;
+            font-weight: 600;
+            font-size: 20px;
+        }
+        
+        .stat-value.green {
+            color: #10b981;
+        }
+        
+        .stat-value.yellow {
+            color: #fbbf24;
+        }
+        
+        .stat-value.red {
+            color: #ef4444;
+        }
+        
+        .stat-sublabel {
+            color: #6b7280;
+            font-size: 11px;
+        }
+        
+        /* 图表容器 */
+        .chart-container {
+            background: #2a2d47;
+            padding: 20px;
+            margin: 0;
+            border-bottom: 1px solid #3a3d5c;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .chart-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #fff;
+        }
+        
+        /* 分页控制器 */
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        .page-btn {
+            background: #3a3d5c;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .page-btn:hover:not(:disabled) {
+            background: #4a4d6c;
+            transform: translateY(-2px);
+        }
+        
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .page-info {
+            color: #00d4ff;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 12px;
+            background: #1e2139;
+            border-radius: 6px;
+            border: 1px solid #3a3d5c;
+        }
+        
+        .date-picker-input {
+            color: #00d4ff;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 12px;
+            background: #1e2139;
+            border-radius: 6px;
+            border: 1px solid #3a3d5c;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 140px;
+            text-align: center;
+        }
+        
+        .date-picker-input:hover {
+            background: #2a2d4a;
+            border-color: #00d4ff;
+        }
+        
+        .date-picker-input::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            filter: invert(0.8) sepia(1) saturate(5) hue-rotate(175deg);
+        }
+        
+        #panicChart {
+            width: 100%;
+            height: 400px;
+        }
+        
+        /* 时间查询工具 */
+        .time-query-box {
+            background: #1e2139;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .time-query-label {
+            color: #8b92b8;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .time-input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .time-input {
+            background: #2a2d47;
+            border: 1px solid #3a3d5c;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+        
+        .time-input:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+        
+        .query-btn {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%);
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .query-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
+        }
+        
+        .reset-btn {
+            background: #3a3d5c;
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .reset-btn:hover {
+            background: #4a4d6c;
+        }
+        
+        .query-result {
+            color: #00d4ff;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        
+        /* 历史数据表格 */
+        .history-container {
+            background: #2a2d47;
+            padding: 20px;
+            border-bottom: 1px solid #3a3d5c;
+        }
+        
+        .history-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        
+        .history-table thead {
+            background: #1e2139;
+        }
+        
+        .history-table th {
+            padding: 10px;
+            text-align: left;
+            color: #8b92b8;
+            font-weight: 500;
+            border-bottom: 1px solid #3a3d5c;
+        }
+        
+        .history-table td {
+            padding: 10px;
+            border-bottom: 1px solid #3a3d5c;
+        }
+        
+        .history-table tbody tr:hover {
+            background: #1e2139;
+        }
+        
+        /* 加载状态 */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #8b92b8;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .stats-bar {
+                gap: 15px;
+            }
+            
+            .stat-value {
+                font-size: 16px;
+            }
+            
+            #panicChart {
+                height: 300px;
+            }
+        }
+        
+        /* 时间范围选择器 */
+        .time-range-select {
+            background: #1e2139;
+            color: #fff;
+            border: 1px solid #3a3d5c;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .time-range-select:hover {
+            border-color: #00d4ff;
+            background: #2a2d47;
+        }
+        
+        .time-range-select:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+        }
+        
+        /* 刷新指示器动画 */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部导航 -->
+        <div class="top-nav">
+            <div class="nav-left">
+                <a href="/" class="home-btn">
+                    <span>🏠</span>
+                    <span>返回首页</span>
+                </a>
+                <div class="nav-title">⚡ 恐慌清洗指数</div>
+            </div>
+        </div>
+        
+        <!-- 当前数据统计栏 -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-label">恐慌清洗指数</div>
+                <div class="stat-value" id="currentIndex">--</div>
+                <div class="stat-sublabel" id="currentLevel">--</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">1小时爆仓金额</div>
+                <div class="stat-value" id="hour1Amount">--</div>
+                <div class="stat-sublabel">万美元</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">24小时爆仓金额</div>
+                <div class="stat-value" id="hour24Amount">--</div>
+                <div class="stat-sublabel">万美元</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">24小时爆仓人数</div>
+                <div class="stat-value" id="currentPeople">--</div>
+                <div class="stat-sublabel">万人</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">全网持仓量</div>
+                <div class="stat-value" id="currentPosition">--</div>
+                <div class="stat-sublabel">亿美元</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">最后更新</div>
+                <div class="stat-value" id="updateTime" style="font-size: 16px;">--</div>
+                <div class="stat-sublabel" style="display: flex; align-items: center; gap: 5px;">
+                    <span>每1分钟自动刷新</span>
+                    <span id="refreshIndicator" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #4ade80;"></span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 系统说明文档面板 -->
+        <div style="max-width: 100%; margin: 0 auto 20px; background: #2a2d47; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 16px; cursor: pointer;" onclick="togglePanicDocPanel()">
+                <h2 style="font-size: 20px; font-weight: 700; color: #fff; display: flex; align-items: center; justify-content: space-between; margin: 0;">
+                    <span>
+                        <i class="fas fa-book" style="margin-right: 8px;"></i>
+                        📖 恐慌清洗指数系统 - 完整技术文档
+                    </span>
+                    <i class="fas fa-chevron-down" style="transition: transform 0.3s;" id="panicDocPanelIcon"></i>
+                </h2>
+            </div>
+            <div style="display: none; padding: 24px; background: #1e2139;" id="panicDocPanelContent">
+                <div style="display: flex; flex-direction: column; gap: 24px;">
+                    
+                    <!-- 系统概述 -->
+                    <div style="background: #2a2d47; border-radius: 8px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                        <h3 style="font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 16px; border-bottom: 2px solid #667eea; padding-bottom: 8px;">
+                            <i class="fas fa-info-circle" style="color: #667eea; margin-right: 8px;"></i>
+                            系统概述
+                        </h3>
+                        <div style="display: flex; flex-direction: column; gap: 12px; font-size: 14px; color: #d1d5db;">
+                            <p><strong style="color: #fff;">系统名称：</strong>恐慌清洗指数 (Panic Wash Index)</p>
+                            <p><strong style="color: #fff;">系统版本：</strong>V2.9 (自定义标签版)</p>
+                            <p><strong style="color: #fff;">核心功能：</strong>实时监控加密货币市场的爆仓数据和恐慌指数</p>
+                            <p><strong style="color: #fff;">数据源：</strong>BTC126.com API (真实爆仓数据 + 持仓量)</p>
+                            <p><strong style="color: #fff;">更新频率：</strong>每2分钟自动采集一次爆仓数据</p>
+                            <p><strong style="color: #fff;">页面刷新：</strong>每1分钟自动刷新显示</p>
+                            <p><strong style="color: #fff;">监控币种：</strong>BTC, ETH, BNB, XRP, SOL (主要币种) + 全网数据</p>
+                        </div>
+                    </div>
+
+                    <!-- 运行逻辑与流程 -->
+                    <div style="background: #2a2d47; border-radius: 8px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                        <h3 style="font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 16px; border-bottom: 2px solid #10b981; padding-bottom: 8px;">
+                            <i class="fas fa-cogs" style="color: #10b981; margin-right: 8px;"></i>
+                            运行逻辑与流程
+                        </h3>
+                        <div style="display: flex; flex-direction: column; gap: 16px; font-size: 14px; color: #d1d5db;">
+                            <div style="background: rgba(102, 126, 234, 0.1); padding: 16px; border-radius: 8px; border-left: 4px solid #667eea;">
+                                <h4 style="font-weight: 700; color: #667eea; margin-bottom: 8px;">🔄 数据采集流程 (每2分钟)</h4>
+                                <ol style="list-style: decimal; padding-left: 24px; margin: 8px 0; line-height: 1.8;">
+                                    <li><strong style="color: #fff;">获取爆仓数据：</strong>调用 BTC126 API 获取 1h/24h 爆仓金额和人数</li>
+                                    <li><strong style="color: #fff;">获取持仓量：</strong>调用 BTC126 API 获取全网持仓量 (亿美元)</li>
+                                    <li><strong style="color: #fff;">获取币价数据：</strong>从 OKX API 获取 BTC/ETH/BNB/XRP/SOL 实时价格和涨跌幅</li>
+                                    <li><strong style="color: #fff;">计算恐慌指数：</strong>综合爆仓金额、持仓量、市场波动计算恐慌指数 (0-1)</li>
+                                    <li><strong style="color: #fff;">判定风险等级：</strong>根据指数划分 low/medium/high/extreme 四个等级</li>
+                                    <li><strong style="color: #fff;">写入JSONL：</strong>追加一行JSON到 <code>panic_wash_index.jsonl</code></li>
+                                    <li><strong style="color: #fff;">等待下一轮：</strong>休眠2分钟后重复上述流程</li>
+                                </ol>
+                            </div>
+                            
+                            <div style="background: rgba(16, 185, 129, 0.1); padding: 16px; border-radius: 8px; border-left: 4px solid #10b981;">
+                                <h4 style="font-weight: 700; color: #10b981; margin-bottom: 8px;">📊 前端显示流程</h4>
+                                <ol style="list-style: decimal; padding-left: 24px; margin: 8px 0; line-height: 1.8;">
+                                    <li><strong style="color: #fff;">初始加载：</strong>调用 <code>/api/panic/history</code> 获取最近数据 (默认500条)</li>
+                                    <li><strong style="color: #fff;">分页展示：</strong>按时间倒序分页显示 (每页100条，约3.3小时)</li>
+                                    <li><strong style="color: #fff;">图表渲染：</strong>ECharts 5.4.3 绘制恐慌指数和爆仓金额双曲线</li>
+                                    <li><strong style="color: #fff;">自动刷新：</strong>每60秒调用 API 更新最新数据点</li>
+                                    <li><strong style="color: #fff;">自定义标签：</strong>用户可在图表上添加/编辑/删除文字标注</li>
+                                    <li><strong style="color: #fff;">LocalStorage 持久化：</strong>标签数据保存在本地浏览器</li>
+                                </ol>
+                            </div>
+                            
+                            <div style="background: rgba(251, 191, 36, 0.1); padding: 16px; border-radius: 8px; border-left: 4px solid #fbbf24;">
+                                <h4 style="font-weight: 700; color: #fbbf24; margin-bottom: 8px;">🧮 恐慌指数计算公式</h4>
+                                <div style="background: #1e2139; padding: 12px; border-radius: 6px; border: 1px solid #3a3d5c; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.8;">
+                                    <p><strong style="color: #fff;">公式：</strong></p>
+                                    <p style="margin-left: 16px;">panic_index = (liquidation_1h / 10000) × (liquidation_24h / 1000000) × adjustment_factor</p>
+                                    <p style="margin-top: 8px;"><strong style="color: #fff;">风险等级划分：</strong></p>
+                                    <p style="margin-left: 16px;">• panic_index < 0.3 → <span style="color: #10b981;">low (低风险)</span></p>
+                                    <p style="margin-left: 16px;">• 0.3 ≤ panic_index < 0.6 → <span style="color: #fbbf24;">medium (中风险)</span></p>
+                                    <p style="margin-left: 16px;">• 0.6 ≤ panic_index < 0.85 → <span style="color: #f97316;">high (高风险)</span></p>
+                                    <p style="margin-left: 16px;">• panic_index ≥ 0.85 → <span style="color: #ef4444;">extreme (极端风险)</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- JSONL数据格式 -->
+                    <div style="background: #2a2d47; border-radius: 8px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                        <h3 style="font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 16px; border-bottom: 2px solid #8b5cf6; padding-bottom: 8px;">
+                            <i class="fas fa-database" style="color: #8b5cf6; margin-right: 8px;"></i>
+                            JSONL 数据存储格式
+                        </h3>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 16px; font-size: 14px;">
+                            <div style="background: rgba(139, 92, 246, 0.1); padding: 16px; border-radius: 8px;">
+                                <h4 style="font-weight: 700; color: #fff; margin-bottom: 8px;">📂 存储路径</h4>
+                                <div style="background: #1e2139; padding: 12px; border-radius: 6px; border: 1px solid #3a3d5c; font-family: 'Courier New', monospace; font-size: 12px; color: #d1d5db;">
+                                    <p><strong>数据目录：</strong>/home/user/webapp/data/panic_jsonl/</p>
+                                    <p><strong>数据文件：</strong>panic_wash_index.jsonl (单文件持续追加)</p>
+                                    <p><strong>备份文件：</strong>panic_wash_index.jsonl.backup_YYYYMMDD_HHMMSS</p>
+                                    <p><strong>示例：</strong>panic_wash_index.jsonl, panic_wash_index.jsonl.backup_20260211_083959</p>
+                                </div>
+                            </div>
+                            
+                            <div style="background: rgba(139, 92, 246, 0.1); padding: 16px; border-radius: 8px;">
+                                <h4 style="font-weight: 700; color: #fff; margin-bottom: 8px;">📋 数据格式 (panic_wash_index.jsonl)</h4>
+                                <div style="color: #d1d5db; margin-bottom: 8px;">
+                                    <p><strong>格式：</strong>JSONL (每行一个完整的JSON对象)</p>
+                                    <p><strong>字段说明：</strong></p>
+                                </div>
+                                <div style="background: #1e2139; padding: 12px; border-radius: 6px; border: 1px solid #3a3d5c; font-family: 'Courier New', monospace; font-size: 12px; overflow-x: auto; color: #d1d5db;">
+                                    <pre style="margin: 0; white-space: pre-wrap;">{
+  "timestamp": 1769908320000,                 // Unix时间戳 (毫秒)
+  "beijing_time": "2026-02-01 09:12:00",     // 北京时间字符串
+  "panic_index": 0.3123970628475203,         // 恐慌指数 (0-1)
+  "level": "medium",                          // 风险等级: low/medium/high/extreme
+  "liquidation_data": {                       // 爆仓相关数据
+    "liquidation_1h": 674.87,                // 1小时爆仓金额 (万美元)
+    "liquidation_24h": 79361.15,             // 24小时爆仓金额 (万美元)
+    "liquidation_count_24h": 23.54,          // 24小时爆仓人数 (万人)
+    "open_interest": 75.37                   // 全网持仓量 (亿美元)
+  }
+}</pre>
+                                </div>
+                            </div>
+                            
+                            <div style="background: rgba(239, 68, 68, 0.1); padding: 16px; border-radius: 8px; border-left: 4px solid #ef4444;">
+                                <h4 style="font-weight: 700; color: #ef4444; margin-bottom: 8px;">⚠️ 数据备份与清理</h4>
+                                <ul style="list-style: disc; padding-left: 24px; margin: 8px 0; line-height: 1.8; color: #d1d5db;">
+                                    <li><strong style="color: #fff;">自动备份：</strong>系统在重要操作前自动创建带时间戳的备份文件</li>
+                                    <li><strong style="color: #fff;">手动备份：</strong>定期备份 <code>data/panic_jsonl/</code> 目录到 <code>/mnt/aidrive/panic_history_backup/</code></li>
+                                    <li><strong style="color: #fff;">文件大小：</strong>每天约生成 720条记录 × 2分钟/条 ≈ 200KB</li>
+                                    <li><strong style="color: #fff;">数据清理：</strong>不自动清理，所有历史数据永久保留</li>
+                                    <li><strong style="color: #fff;">历史查询：</strong>前端支持分页和日期范围查询</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 系统功能详解 -->
+                    <div style="background: #2a2d47; border-radius: 8px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                        <h3 style="font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 16px; border-bottom: 2px solid #fbbf24; padding-bottom: 8px;">
+                            <i class="fas fa-star" style="color: #fbbf24; margin-right: 8px;"></i>
+                            系统功能详解
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; font-size: 14px;">
+                            <div style="background: rgba(102, 126, 234, 0.1); padding: 16px; border-radius: 8px;">
+                                <h4 style="font-weight: 700; color: #667eea; margin-bottom: 8px;">📊 双曲线图表可视化</h4>
+                                <ul style="list-style: disc; padding-left: 24px; margin: 8px 0; line-height: 1.8; color: #d1d5db;">
+                                    <li>恐慌指数曲线 (0-1区间)</li>
+                                    <li>1小时爆仓金额曲线 (万美元)</li>
+                                    <li>动态颜色区域划分 (风险等级)</li>
+                                    <li>鼠标悬停显示详细数据</li>
+                                    <li>时间轴自动适配 (2分钟间隔)</li>
+                                </ul>
+                            </div>
+                            
+                            <div style="background: rgba(16, 185, 129, 0.1); padding: 16px; border-radius: 8px;">
+                                <h4 style="font-weight: 700; color: #10b981; margin-bottom: 8px;">📝 自定义标签系统</h4>
+                                <ul style="list-style: disc; padding-left: 24px; margin: 8px 0; line-height: 1.8; color: #d1d5db;">
+                                    <li>点击图表任意位置添加标注</li>
+                                    <li>双击标签编辑文字内容</li>
+                                    <li>拖拽标签调整位置</li>
+                                    <li>右键删除不需要的标签</li>
+                                    <li>LocalStorage 本地持久化</li>
+                                </ul>
+                            </div>
+                            
+                            <div style="background: rgba(251, 191, 36, 0.1); padding: 16px; border-radius: 8px;">
+                                <h4 style="font-weight: 700; color: #fbbf24; margin-bottom: 8px;">🔄 分页与导航</h4>
+                                <ul style="list-style: disc; padding-left: 24px; margin: 8px 0; line-height: 1.8; color: #d1d5db;">
+                                    <li>恐慌指数分页 (每页100条)</li>
+                                    <li>爆仓金额日期导航 (前一天/后一天)</li>
+                                    <li>快速返回今天按钮</li>
+                                    <li>当前页码和总页数提示</li>
+                                    <li>加载状态友好提示</li>
+                                </ul>
+                            </div>
+                            
+                            <div style="background: rgba(239, 68, 68, 0.1); padding: 16px; border-radius: 8px;">
+                                <h4 style="font-weight: 700; color: #ef4444; margin-bottom: 8px;">⚡ 实时数据统计</h4>
+                                <ul style="list-style: disc; padding-left: 24px; margin: 8px 0; line-height: 1.8; color: #d1d5db;">
+                                    <li>当前恐慌指数 + 风险等级</li>
+                                    <li>1小时爆仓金额 (万美元)</li>
+                                    <li>24小时爆仓金额 (万美元)</li>
+                                    <li>24小时爆仓人数 (万人)</li>
+                                    <li>全网持仓量 (亿美元)</li>
+                                </ul>
+                            </div>
+                            
+                            <div style="background: rgba(139, 92, 246, 0.1); padding: 16px; border-radius: 8px;">
+                                <h4 style="font-weight: 700; color: #8b5cf6; margin-bottom: 8px;">🎯 性能优化</h4>
+                                <ul style="list-style: disc; padding-left: 24px; margin: 8px 0; line-height: 1.8; color: #d1d5db;">
+                                    <li>增量数据更新 (仅加载新数据)</li>
+                                    <li>分页加载避免卡顿</li>
+                                    <li>Canvas 渲染高性能图表</li>
+                                    <li>本地缓存减少 API 调用</li>
+                                    <li>防抖节流优化交互</li>
+                                </ul>
+                            </div>
+                            
+                            <div style="background: rgba(236, 72, 153, 0.1); padding: 16px; border-radius: 8px;">
+                                <h4 style="font-weight: 700; color: #ec4899; margin-bottom: 8px;">🌐 多维度数据展示</h4>
+                                <ul style="list-style: disc; padding-left: 24px; margin: 8px 0; line-height: 1.8; color: #d1d5db;">
+                                    <li>恐慌指数历史趋势</li>
+                                    <li>1小时爆仓金额历史曲线</li>
+                                    <li>多个币种价格监控 (BTC/ETH等)</li>
+                                    <li>全网持仓量变化监控</li>
+                                    <li>风险等级颜色标识</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PM2 进程与路由 API -->
+                    <div style="background: #2a2d47; border-radius: 8px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                        <h3 style="font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 16px; border-bottom: 2px solid #06b6d4; padding-bottom: 8px;">
+                            <i class="fas fa-server" style="color: #06b6d4; margin-right: 8px;"></i>
+                            PM2 进程与路由 API
+                        </h3>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 16px; font-size: 14px;">
+                            <div style="background: rgba(6, 182, 212, 0.1); padding: 16px; border-radius: 8px;">
+                                <h4 style="font-weight: 700; color: #fff; margin-bottom: 8px;">🔧 PM2 进程配置</h4>
+                                <div style="background: #1e2139; padding: 12px; border-radius: 6px; border: 1px solid #3a3d5c; font-family: 'Courier New', monospace; font-size: 12px; color: #d1d5db;">
+                                    <p><strong>进程名：</strong>panic-collector</p>
+                                    <p><strong>脚本路径：</strong>source_code/panic_wash_collector.py</p>
+                                    <p><strong>Python版本：</strong>python3</p>
+                                    <p><strong>工作目录：</strong>/home/user/webapp</p>
+                                    <p><strong>自动重启：</strong>true</p>
+                                    <p><strong>内存限制：</strong>200M</p>
+                                    <p><strong>日志位置：</strong></p>
+                                    <p style="margin-left: 16px;">• 错误日志: logs/panic-collector-error.log</p>
+                                    <p style="margin-left: 16px;">• 输出日志: logs/panic-collector-out.log</p>
+                                </div>
+                                <div style="margin-top: 12px; background: #1e2139; padding: 12px; border-radius: 6px; border: 1px solid #3a3d5c;">
+                                    <p style="color: #fff; font-weight: 700; margin-bottom: 8px;">PM2 管理命令：</p>
+                                    <div style="font-family: 'Courier New', monospace; font-size: 12px; color: #d1d5db; line-height: 1.8;">
+                                        <p>• 查看状态: <code>pm2 status panic-collector</code></p>
+                                        <p>• 查看日志: <code>pm2 logs panic-collector --lines 50</code></p>
+                                        <p>• 重启进程: <code>pm2 restart panic-collector</code></p>
+                                        <p>• 停止进程: <code>pm2 stop panic-collector</code></p>
+                                        <p>• 启动进程: <code>pm2 start ecosystem.config.js --only panic-collector</code></p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="background: rgba(6, 182, 212, 0.1); padding: 16px; border-radius: 8px;">
+                                <h4 style="font-weight: 700; color: #fff; margin-bottom: 8px;">🌐 Flask API 路由</h4>
+                                <div style="background: #1e2139; padding: 12px; border-radius: 6px; border: 1px solid #3a3d5c; font-family: 'Courier New', monospace; font-size: 12px; color: #d1d5db; line-height: 1.8;">
+                                    <p><strong style="color: #10b981;">GET</strong> /api/panic/latest</p>
+                                    <p style="margin-left: 16px; color: #9ca3af;">获取最新的恐慌指数数据点</p>
+                                    
+                                    <p style="margin-top: 8px;"><strong style="color: #10b981;">GET</strong> /api/panic/history</p>
+                                    <p style="margin-left: 16px; color: #9ca3af;">获取历史数据 (默认最近500条)</p>
+                                    <p style="margin-left: 16px; color: #9ca3af;">参数: ?limit=500&offset=0</p>
+                                    
+                                    <p style="margin-top: 8px;"><strong style="color: #10b981;">GET</strong> /api/panic/history-range</p>
+                                    <p style="margin-left: 16px; color: #9ca3af;">获取指定日期范围的数据</p>
+                                    <p style="margin-left: 16px; color: #9ca3af;">参数: ?start=2026-02-01&end=2026-02-11</p>
+                                    
+                                    <p style="margin-top: 8px;"><strong style="color: #10b981;">GET</strong> /api/panic/hour1-curve</p>
+                                    <p style="margin-left: 16px; color: #9ca3af;">获取1小时爆仓金额曲线数据</p>
+                                    <p style="margin-left: 16px; color: #9ca3af;">参数: ?date=2026-02-11 (可选)</p>
+                                    
+                                    <p style="margin-top: 8px;"><strong style="color: #10b981;">GET</strong> /api/panic/30d-stats</p>
+                                    <p style="margin-left: 16px; color: #9ca3af;">获取最近30天统计数据</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 系统依赖与部署 -->
+                    <div style="background: #2a2d47; border-radius: 8px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                        <h3 style="font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 16px; border-bottom: 2px solid #f97316; padding-bottom: 8px;">
+                            <i class="fas fa-cube" style="color: #f97316; margin-right: 8px;"></i>
+                            系统依赖与部署
+                        </h3>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; font-size: 14px;">
+                            <div style="background: rgba(249, 115, 22, 0.1); padding: 16px; border-radius: 8px;">
+                                <h4 style="font-weight: 700; color: #f97316; margin-bottom: 8px;">🐍 Python 依赖</h4>
+                                <ul style="list-style: none; padding-left: 0; margin: 8px 0; line-height: 1.8; color: #d1d5db;">
+                                    <li>• Python 3.8+</li>
+                                    <li>• requests (HTTP客户端)</li>
+                                    <li>• pytz (时区处理)</li>
+                                    <li>• Flask 3.1.2 (Web框架)</li>
+                                    <li>• pathlib (路径操作)</li>
+                                </ul>
+                            </div>
+                            
+                            <div style="background: rgba(249, 115, 22, 0.1); padding: 16px; border-radius: 8px;">
+                                <h4 style="font-weight: 700; color: #f97316; margin-bottom: 8px;">📦 系统服务</h4>
+                                <ul style="list-style: none; padding-left: 0; margin: 8px 0; line-height: 1.8; color: #d1d5db;">
+                                    <li><strong style="color: #fff;">Flask API：</strong>端口 5000</li>
+                                    <li><strong style="color: #fff;">数据采集：</strong>Python 定时脚本 (PM2 守护)</li>
+                                    <li><strong style="color: #fff;">数据存储：</strong>JSONL 文件系统</li>
+                                    <li><strong style="color: #fff;">前端框架：</strong>ECharts 5.4.3</li>
+                                    <li><strong style="color: #fff;">进程管理：</strong>PM2 (自动重启、日志管理)</li>
+                                </ul>
+                            </div>
+                            
+                            <div style="background: rgba(249, 115, 22, 0.1); padding: 16px; border-radius: 8px;">
+                                <h4 style="font-weight: 700; color: #f97316; margin-bottom: 8px;">🚀 部署检查清单</h4>
+                                <ul style="list-style: none; padding-left: 0; margin: 8px 0; line-height: 1.8; color: #d1d5db;">
+                                    <li>✅ PM2 进程运行正常</li>
+                                    <li>✅ Flask API 5000端口可访问</li>
+                                    <li>✅ 数据目录权限正确</li>
+                                    <li>✅ JSONL 文件可写入</li>
+                                    <li>✅ BTC126 API 可访问</li>
+                                    <li>✅ 日志文件正常输出</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 16px; background: rgba(239, 68, 68, 0.1); padding: 16px; border-radius: 8px; border-left: 4px solid #ef4444;">
+                            <h4 style="font-weight: 700; color: #ef4444; margin-bottom: 8px;">⚠️ 故障排查指南</h4>
+                            <ul style="list-style: disc; padding-left: 24px; margin: 8px 0; line-height: 1.8; color: #d1d5db;">
+                                <li>数据不更新 → 检查 PM2 进程状态: <code>pm2 status panic-collector</code></li>
+                                <li>API返回错误 → 查看 Flask 日志: <code>pm2 logs flask-app</code></li>
+                                <li>图表不显示 → 强制刷新页面: Ctrl+F5 或 Cmd+Shift+R</li>
+                                <li>爆仓数据为0 → BTC126 API可能暂时不可用，等待自动恢复</li>
+                                <li>标签丢失 → 检查浏览器 LocalStorage 是否被清除</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+        <script>
+        function togglePanicDocPanel() {
+            const content = document.getElementById('panicDocPanelContent');
+            const icon = document.getElementById('panicDocPanelIcon');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.style.transform = 'rotate(180deg)';
+                localStorage.setItem('panicDocPanelOpen', 'true');
+            } else {
+                content.style.display = 'none';
+                icon.style.transform = 'rotate(0deg)';
+                localStorage.setItem('panicDocPanelOpen', 'false');
+            }
+        }
+        
+        // 页面加载时恢复面板状态
+        document.addEventListener('DOMContentLoaded', function() {
+            const isOpen = localStorage.getItem('panicDocPanelOpen');
+            if (isOpen === 'true') {
+                const content = document.getElementById('panicDocPanelContent');
+                const icon = document.getElementById('panicDocPanelIcon');
+                content.style.display = 'block';
+                icon.style.transform = 'rotate(180deg)';
+            }
+        });
+        </script>
+        
+        <!-- 曲线图 -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <div class="chart-title">📈 恐慌清洗指数趋势 <span style="font-size: 12px; color: #00d4ff;">[v2.1]</span></div>
+                
+                <!-- 分页控制器（右上角） -->
+                <div class="pagination-controls">
+                    <button class="page-btn" id="prevPageBtn" onclick="loadPreviousPage()" title="查看更早的数据">
+                        <span>◀</span>
+                    </button>
+                    <div class="page-info" id="pageInfo">加载中...</div>
+                    <button class="page-btn" id="nextPageBtn" onclick="loadNextPage()" title="查看更新的数据">
+                        <span>▶</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="panicChart"></div>
+            <div id="debugInfo" style="font-size: 11px; color: #6b7280; margin-top: 10px; text-align: center;">
+                正在加载数据...
+            </div>
+        </div>
+        
+        <!-- 1小时爆仓金额曲线图 -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <div class="chart-title">💥 1小时爆仓金额曲线图 <span style="font-size: 12px; color: #fbbf24;">[实时追踪]</span></div>
+                
+                <!-- 日期导航控制器 -->
+                <div class="pagination-controls">
+                    <button class="page-btn" id="liqPrevPageBtn" onclick="loadLiquidationPreviousDate()" title="前一天">
+                        <span>◀ 前一天</span>
+                    </button>
+                    <input type="date" id="liqDatePicker" class="date-picker-input" 
+                           min="2026-02-01" 
+                           onchange="loadLiquidationByDatePicker()" 
+                           title="点击选择日期 (可选范围: 2026-02-01 至今)">
+                    <div class="page-info" id="liqDateDisplay" style="display: none;">2月11日</div>
+                    <button class="page-btn" id="liqNextPageBtn" onclick="loadLiquidationNextDate()" title="后一天">
+                        <span>后一天 ▶</span>
+                    </button>
+                    <button class="page-btn" onclick="loadLiquidationToday()" title="回到今天" style="margin-left: 10px;">
+                        <span>今天</span>
+                    </button>
+                </div>
+            </div>
+            <div style="position: relative; width: 100%; height: 400px;">
+                <div id="liquidation1hChart" style="width: 100%; height: 100%;"></div>
+                <!-- 自定义爆仓金额标签 -->
+                <div id="customMarkPointLabel" style="
+                    position: absolute;
+                    display: none;
+                    background: #fbbf24;
+                    color: #000000;
+                    font-size: 20px;
+                    font-weight: bold;
+                    padding: 10px 15px;
+                    border-radius: 8px;
+                    border: 3px solid #000000;
+                    box-shadow: 3px 3px 10px rgba(0,0,0,0.4);
+                    z-index: 1000;
+                    pointer-events: none;
+                    white-space: nowrap;
+                "></div>
+            </div>
+            <div style="font-size: 11px; color: #6b7280; margin-top: 10px; text-align: center;">
+                数据采集频率: 每3分钟一次 | 数据来源: BTC126 API | 单位: 万美元 | 按日期显示 | 支持左右翻页
+            </div>
+        </div>
+        
+
+        <!-- 历史数据表格 -->
+        <div class="history-container">
+            <div class="history-title">📋 恐慌指数历史记录</div>
+            
+            <!-- 时间查询工具 -->
+            <div class="time-query-box">
+                <span class="time-query-label">🔍 时间查询：</span>
+                <div class="time-input-group">
+                    <input type="datetime-local" id="queryDateTime" class="time-input" placeholder="选择日期时间">
+                    <button onclick="queryHistoryByTime()" class="query-btn">查询</button>
+                    <button onclick="resetQuery()" class="reset-btn">重置</button>
+                    <span id="queryResult" class="query-result"></span>
+                </div>
+            </div>
+            
+            <div id="loadingHistory" class="loading">正在加载历史数据...</div>
+            <table class="history-table" id="historyTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>记录时间</th>
+                        <th>1h爆仓 (万$)</th>
+                        <th>24h爆仓 (亿$)</th>
+                        <th>恐慌指数</th>
+                        <th>等级</th>
+                        <th>爆仓人数 (万人)</th>
+                        <th>全网持仓 (亿$)</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 30日爆仓数据日历 -->
+        <div class="history-container">
+            <div class="history-title">📅 30日爆仓数据日历</div>
+            <div id="loading30Days" class="loading">正在加载30日爆仓数据...</div>
+            <table class="history-table" id="liquidation30Table" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>日期</th>
+                        <th>多单爆仓</th>
+                        <th>空单爆仓</th>
+                        <th>总爆仓</th>
+                    </tr>
+                </thead>
+                <tbody id="liquidation30Body">
+                </tbody>
+            </table>
+            <div class="stat-sublabel" id="liquidation30UpdateTime" style="margin-top: 10px; text-align: right;"></div>
+        </div>
+    </div>
+    
+    <script>
+        let chart = null;
+        let currentPage = 0;  // 当前页码（0=最新日期）
+        let allData = [];     // 所有历史数据
+        let dateGroups = [];  // 按日期分组的数据 [{date: '2026-02-11', records: [...]}]
+        
+        // 按日期分组数据
+        function groupDataByDate(data) {
+            if (!data || data.length === 0) return [];
+            
+            // 按日期分组
+            const groups = {};
+            data.forEach(item => {
+                const date = item.record_time.split(' ')[0]; // YYYY-MM-DD
+                if (!groups[date]) {
+                    groups[date] = {
+                        date: date,
+                        records: []
+                    };
+                }
+                groups[date].records.push(item);
+            });
+            
+            // 转换为数组并按日期倒序排列（最新日期在前）
+            const sortedGroups = Object.values(groups).sort((a, b) => {
+                return b.date.localeCompare(a.date);
+            });
+            
+            console.log(`📅 按日期分组完成: 共${sortedGroups.length}天数据`);
+            sortedGroups.forEach(g => {
+                console.log(`   ${g.date}: ${g.records.length}条记录`);
+            });
+            
+            return sortedGroups;
+        }
+        
+        // 初始化图表
+        function initChart() {
+            const chartDom = document.getElementById('panicChart');
+            chart = echarts.init(chartDom);
+            
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: '#2a2d47',
+                    borderColor: '#3a3d5c',
+                    textStyle: {
+                        color: '#fff'
+                    },
+                    formatter: function(params) {
+                        let html = params[0].axisValue + '<br/>';
+                        params.forEach(param => {
+                            if (param.seriesName === '恐慌清洗指数') {
+                                html += param.marker + param.seriesName + ': ' + param.value.toFixed(2) + '%<br/>';
+                            } else if (param.seriesName === '全网持仓量') {
+                                // 格式化为合理的亿单位显示（保留2位小数）
+                                let valueInYi = param.value;
+                                html += param.marker + param.seriesName + ': $' + valueInYi.toFixed(2) + '亿<br/>';
+                            }
+                        });
+                        return html;
+                    }
+                },
+                legend: {
+                    data: ['恐慌清洗指数', '全网持仓量'],
+                    top: 10,
+                    textStyle: {
+                        color: '#8b92b8'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '5%',
+                    bottom: '3%',
+                    top: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: [],
+                    axisLine: {
+                        lineStyle: {
+                            color: '#3a3d5c'
+                        }
+                    },
+                    axisLabel: {
+                        color: '#8b92b8',
+                        rotate: 45,
+                        fontSize: 10
+                    }
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '恐慌指数 (%)',
+                        position: 'left',
+                        min: 9,
+                        max: 13,
+                        interval: 1,
+                        nameTextStyle: {
+                            color: '#3b7dff'
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                color: '#3a3d5c'
+                            }
+                        },
+                        splitLine: {
+                            lineStyle: {
+                                color: '#3a3d5c'
+                            }
+                        },
+                        axisLabel: {
+                            color: '#3b7dff',
+                            formatter: '{value}%'
+                        }
+                    },
+                    {
+                        type: 'value',
+                        name: '全网持仓 (亿$)',
+                        position: 'right',
+                        min: 90,
+                        max: 100,
+                        interval: 2,
+                        nameTextStyle: {
+                            color: '#10b981'
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                color: '#3a3d5c'
+                            }
+                        },
+                        axisLabel: {
+                            color: '#10b981',
+                            formatter: '${value}亿'
+                        },
+                        splitLine: {
+                            show: false
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: '恐慌清洗指数',
+                        type: 'line',
+                        yAxisIndex: 0,
+                        smooth: true,
+                        symbol: 'circle',
+                        symbolSize: 6,
+                        data: [],
+                        lineStyle: {
+                            width: 2,
+                            color: '#3b7dff'
+                        },
+                        areaStyle: {
+                            color: {
+                                type: 'linear',
+                                x: 0,
+                                y: 0,
+                                x2: 0,
+                                y2: 1,
+                                colorStops: [
+                                    {
+                                        offset: 0,
+                                        color: 'rgba(59, 125, 255, 0.3)'
+                                    },
+                                    {
+                                        offset: 1,
+                                        color: 'rgba(59, 125, 255, 0.05)'
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        name: '全网持仓量',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        smooth: true,
+                        symbol: 'circle',
+                        symbolSize: 6,
+                        data: [],
+                        lineStyle: {
+                            width: 2,
+                            color: '#10b981'
+                        }
+                    }
+                ]
+            };
+            
+            chart.setOption(option);
+        }
+        
+        // 加载当前数据
+        async function loadCurrentData() {
+            // 显示刷新动画
+            const indicator = document.getElementById('refreshIndicator');
+            if (indicator) {
+                indicator.style.background = '#fbbf24';  // 黄色表示正在刷新
+                indicator.style.animation = 'pulse 0.5s ease-in-out infinite';
+            }
+            
+            try {
+                const response = await fetch('/api/panic/latest?_=' + Date.now());
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    const data = result.data;
+                    
+                    // 更新统计栏
+                    const indexEl = document.getElementById('currentIndex');
+                    indexEl.textContent = (data.panic_index * 100).toFixed(2) + '%';
+                    
+                    // 设置颜色
+                    indexEl.className = 'stat-value ' + (data.level_color || 'green');
+                    
+                    document.getElementById('currentLevel').textContent = data.panic_level || '--';
+                    // 1小时爆仓金额：万美元
+                    document.getElementById('hour1Amount').textContent = '$' + data.hour_1_amount.toFixed(2);
+                    // 24小时爆仓金额：万美元
+                    document.getElementById('hour24Amount').textContent = '$' + data.hour_24_amount.toFixed(2);
+                    // 24小时爆仓人数：万人
+                    document.getElementById('currentPeople').textContent = data.hour_24_people.toFixed(2);
+                    // 全网持仓量：亿美元
+                    document.getElementById('currentPosition').textContent = '$' + data.total_position.toFixed(2);
+                    document.getElementById('updateTime').textContent = data.record_time.split(' ')[1];
+                    
+                    // 刷新成功，显示绿色
+                    if (indicator) {
+                        indicator.style.background = '#4ade80';  // 绿色
+                        indicator.style.animation = 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('加载当前数据失败:', error);
+                // 刷新失败，显示红色
+                if (indicator) {
+                    indicator.style.background = '#f87171';  // 红色
+                    indicator.style.animation = 'none';
+                }
+            }
+        }
+        
+        // 加载全部历史数据
+        async function loadAllHistoryData() {
+            try {
+                // 加载全部历史数据（取消限制以支持所有历史日期选择）
+                const conn = await fetch('/api/panic/history?limit=10000&_=' + Date.now());
+                const result = await conn.json();
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    // 过滤掉包含0值的异常数据（API已按时间DESC排序，最新的在前）
+                    allData = result.data.filter(item => {
+                        return item.hour_1_amount > 0 && 
+                               item.hour_24_amount > 0 && 
+                               item.hour_24_people > 0 && 
+                               item.total_position > 0;
+                    }); // 保持API返回的顺序（最新的在前）
+                    
+                    // 按日期分组
+                    dateGroups = groupDataByDate(allData);
+                    
+                    const debugMsg = `数据过滤完成: 总数据${result.data.length}条, 有效数据${allData.length}条, 日期数${dateGroups.length}天`;
+                    console.log(debugMsg);
+                    document.getElementById('debugInfo').textContent = debugMsg + ' | 页面版本: v2.1';
+                    document.getElementById('debugInfo').style.color = '#10b981';
+                    
+                    if (allData.length === 0) {
+                        document.getElementById('debugInfo').textContent = '⚠️ 警告: 过滤后无有效数据！请检查数据采集。';
+                        document.getElementById('debugInfo').style.color = '#ef4444';
+                        console.error('No valid data after filtering!');
+                        return;
+                    }
+                    
+                    updateChartForCurrentPage();
+                    updatePageInfo();
+                } else {
+                    document.getElementById('debugInfo').textContent = '❌ 数据加载失败或无数据';
+                    document.getElementById('debugInfo').style.color = '#ef4444';
+                }
+            } catch (error) {
+                console.error('加载历史数据失败:', error);
+                document.getElementById('debugInfo').textContent = '❌ 加载失败: ' + error.message;
+                document.getElementById('debugInfo').style.color = '#ef4444';
+            }
+        }
+        
+        // 更新图表显示当前页数据（按日期）
+        function updateChartForCurrentPage() {
+            if (dateGroups.length === 0) return;
+            
+            // 确保页码有效
+            if (currentPage >= dateGroups.length) {
+                currentPage = 0;
+            }
+            if (currentPage < 0) {
+                currentPage = dateGroups.length - 1;
+            }
+            
+            // 获取当前日期的所有数据
+            const currentGroup = dateGroups[currentPage];
+            const pageData = currentGroup.records.sort((a, b) => {
+                // 按时间升序排列（从早到晚）
+                return a.record_time.localeCompare(b.record_time);
+            });
+            
+            console.log(`📊 显示 ${currentGroup.date} 的数据，共 ${pageData.length} 条记录`);
+            
+            if (pageData.length === 0) return;
+            
+            // 提取图表数据
+            const times = pageData.map(item => {
+                const parts = item.record_time.split(' ');
+                return parts[1].substring(0, 5); // HH:MM
+            });
+            const panicValues = pageData.map(item => parseFloat((item.panic_index * 100).toFixed(2)));
+            const positionValues = pageData.map(item => parseFloat(item.total_position.toFixed(2)));
+                    
+            // 单日数据不需要日期边界线
+            const dateBoundaries = [];
+            
+            // 动态计算恐慌指数Y轴范围：最低-1%，最高+1%
+            const panicNumbers = pageData.map(item => item.panic_index);
+            const panicMin = Math.min(...panicNumbers);
+            const panicMax = Math.max(...panicNumbers);
+                    
+            // 恐慌指数：最低-1%，最高+1%，保留小数
+            const yAxisMin = (Math.floor(panicMin * 10) / 10) - 1;
+            const yAxisMax = (Math.ceil(panicMax * 10) / 10) + 1;
+            const yAxisInterval = 0.5;  // 固定0.5%刻度间隔
+            
+            // Y轴标签格式化，保留2位小数
+            const yAxisFormatter = (value) => value.toFixed(2) + '%';
+            
+            // 动态计算全网持仓Y轴范围：最低-1亿，最高+1亿
+            const positionNumbers = pageData.map(item => item.total_position);
+            const positionMin = Math.min(...positionNumbers);
+            const positionMax = Math.max(...positionNumbers);
+                    
+            // 全网持仓：最低-1亿，最高+1亿，保留小数
+            const positionYMin = (Math.floor(positionMin * 10) / 10) - 1;
+            const positionYMax = (Math.ceil(positionMax * 10) / 10) + 1;
+            const positionYInterval = 0.5;  // 固定0.5亿刻度间隔
+            
+            // Y轴标签格式化，保留2位小数
+            const positionYFormatter = (value) => value.toFixed(2) + '亿';
+            
+            chart.setOption({
+                xAxis: {
+                    data: times
+                },
+                // 添加日期边界标记线
+                markLine: dateBoundaries.length > 0 ? {
+                    silent: true,
+                    data: dateBoundaries
+                } : undefined,
+                        yAxis: [
+                            {
+                                type: 'value',
+                                name: '恐慌指数 (%)',
+                                position: 'left',
+                                min: yAxisMin,
+                                max: yAxisMax,
+                                interval: yAxisInterval,
+                                nameTextStyle: {
+                                    color: '#3b7dff'
+                                },
+                                axisLine: {
+                                    lineStyle: {
+                                        color: '#3a3d5c'
+                                    }
+                                },
+                                splitLine: {
+                                    lineStyle: {
+                                        color: '#3a3d5c'
+                                    }
+                                },
+                                axisLabel: {
+                                    color: '#3b7dff',
+                                    formatter: function(value) {
+                                        return value.toFixed(2) + '%';
+                                    }
+                                }
+                            },
+                            {
+                                type: 'value',
+                                name: '全网持仓 (亿$)',
+                                position: 'right',
+                                min: positionYMin,
+                                max: positionYMax,
+                                interval: positionYInterval,
+                                nameTextStyle: {
+                                    color: '#10b981'
+                                },
+                                axisLine: {
+                                    lineStyle: {
+                                        color: '#3a3d5c'
+                                    }
+                                },
+                                axisLabel: {
+                                    color: '#10b981',
+                                    formatter: function(value) {
+                                        return '$' + value.toFixed(2) + '亿';
+                                    }
+                                },
+                                splitLine: {
+                                    show: false
+                                }
+                            }
+                        ],
+                series: [
+                    {
+                        name: '恐慌清洗指数',
+                        data: panicValues,
+                        markLine: dateBoundaries.length > 0 ? {
+                            silent: true,
+                            symbol: 'none',
+                            data: dateBoundaries
+                        } : undefined
+                    },
+                    {
+                        name: '全网持仓量',
+                        data: positionValues
+                    }
+                ]
+            });
+        }
+        
+        // 更新分页信息（显示日期）
+        function updatePageInfo() {
+            if (dateGroups.length === 0) {
+                document.getElementById('pageInfo').textContent = '暂无数据';
+                return;
+            }
+            
+            // 确保页码有效
+            if (currentPage >= dateGroups.length) {
+                currentPage = 0;
+            }
+            
+            const currentGroup = dateGroups[currentPage];
+            document.getElementById('pageInfo').textContent = `${currentGroup.date} (第${currentPage + 1}/${dateGroups.length}天)`;
+            
+            // 更新按钮状态
+            document.getElementById('prevPageBtn').disabled = (currentPage >= dateGroups.length - 1);
+            document.getElementById('nextPageBtn').disabled = (currentPage <= 0);
+        }
+        
+        // 加载上一页（更早的日期）
+        function loadPreviousPage() {
+            if (currentPage < dateGroups.length - 1) {
+                currentPage++;
+                updateChartForCurrentPage();
+                updatePageInfo();
+            }
+        }
+        
+        // 加载下一页（更新的日期）
+        function loadNextPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                updateChartForCurrentPage();
+                updatePageInfo();
+            }
+        }
+        
+        // 加载历史数据并更新图表（保留用于表格显示）
+        async function loadHistoryData() {
+            try {
+                const conn = await fetch('/api/panic/history?limit=50');
+                const result = await conn.json();
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    // API已按时间DESC排序，最新的在前，直接使用
+                    const data = result.data;
+                    
+                    // 更新表格
+                    const tbody = document.getElementById('historyTableBody');
+                    tbody.innerHTML = '';
+                    
+                    data.forEach(item => {
+                        const tr = document.createElement('tr');
+                        
+                        let levelColor = 'green';
+                        if (item.panic_index >= 5) levelColor = 'red';
+                        else if (item.panic_index >= 2) levelColor = 'yellow';
+                        
+                        let levelText = '低恐慌';
+                        if (item.panic_index >= 5) levelText = '高度恐慌';
+                        else if (item.panic_index >= 2) levelText = '中度恐慌';
+                        
+                        tr.innerHTML = `
+                            <td>${item.record_time}</td>
+                            <td>$${item.hour_1_amount.toFixed(2)}万</td>
+                            <td>$${item.hour_24_amount.toFixed(2)}万</td>
+                            <td><span class="${levelColor}" style="font-weight: 600;">${(item.panic_index * 100).toFixed(2)}%</span></td>
+                            <td><span class="${levelColor}">${levelText}</span></td>
+                            <td>${item.hour_24_people.toFixed(2)}万人</td>
+                            <td>${item.total_position.toFixed(2)}亿美元</td>
+                        `;
+                        
+                        tbody.appendChild(tr);
+                    });
+                    
+                    document.getElementById('loadingHistory').style.display = 'none';
+                    document.getElementById('historyTable').style.display = 'table';
+                }
+            } catch (error) {
+                console.error('加载历史数据失败:', error);
+                document.getElementById('loadingHistory').textContent = '❌ 加载失败: ' + error.message;
+            }
+        }
+        
+        // 时间查询功能
+        let allHistoryData = [];  // 存储所有历史数据
+        
+        async function queryHistoryByTime() {
+            const dateTimeInput = document.getElementById('queryDateTime');
+            const resultSpan = document.getElementById('queryResult');
+            
+            if (!dateTimeInput.value) {
+                resultSpan.textContent = '⚠️ 请选择查询时间';
+                resultSpan.style.color = '#fbbf24';
+                return;
+            }
+            
+            // 转换选择的时间为查询格式
+            const selectedDate = new Date(dateTimeInput.value);
+            const queryTime = selectedDate.toISOString().slice(0, 16).replace('T', ' ');
+            
+            try {
+                resultSpan.textContent = '🔍 查询中...';
+                resultSpan.style.color = '#00d4ff';
+                
+                // 查询指定时间附近的数据（前后10条）
+                const response = await fetch(`/api/panic/history?time=${encodeURIComponent(queryTime)}&limit=20`);
+                const result = await response.json();
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    // 找到最接近的记录
+                    let closestRecord = result.data[0];
+                    let minDiff = Math.abs(new Date(closestRecord.record_time) - selectedDate);
+                    
+                    result.data.forEach(item => {
+                        const diff = Math.abs(new Date(item.record_time) - selectedDate);
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            closestRecord = item;
+                        }
+                    });
+                    
+                    // 更新表格，高亮匹配的记录
+                    const tbody = document.getElementById('historyTableBody');
+                    tbody.innerHTML = '';
+                    
+                    result.data.forEach(item => {
+                        const tr = document.createElement('tr');
+                        const isMatch = item.record_time === closestRecord.record_time;
+                        
+                        let levelColor = 'green';
+                        if (item.panic_index >= 5) levelColor = 'red';
+                        else if (item.panic_index >= 2) levelColor = 'yellow';
+                        
+                        let levelText = '低恐慌';
+                        if (item.panic_index >= 5) levelText = '高度恐慌';
+                        else if (item.panic_index >= 2) levelText = '中度恐慌';
+                        
+                        tr.innerHTML = `
+                            <td${isMatch ? ' style="background: rgba(0, 212, 255, 0.2); font-weight: 600;"' : ''}>${item.record_time}</td>
+                            <td${isMatch ? ' style="background: rgba(0, 212, 255, 0.2);"' : ''}>$${item.hour_1_amount.toFixed(2)}万</td>
+                            <td${isMatch ? ' style="background: rgba(0, 212, 255, 0.2);"' : ''}>$${item.hour_24_amount.toFixed(2)}万</td>
+                            <td${isMatch ? ' style="background: rgba(0, 212, 255, 0.2);"' : ''}><span class="${levelColor}" style="font-weight: 600;">${(item.panic_index * 100).toFixed(2)}%</span></td>
+                            <td${isMatch ? ' style="background: rgba(0, 212, 255, 0.2);"' : ''}><span class="${levelColor}">${levelText}</span></td>
+                            <td${isMatch ? ' style="background: rgba(0, 212, 255, 0.2);"' : ''}>${item.hour_24_people.toFixed(2)}万人</td>
+                            <td${isMatch ? ' style="background: rgba(0, 212, 255, 0.2);"' : ''}>${item.total_position.toFixed(2)}亿美元</td>
+                        `;
+                        
+                        tbody.appendChild(tr);
+                    });
+                    
+                    // 显示查询结果
+                    const timeDiff = Math.abs(minDiff / 1000 / 60); // 转换为分钟
+                    if (timeDiff < 5) {
+                        resultSpan.textContent = `✅ 找到精确匹配: ${closestRecord.record_time}`;
+                        resultSpan.style.color = '#10b981';
+                    } else {
+                        resultSpan.textContent = `✅ 找到最近记录: ${closestRecord.record_time} (相差${timeDiff.toFixed(0)}分钟)`;
+                        resultSpan.style.color = '#fbbf24';
+                    }
+                    
+                    // 滚动到匹配的记录
+                    document.getElementById('historyTable').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    resultSpan.textContent = '❌ 未找到相关数据';
+                    resultSpan.style.color = '#ef4444';
+                }
+            } catch (error) {
+                console.error('查询失败:', error);
+                resultSpan.textContent = '❌ 查询失败: ' + error.message;
+                resultSpan.style.color = '#ef4444';
+            }
+        }
+        
+        // 重置查询
+        function resetQuery() {
+            document.getElementById('queryDateTime').value = '';
+            document.getElementById('queryResult').textContent = '';
+            loadHistoryData();  // 重新加载所有数据
+        }
+        
+        // 加载30日爆仓数据
+        async function load30DaysLiquidation() {
+            try {
+                const response = await fetch('/api/liquidation/30days');
+                const result = await response.json();
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    const tbody = document.getElementById('liquidation30Body');
+                    tbody.innerHTML = '';
+                    
+                    result.data.forEach(item => {
+                        const tr = document.createElement('tr');
+                        
+                        tr.innerHTML = `
+                            <td>${item.date}</td>
+                            <td style="color: #10b981;">$${item.long_amount}亿</td>
+                            <td style="color: #ef4444;">$${item.short_amount}亿</td>
+                            <td style="font-weight: 600;">$${item.total_amount}亿</td>
+                        `;
+                        
+                        tbody.appendChild(tr);
+                    });
+                    
+                    // 显示更新时间
+                    if (result.data[0].updated_at) {
+                        document.getElementById('liquidation30UpdateTime').textContent = 
+                            '最后更新: ' + result.data[0].updated_at + ' (每1小时更新)';
+                    }
+                    
+                    document.getElementById('loading30Days').style.display = 'none';
+                    document.getElementById('liquidation30Table').style.display = 'table';
+                } else {
+                    document.getElementById('loading30Days').textContent = '❌ 暂无30日爆仓数据';
+                }
+            } catch (error) {
+                console.error('加载30日爆仓数据失败:', error);
+                document.getElementById('loading30Days').textContent = '❌ 加载失败: ' + error.message;
+            }
+        }
+        
+        
+        // ==================== 1小时爆仓金额图表（修改版：按日期翻页） ====================
+let liquidation1hChart = null;
+let currentDate = new Date();  // 当前查看的日期（默认今天）
+let liqAllData = [];  // 当天的所有数据
+
+function initLiquidation1hChart() {
+    const chartDom = document.getElementById('liquidation1hChart');
+    liquidation1hChart = echarts.init(chartDom);
+    loadDataForCurrentDate();
+}
+
+// 加载当前日期的数据
+async function loadDataForCurrentDate() {
+    try {
+        const dateStr = formatDateStr(currentDate);  // YYYY-MM-DD
+        
+        console.log(`📊 加载 ${dateStr} 的1小时爆仓数据...`);
+        
+        // 统一使用历史范围API（支持所有日期，包括今天）
+        console.log('  使用API: /api/panic/history-range');
+        const response = await fetch(`/api/panic/history-range?start_date=${dateStr}&end_date=${dateStr}`);
+        const result = await response.json();
+        
+        if (!result.success || !result.data || result.data.length === 0) {
+            console.warn(`⚠️ ${dateStr} 暂无数据`);
+            liquidation1hChart.setOption({
+                title: {
+                    text: `⚠️ ${dateStr} 暂无数据`,
+                    left: 'center',
+                    top: 'middle',
+                    textStyle: {
+                        color: '#6b7280',
+                        fontSize: 16
+                    }
+                }
+            });
+            updateDateDisplay();
+            return;
+        }
+        
+        liqAllData = result.data;
+        console.log(`✅ 加载成功: ${liqAllData.length}条记录`);
+        
+        // 更新图表
+        updateLiquidation1hChart();
+        // 更新日期显示
+        updateDateDisplay();
+        
+    } catch (error) {
+        console.error('❌ 加载1小时爆仓金额数据失败:', error);
+    }
+}
+
+// 更新图表
+function updateLiquidation1hChart() {
+    if (!liqAllData || liqAllData.length === 0) {
+        console.warn('⚠️ 没有数据可显示');
+        return;
+    }
+    
+    // 提取时间和金额
+    const times = liqAllData.map(d => {
+        // 提取时间部分 HH:MM
+        const time = d.record_time.split(' ')[1];
+        return time.substring(0, 5);
+    });
+    
+    // 1小时爆仓金额数据
+    const amounts = liqAllData.map(d => d.hour_1_amount);
+    
+    // 计算统计信息
+    const avgAmount = (amounts.reduce((a, b) => a + b, 0) / amounts.length).toFixed(2);
+    const maxAmount = Math.max(...amounts);
+    const minAmount = Math.min(...amounts);
+    const maxIndex = amounts.indexOf(maxAmount);
+    const maxTime = times[maxIndex];
+    
+    // 日期字符串
+    const dateStr = formatDateDisplay(currentDate);  // 2月11日
+    
+    // 图表配置
+    const option = {
+        backgroundColor: 'transparent',
+        title: {
+            text: `1小时爆仓金额走势 - ${dateStr}`,
+            left: 'center',
+            top: 10,
+            textStyle: {
+                color: '#e5e7eb',
+                fontSize: 20,
+                fontWeight: 'bold'
+            },
+            subtext: `共${liqAllData.length}条数据 | 平均${avgAmount}万美元 | 峰值${maxAmount.toFixed(2)}万美元 (${maxTime})`,
+            subtextStyle: {
+                color: '#9ca3af',
+                fontSize: 14
+            }
+        },
+        tooltip: {
+            trigger: 'axis',
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            borderColor: '#00d4ff',
+            textStyle: { color: '#fff', fontSize: 12 },
+            formatter: function(params) {
+                const p = params[0];
+                return `
+                    <div style="padding:8px;">
+                        <div style="color:#00d4ff;font-weight:bold;margin-bottom:8px;font-size:14px;">${p.name}</div>
+                        <div style="font-size:16px;">1h爆仓: <span style="color:#fbbf24;font-weight:bold;">${p.value.toFixed(2)}万美元</span></div>
+                        <div style="font-size:13px;color:#9ca3af;margin-top:5px;">平均: ${avgAmount}万美元</div>
+                    </div>
+                `;
+            }
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '8%',
+            top: '15%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            data: times,
+            axisLabel: {
+                color: '#e5e7eb',
+                fontSize: 12,
+                rotate: 45,
+                interval: Math.floor(times.length / 20)  // 显示约20个标签
+            },
+            axisLine: {
+                lineStyle: { color: '#374151' }
+            }
+        },
+        yAxis: {
+            type: 'value',
+            name: '1h爆仓(万美元)',
+            min: 0,
+            // 自动缩放，不强制固定最大值
+            nameTextStyle: {
+                color: '#fbbf24',
+                fontSize: 15,
+                fontWeight: 'bold'
+            },
+            axisLabel: {
+                color: '#e5e7eb',
+                fontSize: 13,
+                formatter: '{value}'
+            },
+            splitLine: {
+                lineStyle: {
+                    color: '#374151',
+                    type: 'dashed'
+                }
+            }
+        },
+        series: [{
+            name: '1小时爆仓金额',
+            type: 'line',
+            data: amounts,
+            smooth: true,
+            lineStyle: {
+                width: 2,
+                color: '#fbbf24'
+            },
+            itemStyle: {
+                color: '#fbbf24'
+            },
+            areaStyle: {
+                color: {
+                    type: 'linear',
+                    x: 0, y: 0, x2: 0, y2: 1,
+                    colorStops: [
+                        { offset: 0, color: 'rgba(251, 191, 36, 0.4)' },
+                        { offset: 1, color: 'rgba(251, 191, 36, 0.05)' }
+                    ]
+                }
+            },
+            showSymbol: false,
+            markPoint: {
+                data: [
+                    { 
+                        type: 'max', 
+                        name: '峰值', 
+                        itemStyle: { 
+                            color: '#ef4444',
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        },
+                        label: {
+                            show: true,
+                            formatter: function(params) {
+                                return '🔥 ' + params.value.toFixed(2) + '万美元';
+                            },
+                            color: '#fff',
+                            fontSize: 14,
+                            fontWeight: 'bold',
+                            backgroundColor: 'rgba(239, 68, 68, 0.9)',
+                            padding: [8, 12],
+                            borderRadius: 6,
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        }
+                    }
+                ]
+            },
+            markLine: {
+                silent: true,
+                data: (function() {
+                    const lines = [];
+                    
+                    // 平均线
+                    lines.push({
+                        yAxis: avgAmount,
+                        lineStyle: {
+                            color: '#10b981',
+                            type: 'dashed',
+                            width: 1
+                        },
+                        label: {
+                            formatter: '平均: {c}万美元',
+                            position: 'insideEndTop',
+                            color: '#10b981',
+                            fontSize: 11
+                        }
+                    });
+                    
+                    // 动态添加参考线（只添加在数据范围内的）
+                    const referenceLines = [
+                        { value: 5000, label: '5000万', color: '#6b7280' },   // 灰色
+                        { value: 10000, label: '10000万', color: '#6b7280' }, // 灰色
+                        { value: 15000, label: '15000万', color: '#6b7280' }  // 灰色
+                    ];
+                    
+                    // 只添加小于等于最大值的参考线
+                    referenceLines.forEach(ref => {
+                        if (ref.value <= maxAmount * 1.1) {  // 留10%余量
+                            lines.push({
+                                yAxis: ref.value,
+                                lineStyle: {
+                                    color: ref.color,
+                                    type: 'dashed',  // 虚线
+                                    width: 1,        // 细线
+                                    opacity: 0.5     // 半透明
+                                },
+                                label: {
+                                    formatter: ref.label,
+                                    position: 'insideEndTop',
+                                    color: ref.color,
+                                    fontSize: 10,
+                                    opacity: 0.7
+                                }
+                            });
+                        }
+                    });
+                    
+                    return lines;
+                })()
+            }
+        }]
+    };
+    
+    liquidation1hChart.setOption(option);
+}
+
+// 前一天
+async function loadLiquidationPreviousDate() {
+    // 检查是否可以向前翻（最早2026-02-01）
+    const minDate = new Date('2026-02-01T00:00:00');
+    const prevDate = new Date(currentDate);
+    prevDate.setDate(prevDate.getDate() - 1);
+    
+    if (prevDate < minDate) {
+        alert('已经是最早日期了（2026-02-01）');
+        return;
+    }
+    
+    currentDate = prevDate;
+    await loadDataForCurrentDate();
+    updateNavigationButtons();
+}
+
+// 后一天
+async function loadLiquidationNextDate() {
+    // 获取服务器当前日期
+    let today = new Date();
+    try {
+        const response = await fetch('/api/server-date');
+        const data = await response.json();
+        if (data.success) {
+            today = new Date(data.date + 'T00:00:00');
+        }
+    } catch (error) {
+        console.error('获取服务器日期失败');
+    }
+    
+    const nextDate = new Date(currentDate);
+    nextDate.setDate(nextDate.getDate() + 1);
+    
+    // 不能超过今天
+    if (nextDate <= today) {
+        currentDate = nextDate;
+        await loadDataForCurrentDate();
+        updateNavigationButtons();
+    } else {
+        alert('已经是最新日期了');
+    }
+}
+
+// 回到今天
+async function loadLiquidationToday() {
+    await initCurrentDate();  // 重新获取服务器日期
+    await loadDataForCurrentDate();
+    updateNavigationButtons();
+}
+
+// 通过日期选择器加载数据
+async function loadLiquidationByDatePicker() {
+    const datePickerValue = document.getElementById('liqDatePicker').value;
+    if (!datePickerValue) return;
+    
+    // 获取服务器当前日期
+    let today = new Date();
+    try {
+        const response = await fetch('/api/server-date');
+        const data = await response.json();
+        if (data.success) {
+            today = new Date(data.date + 'T00:00:00');
+        }
+    } catch (error) {
+        console.error('获取服务器日期失败');
+    }
+    
+    const selectedDate = new Date(datePickerValue + 'T00:00:00');
+    const minDate = new Date('2026-02-01T00:00:00');
+    
+    // 验证日期范围
+    if (selectedDate > today) {
+        alert('不能选择未来日期');
+        // 重置为当前日期
+        document.getElementById('liqDatePicker').value = formatDateStr(currentDate);
+        return;
+    }
+    
+    if (selectedDate < minDate) {
+        alert('不能选择2026-02-01之前的日期');
+        document.getElementById('liqDatePicker').value = formatDateStr(currentDate);
+        return;
+    }
+    
+    // 更新当前日期并加载数据
+    currentDate = selectedDate;
+    await loadDataForCurrentDate();
+    updateNavigationButtons();
+}
+
+// 更新日期显示
+function updateDateDisplay() {
+    const dateStr = formatDateDisplay(currentDate);
+    document.getElementById('liqDateDisplay').textContent = dateStr;
+    
+    // 同时更新日期选择器的值
+    const datePickerValue = formatDateStr(currentDate);
+    document.getElementById('liqDatePicker').value = datePickerValue;
+}
+
+// 更新导航按钮状态
+async function updateNavigationButtons() {
+    const minDate = new Date('2026-02-01T00:00:00');
+    
+    // 获取服务器当前日期作为最大日期
+    let maxDate = new Date();
+    try {
+        const response = await fetch('/api/server-date');
+        const data = await response.json();
+        if (data.success) {
+            maxDate = new Date(data.date + 'T00:00:00');
+        }
+    } catch (error) {
+        console.error('获取服务器日期失败');
+    }
+    
+    const prevBtn = document.getElementById('liqPrevPageBtn');
+    const nextBtn = document.getElementById('liqNextPageBtn');
+    
+    // 检查前一天按钮是否应该禁用
+    const prevDate = new Date(currentDate);
+    prevDate.setDate(prevDate.getDate() - 1);
+    if (prevDate < minDate) {
+        prevBtn.disabled = true;
+        prevBtn.style.opacity = '0.5';
+        prevBtn.style.cursor = 'not-allowed';
+    } else {
+        prevBtn.disabled = false;
+        prevBtn.style.opacity = '1';
+        prevBtn.style.cursor = 'pointer';
+    }
+    
+    // 检查后一天按钮是否应该禁用
+    const nextDate = new Date(currentDate);
+    nextDate.setDate(nextDate.getDate() + 1);
+    if (nextDate > maxDate) {
+        nextBtn.disabled = true;
+        nextBtn.style.opacity = '0.5';
+        nextBtn.style.cursor = 'not-allowed';
+    } else {
+        nextBtn.disabled = false;
+        nextBtn.style.opacity = '1';
+        nextBtn.style.cursor = 'pointer';
+    }
+}
+
+// 格式化日期：YYYY-MM-DD
+function formatDateStr(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+// 格式化显示：2月11日
+function formatDateDisplay(date) {
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${month}月${day}日`;
+}
+
+// 从服务器获取当前日期（北京时间）
+async function initCurrentDate() {
+    try {
+        const response = await fetch('/api/server-date');
+        const data = await response.json();
+        if (data.success) {
+            currentDate = new Date(data.date);
+            console.log(`✓ 服务器当前日期（北京时间）: ${data.date}`);
+            
+            // 设置日期选择器的max属性为今天
+            const datePickerEl = document.getElementById('liqDatePicker');
+            if (datePickerEl) {
+                datePickerEl.max = data.date;
+            }
+        }
+    } catch (error) {
+        console.error('获取服务器日期失败，使用浏览器时间:', error);
+        currentDate = new Date();
+    }
+}
+
+        window.onload = async function() {
+            await initCurrentDate();  // 先获取服务器日期
+            initChart();
+            initLiquidation1hChart();  // 初始化1小时爆仓金额图表
+            loadCurrentData();
+            loadAllHistoryData();  // 加载全部数据用于图表分页
+            loadHistoryData();      // 加载最近50条用于表格
+            load30DaysLiquidation();
+            await loadDataForCurrentDate();  // 加载今天的1小时爆仓数据
+            await updateNavigationButtons();  // 更新导航按钮状态
+            
+            // 每1分钟刷新所有数据
+            setInterval(async () => {
+                console.log('[Auto Refresh] 刷新数据中... ' + new Date().toLocaleTimeString());
+                
+                // 检测是否跨日 - 获取最新的服务器日期
+                const oldDate = formatDateStr(currentDate);
+                try {
+                    const response = await fetch('/api/server-date');
+                    const data = await response.json();
+                    if (data.success) {
+                        const newDate = data.date;  // YYYY-MM-DD 格式
+                        
+                        // 如果日期不同，说明跨日了
+                        if (oldDate !== newDate) {
+                            console.log(`🔄 检测到跨日: ${oldDate} -> ${newDate}，自动跳转到最新日期`);
+                            currentDate = new Date(newDate);
+                            // 显示提示信息
+                            const dateDisplay = document.getElementById('liqDateDisplay');
+                            if (dateDisplay) {
+                                dateDisplay.style.background = 'rgba(34, 197, 94, 0.2)';
+                                dateDisplay.style.transition = 'all 0.5s';
+                                setTimeout(() => {
+                                    dateDisplay.style.background = '';
+                                }, 2000);
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('检测跨日失败:', error);
+                }
+                
+                loadCurrentData();
+                loadAllHistoryData();
+                loadHistoryData();
+                await loadDataForCurrentDate();  // 刷新1小时爆仓金额数据
+                await updateNavigationButtons();  // 刷新导航按钮状态
+            }, 60000);  // 60秒 = 1分钟
+            
+            // 响应窗口大小变化
+            window.addEventListener('resize', () => {
+                if (chart) chart.resize();
+                if (liquidation1hChart) liquidation1hChart.resize();
+            });
+        };
+    </script>
+</body>
+</html>

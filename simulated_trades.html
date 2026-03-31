@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模拟交易详情 - 加密货币自动交易系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .nav-links {
+            margin-top: 15px;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .nav-links a:hover {
+            background: #764ba2;
+        }
+
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            display: inline-block;
+            margin-right: 20px;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            margin-right: 10px;
+            color: #333;
+        }
+
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .stat-card .value.positive {
+            color: #10b981;
+        }
+
+        .stat-card .value.negative {
+            color: #ef4444;
+        }
+
+        .trades-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .trades-section h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .trade-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: box-shadow 0.3s;
+        }
+
+        .trade-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .trade-card.anchor {
+            border-left: 4px solid #f59e0b;
+            background: #fffbeb;
+        }
+
+        .trade-card.normal {
+            border-left: 4px solid #3b82f6;
+            background: #eff6ff;
+        }
+
+        .trade-card.stop-loss {
+            border-left: 4px solid #ef4444;
+            background: #fef2f2;
+        }
+
+        .trade-card.take-profit {
+            border-left: 4px solid #10b981;
+            background: #f0fdf4;
+        }
+
+        .trade-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .trade-title {
+            font-weight: 700;
+            font-size: 18px;
+            color: #1f2937;
+        }
+
+        .trade-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-anchor {
+            background: #fbbf24;
+            color: #78350f;
+        }
+
+        .badge-normal {
+            background: #60a5fa;
+            color: #1e3a8a;
+        }
+
+        .badge-stop-loss {
+            background: #f87171;
+            color: #7f1d1d;
+        }
+
+        .badge-take-profit {
+            background: #34d399;
+            color: #064e3b;
+        }
+
+        .trade-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            background: white;
+            border-radius: 5px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .detail-value {
+            color: #1f2937;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .trade-reason {
+            margin-top: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            font-size: 13px;
+            color: #4b5563;
+            border-left: 3px solid #9ca3af;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .refresh-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .refresh-btn:hover {
+            background: #764ba2;
+        }
+
+        .action-buy {
+            color: #10b981;
+            font-weight: 700;
+        }
+
+        .action-sell {
+            color: #ef4444;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 模拟交易详情</h1>
+            <p>查看系统生成的所有模拟买卖单详情，包括锚点单、普通单、止盈和止损操作</p>
+            <div class="nav-links">
+                <a href="/dashboard">📊 返回仪表板</a>
+                <a href="/trading-manager">⚙️ 交易管理</a>
+                <a href="/anchor-system">⚓ 锚点系统</a>
+                <button class="refresh-btn" onclick="loadTrades()">🔄 刷新</button>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label for="trade-type-filter">交易类型:</label>
+                <select id="trade-type-filter" onchange="loadTrades()">
+                    <option value="all">全部</option>
+                    <option value="anchor">锚点单</option>
+                    <option value="normal">普通单</option>
+                    <option value="stop_loss">止损单</option>
+                    <option value="take_profit">止盈单</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="limit-filter">显示数量:</label>
+                <select id="limit-filter" onchange="loadTrades()">
+                    <option value="20">20条</option>
+                    <option value="50" selected>50条</option>
+                    <option value="100">100条</option>
+                    <option value="200">200条</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="stats-container" id="stats-container">
+            <!-- Stats will be loaded here -->
+        </div>
+
+        <div class="trades-section">
+            <h2>📝 交易记录</h2>
+            <div id="trades-container">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadTrades() {
+            const tradesContainer = document.getElementById('trades-container');
+            const statsContainer = document.getElementById('stats-container');
+            
+            const tradeType = document.getElementById('trade-type-filter').value;
+            const limit = document.getElementById('limit-filter').value;
+            
+            tradesContainer.innerHTML = '<div class="loading">加载中...</div>';
+            
+            try {
+                // Build query params
+                const params = new URLSearchParams();
+                if (tradeType !== 'all') {
+                    params.append('trade_type', tradeType);
+                }
+                params.append('limit', limit);
+                
+                // Fetch trades
+                const response = await fetch(`/api/trading/simulated-trades?${params.toString()}`);
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || '获取数据失败');
+                }
+                
+                const trades = data.trades || [];
+                
+                // Calculate stats
+                calculateStats(trades, statsContainer);
+                
+                // Display trades
+                if (trades.length === 0) {
+                    tradesContainer.innerHTML = `
+                        <div class="empty-state">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <h3>暂无交易记录</h3>
+                            <p>系统尚未生成任何模拟交易记录</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                tradesContainer.innerHTML = trades.map(trade => renderTradeCard(trade)).join('');
+                
+            } catch (error) {
+                console.error('加载交易记录失败:', error);
+                tradesContainer.innerHTML = `
+                    <div class="empty-state">
+                        <h3>❌ 加载失败</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function calculateStats(trades, container) {
+            const stats = {
+                total: trades.length,
+                anchor: trades.filter(t => t.trade_type === 'anchor').length,
+                normal: trades.filter(t => t.trade_type === 'normal').length,
+                stopLoss: trades.filter(t => t.trade_type === 'stop_loss').length,
+                takeProfit: trades.filter(t => t.trade_type === 'take_profit').length,
+                totalAmount: trades.reduce((sum, t) => sum + (t.amount || 0), 0),
+                buyCount: trades.filter(t => t.action === 'open_long' || t.order_side === 'buy').length,
+                sellCount: trades.filter(t => t.action === 'open_short' || t.order_side === 'sell').length
+            };
+            
+            container.innerHTML = `
+                <div class="stat-card">
+                    <h3>📊 总交易数</h3>
+                    <div class="value">${stats.total}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>⚓ 锚点单</h3>
+                    <div class="value" style="color: #f59e0b;">${stats.anchor}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>📈 普通单</h3>
+                    <div class="value" style="color: #3b82f6;">${stats.normal}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>🎯 止盈单</h3>
+                    <div class="value positive">${stats.takeProfit}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>🛑 止损单</h3>
+                    <div class="value negative">${stats.stopLoss}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>💰 总交易金额</h3>
+                    <div class="value">${stats.totalAmount.toFixed(2)} USDT</div>
+                </div>
+            `;
+        }
+        
+        function renderTradeCard(trade) {
+            const typeClass = trade.trade_type || 'normal';
+            const badgeClass = `badge-${typeClass.replace('_', '-')}`;
+            const typeText = {
+                'anchor': '锚点单',
+                'normal': '普通单',
+                'stop_loss': '止损单',
+                'take_profit': '止盈单'
+            }[trade.trade_type] || '未知';
+            
+            const actionText = {
+                'open_long': '开多',
+                'open_short': '开空',
+                'close_long': '平多',
+                'close_short': '平空',
+                'add_long': '加多仓',
+                'add_short': '加空仓'
+            }[trade.action] || trade.action;
+            
+            const actionClass = (trade.action?.includes('long') || trade.order_side === 'buy') ? 'action-buy' : 'action-sell';
+            const orderSideText = trade.order_side === 'buy' ? '买入' : '卖出';
+            
+            return `
+                <div class="trade-card ${typeClass}">
+                    <div class="trade-header">
+                        <div class="trade-title">
+                            ${trade.inst_id} 
+                            <span class="${actionClass}">${actionText}</span>
+                        </div>
+                        <div class="trade-badge ${badgeClass}">${typeText}</div>
+                    </div>
+                    
+                    <div class="trade-details">
+                        <div class="detail-item">
+                            <span class="detail-label">方向</span>
+                            <span class="detail-value ${actionClass}">${orderSideText}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">价格</span>
+                            <span class="detail-value">${trade.price?.toFixed(4) || 'N/A'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">数量</span>
+                            <span class="detail-value">${trade.size?.toFixed(2) || 'N/A'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">金额</span>
+                            <span class="detail-value">${trade.amount?.toFixed(2) || 'N/A'} USDT</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">仓位方向</span>
+                            <span class="detail-value">${trade.pos_side === 'long' ? '多头' : '空头'}</span>
+                        </div>
+                        ${trade.profit_rate ? `
+                        <div class="detail-item">
+                            <span class="detail-label">收益率</span>
+                            <span class="detail-value ${trade.profit_rate > 0 ? 'action-buy' : 'action-sell'}">
+                                ${(trade.profit_rate * 100).toFixed(2)}%
+                            </span>
+                        </div>
+                        ` : ''}
+                        <div class="detail-item">
+                            <span class="detail-label">执行时间</span>
+                            <span class="detail-value">${trade.executed_at || trade.created_at}</span>
+                        </div>
+                    </div>
+                    
+                    ${trade.reason ? `
+                    <div class="trade-reason">
+                        <strong>📌 原因:</strong> ${trade.reason}
+                        ${trade.trigger_condition ? `<br><strong>触发条件:</strong> ${trade.trigger_condition}` : ''}
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+        
+        // Load trades on page load
+        window.onload = () => {
+            loadTrades();
+            // Auto refresh every 30 seconds
+            setInterval(loadTrades, 30000);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>BTC日内涨跌幅监控 v1.0</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .nav-buttons {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .nav-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .nav-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .nav-button i {
+            font-size: 1.2em;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card .label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card .sub-value {
+            font-size: 0.9em;
+            color: #888;
+        }
+        
+        .status-main-down { color: #ef4444; }
+        .status-big-down { color: #f97316; }
+        .status-small-down { color: #f59e0b; }
+        .status-small-up { color: #10b981; }
+        .status-big-up { color: #059669; }
+        .status-main-up { color: #16a34a; }
+        
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .chart-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .date-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .date-selector select,
+        .date-selector button {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .date-selector button:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        #positionChart {
+            width: 100%;
+            height: 400px;
+        }
+        
+        #velocityChart {
+            width: 100%;
+            height: 300px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.2em;
+        }
+        
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+        }
+        
+        .legend-color {
+            width: 30px;
+            height: 4px;
+            border-radius: 2px;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .nav-buttons {
+                position: static;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+            
+            .nav-button {
+                padding: 10px 16px;
+                font-size: 0.9em;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            #positionChart,
+            #velocityChart {
+                height: 300px;
+            }
+        }
+    </style>
+    
+    <!-- ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="nav-buttons">
+                <a href="javascript:history.back()" class="nav-button" title="返回上一页">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>返回</span>
+                </a>
+                <a href="/coin-change-tracker" class="nav-button" title="返回首页">
+                    <i class="fas fa-home"></i>
+                    <span>首页</span>
+                </a>
+            </div>
+            <h1>📊 BTC日内涨跌幅监控系统</h1>
+            <div class="subtitle">实时追踪BTC价格在当日最高最低价之间的百分比位置</div>
+        </div>
+        
+        <div class="stats-container" id="statsContainer">
+            <div class="stat-card">
+                <div class="label">当前价格</div>
+                <div class="value" id="currentPrice">--</div>
+                <div class="sub-value" id="updateTime">等待数据...</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="label">位置百分比</div>
+                <div class="value" id="positionPercent">--</div>
+                <div class="sub-value">0% = 最低价 | 100% = 最高价</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="label">5分钟涨速</div>
+                <div class="value" id="velocity5min">--</div>
+                <div class="sub-value">过去5分钟价格变化率</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="label">市场状态</div>
+                <div class="value" id="marketStatus">--</div>
+                <div class="sub-value" id="priceRange">--</div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-header">
+                <div class="chart-title">📈 价格位置百分比走势</div>
+                <div class="date-selector">
+                    <select id="dateSelect">
+                        <option value="">加载中...</option>
+                    </select>
+                    <button onclick="loadData()">刷新</button>
+                </div>
+            </div>
+            <div id="positionChart"></div>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #16a34a;"></div>
+                    <span>主升 (>80%)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #059669;"></div>
+                    <span>大涨 (65-80%)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #10b981;"></div>
+                    <span>小涨 (50-65%)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f59e0b;"></div>
+                    <span>小跌 (35-50%)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f97316;"></div>
+                    <span>大跌 (20-35%)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ef4444;"></div>
+                    <span>主跌 (<20%)</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-header">
+                <div class="chart-title">⚡ 5分钟涨速变化</div>
+            </div>
+            <div id="velocityChart"></div>
+        </div>
+    </div>
+    
+    <script>
+        let positionChart = null;
+        let velocityChart = null;
+        let updateInterval = null;
+        
+        // 初始化图表
+        function initCharts() {
+            positionChart = echarts.init(document.getElementById('positionChart'));
+            velocityChart = echarts.init(document.getElementById('velocityChart'));
+            
+            // 响应式
+            window.addEventListener('resize', () => {
+                positionChart.resize();
+                velocityChart.resize();
+            });
+        }
+        
+        // 获取颜色
+        function getStatusColor(position) {
+            if (position >= 80) return '#16a34a'; // 主升
+            if (position >= 65) return '#059669'; // 大涨
+            if (position >= 50) return '#10b981'; // 小涨
+            if (position >= 35) return '#f59e0b'; // 小跌
+            if (position >= 20) return '#f97316'; // 大跌
+            return '#ef4444'; // 主跌
+        }
+        
+        // 格式化价格
+        function formatPrice(price) {
+            return '$' + price.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+        
+        // 格式化百分比
+        function formatPercent(value, showSign = true) {
+            const sign = showSign && value > 0 ? '+' : '';
+            return sign + value.toFixed(2) + '%';
+        }
+        
+        // 加载可用日期
+        async function loadAvailableDates() {
+            try {
+                const response = await fetch('/api/btc-daily-range/available-dates');
+                const data = await response.json();
+                
+                if (data.success && data.dates.length > 0) {
+                    const select = document.getElementById('dateSelect');
+                    select.innerHTML = data.dates.map(dateObj => 
+                        `<option value="${dateObj.date}">${dateObj.date}</option>`
+                    ).join('');
+                    
+                    // 默认选择第一个日期（最新日期）
+                    select.value = data.dates[0].date;
+                }
+            } catch (error) {
+                console.error('加载日期失败:', error);
+            }
+        }
+        
+        // 加载历史数据
+        async function loadHistoryData(date) {
+            try {
+                const response = await fetch(`/api/btc-daily-range/history?date=${date}`);
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error);
+                }
+                
+                return data.data;
+            } catch (error) {
+                console.error('加载历史数据失败:', error);
+                return [];
+            }
+        }
+        
+        // 更新图表
+        function updateCharts(data) {
+            if (!data || data.length === 0) return;
+            
+            const times = data.map(d => d.beijing_time.split(' ')[1]);
+            const positions = data.map(d => d.position_percentage);
+            const velocities = data.map(d => d.velocity_5min);
+            const prices = data.map(d => d.current_price);
+            
+            // 位置百分比图表
+            const positionOption = {
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: function(params) {
+                        const p = params[0];
+                        const idx = p.dataIndex;
+                        return `时间: ${times[idx]}<br/>` +
+                               `价格: ${formatPrice(prices[idx])}<br/>` +
+                               `位置: ${formatPercent(positions[idx], false)}<br/>` +
+                               `状态: ${data[idx].status}`;
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: times,
+                    axisLabel: {
+                        rotate: 45,
+                        interval: Math.floor(times.length / 20)
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    min: 0,
+                    max: 100,
+                    axisLabel: {
+                        formatter: '{value}%'
+                    }
+                },
+                series: [{
+                    name: '位置百分比',
+                    type: 'line',
+                    data: positions,
+                    smooth: true,
+                    lineStyle: {
+                        width: 3
+                    },
+                    itemStyle: {
+                        color: function(params) {
+                            return getStatusColor(params.value);
+                        }
+                    },
+                    areaStyle: {
+                        color: {
+                            type: 'linear',
+                            x: 0, y: 0, x2: 0, y2: 1,
+                            colorStops: [
+                                { offset: 0, color: 'rgba(22, 163, 74, 0.3)' },
+                                { offset: 0.5, color: 'rgba(245, 158, 11, 0.2)' },
+                                { offset: 1, color: 'rgba(239, 68, 68, 0.1)' }
+                            ]
+                        }
+                    },
+                    markLine: {
+                        silent: true,
+                        lineStyle: {
+                            type: 'dashed',
+                            color: '#999'
+                        },
+                        data: [
+                            { yAxis: 50, label: { formatter: '50% 中位' } }
+                        ]
+                    }
+                }]
+            };
+            
+            // 涨速图表
+            const velocityOption = {
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: function(params) {
+                        const p = params[0];
+                        const idx = p.dataIndex;
+                        return `时间: ${times[idx]}<br/>` +
+                               `5分钟涨速: ${formatPercent(velocities[idx])}`;
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: times,
+                    axisLabel: {
+                        rotate: 45,
+                        interval: Math.floor(times.length / 20)
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLabel: {
+                        formatter: '{value}%'
+                    }
+                },
+                series: [{
+                    name: '5分钟涨速',
+                    type: 'bar',
+                    data: velocities,
+                    itemStyle: {
+                        color: function(params) {
+                            return params.value >= 0 ? '#10b981' : '#ef4444';
+                        }
+                    },
+                    markLine: {
+                        silent: true,
+                        lineStyle: {
+                            type: 'dashed',
+                            color: '#999'
+                        },
+                        data: [
+                            { yAxis: 0, label: { formatter: '0%' } }
+                        ]
+                    }
+                }]
+            };
+            
+            positionChart.setOption(positionOption);
+            velocityChart.setOption(velocityOption);
+        }
+        
+        // 更新统计卡片
+        function updateStats(latest) {
+            if (!latest) return;
+            
+            document.getElementById('currentPrice').textContent = formatPrice(latest.current_price);
+            document.getElementById('updateTime').textContent = latest.beijing_time;
+            
+            const posPercent = latest.position_percentage;
+            const posElem = document.getElementById('positionPercent');
+            posElem.textContent = formatPercent(posPercent, false);
+            posElem.style.color = getStatusColor(posPercent);
+            
+            const velElem = document.getElementById('velocity5min');
+            const vel = latest.velocity_5min;
+            velElem.textContent = formatPercent(vel);
+            velElem.style.color = vel >= 0 ? '#10b981' : '#ef4444';
+            
+            const statusElem = document.getElementById('marketStatus');
+            statusElem.textContent = latest.status;
+            
+            // 设置状态颜色
+            const statusClasses = {
+                '主跌': 'status-main-down',
+                '大跌': 'status-big-down',
+                '小跌': 'status-small-down',
+                '小涨': 'status-small-up',
+                '大涨': 'status-big-up',
+                '主升': 'status-main-up'
+            };
+            statusElem.className = 'value ' + (statusClasses[latest.status] || '');
+            
+            const rangeText = `最低: ${formatPrice(latest.daily_low)} | 最高: ${formatPrice(latest.daily_high)}`;
+            document.getElementById('priceRange').textContent = rangeText;
+        }
+        
+        // 加载最新数据
+        async function loadLatestData() {
+            try {
+                const response = await fetch('/api/btc-daily-range/latest');
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    updateStats(data.data);
+                }
+            } catch (error) {
+                console.error('加载最新数据失败:', error);
+            }
+        }
+        
+        // 加载数据
+        async function loadData() {
+            const selectedDate = document.getElementById('dateSelect').value;
+            if (!selectedDate) return;
+            
+            const historyData = await loadHistoryData(selectedDate);
+            
+            if (historyData.length > 0) {
+                updateCharts(historyData);
+                updateStats(historyData[historyData.length - 1]);
+            }
+        }
+        
+        // 初始化
+        async function init() {
+            initCharts();
+            await loadAvailableDates();
+            await loadData();
+            
+            // 启动自动刷新（每分钟）
+            updateInterval = setInterval(() => {
+                loadLatestData();
+                loadData();
+            }, 60000);
+            
+            // 日期改变时重新加载数据
+            document.getElementById('dateSelect').addEventListener('change', () => {
+                loadData();
+            });
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

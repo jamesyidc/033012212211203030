@@ -1,0 +1,2122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAR斜率系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: #1e2139;
+            color: #fff;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #00d4ff;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            margin: 0;
+        }
+        
+        .back-btn {
+            background: rgba(59, 125, 255, 0.2);
+            border: 1px solid rgba(59, 125, 255, 0.4);
+            color: #00d4ff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: rgba(59, 125, 255, 0.3);
+            border-color: rgba(59, 125, 255, 0.6);
+        }
+        
+        .crypto-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .crypto-card {
+            background: rgba(42, 45, 71, 0.8);
+            border: 1px solid rgba(59, 125, 255, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .crypto-card:hover {
+            background: rgba(59, 125, 255, 0.15);
+            border-color: rgba(59, 125, 255, 0.6);
+            transform: translateY(-2px);
+        }
+        
+        .crypto-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+        
+        .crypto-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: #8b92b8;
+            margin-bottom: 8px;
+        }
+        
+        .position-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .position-long {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+        }
+        
+        .position-short {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff4444;
+        }
+        
+        .bias-ratio {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .bias-ratio.bullish {
+            color: #8b92b8;
+        }
+        
+        .bias-ratio.bearish {
+            color: #8b92b8;
+        }
+        
+        .duration-list {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(139, 146, 184, 0.2);
+        }
+        
+        .duration-title {
+            font-size: 12px;
+            color: #8b92b8;
+            margin-bottom: 8px;
+        }
+        
+        .duration-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            padding: 4px 0;
+            color: #d0d4e8;
+        }
+        
+        .duration-label {
+            color: #8b92b8;
+        }
+        
+        .duration-value {
+            font-weight: 500;
+            color: #00d4ff;
+        }
+        
+        /* 全屏加载页面样式 */
+        #loadingProgress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 50%, #16213e 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            overflow: hidden;
+        }
+        
+        /* 背景装饰粒子 */
+        .loading-particle {
+            position: absolute;
+            background: radial-gradient(circle, rgba(0, 255, 136, 0.8), rgba(0, 204, 255, 0.4), transparent);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float-particle linear infinite;
+        }
+        
+        @keyframes float-particle {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-100px) scale(1);
+                opacity: 0;
+            }
+        }
+        
+        /* Logo容器 */
+        .loading-logo-container {
+            position: relative;
+            margin-bottom: 40px;
+            animation: pulse-logo 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-logo {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        
+        .loading-logo {
+            font-size: 80px;
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.8),
+                         0 0 60px rgba(0, 204, 255, 0.6);
+            filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.7));
+        }
+        
+        /* 双环特效 */
+        .loading-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 3px solid transparent;
+            border-radius: 50%;
+            animation: ripple-ring 3s ease-out infinite;
+        }
+        
+        .loading-ring:nth-child(1) {
+            width: 120px;
+            height: 120px;
+            border-top-color: rgba(0, 255, 136, 0.6);
+            animation-delay: 0s;
+        }
+        
+        .loading-ring:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            border-top-color: rgba(0, 204, 255, 0.5);
+            animation-delay: 0.5s;
+        }
+        
+        @keyframes ripple-ring {
+            0% {
+                transform: translate(-50%, -50%) scale(0.8) rotate(0deg);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.5) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* 标题文字 */
+        .loading-title {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #00ff88, #00ccff, #667eea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            animation: slide-down 0.8s ease-out;
+            text-shadow: 0 0 40px rgba(0, 255, 136, 0.5);
+        }
+        
+        @keyframes slide-down {
+            0% {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .loading-subtitle {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 50px;
+            animation: slide-down 0.8s ease-out 0.2s both;
+        }
+        
+        /* 进度条容器 */
+        .progress-container {
+            width: 600px;
+            max-width: 90vw;
+            margin-bottom: 25px;
+        }
+        
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00ccff, #667eea);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.8),
+                        0 0 40px rgba(0, 204, 255, 0.6);
+            animation: shine-bar 2s linear infinite;
+        }
+        
+        @keyframes shine-bar {
+            0% {
+                box-shadow: 0 0 20px rgba(0, 255, 136, 0.8),
+                            0 0 40px rgba(0, 204, 255, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(0, 255, 136, 1),
+                            0 0 60px rgba(0, 204, 255, 0.8);
+            }
+            100% {
+                box-shadow: 0 0 20px rgba(0, 255, 136, 0.8),
+                            0 0 40px rgba(0, 204, 255, 0.6);
+            }
+        }
+        
+        /* 进度信息 */
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .progress-percent {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #00ff88, #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .progress-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 15px;
+        }
+        
+        /* 加载中点动画 */
+        .loading-dots {
+            display: inline-block;
+        }
+        
+        .loading-dots::after {
+            content: '';
+            animation: bounce-dots 1.5s infinite;
+        }
+        
+        @keyframes bounce-dots {
+            0%, 20% {
+                content: '';
+            }
+            40% {
+                content: '.';
+            }
+            60% {
+                content: '..';
+            }
+            80%, 100% {
+                content: '...';
+            }
+        }
+        
+        /* 版本标签 */
+        .loading-version {
+            position: absolute;
+            bottom: 30px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 1px;
+        }
+        
+        /* 淡出动画 */
+        .fade-out {
+            animation: fade-out-animation 0.5s ease-out forwards;
+        }
+        
+        @keyframes fade-out-animation {
+            to {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+        
+        .loading {
+            text-align: center;
+            font-size: 18px;
+            color: #8b92b8;
+            padding: 50px;
+            display: none;
+        }
+        
+        .error {
+            text-align: center;
+            font-size: 16px;
+            color: #ff4444;
+            padding: 30px;
+            background: rgba(255, 68, 68, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 68, 68, 0.3);
+        }
+        
+        .statistics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(42, 45, 71, 0.8);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid rgba(59, 125, 255, 0.3);
+        }
+        
+        .stat-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #00d4ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .stat-count {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .stat-count.bullish {
+            color: #26ff82;
+        }
+        
+        .stat-count.bearish {
+            color: #ff4444;
+        }
+        
+        .stat-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .stat-symbol {
+            background: rgba(59, 125, 255, 0.2);
+            border: 1px solid rgba(59, 125, 255, 0.4);
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .stat-symbol.bullish {
+            background: rgba(38, 255, 130, 0.15);
+            border-color: rgba(38, 255, 130, 0.4);
+            color: #26ff82;
+        }
+        
+        .stat-symbol.bearish {
+            background: rgba(255, 68, 68, 0.15);
+            border-color: rgba(255, 68, 68, 0.4);
+            color: #ff4444;
+        }
+        
+        .stat-empty {
+            color: #8b92b8;
+            font-size: 14px;
+            font-style: italic;
+        }
+        
+        /* 健康监控卡片样式 */
+        .health-monitor-card {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+        
+        .health-monitor-card.unhealthy {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+        
+        .health-monitor-card .health-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .health-monitor-card .health-icon {
+            font-size: 2.5rem;
+        }
+        
+        .health-monitor-card .health-text h3 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            color: #10b981;
+        }
+        
+        .health-monitor-card.unhealthy .health-text h3 {
+            color: #ef4444;
+        }
+        
+        .health-monitor-card .health-text p {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .health-monitor-card .health-details {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .health-monitor-card .health-metric {
+            text-align: center;
+        }
+        
+        .health-monitor-card .health-metric-label {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+        
+        .health-monitor-card .health-metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #10b981;
+        }
+        
+        .health-monitor-card.unhealthy .health-metric-value {
+            color: #ef4444;
+        }
+        
+        .health-monitor-card .view-details-btn {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .health-monitor-card .view-details-btn:hover {
+            background: rgba(16, 185, 129, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .health-monitor-card.unhealthy .view-details-btn {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+        
+        .health-monitor-card.unhealthy .view-details-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+        
+        /* 计算逻辑说明卡片样式 */
+        .info-card {
+            background: rgba(42, 45, 71, 0.8);
+            border: 1px solid rgba(59, 125, 255, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .info-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #00d4ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .toggle-icon {
+            font-size: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .toggle-icon.expanded {
+            transform: rotate(180deg);
+        }
+        
+        .info-content {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(59, 125, 255, 0.2);
+            display: none;
+        }
+        
+        .info-content.show {
+            display: block;
+        }
+        
+        .info-section {
+            margin-bottom: 20px;
+        }
+        
+        .info-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffd700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .info-text {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #b8c1ec;
+            margin-bottom: 10px;
+        }
+        
+        .info-formula {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 3px solid #00d4ff;
+            padding: 12px 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #26ff82;
+        }
+        
+        .info-example {
+            background: rgba(139, 69, 255, 0.1);
+            border: 1px solid rgba(139, 69, 255, 0.3);
+            border-radius: 6px;
+            padding: 12px;
+            margin: 10px 0;
+        }
+        
+        .info-example-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #8b45ff;
+            margin-bottom: 8px;
+        }
+        
+        .info-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .info-list li {
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .info-list li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #00d4ff;
+        }
+        
+        .highlight-green {
+            color: #26ff82;
+            font-weight: 600;
+        }
+        
+        .highlight-red {
+            color: #ff4444;
+            font-weight: 600;
+        }
+        
+        .highlight-blue {
+            color: #00d4ff;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- 全屏加载进度页面 -->
+    <div id="loadingProgress">
+        <!-- 背景粒子动画 -->
+        <script>
+            // 创建15个随机粒子
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'loading-particle';
+                const size = Math.random() * 4 + 2;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = (Math.random() * 8 + 15) + 's';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                document.getElementById('loadingProgress').appendChild(particle);
+            }
+        </script>
+        
+        <!-- Logo与动画环 -->
+        <div class="loading-logo-container">
+            <div class="loading-ring"></div>
+            <div class="loading-ring"></div>
+            <div class="loading-logo">📊</div>
+        </div>
+        
+        <!-- 标题 -->
+        <div class="loading-title">SAR 斜率监控系统</div>
+        <div class="loading-subtitle">Parabolic SAR Slope Analysis</div>
+        
+        <!-- 进度条 -->
+        <div class="progress-container">
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progressBar"></div>
+            </div>
+            <div class="progress-info">
+                <span class="progress-text">
+                    <span id="progressText">正在初始化系统<span class="loading-dots"></span></span>
+                </span>
+                <span class="progress-percent" id="progressPercent">0%</span>
+            </div>
+        </div>
+        
+        <!-- 版本信息 -->
+        <div class="loading-version">Version 1.0.0 | GenSpark AI Developer</div>
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>SAR 斜率系统 - 币种列表</h1>
+            <div style="display: flex; gap: 10px;">
+                <a href="/sar-slope/chart" class="back-btn" style="background: rgba(255, 215, 0, 0.2); border-color: rgba(255, 215, 0, 0.4); color: #ffd700;">
+                    📊 实时曲线图
+                </a>
+                <a href="/sar-slope/bias-chart" class="back-btn" style="background: rgba(139, 69, 255, 0.2); border-color: rgba(139, 69, 255, 0.4); color: #8b45ff;">
+                    📈 偏向统计图
+                </a>
+                <a href="/sar-bias-trend" class="back-btn" style="background: rgba(38, 214, 57, 0.2); border-color: rgba(38, 214, 57, 0.4); color: #26d639;">
+                    📉 偏向趋势图
+                </a>
+                <a href="/" class="back-btn">← 返回首页</a>
+            </div>
+        </div>
+        
+        <!-- 健康监控状态卡片 -->
+        <div class="health-monitor-card" id="health-monitor-card">
+            <div class="health-info">
+                <div class="health-icon">💚</div>
+                <div class="health-text">
+                    <h3 id="health-status-title">系统健康运行中</h3>
+                    <p id="health-status-desc">数据采集正常，所有指标正常</p>
+                </div>
+            </div>
+            <div class="health-details">
+                <div class="health-metric">
+                    <div class="health-metric-label">数据延迟</div>
+                    <div class="health-metric-value" id="health-delay">-</div>
+                </div>
+                <div class="health-metric">
+                    <div class="health-metric-label">PM2状态</div>
+                    <div class="health-metric-value" id="health-pm2-status">-</div>
+                </div>
+                <div class="health-metric">
+                    <div class="health-metric-label">成功率</div>
+                    <div class="health-metric-value" id="health-success-rate">-</div>
+                </div>
+                <a href="/data-health-monitor" class="view-details-btn">📊 查看详情</a>
+            </div>
+        </div>
+        
+        <!-- 系统完整说明卡片 -->
+        <div class="info-card">
+            <div class="info-header" onclick="toggleInfoCard()">
+                <div class="info-title">
+                    <span>💡</span>
+                    <span>SAR斜率监控系统完整说明</span>
+                </div>
+                <span class="toggle-icon" id="toggleIcon">▼</span>
+            </div>
+            <div class="info-content" id="infoContent">
+                <!-- 系统概述 -->
+                <div class="info-section">
+                    <div class="info-section-title">
+                        <span>🎯</span>
+                        <span>1. SAR斜率监控系统（基于抛物线转向指标）</span>
+                    </div>
+                    <div class="info-text">
+                        <p><strong>系统定位：</strong>实时加密货币趋势分析工具，基于 Parabolic SAR 指标和斜率分析</p>
+                        <ul class="info-list">
+                            <li>✅ <strong>实时趋势判断</strong>：29种主流加密货币的多空趋势</li>
+                            <li>✅ <strong>象限定位</strong>：4个象限精准定位当前市场位置</li>
+                            <li>✅ <strong>持续时长追踪</strong>：趋势持续时间实时监控（分钟级）</li>
+                            <li>✅ <strong>斜率变化</strong>：SAR 线的斜率方向（上升/下降）</li>
+                            <li>✅ <strong>历史数据归档</strong>：完整的历史趋势数据（JSONL存储）</li>
+                        </ul>
+                    </div>
+                    <div class="info-example">
+                        <div class="info-example-title">监控币种（29个）：</div>
+                        <div class="info-text" style="font-size: 12px;">
+                            AAVE, APT, BCH, BNB, BTC, CFX, CRO, CRV, DOGE, DOT, ETC, ETH, FIL, HBAR, LDO, LINK, LTC, NEAR, OKB, SOL, STX, SUI, TAO, TON, TRX, UNI, XLM, XRP, ADA
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- SAR指标详解 -->
+                <div class="info-section">
+                    <div class="info-section-title">
+                        <span>📊</span>
+                        <span>2. SAR指标（Parabolic Stop and Reverse）</span>
+                    </div>
+                    <div class="info-text">
+                        <p><strong>定义：</strong>抛物线转向指标，用于趋势追踪和止损点位判断</p>
+                        <p><strong>计算公式：</strong></p>
+                        <div class="info-formula">
+SAR(t) = SAR(t-1) + AF × (EP - SAR(t-1))
+<br><br>
+<strong>参数说明：</strong><br>
+• AF (加速因子): 起始0.02，每次新极值点增加0.02，最大0.20<br>
+• EP (极值点): 上升趋势取最高价，下降趋势取最低价<br>
+• SAR(t): 当前周期的SAR值
+                        </div>
+                        <p><strong>趋势判断规则：</strong></p>
+                        <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+                            <tr style="background: #2a2d47;">
+                                <th style="padding: 8px; border: 1px solid #444;">条件</th>
+                                <th style="padding: 8px; border: 1px solid #444;">趋势</th>
+                                <th style="padding: 8px; border: 1px solid #444;">SAR位置</th>
+                                <th style="padding: 8px; border: 1px solid #444;">说明</th>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #444;">价格 > SAR</td>
+                                <td style="padding: 8px; border: 1px solid #444;"><span class="highlight-green">上升趋势</span></td>
+                                <td style="padding: 8px; border: 1px solid #444;">SAR在价格下方</td>
+                                <td style="padding: 8px; border: 1px solid #444;">多头信号</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #444;">价格 < SAR</td>
+                                <td style="padding: 8px; border: 1px solid #444;"><span class="highlight-red">下降趋势</span></td>
+                                <td style="padding: 8px; border: 1px solid #444;">SAR在价格上方</td>
+                                <td style="padding: 8px; border: 1px solid #444;">空头信号</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #444;">价格突破SAR</td>
+                                <td style="padding: 8px; border: 1px solid #444;"><span class="highlight-blue">趋势反转</span></td>
+                                <td style="padding: 8px; border: 1px solid #444;">SAR跳到另一侧</td>
+                                <td style="padding: 8px; border: 1px solid #444;">买卖信号</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- 四象限系统 -->
+                <div class="info-section">
+                    <div class="info-section-title">
+                        <span>📐</span>
+                        <span>3. 四象限定位系统（精准定位市场状态）</span>
+                    </div>
+                    <div class="info-text">
+                        <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+                            <tr style="background: #2a2d47;">
+                                <th style="padding: 8px; border: 1px solid #444;">象限</th>
+                                <th style="padding: 8px; border: 1px solid #444;">价格位置</th>
+                                <th style="padding: 8px; border: 1px solid #444;">SAR趋势</th>
+                                <th style="padding: 8px; border: 1px solid #444;">市场含义</th>
+                                <th style="padding: 8px; border: 1px solid #444;">操作建议</th>
+                            </tr>
+                            <tr style="background: rgba(0, 255, 136, 0.1);">
+                                <td style="padding: 8px; border: 1px solid #444;"><strong>Q1</strong></td>
+                                <td style="padding: 8px; border: 1px solid #444;">价格 > SAR</td>
+                                <td style="padding: 8px; border: 1px solid #444;">Bullish</td>
+                                <td style="padding: 8px; border: 1px solid #444;">🟢 强势上涨</td>
+                                <td style="padding: 8px; border: 1px solid #444;">持有多单</td>
+                            </tr>
+                            <tr style="background: rgba(255, 213, 102, 0.1);">
+                                <td style="padding: 8px; border: 1px solid #444;"><strong>Q2</strong></td>
+                                <td style="padding: 8px; border: 1px solid #444;">价格 < SAR</td>
+                                <td style="padding: 8px; border: 1px solid #444;">Bullish</td>
+                                <td style="padding: 8px; border: 1px solid #444;">🟡 即将反转（多→空）</td>
+                                <td style="padding: 8px; border: 1px solid #444;">警惕做空</td>
+                            </tr>
+                            <tr style="background: rgba(239, 68, 68, 0.1);">
+                                <td style="padding: 8px; border: 1px solid #444;"><strong>Q3</strong></td>
+                                <td style="padding: 8px; border: 1px solid #444;">价格 < SAR</td>
+                                <td style="padding: 8px; border: 1px solid #444;">Bearish</td>
+                                <td style="padding: 8px; border: 1px solid #444;">🔴 强势下跌</td>
+                                <td style="padding: 8px; border: 1px solid #444;">持有空单</td>
+                            </tr>
+                            <tr style="background: rgba(255, 213, 102, 0.1);">
+                                <td style="padding: 8px; border: 1px solid #444;"><strong>Q4</strong></td>
+                                <td style="padding: 8px; border: 1px solid #444;">价格 > SAR</td>
+                                <td style="padding: 8px; border: 1px solid #444;">Bearish</td>
+                                <td style="padding: 8px; border: 1px solid #444;">🟡 即将反转（空→多）</td>
+                                <td style="padding: 8px; border: 1px solid #444;">警惕做多</td>
+                            </tr>
+                        </table>
+                        <div class="info-example">
+                            <div class="info-example-title">交易信号：</div>
+                            <ul class="info-list">
+                                <li><strong>Q1 → Q2</strong>：价格跌破SAR，即将做空信号</li>
+                                <li><strong>Q2 → Q3</strong>：趋势反转确认，做空信号</li>
+                                <li><strong>Q3 → Q4</strong>：价格突破SAR，即将做多信号</li>
+                                <li><strong>Q4 → Q1</strong>：趋势反转确认，做多信号</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 斜率分析 -->
+                <div class="info-section">
+                    <div class="info-section-title">
+                        <span>📈</span>
+                        <span>4. SAR斜率分析（趋势加速度判断）</span>
+                    </div>
+                    <div class="info-text">
+                        <p><strong>斜率定义：</strong>SAR 线的变化速度和方向</p>
+                        <p><strong>计算方法：</strong>使用线性回归计算最近5个周期的SAR斜率</p>
+                        <div class="info-formula">
+slope = 线性拟合(最近5个SAR值)
+<br><br>
+<strong>计算步骤：</strong><br>
+1. 取最近5个SAR值: [SAR₁, SAR₂, SAR₃, SAR₄, SAR₅]<br>
+2. 时间序列: x = [0, 1, 2, 3, 4]<br>
+3. 线性拟合: y = slope × x + intercept<br>
+4. 提取斜率系数: slope
+                        </div>
+                        <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+                            <tr style="background: #2a2d47;">
+                                <th style="padding: 8px; border: 1px solid #444;">斜率值</th>
+                                <th style="padding: 8px; border: 1px solid #444;">方向</th>
+                                <th style="padding: 8px; border: 1px solid #444;">趋势含义</th>
+                                <th style="padding: 8px; border: 1px solid #444;">交易含义</th>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #444;">> 0</td>
+                                <td style="padding: 8px; border: 1px solid #444;"><strong>UP ⬆️</strong></td>
+                                <td style="padding: 8px; border: 1px solid #444;">SAR上升</td>
+                                <td style="padding: 8px; border: 1px solid #444;">空头力量减弱 / 多头力量增强</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #444;">< 0</td>
+                                <td style="padding: 8px; border: 1px solid #444;"><strong>DOWN ⬇️</strong></td>
+                                <td style="padding: 8px; border: 1px solid #444;">SAR下降</td>
+                                <td style="padding: 8px; border: 1px solid #444;">多头力量减弱 / 空头力量增强</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #444;">≈ 0</td>
+                                <td style="padding: 8px; border: 1px solid #444;"><strong>FLAT ➡️</strong></td>
+                                <td style="padding: 8px; border: 1px solid #444;">SAR平稳</td>
+                                <td style="padding: 8px; border: 1px solid #444;">趋势犹豫，等待突破</td>
+                            </tr>
+                        </table>
+                        <div class="info-example">
+                            <div class="info-example-title">斜率与趋势结合判断：</div>
+                            <table style="width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px;">
+                                <tr style="background: #2a2d47;">
+                                    <th style="padding: 6px; border: 1px solid #444;">SAR趋势</th>
+                                    <th style="padding: 6px; border: 1px solid #444;">斜率方向</th>
+                                    <th style="padding: 6px; border: 1px solid #444;">市场状态</th>
+                                    <th style="padding: 6px; border: 1px solid #444;">操作建议</th>
+                                </tr>
+                                <tr style="background: rgba(0, 255, 136, 0.1);">
+                                    <td style="padding: 6px; border: 1px solid #444;">Bullish</td>
+                                    <td style="padding: 6px; border: 1px solid #444;">UP ⬆️</td>
+                                    <td style="padding: 6px; border: 1px solid #444;">🟢 加速上涨</td>
+                                    <td style="padding: 6px; border: 1px solid #444;">追涨/持有多单</td>
+                                </tr>
+                                <tr style="background: rgba(255, 213, 102, 0.1);">
+                                    <td style="padding: 6px; border: 1px solid #444;">Bullish</td>
+                                    <td style="padding: 6px; border: 1px solid #444;">DOWN ⬇️</td>
+                                    <td style="padding: 6px; border: 1px solid #444;">🟡 上涨放缓</td>
+                                    <td style="padding: 6px; border: 1px solid #444;">警惕反转</td>
+                                </tr>
+                                <tr style="background: rgba(255, 213, 102, 0.1);">
+                                    <td style="padding: 6px; border: 1px solid #444;">Bearish</td>
+                                    <td style="padding: 6px; border: 1px solid #444;">UP ⬆️</td>
+                                    <td style="padding: 6px; border: 1px solid #444;">🟡 下跌放缓</td>
+                                    <td style="padding: 6px; border: 1px solid #444;">警惕反转</td>
+                                </tr>
+                                <tr style="background: rgba(239, 68, 68, 0.1);">
+                                    <td style="padding: 6px; border: 1px solid #444;">Bearish</td>
+                                    <td style="padding: 6px; border: 1px solid #444;">DOWN ⬇️</td>
+                                    <td style="padding: 6px; border: 1px solid #444;">🔴 加速下跌</td>
+                                    <td style="padding: 6px; border: 1px solid #444;">追空/持有空单</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 持续时长 -->
+                <div class="info-section">
+                    <div class="info-section-title">
+                        <span>⏱️</span>
+                        <span>5. 持续时长追踪（趋势成熟度判断）</span>
+                    </div>
+                    <div class="info-text">
+                        <p><strong>定义：</strong>当前趋势（Bullish/Bearish）已经持续的分钟数</p>
+                        <p><strong>计算逻辑：</strong></p>
+                        <div class="info-formula">
+if 当前趋势 == 上一次趋势:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;duration_minutes = 上次持续时长 + 5  # 累加（每5分钟采集）<br>
+else:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;duration_minutes = 1  # 新趋势开始，重置为1
+                        </div>
+                        <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+                            <tr style="background: #2a2d47;">
+                                <th style="padding: 8px; border: 1px solid #444;">持续时长</th>
+                                <th style="padding: 8px; border: 1px solid #444;">市场含义</th>
+                                <th style="padding: 8px; border: 1px solid #444;">操作建议</th>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #444;">1-10 分钟</td>
+                                <td style="padding: 8px; border: 1px solid #444;">🆕 新趋势刚开始</td>
+                                <td style="padding: 8px; border: 1px solid #444;">观察确认</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #444;">10-30 分钟</td>
+                                <td style="padding: 8px; border: 1px solid #444;">✅ 趋势初步确认</td>
+                                <td style="padding: 8px; border: 1px solid #444;">可以入场</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #444;">30-60 分钟</td>
+                                <td style="padding: 8px; border: 1px solid #444;">💪 趋势稳固</td>
+                                <td style="padding: 8px; border: 1px solid #444;">持有仓位</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #444;">60-80 分钟</td>
+                                <td style="padding: 8px; border: 1px solid #444;">⚠️ 趋势成熟</td>
+                                <td style="padding: 8px; border: 1px solid #444;">注意获利了结</td>
+                            </tr>
+                            <tr style="background: rgba(239, 68, 68, 0.1);">
+                                <td style="padding: 8px; border: 1px solid #444;"><strong>≥ 80 分钟</strong></td>
+                                <td style="padding: 8px; border: 1px solid #444;">🚨 <strong>成熟趋势（系统标记）</strong></td>
+                                <td style="padding: 8px; border: 1px solid #444;"><strong>高度警惕反转</strong></td>
+                            </tr>
+                        </table>
+                        <div class="info-example">
+                            <div class="info-example-title">⚠️ 80分钟阈值：</div>
+                            <p>系统将持续时长 ≥ 80分钟的趋势标记为"成熟趋势"，在统计页面专门显示"80+币种数量"指标。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 系统运行流程 -->
+                <div class="info-section">
+                    <div class="info-section-title">
+                        <span>🔄</span>
+                        <span>6. 系统运行流程（全自动化）</span>
+                    </div>
+                    <div class="info-text">
+                        <p><strong>流程图：</strong></p>
+                        <div class="info-formula" style="font-size: 12px;">
+<strong>1. PM2启动守护进程</strong><br>
+   └─> pm2 start sar_slope_collector.py --name sar-slope-collector<br><br>
+
+<strong>2. 主循环（每5分钟执行）</strong><br>
+   ├─> process_symbol("BTC")  # 处理BTC<br>
+   ├─> process_symbol("ETH")  # 处理ETH<br>
+   └─> ... (29个币种依次处理)<br><br>
+
+<strong>3. 单币种处理流程 process_symbol(symbol)</strong><br>
+   ├─> <strong>步骤1：</strong>从OKX获取100根1分钟K线<br>
+   │   └─> get_klines(symbol, limit=100)<br>
+   │       ├─> 优先: https://www.okx.com/api/v5/market/candles?instId={symbol}-USDT-SWAP<br>
+   │       └─> 失败则: https://www.okx.com/api/v5/market/candles?instId={symbol}-USDT<br>
+   │<br>
+   ├─> <strong>步骤2：</strong>计算SAR指标<br>
+   │   └─> calculate_sar(high[], low[], close[])<br>
+   │       ├─> AF_START = 0.02<br>
+   │       ├─> AF_INCREMENT = 0.02<br>
+   │       ├─> AF_MAX = 0.20<br>
+   │       └─> 返回: SAR数组、趋势(bullish/bearish)<br>
+   │<br>
+   ├─> <strong>步骤3：</strong>计算SAR斜率（5期线性回归）<br>
+   │   └─> calculate_slope(sar_values[-5:], window=5)<br>
+   │       └─> 返回: slope_value, slope_direction (up/down/flat)<br>
+   │<br>
+   ├─> <strong>步骤4：</strong>确定象限<br>
+   │   └─> get_quadrant(price, sar, trend)<br>
+   │       ├─> Q1: price > sar AND trend=bullish<br>
+   │       ├─> Q2: price < sar AND trend=bullish<br>
+   │       ├─> Q3: price < sar AND trend=bearish<br>
+   │       └─> Q4: price > sar AND trend=bearish<br>
+   │<br>
+   ├─> <strong>步骤5：</strong>计算持续时长<br>
+   │   └─> load_last_position(symbol)  # 读取上次状态<br>
+   │       ├─> 如果趋势未变: duration = 上次时长 + 5分钟<br>
+   │       └─> 如果趋势改变: duration = 1分钟（重置）<br>
+   │<br>
+   └─> <strong>步骤6：</strong>保存数据到JSONL<br>
+       ├─> save_to_jsonl(symbol, record)  # 写入 data/sar_jsonl/{symbol}.jsonl<br>
+       ├─> 更新 latest_sar_slope.jsonl    # 最新快照（29行）<br>
+       ├─> 追加 sar_slope_data.jsonl      # 完整历史<br>
+       └─> 追加 sar_slope_summary.jsonl   # 统计摘要<br><br>
+
+<strong>4. 统计汇总（每次采集后）</strong><br>
+   ├─> 统计 bullish_count (多头数量)<br>
+   ├─> 统计 bearish_count (空头数量)<br>
+   ├─> 统计 bullish_80_plus_count (多头≥80分钟数量)<br>
+   ├─> 统计 bearish_80_plus_count (空头≥80分钟数量)<br>
+   └─> 写入 sar_slope_summary.jsonl<br><br>
+
+<strong>5. 等待300秒（5分钟），重复步骤2</strong>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 数据来源 -->
+                <div class="info-section">
+                    <div class="info-section-title">
+                        <span>📡</span>
+                        <span>7. JSONL数据存储格式（详细说明）</span>
+                    </div>
+                    <div class="info-text">
+                        <p><strong>数据来源：</strong></p>
+                        <ul class="info-list">
+                            <li><strong>API源：</strong>OKX交易所 API（优先永续合约，失败则尝试现货）</li>
+                            <li><strong>K线周期：</strong>1分钟K线（获取100根用于SAR计算）</li>
+                            <li><strong>采集频率：</strong>每5分钟自动采集一次</li>
+                            <li><strong>SAR参数：</strong>AF_START=0.02, AF_INCREMENT=0.02, AF_MAX=0.20</li>
+                        </ul>
+                        <p><strong>目录结构：</strong></p>
+                        <div class="info-formula" style="font-size: 11px;">
+<strong>JSONL数据目录树：</strong><br>
+/home/user/webapp/data/<br>
+├── sar_jsonl/                           # 原始SAR数据（按币种分文件）<br>
+│   ├── AAVE.jsonl                      # AAVE历史记录（~2MB）<br>
+│   ├── APT.jsonl<br>
+│   ├── BTC.jsonl                       # BTC历史记录<br>
+│   ├── ETH.jsonl<br>
+│   └── ... (共29个文件)<br>
+│<br>
+├── sar_slope_jsonl/                     # 汇总数据（跨币种）<br>
+│   ├── latest_sar_slope.jsonl          # ⭐ 最新数据快照（29行，前端主用）<br>
+│   ├── sar_slope_data.jsonl            # 完整历史数据（114MB+，供查询）<br>
+│   └── sar_slope_summary.jsonl         # 统计摘要（每次采集1行）<br>
+│<br>
+└── sar_bias_stats/                      # 偏向统计（用于80%占比分析）<br>
+    ├── AAVE_bias_stats.jsonl<br>
+    └── ... (每个币种的偏向统计历史)
+                        </div>
+                        <p><strong>📄 JSONL文件格式详解：</strong></p>
+                        
+                        <div class="info-example" style="margin-top: 15px;">
+                            <div class="info-example-title">1️⃣ 单币种文件（data/sar_jsonl/{SYMBOL}.jsonl）</div>
+                            <div class="info-formula" style="font-size: 10px; background: #1a1d35; padding: 10px; border-radius: 5px;">
+<strong>示例记录：</strong><br>
+{<br>
+  "symbol": "BTC",<br>
+  "timestamp": 1770711600000,<br>
+  "beijing_time": "2026-02-10 16:20:00",<br>
+  "close": 70195.9,<br>
+  "sar": 69850.12345678,<br>
+  "position": "bullish",<br>
+  "quadrant": "Q1",<br>
+  "duration_minutes": 45,<br>
+  "slope_value": 12.5678,<br>
+  "slope_direction": "up",<br>
+  "sar_diff_abs": 345.77654322,<br>
+  "sar_diff_pct": 0.495<br>
+}<br><br>
+<strong>字段说明：</strong><br>
+• timestamp: Unix毫秒时间戳<br>
+• beijing_time: 北京时间（Asia/Shanghai，YYYY-MM-DD HH:MM:SS）<br>
+• close: 当前收盘价<br>
+• sar: SAR指标值（8位小数精度）<br>
+• position: 趋势方向（bullish多头 / bearish空头）<br>
+• quadrant: 象限（Q1/Q2/Q3/Q4）<br>
+• duration_minutes: 当前趋势持续时长（分钟）<br>
+• slope_value: SAR斜率值（5期线性回归）<br>
+• slope_direction: 斜率方向（up上升 / down下降 / flat平稳）<br>
+• sar_diff_abs: SAR与价格的绝对差值<br>
+• sar_diff_pct: SAR与价格的百分比差值
+                            </div>
+                        </div>
+                        
+                        <div class="info-example" style="margin-top: 15px;">
+                            <div class="info-example-title">2️⃣ 最新快照文件（latest_sar_slope.jsonl）</div>
+                            <div class="info-formula" style="font-size: 10px; background: #1a1d35; padding: 10px; border-radius: 5px;">
+<strong>特点：</strong>固定29行，每行一个币种的最新状态<br>
+<strong>用途：</strong>前端页面快速加载（/api/sar-slope/latest-jsonl）<br>
+<strong>更新：</strong>每5分钟全量覆盖写入<br><br>
+<strong>示例：</strong><br>
+{"symbol":"AAVE","datetime":"2026-02-10 16:20:00","sar_value":109.3545,"sar_position":"bearish","sar_quadrant":"Q3","position_duration":65,"slope_value":-0.2222,"slope_direction":"down","price":109.04}<br>
+{"symbol":"BTC","datetime":"2026-02-10 16:20:00","sar_value":69850.12,"sar_position":"bullish","sar_quadrant":"Q1","position_duration":45,"slope_value":12.5678,"slope_direction":"up","price":70195.9}<br>
+...（共29行）
+                            </div>
+                        </div>
+                        
+                        <div class="info-example" style="margin-top: 15px;">
+                            <div class="info-example-title">3️⃣ 完整历史数据（sar_slope_data.jsonl）</div>
+                            <div class="info-formula" style="font-size: 10px; background: #1a1d35; padding: 10px; border-radius: 5px;">
+<strong>特点：</strong>追加模式，所有历史记录（当前114MB+）<br>
+<strong>用途：</strong>历史查询、趋势分析<br>
+<strong>API：</strong>/api/sar-slope/history/&lt;symbol&gt; (支持hours、limit参数)<br><br>
+<strong>示例记录：</strong><br>
+{<br>
+  "symbol": "AAVE",<br>
+  "timestamp": 1768647600000,<br>
+  "collection_time": "2026-01-17 21:45:46",<br>
+  "datetime": "2026-01-17 19:00:00",<br>
+  "position_duration": 1000,<br>
+  "price": 174.53,<br>
+  "sar_position": "bearish",<br>
+  "quadrant": "Q3",<br>
+  "sar_value": 175.55037176451071,<br>
+  "slope_direction": "up",<br>
+  "slope_value": -0.4444<br>
+}<br><br>
+<strong>字段说明：</strong><br>
+• collection_time: 数据采集时刻<br>
+• datetime: K线时间（可能略早于采集时间）<br>
+• 其他字段同单币种文件
+                            </div>
+                        </div>
+                        
+                        <div class="info-example" style="margin-top: 15px;">
+                            <div class="info-example-title">4️⃣ 统计摘要文件（sar_slope_summary.jsonl）</div>
+                            <div class="info-formula" style="font-size: 10px; background: #1a1d35; padding: 10px; border-radius: 5px;">
+<strong>特点：</strong>每次采集追加1行统计数据<br>
+<strong>用途：</strong>监控系统整体趋势变化<br><br>
+<strong>示例记录：</strong><br>
+{<br>
+  "timestamp": 1769525240.3774493,<br>
+  "collection_time": "2026-01-27 22:47:20",<br>
+  "total_symbols": 29,<br>
+  "bullish_count": 18,<br>
+  "bearish_count": 11,<br>
+  "bullish_80_plus_count": 3,<br>
+  "bearish_80_plus_count": 1,<br>
+  "data_count": 29<br>
+}<br><br>
+<strong>字段说明：</strong><br>
+• total_symbols: 监控币种总数（29）<br>
+• bullish_count: 多头币种数量<br>
+• bearish_count: 空头币种数量<br>
+• bullish_80_plus_count: 多头≥80分钟数量<br>
+• bearish_80_plus_count: 空头≥80分钟数量<br>
+• data_count: 成功采集数据条数
+                            </div>
+                        </div>
+                        
+                        <p style="margin-top: 15px;"><strong>JSONL文件特点：</strong></p>
+                        <ul class="info-list">
+                            <li>✅ <strong>每行独立JSON</strong>：单行损坏不影响其他数据</li>
+                            <li>✅ <strong>追加写入</strong>：高性能，无需加载全部数据</li>
+                            <li>✅ <strong>UTF-8编码</strong>：支持所有Unicode字符</li>
+                            <li>✅ <strong>时序存储</strong>：按采集时间顺序排列</li>
+                            <li>✅ <strong>易于解析</strong>：任何支持JSON的语言都可读取</li>
+                            <li>⚠️ <strong>不适合随机修改</strong>：适合追加写入和顺序读取</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- API接口 -->
+                <div class="info-section">
+                    <div class="info-section-title">
+                        <span>🔗</span>
+                        <span>8. API接口文档（完整路由列表）</span>
+                    </div>
+                    <div class="info-text">
+                        <p><strong>⭐ 前端路由（Flask app.py）：</strong></p>
+                        <table style="width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 11px;">
+                            <tr style="background: #2a2d47;">
+                                <th style="padding: 6px; border: 1px solid #444;">路由</th>
+                                <th style="padding: 6px; border: 1px solid #444;">方法</th>
+                                <th style="padding: 6px; border: 1px solid #444;">描述</th>
+                                <th style="padding: 6px; border: 1px solid #444;">返回类型</th>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #444;"><strong>/sar-slope</strong></td>
+                                <td style="padding: 6px; border: 1px solid #444;">GET</td>
+                                <td style="padding: 6px; border: 1px solid #444;">SAR斜率主页面</td>
+                                <td style="padding: 6px; border: 1px solid #444;">HTML</td>
+                            </tr>
+                        </table>
+                        
+                        <p style="margin-top: 15px;"><strong>⚡ API接口（数据端点）：</strong></p>
+                        <table style="width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 11px;">
+                            <tr style="background: #2a2d47;">
+                                <th style="padding: 6px; border: 1px solid #444; width: 35%;">API端点</th>
+                                <th style="padding: 6px; border: 1px solid #444; width: 10%;">方法</th>
+                                <th style="padding: 6px; border: 1px solid #444; width: 40%;">功能说明</th>
+                                <th style="padding: 6px; border: 1px solid #444; width: 15%;">数据源</th>
+                            </tr>
+                            <tr style="background: rgba(0, 255, 136, 0.05);">
+                                <td style="padding: 6px; border: 1px solid #444;"><strong>/api/sar-slope/latest-jsonl</strong></td>
+                                <td style="padding: 6px; border: 1px solid #444;">GET</td>
+                                <td style="padding: 6px; border: 1px solid #444;">⭐ <strong>最新数据快照</strong>（推荐，前端主用）<br>返回29个币种的最新SAR状态</td>
+                                <td style="padding: 6px; border: 1px solid #444;">latest_sar_slope.jsonl</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #444;">/api/sar-slope/status</td>
+                                <td style="padding: 6px; border: 1px solid #444;">GET</td>
+                                <td style="padding: 6px; border: 1px solid #444;">实时状态（备用接口）</td>
+                                <td style="padding: 6px; border: 1px solid #444;">SQLite DB</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #444;">/api/sar-slope/history/&lt;symbol&gt;</td>
+                                <td style="padding: 6px; border: 1px solid #444;">GET</td>
+                                <td style="padding: 6px; border: 1px solid #444;">单币种历史数据<br><strong>参数：</strong>?hours=24 或 ?limit=100</td>
+                                <td style="padding: 6px; border: 1px solid #444;">sar_slope_data.jsonl</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #444;">/api/sar-slope/position-changes/&lt;symbol&gt;</td>
+                                <td style="padding: 6px; border: 1px solid #444;">GET</td>
+                                <td style="padding: 6px; border: 1px solid #444;">趋势反转点记录<br>仅返回多空切换的时间点</td>
+                                <td style="padding: 6px; border: 1px solid #444;">SQLite DB</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #444;">/api/sar-slope/collector-status</td>
+                                <td style="padding: 6px; border: 1px solid #444;">GET</td>
+                                <td style="padding: 6px; border: 1px solid #444;">采集器状态监控<br>返回最新采集时间、数据统计</td>
+                                <td style="padding: 6px; border: 1px solid #444;">SQLite DB</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #444;">/api/sar-bias/stats/&lt;symbol&gt;</td>
+                                <td style="padding: 6px; border: 1px solid #444;">GET</td>
+                                <td style="padding: 6px; border: 1px solid #444;">偏向统计（80%占比分析）<br><strong>参数：</strong>?hours=24</td>
+                                <td style="padding: 6px; border: 1px solid #444;">sar_bias_stats.jsonl</td>
+                            </tr>
+                        </table>
+                        
+                        <div class="info-example" style="margin-top: 15px;">
+                            <div class="info-example-title">📊 API响应示例（/api/sar-slope/latest-jsonl）：</div>
+                            <div class="info-formula" style="font-size: 10px; background: #1a1d35; padding: 10px; border-radius: 5px;">
+<strong>请求：</strong><br>
+GET https://9002-xxxxx.sandbox.novita.ai/api/sar-slope/latest-jsonl<br><br>
+<strong>响应（JSON）：</strong><br>
+{<br>
+&nbsp;&nbsp;"success": true,<br>
+&nbsp;&nbsp;"data": [<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"symbol": "BTC",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"datetime": "2026-02-15 16:20:00",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"sar_value": 69850.12345678,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"sar_position": "bullish",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"sar_quadrant": "Q1",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"position_duration": 45,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"slope_value": 12.5678,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"slope_direction": "up",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"price": 70195.9,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"sar_diff_abs": 345.78,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"sar_diff_pct": 0.495<br>
+&nbsp;&nbsp;&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{ "symbol": "ETH", ... },<br>
+&nbsp;&nbsp;&nbsp;&nbsp;... (共29条记录)<br>
+&nbsp;&nbsp;],<br>
+&nbsp;&nbsp;"total": 29,<br>
+&nbsp;&nbsp;"timestamp": "2026-02-15 16:21:03",<br>
+&nbsp;&nbsp;"source": "jsonl"<br>
+}
+                            </div>
+                        </div>
+                        
+                        <div class="info-example" style="margin-top: 15px;">
+                            <div class="info-example-title">📈 API响应示例（/api/sar-slope/history/BTC?hours=24）：</div>
+                            <div class="info-formula" style="font-size: 10px; background: #1a1d35; padding: 10px; border-radius: 5px;">
+<strong>请求：</strong><br>
+GET https://9002-xxxxx.sandbox.novita.ai/api/sar-slope/history/BTC?hours=24<br><br>
+<strong>响应：</strong><br>
+{<br>
+&nbsp;&nbsp;"success": true,<br>
+&nbsp;&nbsp;"data": [<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{ "timestamp": 1770625200000, "sar_value": 69500.12, "price": 70000.5, "position": "bullish", ... },<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{ "timestamp": 1770625500000, "sar_value": 69512.34, "price": 70010.8, "position": "bullish", ... },<br>
+&nbsp;&nbsp;&nbsp;&nbsp;... (288条记录，24小时 × 12次/小时)<br>
+&nbsp;&nbsp;],<br>
+&nbsp;&nbsp;"count": 288,<br>
+&nbsp;&nbsp;"symbol": "BTC"<br>
+}
+                            </div>
+                        </div>
+                        
+                        <p style="margin-top: 15px;"><strong>💡 API使用建议：</strong></p>
+                        <ul class="info-list">
+                            <li>✅ <strong>实时监控</strong>：使用 /api/sar-slope/latest-jsonl（响应快，数据新）</li>
+                            <li>✅ <strong>历史分析</strong>：使用 /api/sar-slope/history（支持时间范围筛选）</li>
+                            <li>✅ <strong>反转检测</strong>：使用 /api/sar-slope/position-changes（仅返回关键点）</li>
+                            <li>⚠️ <strong>数据延迟</strong>：所有API数据最多延迟5分钟（采集间隔）</li>
+                            <li>⚠️ <strong>频率限制</strong>：建议前端轮询间隔≥30秒</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- PM2进程 -->
+                <div class="info-section">
+                    <div class="info-section-title">
+                        <span>⚙️</span>
+                        <span>9. 后台进程与技术栈（完整依赖清单）</span>
+                    </div>
+                    <div class="info-text">
+                        <p><strong>🔧 PM2守护进程列表：</strong></p>
+                        <table style="width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 11px;">
+                            <tr style="background: #2a2d47;">
+                                <th style="padding: 6px; border: 1px solid #444;">进程名</th>
+                                <th style="padding: 6px; border: 1px solid #444;">脚本路径</th>
+                                <th style="padding: 6px; border: 1px solid #444;">运行模式</th>
+                                <th style="padding: 6px; border: 1px solid #444;">执行频率</th>
+                                <th style="padding: 6px; border: 1px solid #444;">日志路径</th>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #444;"><strong>sar-slope-collector</strong></td>
+                                <td style="padding: 6px; border: 1px solid #444;">source_code/sar_slope_collector.py</td>
+                                <td style="padding: 6px; border: 1px solid #444;">daemon（常驻）</td>
+                                <td style="padding: 6px; border: 1px solid #444;">每5分钟（300秒）</td>
+                                <td style="padding: 6px; border: 1px solid #444;">~/.pm2/logs/</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #444;"><strong>sar-bias-stats-collector</strong></td>
+                                <td style="padding: 6px; border: 1px solid #444;">source_code/sar_bias_stats_collector.py</td>
+                                <td style="padding: 6px; border: 1px solid #444;">daemon（常驻）</td>
+                                <td style="padding: 6px; border: 1px solid #444;">每3分钟（180秒）</td>
+                                <td style="padding: 6px; border: 1px solid #444;">~/.pm2/logs/</td>
+                            </tr>
+                        </table>
+                        
+                        <div class="info-formula" style="font-size: 11px; margin-top: 10px;">
+<strong>PM2常用命令：</strong><br>
+# 查看所有进程状态<br>
+pm2 status<br><br>
+
+# 查看SAR相关进程<br>
+pm2 status | grep sar<br><br>
+
+# 查看实时日志（SAR斜率）<br>
+pm2 logs sar-slope-collector --lines 50<br><br>
+
+# 查看实时日志（偏向统计）<br>
+pm2 logs sar-bias-stats-collector --lines 50<br><br>
+
+# 重启采集器（SAR斜率）<br>
+pm2 restart sar-slope-collector<br><br>
+
+# 重启采集器（偏向统计）<br>
+pm2 restart sar-bias-stats-collector<br><br>
+
+# 停止进程<br>
+pm2 stop sar-slope-collector<br><br>
+
+# 启动进程<br>
+pm2 start source_code/sar_slope_collector.py --name sar-slope-collector --interpreter python3
+                        </div>
+                        
+                        <p style="margin-top: 15px;"><strong>🐍 Python依赖包（requirements.txt）：</strong></p>
+                        <table style="width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 11px;">
+                            <tr style="background: #2a2d47;">
+                                <th style="padding: 6px; border: 1px solid #444; width: 25%;">包名</th>
+                                <th style="padding: 6px; border: 1px solid #444; width: 15%;">版本</th>
+                                <th style="padding: 6px; border: 1px solid #444; width: 60%;">用途说明</th>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #444;"><strong>numpy</strong></td>
+                                <td style="padding: 6px; border: 1px solid #444;">≥1.21.0</td>
+                                <td style="padding: 6px; border: 1px solid #444;">数值计算、数组处理、线性回归（斜率计算）、SAR指标计算</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #444;"><strong>requests</strong></td>
+                                <td style="padding: 6px; border: 1px solid #444;">≥2.28.0</td>
+                                <td style="padding: 6px; border: 1px solid #444;">HTTP请求库、OKX API调用、K线数据获取</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #444;"><strong>pytz</strong></td>
+                                <td style="padding: 6px; border: 1px solid #444;">≥2023.3</td>
+                                <td style="padding: 6px; border: 1px solid #444;">时区处理、北京时间转换（Asia/Shanghai）</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #444;"><strong>flask</strong></td>
+                                <td style="padding: 6px; border: 1px solid #444;">≥2.3.0</td>
+                                <td style="padding: 6px; border: 1px solid #444;">Web框架、API服务、路由处理、JSON响应</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #444;"><strong>flask-cors</strong></td>
+                                <td style="padding: 6px; border: 1px solid #444;">≥4.0.0</td>
+                                <td style="padding: 6px; border: 1px solid #444;">跨域资源共享（CORS）支持、前端跨域请求</td>
+                            </tr>
+                        </table>
+                        
+                        <p style="margin-top: 15px;"><strong>📦 Node.js依赖包（package.json）：</strong></p>
+                        <table style="width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 11px;">
+                            <tr style="background: #2a2d47;">
+                                <th style="padding: 6px; border: 1px solid #444; width: 25%;">包名</th>
+                                <th style="padding: 6px; border: 1px solid #444; width: 15%;">版本</th>
+                                <th style="padding: 6px; border: 1px solid #444; width: 60%;">用途说明</th>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #444;"><strong>pm2</strong></td>
+                                <td style="padding: 6px; border: 1px solid #444;">≥5.3.0</td>
+                                <td style="padding: 6px; border: 1px solid #444;">进程管理器、守护Python脚本、自动重启、日志管理</td>
+                            </tr>
+                        </table>
+                        
+                        <p style="margin-top: 15px;"><strong>🗂️ 数据目录结构（完整目录树）：</strong></p>
+                        <div class="info-formula" style="font-size: 10px; background: #1a1d35; padding: 10px; border-radius: 5px;">
+<strong>/home/user/webapp/</strong><br>
+├── <strong>app.py</strong>                              # Flask主应用（Web服务器，端口9002）<br>
+├── <strong>source_code/</strong>                        # 后台采集脚本目录<br>
+│   ├── sar_slope_collector.py             # SAR斜率采集器（5分钟/次）<br>
+│   └── sar_bias_stats_collector.py        # 偏向统计采集器（3分钟/次）<br>
+├── <strong>templates/</strong>                          # HTML模板<br>
+│   └── sar_slope.html                     # SAR斜率主页面<br>
+├── <strong>data/</strong>                               # 📁 数据存储目录（所有JSONL文件）<br>
+│   ├── <strong>sar_jsonl/</strong>                      # 原始SAR数据（按币种分文件）<br>
+│   │   ├── AAVE.jsonl                     # AAVE历史数据（~2MB）<br>
+│   │   ├── APT.jsonl<br>
+│   │   ├── BCH.jsonl<br>
+│   │   ├── BNB.jsonl<br>
+│   │   ├── BTC.jsonl                      # BTC历史数据<br>
+│   │   ├── ETH.jsonl                      # ETH历史数据<br>
+│   │   ├── ... (共29个文件)<br>
+│   │   └── XRP.jsonl<br>
+│   ├── <strong>sar_slope_jsonl/</strong>                # 汇总数据（跨币种统计）<br>
+│   │   ├── latest_sar_slope.jsonl         # ⭐ 最新快照（29行，前端主用）<br>
+│   │   ├── sar_slope_data.jsonl           # 完整历史（114MB+，供查询）<br>
+│   │   └── sar_slope_summary.jsonl        # 统计摘要（每次采集1行）<br>
+│   └── <strong>sar_bias_stats/</strong>                 # 偏向统计数据<br>
+│       ├── AAVE_bias_stats.jsonl          # AAVE偏向历史<br>
+│       ├── BTC_bias_stats.jsonl           # BTC偏向历史<br>
+│       └── ... (共29个文件)<br>
+├── <strong>database.db</strong>                         # SQLite数据库（备用存储，主要用JSONL）<br>
+├── requirements.txt                       # Python依赖清单<br>
+├── package.json                           # Node.js依赖清单<br>
+└── <strong>docs/</strong>                               # 📄 文档目录<br>
+    └── SAR斜率监控系统完整文档.md         # 系统完整说明文档（1752行）
+                        </div>
+                        
+                        <p style="margin-top: 15px;"><strong>🌐 环境变量（可选配置）：</strong></p>
+                        <div class="info-formula" style="font-size: 11px;">
+<strong>无环境变量依赖</strong>（系统使用默认配置）<br><br>
+<strong>可配置项（通过修改源码）：</strong><br>
+• SAR参数: AF_START, AF_INCREMENT, AF_MAX (sar_slope_collector.py)<br>
+• 采集频率: SLEEP_INTERVAL = 300秒 (sar_slope_collector.py 第220行)<br>
+• 偏向统计频率: SLEEP_INTERVAL = 180秒 (sar_bias_stats_collector.py)<br>
+• Flask端口: PORT = 9002 (app.py)<br>
+• 斜率窗口: SLOPE_WINDOW = 5 (sar_slope_collector.py)<br>
+• 成熟阈值: MATURE_DURATION = 80分钟 (页面显示逻辑)
+                        </div>
+                        
+                        <p style="margin-top: 15px;"><strong>🔧 外部API依赖：</strong></p>
+                        <table style="width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 11px;">
+                            <tr style="background: #2a2d47;">
+                                <th style="padding: 6px; border: 1px solid #444; width: 30%;">API名称</th>
+                                <th style="padding: 6px; border: 1px solid #444; width: 45%;">端点</th>
+                                <th style="padding: 6px; border: 1px solid #444; width: 25%;">用途</th>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #444;"><strong>OKX永续合约K线</strong></td>
+                                <td style="padding: 6px; border: 1px solid #444;">https://www.okx.com/api/v5/market/candles?instId={SYMBOL}-USDT-SWAP</td>
+                                <td style="padding: 6px; border: 1px solid #444;">获取1分钟K线（优先）</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px; border: 1px solid #444;"><strong>OKX现货K线（备用）</strong></td>
+                                <td style="padding: 6px; border: 1px solid #444;">https://www.okx.com/api/v5/market/candles?instId={SYMBOL}-USDT</td>
+                                <td style="padding: 6px; border: 1px solid #444;">永续合约失败时使用</td>
+                            </tr>
+                        </table>
+                        
+                        <p style="margin-top: 15px;"><strong>📊 系统性能指标：</strong></p>
+                        <ul class="info-list">
+                            <li>⚡ <strong>内存占用</strong>：~75MB（sar-slope-collector 44.7MB + sar-bias-stats-collector 30.8MB）</li>
+                            <li>⚡ <strong>CPU使用率</strong>：<1%（空闲时）</li>
+                            <li>⚡ <strong>采集时长</strong>：~15-25秒/次（29个币种并发请求）</li>
+                            <li>⚡ <strong>数据增长速率</strong>：~50MB/月（按当前采集频率）</li>
+                            <li>⚡ <strong>API响应速度</strong>：<100ms（/api/sar-slope/latest-jsonl）</li>
+                            <li>⚡ <strong>前端页面加载</strong>：<2秒（含数据请求和渲染）</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- 使用建议 -->
+                <div class="info-section">
+                    <div class="info-section-title">
+                        <span>💡</span>
+                        <span>10. 使用建议与注意事项</span>
+                    </div>
+                    <div class="info-text">
+                        <p><strong>✅ 使用建议：</strong></p>
+                        <ul class="info-list">
+                            <li>✅ <strong>趋势确认</strong>：结合象限定位和斜率方向，双重确认趋势强度</li>
+                            <li>✅ <strong>反转信号</strong>：Q2、Q4象限为反转警示区，价格与SAR趋势不一致时需谨慎操作</li>
+                            <li>✅ <strong>持续时长</strong>：≥80分钟的成熟趋势需警惕反转（统计页面专门标记）</li>
+                            <li>✅ <strong>斜率变化</strong>：斜率方向变化可能预示趋势减弱，如多头+斜率下降→上涨放缓</li>
+                            <li>✅ <strong>偏向统计</strong>：80%占比以上的偏多/偏空币种可作为市场情绪参考</li>
+                            <li>✅ <strong>API集成</strong>：使用 /api/sar-slope/latest-jsonl 快速获取所有币种状态</li>
+                        </ul>
+                        
+                        <p style="margin-top: 15px;"><strong>⚠️ 注意事项：</strong></p>
+                        <ul class="info-list">
+                            <li>⚠️ <strong>数据延迟</strong>：采集间隔5分钟，数据最多延迟5分钟（非实时）</li>
+                            <li>⚠️ <strong>震荡市场</strong>：横盘行情中，象限会频繁切换（Q1⇄Q2⇄Q3⇄Q4），信号可靠性降低</li>
+                            <li>⚠️ <strong>单一指标</strong>：SAR是趋势追踪指标，不含成交量、波动率信息，需结合其他指标（RSI、MACD、成交量）</li>
+                            <li>⚠️ <strong>反转滞后</strong>：SAR在趋势反转初期有滞后性，价格突破SAR后才确认反转</li>
+                            <li>⚠️ <strong>假突破</strong>：短时间内的价格突破可能是假信号，建议等待2-3个采集周期（10-15分钟）确认</li>
+                            <li>⚠️ <strong>网络依赖</strong>：依赖OKX API稳定性，API异常时数据会中断</li>
+                        </ul>
+                        
+                        <p style="margin-top: 15px;"><strong>📖 使用场景举例：</strong></p>
+                        <div class="info-example">
+                            <div class="info-example-title">场景1：寻找做多机会</div>
+                            <ol class="info-list">
+                                <li>1️⃣ 筛选条件：象限=Q4（价格突破SAR，但趋势仍为Bearish）</li>
+                                <li>2️⃣ 确认信号：持续时长<10分钟（新反转）+ 斜率方向=up（SAR上升）</li>
+                                <li>3️⃣ 入场时机：下一个5分钟周期象限变为Q1，确认多头趋势</li>
+                                <li>4️⃣ 止损位：以SAR值作为动态止损线</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="info-example" style="margin-top: 10px;">
+                            <div class="info-example-title">场景2：持仓警示</div>
+                            <ol class="info-list">
+                                <li>1️⃣ 持有多单：BTC在Q1象限，持续时长85分钟（≥80分钟成熟）</li>
+                                <li>2️⃣ 警示信号：斜率方向从up变为down（SAR上升速度放缓）</li>
+                                <li>3️⃣ 操作建议：部分获利了结，关注是否进入Q2象限（价格跌破SAR）</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="info-example" style="margin-top: 10px;">
+                            <div class="info-example-title">场景3：市场情绪判断</div>
+                            <ol class="info-list">
+                                <li>1️⃣ 查看统计页面：偏多占比>80%的币种数量=15个（超过半数）</li>
+                                <li>2️⃣ 结论：市场整体偏多，多头情绪强烈</li>
+                                <li>3️⃣ 策略：逢低做多为主，警惕短期回调</li>
+                            </ol>
+                        </div>
+                        
+                        <p style="margin-top: 15px;"><strong>🔍 数据验证方法：</strong></p>
+                        <div class="info-formula" style="font-size: 11px;">
+<strong>验证最新数据是否更新：</strong><br>
+1. 查看页面顶部"最后更新时间"<br>
+2. 访问 /api/sar-slope/latest-jsonl，检查返回的 timestamp<br>
+3. 查看PM2进程状态: pm2 logs sar-slope-collector --lines 10<br><br>
+
+<strong>验证数据一致性：</strong><br>
+1. 对比页面显示的BTC价格与OKX实时价格（允许5分钟延迟）<br>
+2. 验证象限逻辑：Q1(价格>SAR且Bullish) / Q3(价格<SAR且Bearish)<br>
+3. 检查持续时长：连续两次采集，同趋势时长应增加5分钟<br><br>
+
+<strong>故障排查步骤：</strong><br>
+1. pm2 status → 确认进程状态为 online<br>
+2. pm2 logs sar-slope-collector → 查看错误日志<br>
+3. 检查数据文件时间戳: ls -lh data/sar_slope_jsonl/latest_sar_slope.jsonl<br>
+4. 手动测试OKX API: curl "https://www.okx.com/api/v5/market/candles?instId=BTC-USDT-SWAP&bar=1m&limit=10"<br>
+5. 重启采集器: pm2 restart sar-slope-collector
+                        </div>
+                        
+                        <p style="margin-top: 15px;"><strong>📚 扩展学习资源：</strong></p>
+                        <ul class="info-list">
+                            <li>📖 <strong>SAR指标原理</strong>：搜索"Parabolic SAR Indicator"了解J. Welles Wilder原始论文</li>
+                            <li>📖 <strong>象限交易系统</strong>：参考Mark Fisher的"四象限交易法"</li>
+                            <li>📖 <strong>OKX API文档</strong>：https://www.okx.com/docs-v5/zh/</li>
+                            <li>📖 <strong>系统完整文档</strong>：查看 /home/user/webapp/docs/SAR斜率监控系统完整文档.md（1752行）</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="loading" class="loading">正在加载数据...</div>
+        <div id="error" class="error" style="display: none;"></div>
+        
+        <div id="statistics" class="statistics" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-title">
+                    <span>📈</span>
+                    <span>偏多占比 > 80%</span>
+                </div>
+                <div class="stat-count bullish" id="bullishCount">0</div>
+                <div class="stat-list" id="bullishList"></div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-title">
+                    <span>📉</span>
+                    <span>偏空占比 > 80%</span>
+                </div>
+                <div class="stat-count bearish" id="bearishCount">0</div>
+                <div class="stat-list" id="bearishList"></div>
+            </div>
+        </div>
+        
+        <div id="cryptoGrid" class="crypto-grid"></div>
+    </div>
+
+    <script>
+        // 更新加载进度
+        function updateLoadProgress(step, total, text) {
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const progressPercent = document.getElementById('progressPercent');
+            const loadingProgress = document.getElementById('loadingProgress');
+            
+            const percent = Math.round((step / total) * 100);
+            
+            progressBar.style.width = percent + '%';
+            progressPercent.textContent = percent + '%';
+            progressText.innerHTML = text + '<span class="loading-dots"></span>';
+            
+            // 100% 时自动隐藏
+            if (percent >= 100) {
+                setTimeout(() => {
+                    loadingProgress.classList.add('fade-out');
+                    setTimeout(() => {
+                        loadingProgress.style.display = 'none';
+                    }, 500);
+                }, 800);
+            }
+        }
+        
+        // 切换说明卡片展开/折叠
+        function toggleInfoCard() {
+            const content = document.getElementById('infoContent');
+            const icon = document.getElementById('toggleIcon');
+            
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                icon.classList.remove('expanded');
+            } else {
+                content.classList.add('show');
+                icon.classList.add('expanded');
+            }
+        }
+        
+        // 加载健康监控数据
+        async function loadHealthMonitor() {
+            try {
+                const response = await fetch('/api/data-health-monitor/status');
+                const data = await response.json();
+                
+                // 查找SAR斜率系统的健康状态
+                const sarMonitor = data.monitors?.find(m => m.name === 'SAR斜率系统');
+                
+                if (sarMonitor) {
+                    updateHealthCard(sarMonitor);
+                }
+            } catch (error) {
+                console.error('Failed to load health monitor:', error);
+            }
+        }
+        
+        // 更新健康监控卡片
+        function updateHealthCard(monitor) {
+            const card = document.getElementById('health-monitor-card');
+            const icon = card.querySelector('.health-icon');
+            const title = document.getElementById('health-status-title');
+            const desc = document.getElementById('health-status-desc');
+            const delayEl = document.getElementById('health-delay');
+            const pm2StatusEl = document.getElementById('health-pm2-status');
+            const successRateEl = document.getElementById('health-success-rate');
+            
+            const isHealthy = monitor.status === 'healthy';
+            const delay = monitor.delay_minutes ? Math.round(monitor.delay_minutes) : null;
+            
+            if (isHealthy) {
+                card.className = 'health-monitor-card';
+                icon.textContent = '💚';
+                title.textContent = '系统健康运行中';
+                desc.textContent = delay !== null ? `数据采集正常，延迟 ${delay} 分钟` : '数据采集正常';
+                delayEl.textContent = delay !== null ? `${delay}分钟` : '-';
+                pm2StatusEl.textContent = monitor.pm2_status === 'online' ? '在线' : '-';
+                successRateEl.textContent = '正常';
+            } else {
+                card.className = 'health-monitor-card unhealthy';
+                icon.textContent = '⚠️';
+                title.textContent = '系统需要关注';
+                desc.textContent = delay !== null ? `数据延迟: ${delay} 分钟` : '监控异常，请检查';
+                delayEl.textContent = delay !== null ? `${delay}分钟` : '-';
+                pm2StatusEl.textContent = monitor.pm2_status === 'online' ? '在线' : '离线';
+                successRateEl.textContent = '异常';
+            }
+        }
+        
+        // 加载数据
+        async function loadData() {
+            console.log('[Main] Starting loadData()...');
+            
+            try {
+                // 步骤1：初始化系统（10%）
+                updateLoadProgress(1, 5, '正在初始化系统');
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                // 步骤2：连接数据源（30%）
+                updateLoadProgress(2, 5, '正在连接数据源');
+                
+                // 加载健康监控（不阻塞主要数据加载）
+                loadHealthMonitor().catch(err => console.error('Health monitor error:', err));
+                
+                console.log('[Main] Fetching /api/sar-slope/status...');
+                const response = await fetch('/api/sar-slope/status');
+                const data = await response.json();
+                console.log('[Main] Got response:', data.success, 'data count:', data.data?.length);
+                
+                if (!data.success) {
+                    throw new Error(data.error || '加载数据失败');
+                }
+                
+                // 步骤3：加载SAR数据（50%）
+                updateLoadProgress(3, 5, '正在加载 SAR 指标数据');
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                // 步骤4：渲染币种列表（70%）
+                updateLoadProgress(4, 5, '正在渲染 29 个币种数据');
+                console.log('[Main] Hiding loading, rendering crypto grid...');
+                document.getElementById('loading').style.display = 'none';
+                renderCryptoGrid(data.data);
+                
+                // 步骤5：加载统计数据（100%）
+                updateLoadProgress(5, 5, '正在计算偏向统计');
+                console.log('[Main] Starting loadDetailedStatistics in background...');
+                document.getElementById('statistics').style.display = 'grid';
+                document.getElementById('bullishList').innerHTML = '<div class="stat-empty">正在加载...</div>';
+                document.getElementById('bearishList').innerHTML = '<div class="stat-empty">正在加载...</div>';
+                
+                // 完成加载
+                await new Promise(resolve => setTimeout(resolve, 500));
+                updateLoadProgress(5, 5, '加载完成');
+                
+                // 后台异步加载统计数据（不阻塞页面）
+                loadDetailedStatistics(data.data).catch(error => {
+                    console.error('[Main] 统计数据加载失败:', error);
+                    document.getElementById('bullishList').innerHTML = '<div class="stat-empty">加载失败</div>';
+                    document.getElementById('bearishList').innerHTML = '<div class="stat-empty">加载失败</div>';
+                });
+                
+            } catch (error) {
+                console.error('[Main] Error:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('loadingProgress').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').textContent = '加载数据失败: ' + error.message;
+            }
+        }
+        
+        // 加载详细统计数据（异步，不阻塞）
+        async function loadDetailedStatistics(cryptos) {
+            console.log('[Statistics] Starting to load detailed statistics for', cryptos.length, 'cryptos');
+            const bullishSymbols = [];
+            const bearishSymbols = [];
+            
+            let completed = 0;
+            const total = cryptos.length;
+            
+            // 批量加载每个币种的偏向统计（限制并发数量）
+            const batchSize = 5; // 每批5个请求
+            for (let i = 0; i < cryptos.length; i += batchSize) {
+                const batch = cryptos.slice(i, i + batchSize);
+                console.log(`[Statistics] Processing batch ${Math.floor(i/batchSize) + 1}:`, batch.map(c => c.symbol).join(', '));
+                
+                await Promise.all(batch.map(async (crypto) => {
+                    try {
+                        const response = await fetch(`/api/sar-slope/current-cycle/${crypto.symbol}?include_history=true&limit=500&_t=${Date.now()}`, {
+                            signal: AbortSignal.timeout(5000) // 5秒超时
+                        });
+                        const data = await response.json();
+                        
+                        if (data.success && data.bias_statistics) {
+                            const stats = data.bias_statistics;
+                            const bullishRatio = stats.bullish_ratio || 0;
+                            const bearishRatio = stats.bearish_ratio || 0;
+                            
+                            console.log(`[Statistics] ${crypto.symbol}: bullish=${bullishRatio.toFixed(1)}%, bearish=${bearishRatio.toFixed(1)}%`);
+                            
+                            // 偏多占比 > 80%
+                            if (bullishRatio > 80) {
+                                bullishSymbols.push({
+                                    symbol: crypto.symbol,
+                                    ratio: bullishRatio
+                                });
+                                console.log(`[Statistics] ✓ ${crypto.symbol} added to bullish (${bullishRatio.toFixed(1)}%)`);
+                            }
+                            
+                            // 偏空占比 > 80%
+                            if (bearishRatio > 80) {
+                                bearishSymbols.push({
+                                    symbol: crypto.symbol,
+                                    ratio: bearishRatio
+                                });
+                                console.log(`[Statistics] ✓ ${crypto.symbol} added to bearish (${bearishRatio.toFixed(1)}%)`);
+                            }
+                        }
+                    } catch (error) {
+                        console.error(`[Statistics] Failed to load ${crypto.symbol}:`, error);
+                    }
+                    
+                    completed++;
+                    // 更新进度
+                    document.getElementById('bullishList').innerHTML = `<div class="stat-empty">加载中... ${completed}/${total}</div>`;
+                }));
+            }
+            
+            console.log('[Statistics] Finished loading. Bullish:', bullishSymbols.length, 'Bearish:', bearishSymbols.length);
+            // 显示统计结果
+            renderStatistics(bullishSymbols, bearishSymbols);
+        }
+        
+        // 渲染统计结果
+        function renderStatistics(bullishSymbols, bearishSymbols) {
+            document.getElementById('statistics').style.display = 'grid';
+            
+            // 偏多统计
+            document.getElementById('bullishCount').textContent = bullishSymbols.length;
+            const bullishList = document.getElementById('bullishList');
+            if (bullishSymbols.length > 0) {
+                bullishList.innerHTML = bullishSymbols
+                    .sort((a, b) => b.ratio - a.ratio)
+                    .map(item => `<span class="stat-symbol bullish">${item.symbol} (${item.ratio.toFixed(1)}%)</span>`)
+                    .join('');
+            } else {
+                bullishList.innerHTML = '<div class="stat-empty">暂无币种</div>';
+            }
+            
+            // 偏空统计
+            document.getElementById('bearishCount').textContent = bearishSymbols.length;
+            const bearishList = document.getElementById('bearishList');
+            if (bearishSymbols.length > 0) {
+                bearishList.innerHTML = bearishSymbols
+                    .sort((a, b) => b.ratio - a.ratio)
+                    .map(item => `<span class="stat-symbol bearish">${item.symbol} (${item.ratio.toFixed(1)}%)</span>`)
+                    .join('');
+            } else {
+                bearishList.innerHTML = '<div class="stat-empty">暂无币种</div>';
+            }
+        }
+        
+        // 渲染币种网格
+        async function renderCryptoGrid(cryptos) {
+            const grid = document.getElementById('cryptoGrid');
+            grid.innerHTML = '';
+            
+            // 🚀 批量加载所有币种的偏多/偏空占比（一次API调用）
+            console.log('[Main] Fetching all bias ratios in batch...');
+            const biasRatiosPromise = fetch('/api/sar-slope/bias-ratios')
+                .then(res => res.json())
+                .catch(err => {
+                    console.error('[Main] Failed to load batch bias ratios:', err);
+                    return { success: false, data: {} };
+                });
+            
+            cryptos.forEach(crypto => {
+                const card = document.createElement('div');
+                card.className = 'crypto-card';
+                card.onclick = () => window.location.href = `/sar-slope/${crypto.symbol}`;
+                
+                const positionClass = crypto.current_position === 'long' ? 'position-long' : 'position-short';
+                const positionText = crypto.current_position === 'long' ? '多头' : '空头';
+                
+                card.innerHTML = `
+                    <div class="crypto-name">${crypto.symbol}</div>
+                    <div class="crypto-info">
+                        <span>当前状态:</span>
+                        <span class="position-badge ${positionClass}">${positionText} ${crypto.current_sequence}</span>
+                    </div>
+                    <div class="crypto-info">
+                        <span>偏多占比:</span>
+                        <span class="bias-ratio bullish" id="bullish-${crypto.symbol}">加载中...</span>
+                    </div>
+                    <div class="crypto-info">
+                        <span>偏空占比:</span>
+                        <span class="bias-ratio bearish" id="bearish-${crypto.symbol}">加载中...</span>
+                    </div>
+                    <div class="crypto-info">
+                        <span>K线数量:</span>
+                        <span>${crypto.total_klines}</span>
+                    </div>
+                    <div class="crypto-info">
+                        <span>最后更新:</span>
+                        <span id="last-update-${crypto.symbol}">${crypto.last_kline_time}</span>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+            
+            // 等待批量数据返回后，更新所有币种的偏多/偏空占比
+            const biasData = await biasRatiosPromise;
+            if (biasData.success && biasData.data) {
+                console.log('[Main] Batch bias ratios loaded, updating all cards...');
+                cryptos.forEach(crypto => {
+                    const ratios = biasData.data[crypto.symbol];
+                    if (ratios && ratios.data_available) {
+                        updateBiasRatioDisplay(crypto.symbol, ratios.bullish_ratio, ratios.bearish_ratio);
+                    } else {
+                        // 数据不可用，显示 "-"
+                        const bullishEl = document.getElementById(`bullish-${crypto.symbol}`);
+                        const bearishEl = document.getElementById(`bearish-${crypto.symbol}`);
+                        if (bullishEl) bullishEl.textContent = '-';
+                        if (bearishEl) bearishEl.textContent = '-';
+                    }
+                });
+                console.log('[Main] All bias ratios updated!');
+            } else {
+                console.error('[Main] Failed to update bias ratios');
+            }
+        }
+        
+        // 更新偏多/偏空占比显示的辅助函数
+        function updateBiasRatioDisplay(symbol, bullishRatio, bearishRatio) {
+            // 更新多头占比
+            const bullishEl = document.getElementById(`bullish-${symbol}`);
+            if (bullishEl) {
+                bullishEl.textContent = `${bullishRatio.toFixed(1)}%`;
+                if (bullishRatio > 80) {
+                    bullishEl.style.color = '#26d639';
+                    bullishEl.style.fontWeight = 'bold';
+                } else if (bullishRatio > 60) {
+                    bullishEl.style.color = '#ffd700';
+                }
+            }
+            
+            // 更新空头占比
+            const bearishEl = document.getElementById(`bearish-${symbol}`);
+            if (bearishEl) {
+                bearishEl.textContent = `${bearishRatio.toFixed(1)}%`;
+                if (bearishRatio > 80) {
+                    bearishEl.style.color = '#ff4757';
+                    bearishEl.style.fontWeight = 'bold';
+                } else if (bearishRatio > 60) {
+                    bearishEl.style.color = '#ffa502';
+                }
+            }
+        }
+        
+        // 加载单个币种的多空占比（保留作为备用，不再主动调用）
+        async function loadBiasRatio(symbol) {
+            try {
+                console.log(`[BiasRatio] Loading ${symbol}...`);
+                const response = await fetch(`/api/sar-slope/current-cycle/${symbol}`);
+                const data = await response.json();
+                console.log(`[BiasRatio] ${symbol}: bullish=${data.bias_statistics?.bullish_ratio}%, bearish=${data.bias_statistics?.bearish_ratio}%`);
+                
+                if (data.success && data.bias_statistics) {
+                    const stats = data.bias_statistics;
+                    const bullishRatio = stats.bullish_ratio || 0;
+                    const bearishRatio = stats.bearish_ratio || 0;
+                    
+                    // 更新多头占比
+                    const bullishEl = document.getElementById(`bullish-${symbol}`);
+                    if (bullishEl) {
+                        bullishEl.textContent = `${bullishRatio.toFixed(1)}%`;
+                        if (bullishRatio > 80) {
+                            bullishEl.style.color = '#26d639';
+                            bullishEl.style.fontWeight = 'bold';
+                        } else if (bullishRatio > 60) {
+                            bullishEl.style.color = '#ffd700';
+                        }
+                    }
+                    
+                    // 更新空头占比
+                    const bearishEl = document.getElementById(`bearish-${symbol}`);
+                    if (bearishEl) {
+                        bearishEl.textContent = `${bearishRatio.toFixed(1)}%`;
+                        if (bearishRatio > 80) {
+                            bearishEl.style.color = '#ff4757';
+                            bearishEl.style.fontWeight = 'bold';
+                        } else if (bearishRatio > 60) {
+                            bearishEl.style.color = '#ffa502';
+                        }
+                    }
+                    
+                    // 更新最后更新时间（如果API返回）
+                    if (data.current_status && data.current_status.last_update) {
+                        const lastUpdateEl = document.getElementById(`last-update-${symbol}`);
+                        if (lastUpdateEl) {
+                            lastUpdateEl.textContent = data.current_status.last_update;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error(`Failed to load bias ratio for ${symbol}:`, error);
+                const bullishEl = document.getElementById(`bullish-${symbol}`);
+                const bearishEl = document.getElementById(`bearish-${symbol}`);
+                if (bullishEl) bullishEl.textContent = '-';
+                if (bearishEl) bearishEl.textContent = '-';
+            }
+        }
+        
+        // 页面加载时获取数据
+        loadData();
+        
+        // 每30秒自动刷新
+        setInterval(loadData, 30000);
+    </script>
+</body>
+</html>

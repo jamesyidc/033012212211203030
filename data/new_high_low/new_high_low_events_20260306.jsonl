@@ -1,0 +1,4 @@
+{"time": "2026-03-06 23:09:56", "timestamp": 1772809796.0, "symbol": "ADA", "event_type": "new_low", "price": 0.2574, "previous_low": 0.258, "previous_time": "2026-02-23 10:00:28"}
+{"time": "2026-03-06 23:47:37", "timestamp": 1772812057.0, "symbol": "ADA", "event_type": "new_low", "price": 0.2566, "previous_low": 0.2574, "previous_time": "2026-03-06 23:09:56"}
+{"time": "2026-03-06 23:51:01", "timestamp": 1772812261.0, "symbol": "ADA", "event_type": "new_low", "price": 0.2561, "previous_low": 0.2566, "previous_time": "2026-03-06 23:47:37"}
+{"time": "2026-03-06 23:54:27", "timestamp": 1772812467.0, "symbol": "ADA", "event_type": "new_low", "price": 0.256, "previous_low": 0.2561, "previous_time": "2026-03-06 23:51:01"}

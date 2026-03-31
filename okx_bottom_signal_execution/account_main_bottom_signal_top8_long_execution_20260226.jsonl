@@ -1,0 +1,1 @@
+{"timestamp": "2026-02-26T02:55:53.510470", "time": "2026-02-26 02:55:53", "date": "2026-02-26", "account_id": "account_main", "strategy_type": "top8_long", "rsi_value": 450.5, "coins": ["BTC", "ETH", "SOL", "BNB", "XRP", "ADA", "DOGE", "AVAX"], "result": {"success_count": 8, "failed_coins": [], "total_investment": 120.0, "per_coin_amount": 15.0}}

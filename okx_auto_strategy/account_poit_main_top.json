@@ -1,0 +1,10 @@
+{
+  "enabled": false,
+  "triggerPrice": 65700.0,
+  "strategyType": "top_performers",
+  "positionSize": 1.5,
+  "maxOrderSize": 5.0,
+  "lastExecutedTime": null,
+  "executedCount": 0,
+  "lastUpdated": "2026-02-19 16:28:00"
+}

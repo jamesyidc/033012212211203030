@@ -1,0 +1,68 @@
+{
+  "accounts": {
+    "A": {
+      "positions": {
+        "A": null,
+        "B": null,
+        "C": null
+      },
+      "total_cost": 0,
+      "unrealized_pnl": 0,
+      "pnl_pct": 0,
+      "position_count": 0,
+      "account_name": "主账户",
+      "okx_account": "account_main",
+      "color": "none"
+    },
+    "B": {
+      "positions": {
+        "A": null,
+        "B": null,
+        "C": null
+      },
+      "total_cost": 0,
+      "unrealized_pnl": 0,
+      "pnl_pct": 0,
+      "position_count": 0,
+      "account_name": "POIT",
+      "okx_account": "account_poit_main",
+      "color": "none"
+    },
+    "C": {
+      "positions": {
+        "A": null,
+        "B": null,
+        "C": null
+      },
+      "total_cost": 0,
+      "unrealized_pnl": 0,
+      "pnl_pct": 0,
+      "position_count": 0,
+      "account_name": "fangfang12",
+      "okx_account": "account_fangfang12",
+      "color": "none"
+    },
+    "D": {
+      "positions": {
+        "A": null,
+        "B": null,
+        "C": null
+      },
+      "total_cost": 0,
+      "unrealized_pnl": 0,
+      "pnl_pct": 0,
+      "position_count": 0,
+      "account_name": "dadanini",
+      "okx_account": "account_dadanini",
+      "color": "none"
+    }
+  },
+  "trading_permission": {
+    "enabled": false,
+    "direction": "none",
+    "last_update": null
+  },
+  "current_direction": "none",
+  "last_update": "2026-03-16T01:35:55.453596+08:00",
+  "trigger_history": []
+}

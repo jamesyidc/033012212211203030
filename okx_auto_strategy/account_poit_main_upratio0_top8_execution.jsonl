@@ -1,0 +1,6 @@
+{"timestamp": "2026-02-23T02:13:12.123275", "time": "2026-02-23 02:13:12", "account_id": "account_poit_main", "strategy_type": "top8", "allowed": false, "reason": "用户已暂停所有策略", "up_ratio": null}
+{"timestamp": "2026-02-17T03:49:05.954320", "time": "2026-02-17 03:49:05", "account_id": "account_poit_main", "strategy_type": "top8", "allowed": true, "reason": "User enabled strategy", "up_ratio": null}
+{"timestamp": "2026-02-17T16:34:11.651972", "time": "2026-02-17 16:34:11", "account_id": "account_poit_main", "strategy_type": "top8", "allowed": false, "reason": "User disabled strategy", "up_ratio": null}
+{"timestamp": "2026-02-17T16:34:12.689552", "time": "2026-02-17 16:34:12", "account_id": "account_poit_main", "strategy_type": "top8", "allowed": true, "reason": "User enabled strategy", "up_ratio": null}
+{"timestamp": "2026-02-19T00:19:32.743576", "time": "2026-02-19 00:19:32", "account_id": "account_poit_main", "strategy_type": "top8", "allowed": false, "reason": "Strategy executed successfully", "up_ratio": 0}
+{"timestamp": "2026-02-19T00:19:32.746481", "time": "2026-02-19 00:19:32", "account_id": "account_poit_main", "strategy_type": "top8", "allowed": false, "reason": "Strategy executed successfully", "up_ratio": 0}

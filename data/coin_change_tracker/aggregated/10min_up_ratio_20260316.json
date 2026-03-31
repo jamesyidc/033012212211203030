@@ -1,0 +1,30 @@
+{
+  "date": "20260316",
+  "generated_at": "2026-03-16T01:46:45.474374+08:00",
+  "data": [
+    {
+      "time": "01:10",
+      "timestamp": 1773594600000,
+      "up_ratio": 71.06,
+      "sample_count": 8
+    },
+    {
+      "time": "01:20",
+      "timestamp": 1773595200000,
+      "up_ratio": 70.78,
+      "sample_count": 9
+    },
+    {
+      "time": "01:30",
+      "timestamp": 1773595800000,
+      "up_ratio": 53.9,
+      "sample_count": 8
+    },
+    {
+      "time": "01:40",
+      "timestamp": 1773596400000,
+      "up_ratio": 59.74,
+      "sample_count": 5
+    }
+  ]
+}

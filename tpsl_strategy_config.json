@@ -1,0 +1,476 @@
+{
+  "空单策略A": {
+    "name": "空单策略A",
+    "type": "short",
+    "description": "涨幅前6·3%留仓金·10x",
+    "enabled": true,
+    "take_profit_levels": [
+      {
+        "profit_percent": 5,
+        "close_percent": 20,
+        "description": "涨幅5%平仓20%"
+      },
+      {
+        "profit_percent": 10,
+        "close_percent": 30,
+        "description": "涨幅10%平仓30%"
+      },
+      {
+        "profit_percent": 20,
+        "close_percent": 40,
+        "description": "涨幅20%平仓40%"
+      },
+      {
+        "profit_percent": 30,
+        "close_percent": 50,
+        "description": "涨幅30%平仓50%"
+      }
+    ],
+    "stop_loss_percent": -30,
+    "leverage": 10,
+    "risk_management": {
+      "max_position_percent": 3,
+      "reserve_margin_percent": 3,
+      "rank_based_selection": {
+        "enabled": true,
+        "top_n": 6,
+        "metric": "涨幅"
+      }
+    }
+  },
+  "空单策略B": {
+    "name": "空单策略B",
+    "type": "short",
+    "description": "涨幅前6·5%留仓金·10x",
+    "enabled": true,
+    "take_profit_levels": [
+      {
+        "profit_percent": 5,
+        "close_percent": 15,
+        "description": "涨幅5%平仓15%"
+      },
+      {
+        "profit_percent": 10,
+        "close_percent": 25,
+        "description": "涨幅10%平仓25%"
+      },
+      {
+        "profit_percent": 20,
+        "close_percent": 35,
+        "description": "涨幅20%平仓35%"
+      },
+      {
+        "profit_percent": 30,
+        "close_percent": 45,
+        "description": "涨幅30%平仓45%"
+      }
+    ],
+    "stop_loss_percent": -30,
+    "leverage": 10,
+    "risk_management": {
+      "max_position_percent": 5,
+      "reserve_margin_percent": 5,
+      "rank_based_selection": {
+        "enabled": true,
+        "top_n": 6,
+        "metric": "涨幅"
+      }
+    }
+  },
+  "空单策略C": {
+    "name": "空单策略C",
+    "type": "short",
+    "description": "涨幅前6·8%留仓金·10x",
+    "enabled": true,
+    "take_profit_levels": [
+      {
+        "profit_percent": 5,
+        "close_percent": 10,
+        "description": "涨幅5%平仓10%"
+      },
+      {
+        "profit_percent": 10,
+        "close_percent": 20,
+        "description": "涨幅10%平仓20%"
+      },
+      {
+        "profit_percent": 20,
+        "close_percent": 30,
+        "description": "涨幅20%平仓30%"
+      },
+      {
+        "profit_percent": 30,
+        "close_percent": 40,
+        "description": "涨幅30%平仓40%"
+      }
+    ],
+    "stop_loss_percent": -30,
+    "leverage": 10,
+    "risk_management": {
+      "max_position_percent": 8,
+      "reserve_margin_percent": 8,
+      "rank_based_selection": {
+        "enabled": true,
+        "top_n": 6,
+        "metric": "涨幅"
+      }
+    }
+  },
+  "多单策略A": {
+    "name": "多单策略A",
+    "type": "long",
+    "description": "涨幅前6·3%留仓金·10x",
+    "enabled": true,
+    "take_profit_levels": [
+      {
+        "profit_percent": 10,
+        "close_percent": 20,
+        "description": "涨幅10%平仓20%"
+      },
+      {
+        "profit_percent": 20,
+        "close_percent": 50,
+        "description": "涨幅20%平仓50%"
+      },
+      {
+        "profit_percent": 30,
+        "close_percent": 75,
+        "description": "涨幅30%平仓75%"
+      },
+      {
+        "profit_percent": 40,
+        "close_percent": 100,
+        "description": "涨幅40%全部平仓"
+      }
+    ],
+    "stop_loss_percent": -20,
+    "leverage": 10,
+    "risk_management": {
+      "max_position_percent": 3,
+      "reserve_margin_percent": 3,
+      "rank_based_selection": {
+        "enabled": true,
+        "top_n": 6,
+        "metric": "涨幅"
+      }
+    }
+  },
+  "多单策略B": {
+    "name": "多单策略B",
+    "type": "long",
+    "description": "涨幅前6·5%留仓金·10x",
+    "enabled": true,
+    "take_profit_levels": [
+      {
+        "profit_percent": 10,
+        "close_percent": 25,
+        "description": "涨幅10%平仓25%"
+      },
+      {
+        "profit_percent": 20,
+        "close_percent": 50,
+        "description": "涨幅20%平仓50%"
+      },
+      {
+        "profit_percent": 30,
+        "close_percent": 75,
+        "description": "涨幅30%平仓75%"
+      },
+      {
+        "profit_percent": 40,
+        "close_percent": 100,
+        "description": "涨幅40%全部平仓"
+      }
+    ],
+    "stop_loss_percent": -20,
+    "leverage": 10,
+    "risk_management": {
+      "max_position_percent": 5,
+      "reserve_margin_percent": 5,
+      "rank_based_selection": {
+        "enabled": true,
+        "top_n": 6,
+        "metric": "涨幅"
+      }
+    }
+  },
+  "多单策略C": {
+    "name": "多单策略C",
+    "type": "long",
+    "description": "涨幅前6·8%留仓金·10x",
+    "enabled": true,
+    "take_profit_levels": [
+      {
+        "profit_percent": 10,
+        "close_percent": 30,
+        "description": "涨幅10%平仓30%"
+      },
+      {
+        "profit_percent": 20,
+        "close_percent": 50,
+        "description": "涨幅20%平仓50%"
+      },
+      {
+        "profit_percent": 30,
+        "close_percent": 75,
+        "description": "涨幅30%平仓75%"
+      },
+      {
+        "profit_percent": 40,
+        "close_percent": 100,
+        "description": "涨幅40%全部平仓"
+      }
+    ],
+    "stop_loss_percent": -20,
+    "leverage": 10,
+    "risk_management": {
+      "max_position_percent": 8,
+      "reserve_margin_percent": 8,
+      "rank_based_selection": {
+        "enabled": true,
+        "top_n": 6,
+        "metric": "涨幅"
+      }
+    }
+  },
+  "多单策略D": {
+    "name": "多单策略D",
+    "type": "long",
+    "description": "涨幅后6·3%留仓金·10x",
+    "enabled": true,
+    "take_profit_levels": [
+      {
+        "profit_percent": 10,
+        "close_percent": 20,
+        "description": "涨幅10%平仓20%"
+      },
+      {
+        "profit_percent": 20,
+        "close_percent": 50,
+        "description": "涨幅20%平仓50%"
+      },
+      {
+        "profit_percent": 30,
+        "close_percent": 75,
+        "description": "涨幅30%平仓75%"
+      },
+      {
+        "profit_percent": 40,
+        "close_percent": 100,
+        "description": "涨幅40%全部平仓"
+      }
+    ],
+    "stop_loss_percent": -20,
+    "leverage": 10,
+    "risk_management": {
+      "max_position_percent": 3,
+      "reserve_margin_percent": 3,
+      "rank_based_selection": {
+        "enabled": true,
+        "top_n": 6,
+        "metric": "涨幅后",
+        "favorite_symbols_only": true
+      }
+    }
+  },
+  "多单策略E": {
+    "name": "多单策略E",
+    "type": "long",
+    "description": "涨幅后6·5%留仓金·10x",
+    "enabled": true,
+    "take_profit_levels": [
+      {
+        "profit_percent": 10,
+        "close_percent": 25,
+        "description": "涨幅10%平仓25%"
+      },
+      {
+        "profit_percent": 20,
+        "close_percent": 50,
+        "description": "涨幅20%平仓50%"
+      },
+      {
+        "profit_percent": 30,
+        "close_percent": 75,
+        "description": "涨幅30%平仓75%"
+      },
+      {
+        "profit_percent": 40,
+        "close_percent": 100,
+        "description": "涨幅40%全部平仓"
+      }
+    ],
+    "stop_loss_percent": -20,
+    "leverage": 10,
+    "risk_management": {
+      "max_position_percent": 5,
+      "reserve_margin_percent": 5,
+      "rank_based_selection": {
+        "enabled": true,
+        "top_n": 6,
+        "metric": "涨幅后",
+        "favorite_symbols_only": true
+      }
+    }
+  },
+  "多单策略F": {
+    "name": "多单策略F",
+    "type": "long",
+    "description": "涨幅后6·8%留仓金·10x",
+    "enabled": true,
+    "take_profit_levels": [
+      {
+        "profit_percent": 10,
+        "close_percent": 30,
+        "description": "涨幅10%平仓30%"
+      },
+      {
+        "profit_percent": 20,
+        "close_percent": 50,
+        "description": "涨幅20%平仓50%"
+      },
+      {
+        "profit_percent": 30,
+        "close_percent": 75,
+        "description": "涨幅30%平仓75%"
+      },
+      {
+        "profit_percent": 40,
+        "close_percent": 100,
+        "description": "涨幅40%全部平仓"
+      }
+    ],
+    "stop_loss_percent": -20,
+    "leverage": 10,
+    "risk_management": {
+      "max_position_percent": 8,
+      "reserve_margin_percent": 8,
+      "rank_based_selection": {
+        "enabled": true,
+        "top_n": 6,
+        "metric": "涨幅后",
+        "favorite_symbols_only": true
+      }
+    }
+  },
+  "空单策略D": {
+    "name": "空单策略D",
+    "type": "short",
+    "description": "涨幅后6·3%留仓金·10x",
+    "enabled": true,
+    "take_profit_levels": [
+      {
+        "profit_percent": 5,
+        "close_percent": 20,
+        "description": "跌幅5%平仓20%"
+      },
+      {
+        "profit_percent": 10,
+        "close_percent": 30,
+        "description": "跌幅10%平仓30%"
+      },
+      {
+        "profit_percent": 20,
+        "close_percent": 40,
+        "description": "跌幅20%平仓40%"
+      },
+      {
+        "profit_percent": 30,
+        "close_percent": 50,
+        "description": "跌幅30%平仓50%"
+      }
+    ],
+    "stop_loss_percent": -30,
+    "leverage": 10,
+    "risk_management": {
+      "max_position_percent": 3,
+      "reserve_margin_percent": 3,
+      "rank_based_selection": {
+        "enabled": true,
+        "top_n": 6,
+        "metric": "涨幅后",
+        "favorite_symbols_only": true
+      }
+    }
+  },
+  "空单策略E": {
+    "name": "空单策略E",
+    "type": "short",
+    "description": "涨幅后6·5%留仓金·10x",
+    "enabled": true,
+    "take_profit_levels": [
+      {
+        "profit_percent": 5,
+        "close_percent": 15,
+        "description": "跌幅5%平仓15%"
+      },
+      {
+        "profit_percent": 10,
+        "close_percent": 25,
+        "description": "跌幅10%平仓25%"
+      },
+      {
+        "profit_percent": 20,
+        "close_percent": 35,
+        "description": "跌幅20%平仓35%"
+      },
+      {
+        "profit_percent": 30,
+        "close_percent": 45,
+        "description": "跌幅30%平仓45%"
+      }
+    ],
+    "stop_loss_percent": -30,
+    "leverage": 10,
+    "risk_management": {
+      "max_position_percent": 5,
+      "reserve_margin_percent": 5,
+      "rank_based_selection": {
+        "enabled": true,
+        "top_n": 6,
+        "metric": "涨幅后",
+        "favorite_symbols_only": true
+      }
+    }
+  },
+  "空单策略F": {
+    "name": "空单策略F",
+    "type": "short",
+    "description": "涨幅后6·8%留仓金·10x",
+    "enabled": true,
+    "take_profit_levels": [
+      {
+        "profit_percent": 5,
+        "close_percent": 10,
+        "description": "跌幅5%平仓10%"
+      },
+      {
+        "profit_percent": 10,
+        "close_percent": 20,
+        "description": "跌幅10%平仓20%"
+      },
+      {
+        "profit_percent": 20,
+        "close_percent": 30,
+        "description": "跌幅20%平仓30%"
+      },
+      {
+        "profit_percent": 30,
+        "close_percent": 40,
+        "description": "跌幅30%平仓40%"
+      }
+    ],
+    "stop_loss_percent": -30,
+    "leverage": 10,
+    "risk_management": {
+      "max_position_percent": 8,
+      "reserve_margin_percent": 8,
+      "rank_based_selection": {
+        "enabled": true,
+        "top_n": 6,
+        "metric": "涨幅后",
+        "favorite_symbols_only": true
+      }
+    }
+  }
+}

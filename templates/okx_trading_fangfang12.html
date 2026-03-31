@@ -1,0 +1,4455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>OKX实盘交易系统 - Fangfang12</title>
+    <!-- 版本: 2026-02-08 13:00 - 修复账户列表加载问题 -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+                'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 30px;
+            zoom: 1.5;
+        }
+
+        .container {
+            max-width: 2100px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 25px 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .mode-badge {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        /* 账户切换横条 */
+        .account-switcher {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .account-switcher-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .account-tabs {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .account-tab {
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid #e2e8f0;
+            background: white;
+            color: #64748b;
+        }
+
+        .account-tab:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .account-tab.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border-color: #2563eb;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .account-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-left: auto;
+            padding-left: 20px;
+            border-left: 2px solid #e2e8f0;
+        }
+
+        .account-balance {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .account-balance strong {
+            color: #10b981;
+            font-size: 16px;
+            margin-left: 5px;
+        }
+
+        .btn-manage-accounts {
+            background: #8b5cf6;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-manage-accounts:hover {
+            background: #7c3aed;
+            transform: translateY(-2px);
+        }
+
+        /* 账户管理对话框 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .modal-header h2 {
+            font-size: 22px;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #64748b;
+            line-height: 1;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .btn-close:hover {
+            background: #f1f5f9;
+            color: #2d3748;
+        }
+
+        .account-list {
+            margin-bottom: 25px;
+        }
+
+        .account-item {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .account-item:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+        }
+
+        .account-item-info {
+            flex: 1;
+        }
+
+        .account-item-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .account-item-balance {
+            font-size: 14px;
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .account-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-edit {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #2563eb;
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+        }
+
+        .account-form {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-primary {
+            background: #10b981;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #059669;
+        }
+
+        .btn-secondary {
+            background: #64748b;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .btn-add-account {
+            background: #10b981;
+            color: white;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-add-account:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-home {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-home:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .btn-refresh {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-refresh:hover {
+            background: #2563eb;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr 320px;
+            gap: 20px;
+        }
+
+        /* 左侧交易对列表 */
+        .symbols-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            max-height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+
+        .symbols-panel h3 {
+            font-size: 16px;
+            color: #2d3748;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .symbol-search {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .symbol-search:focus {
+            border-color: #3b82f6;
+        }
+
+        .symbol-item {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .symbol-item:hover {
+            background: #f7fafc;
+        }
+
+        .symbol-item.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border-color: #1e40af;
+        }
+
+        .symbol-item.favorite {
+            background: #fef3c7;
+            border-color: #fbbf24;
+        }
+
+        .symbol-item.favorite.active {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border-color: #b45309;
+        }
+
+        .symbol-content {
+            flex: 1;
+        }
+
+        .symbol-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .favorite-badge {
+            color: #f59e0b;
+            font-size: 12px;
+        }
+
+        .symbol-item.active .favorite-badge {
+            color: #fef3c7;
+        }
+
+        .symbol-price {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .favorite-btn {
+            padding: 4px 8px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+            opacity: 0;
+            margin-left: 8px;
+        }
+
+        .symbol-item:hover .favorite-btn {
+            opacity: 1;
+        }
+
+        .favorite-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .favorite-btn.favorited {
+            opacity: 1;
+        }
+
+        .favorite-section {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #fbbf24;
+        }
+
+        .favorite-section-title {
+            font-size: 13px;
+            color: #d97706;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 中间交易面板 */
+        .trading-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .symbol-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .symbol-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .current-symbol {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .symbol-subtitle {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        .current-price {
+            text-align: right;
+        }
+
+        .price-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #10b981;
+        }
+
+        .price-change {
+            font-size: 14px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        .price-change.up {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .price-change.down {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        /* 交易方向按钮 */
+        .direction-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .direction-tab {
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .direction-tab:hover {
+            transform: translateY(-2px);
+        }
+
+        .direction-tab.long {
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        .direction-tab.long.active {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-color: #059669;
+        }
+
+        .direction-tab.short {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .direction-tab.short.active {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border-color: #dc2626;
+        }
+
+        /* 交易表单 */
+        .trading-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .form-control {
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #3b82f6;
+        }
+
+        .leverage-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .leverage-btn {
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .leverage-btn:hover {
+            background: #f7fafc;
+        }
+
+        .leverage-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .amount-presets {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .preset-btn {
+            padding: 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .preset-btn:hover {
+            background: #f7fafc;
+            border-color: #cbd5e0;
+        }
+
+        .submit-order {
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .submit-order.long {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .submit-order.long:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .submit-order.short {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .submit-order.short:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        /* 批量开仓按钮 */
+        .batch-btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .batch-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .batch-btn-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .batch-btn-desc {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .batch-btn.long .batch-btn-title {
+            color: #10b981;
+        }
+
+        .batch-btn.short .batch-btn-title {
+            color: #ef4444;
+        }
+
+        .batch-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* 批量平仓按钮 */
+        .batch-close-btn {
+            padding: 10px 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .batch-close-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .batch-close-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* 平一半多单 */
+        .batch-close-long-half {
+            background: linear-gradient(135deg, #86efac 0%, #4ade80 100%);
+            color: #166534;
+        }
+
+        .batch-close-long-half:hover {
+            box-shadow: 0 4px 12px rgba(74, 222, 128, 0.4);
+        }
+
+        /* 平一半空单 */
+        .batch-close-short-half {
+            background: linear-gradient(135deg, #fca5a5 0%, #f87171 100%);
+            color: #7f1d1d;
+        }
+
+        .batch-close-short-half:hover {
+            box-shadow: 0 4px 12px rgba(248, 113, 113, 0.4);
+        }
+
+        /* 平全部多单 */
+        .batch-close-long-all {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .batch-close-long-all:hover {
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.5);
+        }
+
+        /* 平全部空单 */
+        .batch-close-short-all {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .batch-close-short-all:hover {
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
+        }
+
+
+        /* 右侧账户信息 */
+        .account-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-card h3 {
+            font-size: 16px;
+            color: #2d3748;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f7fafc;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-size: 13px;
+            color: #718096;
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .risk-warning {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .risk-warning h4 {
+            font-size: 14px;
+            color: #92400e;
+            margin-bottom: 8px;
+        }
+
+        .risk-warning ul {
+            font-size: 12px;
+            color: #78350f;
+            padding-left: 20px;
+        }
+
+        .risk-warning li {
+            margin-bottom: 4px;
+        }
+
+        /* 暂无持仓提示 */
+        .no-positions {
+            background: #f7fafc;
+            border: 2px dashed #cbd5e0;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            color: #a0aec0;
+            font-size: 14px;
+        }
+
+        /* 持仓项目 */
+        .position-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .position-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .position-symbol {
+            font-weight: 600;
+            font-size: 14px;
+            color: #2d3748;
+        }
+
+        .position-side {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .position-side.long {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .position-side.short {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .close-position-btn {
+            padding: 4px 12px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .close-position-btn:hover {
+            background: #dc2626;
+        }
+
+        .close-position-btn:active {
+            background: #b91c1c;
+        }
+
+        .cancel-order-btn {
+            padding: 4px 12px;
+            background: #f59e0b;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .cancel-order-btn:hover {
+            background: #d97706;
+        }
+
+        .cancel-order-btn:active {
+            background: #b45309;
+        }
+
+
+        .position-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        .position-detail-item {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .position-detail-label {
+            color: #718096;
+        }
+
+        .position-detail-value {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .position-pnl {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+        /* 开关样式 */
+        .switch input:checked + .slider {
+            background-color: #10b981;
+        }
+        
+        .switch input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部导航 -->
+        <div class="header">
+            <div>
+                <h1>
+                    💹 OKX实盘交易系统
+                    <span class="mode-badge">🔴 实盘交易</span>
+                </h1>
+            </div>
+            <div class="header-actions">
+                <a href="/" class="btn btn-home">🏠 返回首页</a>
+                <a href="/okx-profit-analysis" class="btn btn-home" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">📊 利润分析</a>
+                <button class="btn btn-refresh" onclick="refreshData()">🔄 刷新</button>
+            </div>
+        </div>
+
+        <!-- 账户切换 -->
+        <div class="account-switcher">
+            <div class="account-switcher-label">
+                👤 选择账户
+            </div>
+            <div class="account-tabs" id="accountTabs">
+                <!-- 账户标签将通过JavaScript动态加载 -->
+            </div>
+            <div class="account-info">
+                <span class="account-balance">
+                    账户余额: <strong id="accountBalance">0.00 USDT</strong>
+                </span>
+                <button class="btn-manage-accounts" onclick="openAccountModal()">
+                    ⚙️ 管理账户
+                </button>
+                <button class="btn-close-all-positions" onclick="closeAllAccountsPositions()" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; padding: 12px 24px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; margin-left: 15px; box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4); transition: all 0.3s;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(239, 68, 68, 0.5)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 16px rgba(239, 68, 68, 0.4)'">
+                    🚨 一键全平
+                </button>
+            </div>
+        </div>
+
+        <!-- 主要布局 -->
+        <div class="main-layout">
+            <!-- 左侧：交易对列表 -->
+            <div class="symbols-panel">
+                <h3>💰 交易对列表 (27)</h3>
+                <input type="text" class="symbol-search" placeholder="搜索交易对..." id="symbolSearch">
+                <div id="symbolsList">
+                    <!-- 交易对列表将通过JavaScript动态加载 -->
+                </div>
+            </div>
+
+            <!-- 中间：交易面板 -->
+            <div class="trading-panel">
+                <!-- 当前交易对信息 -->
+                <div class="symbol-header">
+                    <div class="symbol-info">
+                        <div class="current-symbol" id="currentSymbol">BTC-USDT</div>
+                        <div class="symbol-subtitle">永续合约</div>
+                    </div>
+                    <div class="current-price">
+                        <div class="price-value" id="currentPrice">95650.00</div>
+                        <span class="price-change down" id="priceChange">-0.96%</span>
+                    </div>
+                </div>
+
+                <!-- 交易方向选择 -->
+                <div class="direction-tabs">
+                    <div class="direction-tab long active" onclick="selectDirection('long')">
+                        ⬆ 做多
+                    </div>
+                    <div class="direction-tab short" onclick="selectDirection('short')">
+                        ⬇ 做空
+                    </div>
+                </div>
+
+                <!-- 交易表单 -->
+                <form class="trading-form" onsubmit="submitOrder(event)">
+                    <!-- 价格类型 -->
+                    <div class="form-group">
+                        <label class="form-label">价格类型</label>
+                        <select class="form-control" id="priceType">
+                            <option value="market">市价委托</option>
+                            <option value="limit">限价委托</option>
+                        </select>
+                    </div>
+
+                    <!-- 杠杆倍数 -->
+                    <div class="form-group">
+                        <label class="form-label">杠杆倍数</label>
+                        <div class="leverage-buttons">
+                            <button type="button" class="leverage-btn" onclick="selectLeverage(3)">3x</button>
+                            <button type="button" class="leverage-btn" onclick="selectLeverage(5)">5x</button>
+                            <button type="button" class="leverage-btn active" onclick="selectLeverage(10)">10x</button>
+                            <button type="button" class="leverage-btn" onclick="selectLeverage(20)">20x</button>
+                        </div>
+                    </div>
+
+                    <!-- 交易数量 -->
+                    <div class="form-group">
+                        <label class="form-label">开仓金额 (USDT)</label>
+                        <input type="number" class="form-control" id="orderAmount" placeholder="输入开仓金额USDT" step="0.01" required>
+                        <div style="margin-top: 8px; font-size: 12px; color: #718096;">
+                            可用余额: <span id="orderAvailableBalance">224.15 USDT</span>
+                        </div>
+                        <div style="margin-top: 4px; font-size: 11px; color: #a0aec0;">
+                            💡 实际占用保证金 = 开仓金额 ÷ 杠杆倍数
+                        </div>
+                    </div>
+
+                    <!-- 快捷金额 -->
+                    <div class="form-group">
+                        <div class="amount-presets">
+                            <button type="button" class="preset-btn" onclick="setAmount(5)">5%</button>
+                            <button type="button" class="preset-btn" onclick="setAmount(10)">10%</button>
+                            <button type="button" class="preset-btn" onclick="setAmount(20)">20%</button>
+                            <button type="button" class="preset-btn" onclick="setAmount(25)">25%</button>
+                            <button type="button" class="preset-btn" onclick="setAmount(33)">33%</button>
+                            <button type="button" class="preset-btn" onclick="setAmount(50)">50%</button>
+                            <button type="button" class="preset-btn" onclick="setAmount(100)">100%</button>
+                        </div>
+                    </div>
+
+                    <!-- 提交按钮 -->
+                    <button type="submit" class="submit-order long" id="submitBtn">
+                        ⬆ 做多
+                    </button>
+                </form>
+
+                <!-- 批量开仓功能区 - 涨幅前6名策略 -->
+                <div class="batch-trading-section" style="margin-top: 24px; padding: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3); max-width: 700px;">
+                    <h3 style="color: white; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-size: 16px;">
+                        <span style="font-size: 18px;">⚡</span>
+                        涨幅前6名策略
+                        <span style="background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-left: auto;">常规策略</span>
+                    </h3>
+                    
+                    <!-- 空单策略行 -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                        <button type="button" class="batch-btn short" onclick="batchOrder('short', 3)" style="padding: 8px;">
+                            <div class="batch-btn-title" style="font-size: 13px;">📉 空单策略 A</div>
+                            <div class="batch-btn-desc" style="font-size: 11px;">涨幅前6 · 3% · 10x</div>
+                        </button>
+                        
+                        <button type="button" class="batch-btn short" onclick="batchOrder('short', 5)" style="padding: 8px;">
+                            <div class="batch-btn-title" style="font-size: 13px;">📉 空单策略 B</div>
+                            <div class="batch-btn-desc" style="font-size: 11px;">涨幅前6 · 5% · 10x</div>
+                        </button>
+                        
+                        <button type="button" class="batch-btn short" onclick="batchOrder('short', 8)" style="padding: 8px;">
+                            <div class="batch-btn-title" style="font-size: 13px;">📉 空单策略 C</div>
+                            <div class="batch-btn-desc" style="font-size: 11px;">涨幅前6 · 8% · 10x</div>
+                        </button>
+                    </div>
+                    
+                    <!-- 多单策略行 -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                        <button type="button" class="batch-btn long" onclick="batchOrder('long', 3)" style="padding: 8px;">
+                            <div class="batch-btn-title" style="font-size: 13px;">📈 多单策略 A</div>
+                            <div class="batch-btn-desc" style="font-size: 11px;">涨幅前6 · 3% · 10x</div>
+                        </button>
+                        
+                        <button type="button" class="batch-btn long" onclick="batchOrder('long', 5)" style="padding: 8px;">
+                            <div class="batch-btn-title" style="font-size: 13px;">📈 多单策略 B</div>
+                            <div class="batch-btn-desc" style="font-size: 11px;">涨幅前6 · 5% · 10x</div>
+                        </button>
+                        
+                        <button type="button" class="batch-btn long" onclick="batchOrder('long', 8)" style="padding: 8px;">
+                            <div class="batch-btn-title" style="font-size: 13px;">📈 多单策略 C</div>
+                            <div class="batch-btn-desc" style="font-size: 11px;">涨幅前6 · 8% · 10x</div>
+                        </button>
+                    </div>
+                    
+                    <div style="margin-top: 12px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 6px; color: white; font-size: 12px;">
+                        <div style="margin-bottom: 4px;">💡 <strong>策略说明：</strong></div>
+                        <div style="padding-left: 20px;">
+                            • 从⭐<strong>常用币</strong>中选择<strong>涨幅前6名</strong><br>
+                            • 每个币种平均分配开仓金额<br>
+                            • 统一使用10倍杠杆、市价单<br>
+                            • 空单策略：做空涨幅高的币种<br>
+                            • 多单策略：做多涨幅高的币种<br>
+                            • <span style="color: #fbbf24;">⚠️ 请先收藏至少6个常用币</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 批量开仓功能区 - 涨幅后6名策略 (高风险) -->
+                <div class="batch-trading-section" style="margin-top: 20px; padding: 16px; background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); border-radius: 12px; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); max-width: 700px; border: 3px solid #fbbf24;">
+                    <h3 style="color: white; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-size: 16px;">
+                        <span style="font-size: 18px;">⚠️</span>
+                        涨幅后6名策略
+                        <span style="background: rgba(251,191,36,0.9); padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-left: auto; color: #78350f; font-weight: bold;">⚠️ 高风险区域</span>
+                    </h3>
+                    
+                    <!-- 警告提示 -->
+                    <div style="margin-bottom: 12px; padding: 10px; background: rgba(251,191,36,0.15); border: 2px solid rgba(251,191,36,0.5); border-radius: 6px; color: #fbbf24; font-size: 12px; font-weight: bold;">
+                        ⚠️ 注意：此区域针对跌幅最大的币种，波动性极高，请谨慎操作！
+                    </div>
+                    
+                    <!-- 多单策略行 (预期反弹) -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                        <button type="button" class="batch-btn long" onclick="batchOrder('long', 3, 'bottom')" style="padding: 8px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                            <div class="batch-btn-title" style="font-size: 13px;">📈 多单策略 D</div>
+                            <div class="batch-btn-desc" style="font-size: 11px;">涨幅后6 · 3% · 10x</div>
+                        </button>
+                        
+                        <button type="button" class="batch-btn long" onclick="batchOrder('long', 5, 'bottom')" style="padding: 8px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                            <div class="batch-btn-title" style="font-size: 13px;">📈 多单策略 E</div>
+                            <div class="batch-btn-desc" style="font-size: 11px;">涨幅后6 · 5% · 10x</div>
+                        </button>
+                        
+                        <button type="button" class="batch-btn long" onclick="batchOrder('long', 8, 'bottom')" style="padding: 8px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                            <div class="batch-btn-title" style="font-size: 13px;">📈 多单策略 F</div>
+                            <div class="batch-btn-desc" style="font-size: 11px;">涨幅后6 · 8% · 10x</div>
+                        </button>
+                    </div>
+                    
+                    <!-- 空单策略行 (趋势延续) -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                        <button type="button" class="batch-btn short" onclick="batchOrder('short', 3, 'bottom')" style="padding: 8px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                            <div class="batch-btn-title" style="font-size: 13px;">📉 空单策略 D</div>
+                            <div class="batch-btn-desc" style="font-size: 11px;">涨幅后6 · 3% · 10x</div>
+                        </button>
+                        
+                        <button type="button" class="batch-btn short" onclick="batchOrder('short', 5, 'bottom')" style="padding: 8px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                            <div class="batch-btn-title" style="font-size: 13px;">📉 空单策略 E</div>
+                            <div class="batch-btn-desc" style="font-size: 11px;">涨幅后6 · 5% · 10x</div>
+                        </button>
+                        
+                        <button type="button" class="batch-btn short" onclick="batchOrder('short', 8, 'bottom')" style="padding: 8px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                            <div class="batch-btn-title" style="font-size: 13px;">📉 空单策略 F</div>
+                            <div class="batch-btn-desc" style="font-size: 11px;">涨幅后6 · 8% · 10x</div>
+                        </button>
+                    </div>
+                    
+                    <div style="margin-top: 12px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 6px; color: white; font-size: 12px;">
+                        <div style="margin-bottom: 4px;">💡 <strong>策略说明：</strong></div>
+                        <div style="padding-left: 20px;">
+                            • 从⭐<strong>常用币</strong>中选择<strong>涨幅后6名</strong>（跌幅最大）<br>
+                            • <strong style="color: #fbbf24;">多单策略：</strong>预期超跌反弹，开多单等待回升<br>
+                            • <strong style="color: #fbbf24;">空单策略：</strong>预期趋势延续，做空继续下跌<br>
+                            • 统一使用10倍杠杆、市价单<br>
+                            • <span style="color: #fef3c7;">⚠️ 跌幅大的币种波动极高，风险极大！</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 批量开仓功能区 - 涨幅前8/后8名策略 -->
+                <div class="batch-trading-section" style="margin-top: 20px; padding: 16px; background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%); border-radius: 12px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); max-width: 1450px;">
+                    <h3 style="color: white; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-size: 16px;">
+                        <span style="font-size: 18px;">🎯</span>
+                        涨幅前8/后8名策略
+                        <span style="background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-left: auto;">扩展策略</span>
+                    </h3>
+                    
+                    <!-- 涨幅前8名策略区域 -->
+                    <div style="margin-bottom: 16px; padding: 12px; background: rgba(102,126,234,0.2); border-radius: 8px; border: 2px solid rgba(102,126,234,0.4);">
+                        <h4 style="color: white; font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                            ⚡ 涨幅前8名策略
+                        </h4>
+                        
+                        <!-- 多单策略行 -->
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 8px;">
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8('long', 1.5)" style="padding: 8px;">
+                                <div class="batch-btn-title" style="font-size: 13px;">📈 多单策略</div>
+                                <div class="batch-btn-desc" style="font-size: 11px;">涨幅前8 · 1.5% · 10x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8('long', 3)" style="padding: 8px;">
+                                <div class="batch-btn-title" style="font-size: 13px;">📈 多单策略</div>
+                                <div class="batch-btn-desc" style="font-size: 11px;">涨幅前8 · 3% · 10x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8('long', 5)" style="padding: 8px;">
+                                <div class="batch-btn-title" style="font-size: 13px;">📈 多单策略</div>
+                                <div class="batch-btn-desc" style="font-size: 11px;">涨幅前8 · 5% · 10x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8('long', 8)" style="padding: 8px;">
+                                <div class="batch-btn-title" style="font-size: 13px;">📈 多单策略</div>
+                                <div class="batch-btn-desc" style="font-size: 11px;">涨幅前8 · 8% · 10x</div>
+                            </button>
+                        </div>
+                        
+                        <!-- 空单策略行 -->
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8('short', 1.5)" style="padding: 8px;">
+                                <div class="batch-btn-title" style="font-size: 13px;">📉 空单策略</div>
+                                <div class="batch-btn-desc" style="font-size: 11px;">涨幅前8 · 1.5% · 10x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8('short', 3)" style="padding: 8px;">
+                                <div class="batch-btn-title" style="font-size: 13px;">📉 空单策略</div>
+                                <div class="batch-btn-desc" style="font-size: 11px;">涨幅前8 · 3% · 10x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8('short', 5)" style="padding: 8px;">
+                                <div class="batch-btn-title" style="font-size: 13px;">📉 空单策略</div>
+                                <div class="batch-btn-desc" style="font-size: 11px;">涨幅前8 · 5% · 10x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8('short', 8)" style="padding: 8px;">
+                                <div class="batch-btn-title" style="font-size: 13px;">📉 空单策略</div>
+                                <div class="batch-btn-desc" style="font-size: 11px;">涨幅前8 · 8% · 10x</div>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 涨幅后8名策略区域 -->
+                    <div style="padding: 12px; background: rgba(220,38,38,0.2); border-radius: 8px; border: 2px solid rgba(220,38,38,0.4);">
+                        <h4 style="color: white; font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                            ⚠️ 涨幅后8名策略 <span style="color: #fbbf24; font-size: 11px; margin-left: auto;">(高风险)</span>
+                        </h4>
+                        
+                        <!-- 多单策略行 -->
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 8px;">
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8('long', 1.5)" style="padding: 8px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title" style="font-size: 13px;">📈 多单策略</div>
+                                <div class="batch-btn-desc" style="font-size: 11px;">涨幅后8 · 1.5% · 10x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8('long', 3)" style="padding: 8px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title" style="font-size: 13px;">📈 多单策略</div>
+                                <div class="batch-btn-desc" style="font-size: 11px;">涨幅后8 · 3% · 10x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8('long', 5)" style="padding: 8px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title" style="font-size: 13px;">📈 多单策略</div>
+                                <div class="batch-btn-desc" style="font-size: 11px;">涨幅后8 · 5% · 10x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8('long', 8)" style="padding: 8px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title" style="font-size: 13px;">📈 多单策略</div>
+                                <div class="batch-btn-desc" style="font-size: 11px;">涨幅后8 · 8% · 10x</div>
+                            </button>
+                        </div>
+                        
+                        <!-- 空单策略行 -->
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8('short', 1.5)" style="padding: 8px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title" style="font-size: 13px;">📉 空单策略</div>
+                                <div class="batch-btn-desc" style="font-size: 11px;">涨幅后8 · 1.5% · 10x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8('short', 3)" style="padding: 8px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title" style="font-size: 13px;">📉 空单策略</div>
+                                <div class="batch-btn-desc" style="font-size: 11px;">涨幅后8 · 3% · 10x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8('short', 5)" style="padding: 8px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title" style="font-size: 13px;">📉 空单策略</div>
+                                <div class="batch-btn-desc" style="font-size: 11px;">涨幅后8 · 5% · 10x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8('short', 8)" style="padding: 8px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title" style="font-size: 13px;">📉 空单策略</div>
+                                <div class="batch-btn-desc" style="font-size: 11px;">涨幅后8 · 8% · 10x</div>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 12px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 6px; color: white; font-size: 12px;">
+                        <div style="margin-bottom: 4px;">💡 <strong>策略说明：</strong></div>
+                        <div style="padding-left: 20px;">
+                            • 从⭐<strong>常用币</strong>中选择<strong>涨幅前8名</strong>或<strong>涨幅后8名</strong><br>
+                            • 每个币种平均分配开仓金额，统一使用10倍杠杆<br>
+                            • <strong>涨幅前8：</strong>针对表现最强的币种<br>
+                            • <strong>涨幅后8：</strong>针对跌幅最大的币种（高风险）<br>
+                            • <span style="color: #fbbf24;">⚠️ 请先收藏至少8个常用币</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 1:1对冲配对策略 -->
+                <div class="batch-trading-section" style="margin-top: 24px; padding: 20px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 12px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
+                    <h3 style="color: white; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 20px;">⚖️</span>
+                        1:1对冲配对策略
+                    </h3>
+                    
+                    <div class="batch-strategies" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <!-- 空单配多单 -->
+                        <button type="button" class="batch-btn" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); color: #78350f;" onclick="hedgePositions('short')">
+                            <div class="batch-btn-title">⚖️ 空单配多单</div>
+                            <div class="batch-btn-desc">持仓空单 1:1 配对多单</div>
+                        </button>
+                        
+                        <!-- 多单配空单 -->
+                        <button type="button" class="batch-btn" style="background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%); color: #7c2d12;" onclick="hedgePositions('long')">
+                            <div class="batch-btn-title">⚖️ 多单配空单</div>
+                            <div class="batch-btn-desc">持仓多单 1:1 配对空单</div>
+                        </button>
+                    </div>
+                    
+                    <div style="margin-top: 12px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 6px; color: white; font-size: 12px;">
+                        <div style="margin-bottom: 4px;">💡 <strong>对冲说明：</strong></div>
+                        <div style="padding-left: 20px;">
+                            • <strong>空单配多单：</strong>根据现有空单持仓，开等额多单对冲<br>
+                            • <strong>多单配空单：</strong>根据现有多单持仓，开等额空单对冲<br>
+                            • 自动计算每个币种的持仓金额<br>
+                            • 对冲后锁定盈亏，降低风险<br>
+                            • 示例：6个空单各7U → 开6个多单各7U<br>
+                            • <span style="color: #fef3c7;">⚠️ 需要有对应方向的持仓</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 风险提示 -->
+                <div class="risk-warning">
+                    <h4>⚠️ 风险提示</h4>
+                    <ul>
+                        <li>合约交易存在高风险，请谨慎操作</li>
+                        <li>杠杆会放大收益，也会放大亏损</li>
+                        <li>建议设置止损，控制风险</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 右侧：账户信息 -->
+            <div class="account-panel">
+                <!-- API配置提示 -->
+                <div id="apiConfigNotice" style="display: none; background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <span style="font-size: 20px;">⚠️</span>
+                        <strong style="color: #92400e;">需要配置API凭证</strong>
+                    </div>
+                    <p style="margin: 0 0 8px 28px; color: #78350f; font-size: 13px;">
+                        当前账户未配置OKX API凭证，无法查询账户余额和持仓信息。
+                    </p>
+                    <p style="margin: 0 0 0 28px; color: #78350f; font-size: 13px;">
+                        请点击账户标签上的"编辑"按钮，填入您的API Key、API Secret和Passphrase。
+                    </p>
+                </div>
+                
+                <!-- 账户总览 -->
+                <div class="info-card">
+                    <h3>💰 账户信息 <button onclick="refreshAccountData()" style="background: #3b82f6; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 10px;">🔄</button></h3>
+                    <div class="info-row">
+                        <span class="info-label">总权益</span>
+                        <span class="info-value" style="color: #10b981;" id="totalEquity">-- USDT</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">可用余额</span>
+                        <span class="info-value" id="availableBalance">-- USDT</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">持仓保证金</span>
+                        <span class="info-value" id="usedMargin">-- USDT</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">未实现盈亏</span>
+                        <span class="info-value" id="unrealizedPnl">-- USDT</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">冻结余额</span>
+                        <span class="info-value" id="frozenBalance">-- USDT</span>
+                    </div>
+                </div>
+
+                <!-- 账户仓位限额 -->
+                <div class="info-card" style="margin-top: 16px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #fbbf24;">
+                    <h3 style="color: #78350f; margin-bottom: 12px;">📊 账户仓位限额</h3>
+                    <div class="info-row">
+                        <span class="info-label" style="color: #78350f;">账户名称</span>
+                        <span class="info-value" style="color: #78350f; font-weight: bold;" id="accountName">主账户</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label" style="color: #78350f;">开始日期</span>
+                        <span class="info-value" style="color: #78350f;" id="accountStartDate">--</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label" style="color: #78350f;">已运行天数</span>
+                        <span class="info-value" style="color: #78350f;" id="accountDaysPassed">-- 天</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label" style="color: #78350f;">当前最大仓位</span>
+                        <span class="info-value" style="color: #059669; font-weight: bold; font-size: 16px;" id="accountMaxLimit">-- USDT</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label" style="color: #78350f;">下次增加日期</span>
+                        <span class="info-value" style="color: #78350f;" id="accountNextIncreaseDate">--</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label" style="color: #78350f;">距离下次增加</span>
+                        <span class="info-value" style="color: #78350f;" id="accountDaysUntilIncrease">-- 天</span>
+                    </div>
+                    <div style="margin-top: 10px; padding: 8px; background: rgba(251, 191, 36, 0.2); border-radius: 6px; border-left: 3px solid #fbbf24;">
+                        <p style="color: #78350f; font-size: 11px; margin: 0; line-height: 1.5;">
+                            💡 <strong>规则说明：</strong>账户从开始日期计算，初始限额300 USDT，每满30天自动增加300 USDT仓位上限。此限额为硬编码规则，不可修改。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 涨跌预警设置 -->
+                <div class="info-card" style="margin-top: 16px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 2px solid #ef4444;">
+                    <h3 style="color: #991b1b; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                        🔔 涨跌预警
+                        <button onclick="window.open('/coin-change-tracker', '_blank')" style="margin-left: auto; padding: 4px 10px; font-size: 11px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer;" title="打开详细页面">
+                            📊 详情
+                        </button>
+                    </h3>
+                    
+                    <!-- 当前涨跌幅 -->
+                    <div class="info-row" style="margin-bottom: 12px; padding: 10px; background: rgba(255,255,255,0.5); border-radius: 6px;">
+                        <span class="info-label" style="color: #991b1b;">27币总涨跌幅</span>
+                        <span class="info-value" style="font-weight: bold; font-size: 18px;" id="totalChangePercent">--</span>
+                    </div>
+                    
+                    <!-- 上涨预警 -->
+                    <div style="padding: 10px; background: rgba(34, 197, 94, 0.1); border-radius: 8px; border: 1px solid #22c55e; margin-bottom: 10px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="color: #166534; font-weight: 600; font-size: 13px;">📈 上涨预警</span>
+                            <label class="switch" style="position: relative; display: inline-block; width: 44px; height: 24px;">
+                                <input type="checkbox" id="upperAlertSwitch" style="opacity: 0; width: 0; height: 0;">
+                                <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
+                            </label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="number" id="upperThreshold" value="30" step="0.1" min="0" max="100" 
+                                   style="flex: 1; padding: 6px 10px; border: 1px solid #22c55e; border-radius: 6px; font-size: 13px;">
+                            <span style="color: #166534; font-size: 13px; font-weight: 600;">%</span>
+                        </div>
+                        <div style="font-size: 11px; color: #166534; margin-top: 6px;">
+                            涨幅超过此值时触发
+                        </div>
+                    </div>
+                    
+                    <!-- 下跌预警 -->
+                    <div style="padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; border: 1px solid #ef4444; margin-bottom: 10px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="color: #991b1b; font-weight: 600; font-size: 13px;">📉 下跌预警</span>
+                            <label class="switch" style="position: relative; display: inline-block; width: 44px; height: 24px;">
+                                <input type="checkbox" id="lowerAlertSwitch" style="opacity: 0; width: 0; height: 0;">
+                                <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
+                            </label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="number" id="lowerThreshold" value="-40" step="0.1" max="0" min="-100" 
+                                   style="flex: 1; padding: 6px 10px; border: 1px solid #ef4444; border-radius: 6px; font-size: 13px;">
+                            <span style="color: #991b1b; font-size: 13px; font-weight: 600;">%</span>
+                        </div>
+                        <div style="font-size: 11px; color: #991b1b; margin-top: 6px;">
+                            跌幅小于此值时触发
+                        </div>
+                    </div>
+                    
+                    <!-- 保存按钮 -->
+                    <button onclick="saveAlertSettingsOKX()" style="width: 100%; padding: 10px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);">
+                        💾 保存预警设置
+                    </button>
+                    
+                    <!-- 提示 -->
+                    <div style="margin-top: 10px; padding: 8px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 3px solid #ef4444;">
+                        <p style="color: #991b1b; font-size: 10px; margin: 0; line-height: 1.4;">
+                            💡 触发后将播放音效、显示弹窗，并自动关闭开关。需要重新开启才能再次触发。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 持仓列表 -->
+                <div class="info-card">
+                    <h3 style="margin-bottom: 12px;">
+                        📊 持仓 
+                        <span id="positionsCount" style="color: #888; font-size: 14px; font-weight: normal;">(0)</span>
+                        <button onclick="loadPositions()" style="float: right; padding: 4px 12px; font-size: 12px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer;" title="刷新持仓">
+                            🔄 刷新
+                        </button>
+                    </h3>
+                    
+                    <!-- 批量平仓按钮组 -->
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px;">
+                        <button onclick="batchClosePositions('long', 0.5)" class="batch-close-btn batch-close-long-half">
+                            📉 平一半多单
+                        </button>
+                        <button onclick="batchClosePositions('short', 0.5)" class="batch-close-btn batch-close-short-half">
+                            📈 平一半空单
+                        </button>
+                        <button onclick="batchClosePositions('long', 1)" class="batch-close-btn batch-close-long-all">
+                            🚫 平全部多单
+                        </button>
+                        <button onclick="batchClosePositions('short', 1)" class="batch-close-btn batch-close-short-all">
+                            ⛔ 平全部空单
+                        </button>
+                    </div>
+                    
+                    <div id="positionsList" class="no-positions">
+                        暂无持仓
+                    </div>
+                </div>
+
+                <!-- 当前委托列表 -->
+                <div class="info-card" style="margin-top: 24px;">
+                    <h3>
+                        📋 当前委托 
+                        <span id="pendingOrdersCount" style="color: #888; font-size: 14px; font-weight: normal;">(0)</span>
+                        <button onclick="loadPendingOrders()" style="float: right; padding: 4px 12px; font-size: 12px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer;" title="刷新委托">
+                            🔄 刷新
+                        </button>
+                    </h3>
+                    <div id="pendingOrdersList" class="no-positions">
+                        暂无委托
+                    </div>
+                </div>
+                
+                <!-- 交易日志 -->
+                <div class="info-card" style="margin-top: 24px;">
+                    <h3>
+                        📜 交易日志 
+                        <span id="logsCount" style="color: #888; font-size: 14px; font-weight: normal;">(0)</span>
+                        <button onclick="loadTradingLogs()" style="float: right; padding: 4px 12px; font-size: 12px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer;" title="刷新日志">
+                            🔄 刷新
+                        </button>
+                    </h3>
+                    <div style="margin-bottom: 12px; font-size: 12px; color: #64748b;">
+                        📝 所有操作均自动记录，不可修改 | 数据保存格式: JSONL
+                    </div>
+                    <div id="tradingLogsList" style="max-height: 400px; overflow-y: auto;">
+                        <div style="text-align: center; padding: 20px; color: #94a3b8;">
+                            暂无日志
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 当前交易方向
+        let currentDirection = 'long';
+        let currentLeverage = 10;
+        let currentSymbol = 'BTC-USDT-SWAP';
+
+        // 当前账户
+        let currentAccount = 'account_fangfang12';
+        
+        // 收藏的交易对（从服务器API读取，全局共享）
+        let favoriteSymbols = [];
+        
+        // 从服务器加载常用币列表
+        async function loadFavoriteSymbols() {
+            try {
+                const response = await fetch('/api/okx-trading/favorite-symbols');
+                const data = await response.json();
+                
+                if (data.success) {
+                    favoriteSymbols = data.symbols || [];
+                    console.log('✅ 已加载常用币列表:', favoriteSymbols);
+                } else {
+                    console.error('❌ 加载常用币失败:', data.error);
+                    // 使用默认列表
+                    favoriteSymbols = ["BTC-USDT-SWAP", "ETH-USDT-SWAP", "SOL-USDT-SWAP", 
+                                      "BNB-USDT-SWAP", "XRP-USDT-SWAP", "DOGE-USDT-SWAP"];
+                }
+            } catch (error) {
+                console.error('❌ 加载常用币异常:', error);
+                // 使用默认列表
+                favoriteSymbols = ["BTC-USDT-SWAP", "ETH-USDT-SWAP", "SOL-USDT-SWAP", 
+                                  "BNB-USDT-SWAP", "XRP-USDT-SWAP", "DOGE-USDT-SWAP"];
+            }
+        }
+        
+        // 保存常用币列表到服务器
+        async function saveFavoriteSymbols() {
+            try {
+                const response = await fetch('/api/okx-trading/favorite-symbols', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ symbols: favoriteSymbols })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    console.log('✅ 常用币列表已保存到服务器');
+                } else {
+                    console.error('❌ 保存常用币失败:', data.error);
+                }
+            } catch (error) {
+                console.error('❌ 保存常用币异常:', error);
+            }
+        }
+        
+        // 从localStorage加载账户列表，如果没有则使用默认账户
+        let accounts = JSON.parse(localStorage.getItem('okx_accounts') || JSON.stringify([
+            { 
+                id: 'account_main', 
+                name: '主账户', 
+                apiKey: 'd6b272da-b59e-4ca3-97bd-663102f981b3',
+                apiSecret: '5D76ACDE6D74CF07842661385E12C61E',
+                passphrase: 'Tencent@123',
+                balance: 0 
+            },
+            { 
+                id: 'account_fangfang12', 
+                name: 'Fangfang12', 
+                apiKey: 'e5867a9a-93b7-476f-81ce-093c3aacae0d',
+                apiSecret: '4624EE63A9BF3F84250AC71C9A37F47D',
+                passphrase: 'Tencent@123',
+                balance: 0 
+            },
+            { 
+                id: 'account_anchor', 
+                name: '锚点账号', 
+                apiKey: '0b05a729-40eb-4809-b3eb-eb2de75b7e9e',
+                apiSecret: '4E4DA8BE3B18D01AA07185A006BF9F8E',
+                passphrase: 'Tencent@123',
+                balance: 0 
+            },
+            { 
+                id: 'account_poit', 
+                name: 'POIT', 
+                apiKey: '8650e46c-059b-431d-93cf-55f8c79babdb',
+                apiSecret: '4C2BD2AC6A08615EA7F36A6251857FCE',
+                passphrase: 'Wu666666.',
+                balance: 0 
+            }
+        ]));
+
+        // 交易对数据（初始化为空，从API加载）
+        let symbols = [];
+
+        // 加载实时行情数据
+        async function loadMarketTickers() {
+            try {
+                console.log('[loadMarketTickers] 开始加载行情数据...');
+                const response = await fetch('/api/okx-trading/market-tickers');
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    symbols = result.data.map(ticker => ({
+                        symbol: ticker.symbol,
+                        name: ticker.name,
+                        price: ticker.price,
+                        change: ticker.change24h  // 24h涨跌幅
+                    }));
+                    console.log(`[loadMarketTickers] 加载成功，共${symbols.length}个交易对`);
+                    
+                    // 重新渲染交易对列表
+                    renderSymbolsList();
+                } else {
+                    console.error('[loadMarketTickers] 加载失败:', result.error);
+                    // 使用默认数据
+                    symbols = [
+                        { symbol: 'BTC-USDT-SWAP', name: 'BTC', price: 0, change: 0 },
+                        { symbol: 'ETH-USDT-SWAP', name: 'ETH', price: 0, change: 0 }
+                    ];
+                    renderSymbolsList();
+                }
+            } catch (error) {
+                console.error('[loadMarketTickers] 加载异常:', error);
+                // 使用默认数据
+                symbols = [
+                    { symbol: 'BTC-USDT-SWAP', name: 'BTC', price: 0, change: 0 },
+                    { symbol: 'ETH-USDT-SWAP', name: 'ETH', price: 0, change: 0 }
+                ];
+                renderSymbolsList();
+            }
+        }
+
+        // 加载账户信息
+        async function loadAccountInfo() {
+            const account = accounts.find(acc => acc.id === currentAccount);
+            if (!account || !account.apiKey || !account.apiSecret || !account.passphrase) {
+                // 没有API凭证，显示默认值和提示
+                document.getElementById('totalEquity').textContent = '未配置';
+                document.getElementById('availableBalance').textContent = '未配置';
+                document.getElementById('usedMargin').textContent = '未配置';
+                document.getElementById('unrealizedPnl').textContent = '未配置';
+                document.getElementById('frozenBalance').textContent = '未配置';
+                
+                // 显示配置提示
+                showApiConfigNotice();
+                return;
+            }
+            
+            // 隐藏配置提示
+            hideApiConfigNotice();
+
+            try {
+                const response = await fetch('/api/okx-trading/account-info', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        apiKey: account.apiKey,
+                        apiSecret: account.apiSecret,
+                        passphrase: account.passphrase
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success && result.data) {
+                    const data = result.data;
+                    document.getElementById('totalEquity').textContent = data.totalEquity.toFixed(2) + ' USDT';
+                    document.getElementById('availableBalance').textContent = data.availableBalance.toFixed(2) + ' USDT';
+                    document.getElementById('usedMargin').textContent = data.usedMargin.toFixed(2) + ' USDT';
+                    
+                    // 更新账户对象中的余额（使用可用余额）
+                    account.balance = data.availableBalance;
+                    localStorage.setItem('okx_accounts', JSON.stringify(accounts));
+                    
+                    // 同时更新订单表单中的可用余额
+                    const orderBalanceEl = document.getElementById('orderAvailableBalance');
+                    if (orderBalanceEl) {
+                        orderBalanceEl.textContent = data.availableBalance.toFixed(2) + ' USDT';
+                    }
+                    
+                    // 更新账户标签处的余额
+                    const accountBalanceEl = document.getElementById('accountBalance');
+                    if (accountBalanceEl) {
+                        accountBalanceEl.textContent = data.availableBalance.toFixed(2) + ' USDT';
+                    }
+                    
+                    // 未实现盈亏带颜色
+                    const uplElement = document.getElementById('unrealizedPnl');
+                    const upl = data.unrealizedPnl;
+                    uplElement.textContent = (upl >= 0 ? '+' : '') + upl.toFixed(2) + ' USDT';
+                    uplElement.style.color = upl >= 0 ? '#10b981' : '#ef4444';
+                    
+                    document.getElementById('frozenBalance').textContent = data.frozenBalance.toFixed(2) + ' USDT';
+                } else {
+                    console.error('获取账户信息失败:', result.error);
+                }
+            } catch (error) {
+                console.error('加载账户信息异常:', error);
+            }
+        }
+
+        // 加载持仓列表
+        async function loadPositions() {
+            console.log('[loadPositions] 开始加载持仓...');
+            console.log('[loadPositions] currentAccount:', currentAccount);
+            console.log('[loadPositions] accounts:', accounts);
+            
+            const account = accounts.find(acc => acc.id === currentAccount);
+            console.log('[loadPositions] 找到的账户:', account);
+            
+            if (!account) {
+                console.error('[loadPositions] 账户不存在');
+                document.getElementById('positionsList').innerHTML = '<div class="no-positions">账户不存在</div>';
+                document.getElementById('positionsCount').textContent = '(0)';
+                return;
+            }
+            
+            console.log('[loadPositions] API凭证检查:', {
+                hasApiKey: !!account.apiKey,
+                hasApiSecret: !!account.apiSecret,
+                hasPassphrase: !!account.passphrase
+            });
+            
+            if (!account.apiKey || !account.apiSecret || !account.passphrase) {
+                console.log('[loadPositions] 未配置API凭证');
+                document.getElementById('positionsList').innerHTML = '<div class="no-positions">请先配置账户API凭证</div>';
+                document.getElementById('positionsCount').textContent = '(0)';
+                return;
+            }
+
+            try {
+                console.log('[loadPositions] 调用API...');
+                const response = await fetch('/api/okx-trading/positions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        apiKey: account.apiKey,
+                        apiSecret: account.apiSecret,
+                        passphrase: account.passphrase
+                    })
+                });
+
+                const result = await response.json();
+                console.log('[loadPositions] API响应:', result);
+
+                if (result.success && result.data) {
+                    const positions = result.data;
+                    const positionsCount = positions.length;
+                    
+                    console.log('[loadPositions] 持仓数量:', positionsCount);
+                    console.log('[loadPositions] 持仓数据:', positions);
+                    
+                    document.getElementById('positionsCount').textContent = `(${positionsCount})`;
+                    
+                    if (positionsCount === 0) {
+                        document.getElementById('positionsList').innerHTML = '<div class="no-positions">暂无持仓</div>';
+                    } else {
+                        // 更新已用保证金
+                        if (result.summary) {
+                            document.getElementById('usedMargin').textContent = result.summary.totalMargin.toFixed(2) + ' USDT';
+                        }
+                        
+                        // 渲染持仓列表
+                        const html = positions.map(pos => {
+                            const pnlColor = pos.unrealizedPnl >= 0 ? '#10b981' : '#ef4444';
+                            const pnlSign = pos.unrealizedPnl >= 0 ? '+' : '';
+                            const sideClass = pos.posSide === 'long' ? 'long' : 'short';
+                            const sideName = pos.posSide === 'long' ? '做多' : '做空';
+                            
+                            return `
+                                <div class="position-item">
+                                    <div class="position-header">
+                                        <span class="position-symbol">${pos.instId}</span>
+                                        <span class="position-side ${sideClass}">${sideName}</span>
+                                        <button class="close-position-btn" onclick="closePosition('${pos.instId}', '${pos.posSide}')">
+                                            平仓
+                                        </button>
+                                    </div>
+                                    <div class="position-details">
+                                        <div class="position-detail-item">
+                                            <span class="position-detail-label">持仓量:</span>
+                                            <span class="position-detail-value">${pos.posSize}</span>
+                                        </div>
+                                        <div class="position-detail-item">
+                                            <span class="position-detail-label">杠杆:</span>
+                                            <span class="position-detail-value">${pos.leverage}x</span>
+                                        </div>
+                                        <div class="position-detail-item">
+                                            <span class="position-detail-label">开仓价:</span>
+                                            <span class="position-detail-value">$${pos.avgPrice.toFixed(2)}</span>
+                                        </div>
+                                        <div class="position-detail-item">
+                                            <span class="position-detail-label">标记价:</span>
+                                            <span class="position-detail-value">$${pos.markPrice.toFixed(2)}</span>
+                                        </div>
+                                        <div class="position-detail-item">
+                                            <span class="position-detail-label">保证金:</span>
+                                            <span class="position-detail-value">${pos.margin.toFixed(2)} USDT</span>
+                                        </div>
+                                    </div>
+                                    <div class="position-pnl">
+                                        <span>未实现盈亏:</span>
+                                        <span style="color: ${pnlColor};">
+                                            ${pnlSign}${pos.unrealizedPnl.toFixed(2)} USDT 
+                                            (${pnlSign}${pos.unrealizedPnlRatio.toFixed(2)}%)
+                                        </span>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                        
+                        document.getElementById('positionsList').innerHTML = html;
+                    }
+                } else {
+                    console.error('[loadPositions] 获取持仓失败:', result.error);
+                    console.error('[loadPositions] 完整响应:', result);
+                    document.getElementById('positionsList').innerHTML = '<div class="no-positions">加载失败: ' + (result.error || '未知错误') + '</div>';
+                }
+            } catch (error) {
+                console.error('[loadPositions] 加载持仓异常:', error);
+                document.getElementById('positionsList').innerHTML = '<div class="no-positions">加载异常</div>';
+            }
+        }
+
+        // 刷新账户数据（账户信息+持仓）
+        async function refreshAccountData() {
+            await Promise.all([
+                loadAccountInfo(),
+                loadPositions()
+            ]);
+        }
+
+        // 加载账户仓位限额
+        async function loadAccountLimit() {
+            console.log('[loadAccountLimit] 开始加载账户仓位限额...');
+            
+            const account = accounts.find(acc => acc.id === currentAccount);
+            const accountName = account ? account.name : '主账户';
+            
+            try {
+                const response = await fetch(`/api/okx-trading/account-limit?account_name=${encodeURIComponent(accountName)}`);
+                const result = await response.json();
+                
+                console.log('[loadAccountLimit] API响应:', result);
+                
+                if (result.success) {
+                    const data = result.data;
+                    
+                    // 更新页面显示
+                    document.getElementById('accountName').textContent = data.account_name;
+                    document.getElementById('accountStartDate').textContent = data.start_date;
+                    document.getElementById('accountDaysPassed').textContent = `${data.days_passed} 天`;
+                    document.getElementById('accountMaxLimit').textContent = `${data.current_max_limit} USDT`;
+                    document.getElementById('accountNextIncreaseDate').textContent = data.next_increase_date;
+                    document.getElementById('accountDaysUntilIncrease').textContent = `${data.days_until_next_increase} 天`;
+                    
+                    console.log(`✅ 账户限额已更新: ${data.current_max_limit} USDT`);
+                } else {
+                    console.error('[loadAccountLimit] 加载失败:', result.error);
+                }
+            } catch (error) {
+                console.error('[loadAccountLimit] 加载异常:', error);
+            }
+        }
+
+        // 平仓函数
+        async function closePosition(instId, posSide) {
+            const account = accounts.find(acc => acc.id === currentAccount);
+            
+            if (!account || !account.apiKey || !account.apiSecret || !account.passphrase) {
+                alert('请先配置账户API凭证！');
+                return;
+            }
+            
+            const sideName = posSide === 'long' ? '做多' : '做空';
+            const confirmMsg = `确认平仓 ${instId} ${sideName} 持仓？`;
+            
+            // 使用自定义确认对话框
+            const confirmed = await showConfirmDialog(confirmMsg, '🔔 批量平全单提示');
+            if (!confirmed) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/okx-trading/close-position', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        apiKey: account.apiKey,
+                        apiSecret: account.apiSecret,
+                        passphrase: account.passphrase,
+                        instId: instId,
+                        posSide: posSide
+                    })
+                });
+                
+                const result = await response.json();
+                console.log('平仓响应:', result);
+                
+                if (result.success) {
+                    alert('✅ 平仓成功！');
+                    // 平仓成功后刷新账户信息和持仓
+                    await refreshAccountData();
+                } else {
+                    const errorMsg = result.error || '未知错误';
+                    // 特殊处理"没有持仓"错误
+                    if (errorMsg.includes('没有') && errorMsg.includes('持仓')) {
+                        alert(`⚠️ ${errorMsg}\n\n可能原因：\n• 持仓已被其他操作平仓\n• 账户切换后持仓未同步\n• 持仓已过期或被清算\n\n建议：点击"刷新"按钮更新持仓信息`);
+                        // 自动刷新持仓列表
+                        console.log('[closePosition] 持仓不存在，自动刷新持仓列表');
+                        await refreshAccountData();
+                    } else {
+                        alert(`❌ 平仓失败: ${errorMsg}`);
+                    }
+                }
+            } catch (error) {
+                console.error('平仓异常:', error);
+                alert(`❌ 平仓异常: ${error.message || error}`);
+            }
+        }
+
+        // 加载当前委托（未成交订单）
+        async function loadPendingOrders() {
+            console.log('[loadPendingOrders] 开始加载委托订单...');
+            
+            const account = accounts.find(acc => acc.id === currentAccount);
+            
+            if (!account) {
+                console.error('[loadPendingOrders] 账户不存在');
+                document.getElementById('pendingOrdersList').innerHTML = '<div class="no-positions">账户不存在</div>';
+                document.getElementById('pendingOrdersCount').textContent = '(0)';
+                return;
+            }
+            
+            if (!account.apiKey || !account.apiSecret || !account.passphrase) {
+                console.log('[loadPendingOrders] 未配置API凭证');
+                document.getElementById('pendingOrdersList').innerHTML = '<div class="no-positions">请先配置账户API凭证</div>';
+                document.getElementById('pendingOrdersCount').textContent = '(0)';
+                return;
+            }
+
+            try {
+                console.log('[loadPendingOrders] 调用API...');
+                const response = await fetch('/api/okx-trading/pending-orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        apiKey: account.apiKey,
+                        apiSecret: account.apiSecret,
+                        passphrase: account.passphrase
+                    })
+                });
+
+                const result = await response.json();
+                console.log('[loadPendingOrders] API响应:', result);
+
+                if (result.success && result.data) {
+                    const orders = result.data;
+                    const ordersCount = orders.length;
+                    
+                    console.log('[loadPendingOrders] 委托数量:', ordersCount);
+                    
+                    document.getElementById('pendingOrdersCount').textContent = `(${ordersCount})`;
+                    
+                    if (ordersCount === 0) {
+                        document.getElementById('pendingOrdersList').innerHTML = '<div class="no-positions">暂无委托</div>';
+                    } else {
+                        // 渲染委托订单列表
+                        const html = orders.map(order => {
+                            const sideClass = order.posSide === 'long' ? 'long' : 'short';
+                            const sideName = order.posSide === 'long' ? '做多' : '做空';
+                            const sideAction = order.side === 'buy' ? '买入' : '卖出';
+                            
+                            // 格式化创建时间
+                            const createTime = new Date(parseInt(order.createTime)).toLocaleString('zh-CN');
+                            
+                            return `
+                                <div class="position-item" style="border-left: 3px solid #f59e0b;">
+                                    <div class="position-header">
+                                        <span class="position-symbol">${order.instId}</span>
+                                        <span class="position-side ${sideClass}">${sideName}</span>
+                                        <button class="cancel-order-btn" onclick="cancelOrder('${order.ordId}', '${order.instId}')">
+                                            撤销
+                                        </button>
+                                    </div>
+                                    <div class="position-details">
+                                        <div class="position-detail-item">
+                                            <span class="position-detail-label">状态:</span>
+                                            <span class="position-detail-value" style="color: #f59e0b;">${order.stateText}</span>
+                                        </div>
+                                        <div class="position-detail-item">
+                                            <span class="position-detail-label">类型:</span>
+                                            <span class="position-detail-value">${order.ordTypeText}</span>
+                                        </div>
+                                        <div class="position-detail-item">
+                                            <span class="position-detail-label">数量:</span>
+                                            <span class="position-detail-value">${order.size}</span>
+                                        </div>
+                                        <div class="position-detail-item">
+                                            <span class="position-detail-label">价格:</span>
+                                            <span class="position-detail-value">$${parseFloat(order.price).toFixed(4)}</span>
+                                        </div>
+                                        <div class="position-detail-item">
+                                            <span class="position-detail-label">已成交:</span>
+                                            <span class="position-detail-value">${order.filledSize}</span>
+                                        </div>
+                                        <div class="position-detail-item">
+                                            <span class="position-detail-label">创建时间:</span>
+                                            <span class="position-detail-value" style="font-size: 11px;">${createTime}</span>
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 8px; font-size: 11px; color: #888;">
+                                        订单ID: ${order.ordId}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                        
+                        document.getElementById('pendingOrdersList').innerHTML = html;
+                    }
+                } else {
+                    console.error('[loadPendingOrders] 获取委托列表失败:', result.error);
+                    document.getElementById('pendingOrdersList').innerHTML = '<div class="no-positions">加载失败: ' + (result.error || '未知错误') + '</div>';
+                }
+            } catch (error) {
+                console.error('[loadPendingOrders] 加载委托异常:', error);
+                document.getElementById('pendingOrdersList').innerHTML = '<div class="no-positions">加载异常</div>';
+            }
+        }
+
+        // 撤销订单函数
+        async function cancelOrder(ordId, instId) {
+            const account = accounts.find(acc => acc.id === currentAccount);
+            
+            if (!account || !account.apiKey || !account.apiSecret || !account.passphrase) {
+                alert('请先配置账户API凭证！');
+                return;
+            }
+            
+            const confirmMsg = `确认撤销订单？\n\n交易对: ${instId}\n订单ID: ${ordId}`;
+            
+            if (!confirm(confirmMsg)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/okx-trading/cancel-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        apiKey: account.apiKey,
+                        apiSecret: account.apiSecret,
+                        passphrase: account.passphrase,
+                        ordId: ordId,
+                        instId: instId
+                    })
+                });
+                
+                const result = await response.json();
+                console.log('撤销响应:', result);
+                
+                if (result.success) {
+                    alert('✅ 订单已撤销！');
+                    // 撤销成功后刷新账户信息、持仓和委托列表
+                    await refreshAccountData();
+                    await loadPendingOrders();
+                } else {
+                    alert(`❌ 撤销失败: ${result.error || '未知错误'}`);
+                }
+            } catch (error) {
+                console.error('撤销异常:', error);
+                alert(`❌ 撤销异常: ${error.message || error}`);
+            }
+        }
+
+
+        // 显示API配置提示
+        function showApiConfigNotice() {
+            const notice = document.getElementById('apiConfigNotice');
+            if (notice) {
+                notice.style.display = 'block';
+            }
+        }
+
+        // 隐藏API配置提示
+        function hideApiConfigNotice() {
+            const notice = document.getElementById('apiConfigNotice');
+            if (notice) {
+                notice.style.display = 'none';
+            }
+        }
+
+        // 加载交易日志
+        async function loadTradingLogs() {
+            console.log('[loadTradingLogs] 开始加载交易日志');
+            
+            try {
+                const response = await fetch('/api/okx-trading/logs?limit=50');
+                const result = await response.json();
+                
+                if (result.success && result.logs) {
+                    const logs = result.logs;
+                    const logsCount = document.getElementById('logsCount');
+                    const logsContainer = document.getElementById('tradingLogsList');
+                    
+                    logsCount.textContent = `(${logs.length})`;
+                    
+                    if (logs.length === 0) {
+                        logsContainer.innerHTML = `
+                            <div style="text-align: center; padding: 20px; color: #94a3b8;">
+                                暂无日志
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    // 反转顺序，最新的在上面
+                    const reversedLogs = [...logs].reverse();
+                    
+                    logsContainer.innerHTML = reversedLogs.map(log => {
+                        const time = new Date(log.timestamp).toLocaleString('zh-CN');
+                        const actionEmoji = {
+                            'open_position': '📈',
+                            'close_position': '📉',
+                            'cancel_order': '🚫',
+                            'batch_open': '🎯',
+                            'batch_close': '⚡'
+                        }[log.action] || '📝';
+                        
+                        const actionText = {
+                            'open_position': '开仓',
+                            'close_position': '平仓',
+                            'cancel_order': '撤单',
+                            'batch_open': '批量开仓',
+                            'batch_close': '批量平仓'
+                        }[log.action] || log.action;
+                        
+                        const status = log.result.status;
+                        const statusColor = status === 'success' ? '#10b981' : '#ef4444';
+                        const statusText = status === 'success' ? '成功' : '失败';
+                        const statusEmoji = status === 'success' ? '✅' : '❌';
+                        
+                        // 构建详情文本
+                        let detailsText = '';
+                        if (log.details.instId) {
+                            const coinName = log.details.instId.replace('-USDT-SWAP', '');
+                            detailsText += `${coinName} `;
+                        }
+                        if (log.details.posSide) {
+                            detailsText += log.details.posSide === 'long' ? '做多' : '做空';
+                            detailsText += ' ';
+                        }
+                        if (log.details.inputUsdt) {
+                            detailsText += `${log.details.inputUsdt} USDT`;
+                        }
+                        if (log.details.contracts) {
+                            detailsText += ` (${log.details.contracts}张)`;
+                        }
+                        if (log.details.leverage) {
+                            detailsText += ` ${log.details.leverage}x`;
+                        }
+                        
+                        // 错误信息
+                        let errorText = '';
+                        if (status === 'failed' && log.result.error) {
+                            errorText = `<div style="margin-top: 4px; font-size: 11px; color: #ef4444;">错误: ${log.result.error}</div>`;
+                        }
+                        
+                        return `
+                            <div style="padding: 12px; border-bottom: 1px solid #e5e7eb; transition: background 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='transparent'">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 4px;">
+                                    <div>
+                                        <span style="font-size: 16px;">${actionEmoji}</span>
+                                        <strong style="margin-left: 6px; color: #1e293b;">${actionText}</strong>
+                                        <span style="margin-left: 8px; color: #64748b; font-size: 13px;">${detailsText}</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center;">
+                                        <span style="font-size: 14px;">${statusEmoji}</span>
+                                        <span style="margin-left: 4px; color: ${statusColor}; font-weight: 600; font-size: 13px;">${statusText}</span>
+                                    </div>
+                                </div>
+                                <div style="font-size: 11px; color: #94a3b8;">
+                                    ${time}
+                                </div>
+                                ${errorText}
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    console.log(`[loadTradingLogs] 加载了 ${logs.length} 条日志`);
+                } else {
+                    console.error('[loadTradingLogs] 加载失败:', result.error);
+                }
+            } catch (error) {
+                console.error('[loadTradingLogs] 加载异常:', error);
+            }
+        }
+
+        // 初始化页面
+        // 从后端API加载账户列表
+        async function loadAccountsList() {
+            console.log('[loadAccountsList] 开始加载账户列表...');
+            try {
+                const response = await fetch('/api/okx-accounts/list-with-credentials');
+                const result = await response.json();
+                
+                if (result.success && result.accounts) {
+                    console.log('[loadAccountsList] 从后端加载成功:', result);
+                    
+                    // 将后端账户转换为前端格式
+                    accounts = result.accounts.map(acc => ({
+                        id: acc.id || acc.account_id,
+                        name: acc.name || acc.account_name,
+                        apiKey: acc.apiKey || acc.api_key,
+                        apiSecret: acc.apiSecret || acc.api_secret,
+                        passphrase: acc.passphrase,
+                        balance: 0
+                    }));
+                    
+                    // 保存到 localStorage
+                    localStorage.setItem('okx_accounts', JSON.stringify(accounts));
+                    
+                    // ⭐ 强制使用 fangfang12 账户（这是fangfang12专用页面）
+                    const fangfangAcc = accounts.find(acc => acc.id === 'account_fangfang12');
+                    if (fangfangAcc) {
+                        currentAccount = 'account_fangfang12';
+                        console.log('[loadAccountsList] ✅ 已设置为 Fangfang12 账户');
+                    } else {
+                        console.error('[loadAccountsList] ❌ 未找到 fangfang12 账户');
+                        // 尝试默认账户
+                        if (result.default_account && accounts.length > 0) {
+                            const defaultAcc = accounts.find(acc => acc.id === result.default_account);
+                            if (defaultAcc) {
+                                currentAccount = defaultAcc.id;
+                            } else {
+                                currentAccount = accounts[0].id;
+                            }
+                        }
+                    }
+                    
+                    console.log('[loadAccountsList] 账户列表已更新:', accounts);
+                    console.log('[loadAccountsList] 当前账户:', currentAccount);
+                } else {
+                    console.warn('[loadAccountsList] 后端API返回失败，使用localStorage数据');
+                    // 备用方案：从localStorage读取
+                    loadAccountsFromLocalStorage();
+                }
+            } catch (error) {
+                console.warn('[loadAccountsList] 后端API调用异常，使用localStorage数据:', error);
+                // 备用方案：从localStorage读取
+                loadAccountsFromLocalStorage();
+            }
+        }
+        
+        function loadAccountsFromLocalStorage() {
+            const storedAccounts = localStorage.getItem('okx_accounts');
+            if (storedAccounts) {
+                try {
+                    accounts = JSON.parse(storedAccounts);
+                    console.log('[loadAccountsFromLocalStorage] 从localStorage加载账户:', accounts);
+                    
+                    // 设置默认账户
+                    if (accounts.length > 0) {
+                        currentAccount = accounts[0].id;
+                    }
+                } catch (error) {
+                    console.error('[loadAccountsFromLocalStorage] 解析localStorage失败:', error);
+                }
+            } else {
+                console.warn('[loadAccountsFromLocalStorage] localStorage中没有账户数据');
+            }
+        }
+
+        async function init() {
+            await loadAccountsList();  // 首先从后端加载账户列表
+            
+            // 确保accounts数组不为空
+            if (!accounts || accounts.length === 0) {
+                console.warn('[init] accounts为空，使用初始化的默认值');
+                // accounts已在第1594行初始化，这里不需要再赋值
+                // 但如果currentAccount为空，设置默认值
+                if (!currentAccount && accounts.length > 0) {
+                    currentAccount = accounts[0].id;
+                }
+            }
+            
+            renderAccountTabs();
+            await loadFavoriteSymbols();  // 先加载常用币列表（从服务器）
+            loadMarketTickers();  // 加载实时行情数据
+            loadAccountData();
+            refreshAccountData();  // 加载账户信息和持仓
+            loadPendingOrders();   // 加载委托订单
+            loadTradingLogs();     // 加载交易日志
+            loadAccountLimit();    // 加载账户仓位限额
+            
+            // 每30秒自动刷新账户信息、持仓、委托和日志
+            setInterval(() => {
+                refreshAccountData();
+                loadPendingOrders();
+                loadTradingLogs();
+            }, 30000);
+            
+            // 每10秒自动刷新行情数据
+            setInterval(() => {
+                loadMarketTickers();
+            }, 10000);
+        }
+
+        // 渲染账户标签
+        function renderAccountTabs() {
+            console.log('[renderAccountTabs] 开始渲染账户标签...');
+            console.log('[renderAccountTabs] accounts:', accounts);
+            console.log('[renderAccountTabs] currentAccount:', currentAccount);
+            
+            const tabsContainer = document.getElementById('accountTabs');
+            if (!tabsContainer) {
+                console.error('[renderAccountTabs] accountTabs元素不存在！');
+                return;
+            }
+            
+            if (!accounts || accounts.length === 0) {
+                console.error('[renderAccountTabs] accounts数组为空！');
+                tabsContainer.innerHTML = '<div class="text-gray-500">暂无账户</div>';
+                return;
+            }
+            
+            tabsContainer.innerHTML = accounts.map(acc => `
+                <div class="account-tab ${acc.id === currentAccount ? 'active' : ''}" onclick="selectAccount('${acc.id}')">
+                    ${acc.name}
+                </div>
+            `).join('');
+            
+            console.log('[renderAccountTabs] 渲染完成，共', accounts.length, '个账户');
+            
+            // 更新账户余额显示
+            updateAccountBalance();
+        }
+
+        // 选择账户
+        function selectAccount(accountId) {
+            console.log(`[selectAccount] 切换账户: ${accountId}`);
+            console.log(`[selectAccount] 切换前 currentAccount: ${currentAccount}`);
+            
+            currentAccount = accountId;
+            
+            console.log(`[selectAccount] 切换后 currentAccount: ${currentAccount}`);
+            console.log(`[selectAccount] 当前账户列表:`, accounts.map(a => ({id: a.id, name: a.name})));
+            
+            renderAccountTabs();
+            loadAccountData();
+            refreshAccountData();  // 刷新账户信息和持仓
+            
+            const account = accounts.find(acc => acc.id === accountId);
+            console.log(`[selectAccount] 已切换到账户: ${account ? account.name : '未找到'} (${accountId})`);
+        }
+
+        // 更新账户余额显示
+        function updateAccountBalance() {
+            const account = accounts.find(acc => acc.id === currentAccount);
+            if (account) {
+                // 更新账户标签处的余额
+                document.getElementById('accountBalance').textContent = account.balance.toFixed(2) + ' USDT';
+                // 更新订单表单中的可用余额
+                const orderBalanceEl = document.getElementById('orderAvailableBalance');
+                if (orderBalanceEl) {
+                    orderBalanceEl.textContent = account.balance.toFixed(2) + ' USDT';
+                }
+            }
+        }
+
+        // 渲染交易对列表
+        function renderSymbolsList() {
+            const list = document.getElementById('symbolsList');
+            
+            // 分组：收藏的和非收藏的
+            const favorited = symbols.filter(s => favoriteSymbols.includes(s.symbol));
+            const notFavorited = symbols.filter(s => !favoriteSymbols.includes(s.symbol));
+            
+            let html = '';
+            
+            // 渲染收藏分组
+            if (favorited.length > 0) {
+                html += '<div class="favorite-section">';
+                html += '<div class="favorite-section-title">⭐ 常用币 (' + favorited.length + ')</div>';
+                html += favorited.map(s => renderSymbolItem(s, true)).join('');
+                html += '</div>';
+            }
+            
+            // 渲染非收藏分组
+            html += notFavorited.map(s => renderSymbolItem(s, false)).join('');
+            
+            list.innerHTML = html;
+        }
+        
+        // 渲染单个交易对项
+        function renderSymbolItem(s, isFavorite) {
+            const isActive = s.symbol === currentSymbol;
+            const favoriteClass = isFavorite ? 'favorite' : '';
+            const starIcon = isFavorite ? '⭐' : '☆';
+            
+            return `
+                <div class="symbol-item ${isActive ? 'active' : ''} ${favoriteClass}" onclick="selectSymbol('${s.symbol}')">
+                    <div class="symbol-content">
+                        <div class="symbol-name">
+                            ${s.name}/USDT
+                            ${isFavorite ? '<span class="favorite-badge">⭐</span>' : ''}
+                        </div>
+                        <div class="symbol-price">
+                            $${s.price.toFixed(s.price < 1 ? 4 : 2)} 
+                            <span style="color: ${s.change >= 0 ? '#10b981' : '#ef4444'}">
+                                ${s.change >= 0 ? '+' : ''}${s.change}%
+                            </span>
+                        </div>
+                    </div>
+                    <button class="favorite-btn ${isFavorite ? 'favorited' : ''}" 
+                            onclick="event.stopPropagation(); toggleFavorite('${s.symbol}')"
+                            title="${isFavorite ? '取消收藏' : '收藏'}">
+                        ${starIcon}
+                    </button>
+                </div>
+            `;
+        }
+        
+        // 切换收藏状态
+        async function toggleFavorite(symbol) {
+            const index = favoriteSymbols.indexOf(symbol);
+            
+            if (index > -1) {
+                // 取消收藏
+                favoriteSymbols.splice(index, 1);
+            } else {
+                // 添加收藏
+                favoriteSymbols.push(symbol);
+            }
+            
+            // 保存到服务器（全局共享）
+            await saveFavoriteSymbols();
+            
+            // 重新渲染列表
+            renderSymbolsList();
+            
+            console.log('收藏列表已更新:', favoriteSymbols);
+        }
+
+        // 选择交易对
+        function selectSymbol(symbol) {
+            currentSymbol = symbol;
+            const symbolData = symbols.find(s => s.symbol === symbol);
+            
+            document.getElementById('currentSymbol').textContent = symbolData.name + '-USDT';
+            document.getElementById('currentPrice').textContent = symbolData.price.toFixed(2);
+            
+            const changeEl = document.getElementById('priceChange');
+            changeEl.textContent = (symbolData.change >= 0 ? '+' : '') + symbolData.change + '%';
+            changeEl.className = 'price-change ' + (symbolData.change >= 0 ? 'up' : 'down');
+            
+            renderSymbolsList();
+        }
+
+        // 选择交易方向
+        function selectDirection(direction) {
+            currentDirection = direction;
+            
+            document.querySelectorAll('.direction-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector('.direction-tab.' + direction).classList.add('active');
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.className = 'submit-order ' + direction;
+            submitBtn.innerHTML = direction === 'long' ? '⬆ 做多' : '⬇ 做空';
+        }
+
+        // 选择杠杆
+        function selectLeverage(leverage) {
+            currentLeverage = leverage;
+            
+            document.querySelectorAll('.leverage-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // 设置金额百分比
+        function setAmount(percent) {
+            // 从DOM中获取实时的可用余额
+            const orderBalanceEl = document.getElementById('orderAvailableBalance');
+            let balance = 0;
+            
+            if (orderBalanceEl && orderBalanceEl.textContent) {
+                // 提取数字部分，例如 "101.28 USDT" -> 101.28
+                const balanceText = orderBalanceEl.textContent.trim();
+                const balanceMatch = balanceText.match(/[\d.]+/);
+                if (balanceMatch) {
+                    balance = parseFloat(balanceMatch[0]);
+                }
+            }
+            
+            // 如果没有从DOM获取到，尝试从账户对象获取
+            if (balance === 0) {
+                const account = accounts.find(acc => acc.id === currentAccount);
+                balance = account ? (account.balance || 0) : 0;
+            }
+            
+            // 计算仓位金额
+            const amount = (balance * percent / 100).toFixed(2);
+            const orderAmountInput = document.getElementById('orderAmount');
+            if (orderAmountInput) {
+                orderAmountInput.value = amount;
+                console.log(`设置${percent}%仓位: 可用余额=${balance} USDT, 仓位金额=${amount} USDT`);
+            }
+        }
+
+        // 批量开仓函数
+        async function batchOrder(direction, percentPerCoin) {
+            console.log(`[batchOrder] 开始批量开仓: direction=${direction}, percentPerCoin=${percentPerCoin}%`);
+            
+            const account = accounts.find(acc => acc.id === currentAccount);
+            
+            if (!account || !account.apiKey || !account.apiSecret || !account.passphrase) {
+                alert('❌ 请先配置账户API凭证！');
+                return;
+            }
+            
+            // 获取可用余额
+            const balance = account.balance || 0;
+            if (balance <= 0) {
+                alert('❌ 账户余额不足！');
+                return;
+            }
+            
+            // 只从收藏的币种中选择
+            const favoriteSymbolsData = symbols.filter(s => favoriteSymbols.includes(s.symbol));
+            
+            if (favoriteSymbolsData.length === 0) {
+                alert('❌ 请先收藏一些常用币种！\n\n在交易对列表中点击⭐按钮添加收藏。');
+                return;
+            }
+            
+            console.log('[batchOrder] 常用币种数量:', favoriteSymbolsData.length);
+            console.log('[batchOrder] 常用币种:', favoriteSymbolsData.map(s => s.name).join(', '));
+            
+            // 从常用币种中按涨跌幅排序，获取前6名
+            const sortedSymbols = [...favoriteSymbolsData].sort((a, b) => b.change - a.change);
+            const top6Symbols = sortedSymbols.slice(0, 6);
+            
+            if (top6Symbols.length < 6) {
+                alert(`❌ 常用币种不足6个！\n\n当前常用币种：${favoriteSymbolsData.length}个\n请至少收藏6个币种才能使用批量开仓。`);
+                return;
+            }
+            
+            console.log('[batchOrder] 常用币种涨幅前6:', top6Symbols.map(s => `${s.name} (${s.change}%)`));
+            
+            // 计算每个币的保证金占用（用户输入的百分比是指保证金占比）
+            const marginPerCoin = (balance * percentPerCoin / 100).toFixed(2);
+            const totalMargin = (marginPerCoin * 6).toFixed(2);
+            
+            // ⚠️ 重要：10x杠杆下，合约价值 = 保证金 × 10
+            const contractValuePerCoin = (parseFloat(marginPerCoin) * 10).toFixed(2);
+            const totalContractValue = (parseFloat(contractValuePerCoin) * 6).toFixed(2);
+            
+            console.log(`[batchOrder] 余额检查: 可用=${balance.toFixed(2)}, 每币保证金=${marginPerCoin}, 每币合约价值=${contractValuePerCoin}, 总保证金=${totalMargin}, 总合约价值=${totalContractValue}`);
+            
+            // 检查余额是否足够（保守检查：需要总保证金的 1.2 倍作为缓冲）
+            const requiredBalance = parseFloat(totalMargin) * 1.2;
+            if (balance < requiredBalance) {
+                alert(`❌ 余额不足！\n\n` +
+                    `【资金需求】\n` +
+                    `  • 每个币保证金: ${marginPerCoin} USDT (${percentPerCoin}%)\n` +
+                    `  • 每个币合约价值: ${contractValuePerCoin} USDT (10x杠杆)\n` +
+                    `  • 6个币总保证金: ${totalMargin} USDT\n` +
+                    `  • 建议余额: ${requiredBalance.toFixed(2)} USDT\n\n` +
+                    `【当前状态】\n` +
+                    `  • 可用余额: ${balance.toFixed(2)} USDT\n` +
+                    `  • 缺少: ${(requiredBalance - balance).toFixed(2)} USDT\n\n` +
+                    `💡 建议：\n` +
+                    `  1. 降低开仓比例 (当前每币${percentPerCoin}%)\n` +
+                    `  2. 增加账户余额\n` +
+                    `  3. 减少开仓币种数量`);
+                return;
+            }
+            
+            // 额外提示：如果余额刚好够，给个警告
+            if (balance < requiredBalance * 1.5) {
+                const warningMsg = `⚠️ 余额偏紧\n\n` +
+                    `可用余额: ${balance.toFixed(2)} USDT\n` +
+                    `预计占用保证金: ${totalMargin} USDT\n` +
+                    `剩余: ${(balance - parseFloat(totalMargin)).toFixed(2)} USDT\n\n` +
+                    `建议增加余额或降低开仓比例，避免因余额不足导致部分订单失败。\n\n` +
+                    `是否继续？`;
+                if (!confirm(warningMsg)) {
+                    console.log('[batchOrder] 用户因余额不足取消');
+                    return;
+                }
+            }
+            
+            // 确认对话框
+            const directionText = direction === 'long' ? '做多' : '做空';
+            const emoji = direction === 'long' ? '📈' : '📉';
+            const strategyName = direction === 'long' ? '多单' : '空单';
+            
+            const symbolsList = top6Symbols.map(s => 
+                `  • ${s.name}: $${s.price.toFixed(2)} (${s.change >= 0 ? '+' : ''}${s.change}%)`
+            ).join('\n');
+            
+            const confirmMsg = `${emoji} 批量${strategyName}策略\n\n` +
+                `【常用币涨幅前6】\n${symbolsList}\n\n` +
+                `【开仓参数】\n` +
+                `  • 方向: ${directionText}\n` +
+                `  • 杠杆: 10x\n` +
+                `  • 订单类型: 市价单\n\n` +
+                `【资金分配】\n` +
+                `  • 每个币保证金: ${marginPerCoin} USDT (${percentPerCoin}%)\n` +
+                `  • 每个币合约价值: ${contractValuePerCoin} USDT\n` +
+                `  • 总保证金: ${totalMargin} USDT\n` +
+                `  • 总合约价值: ${totalContractValue} USDT\n` +
+                `  • 可用余额: ${balance.toFixed(2)} USDT\n\n` +
+                `确认批量开仓？`;
+            
+            if (!confirm(confirmMsg)) {
+                console.log('[batchOrder] 用户取消批量开仓');
+                return;
+            }
+            
+            // 开始批量下单
+            console.log('[batchOrder] 开始批量下单...');
+            let successCount = 0;
+            let failCount = 0;
+            const results = [];
+            
+            for (const symbolData of top6Symbols) {
+                try {
+                    console.log(`[batchOrder] 正在下单: ${symbolData.name}...`);
+                    
+                    // 构建订单数据
+                    // sz传递合约价值，后端会根据当前价格计算合约张数
+                    const orderData = {
+                        instId: symbolData.symbol,
+                        side: direction === 'long' ? 'buy' : 'sell',
+                        posSide: direction,
+                        ordType: 'market',
+                        sz: contractValuePerCoin,  // 传递合约价值（保证金 × 10）
+                        lever: '10'
+                    };
+                    
+                    // 发送订单请求
+                    const response = await fetch('/api/okx-trading/place-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            apiKey: account.apiKey,
+                            apiSecret: account.apiSecret,
+                            passphrase: account.passphrase,
+                            ...orderData
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        successCount++;
+                        results.push(`✅ ${symbolData.name}: 成功`);
+                        console.log(`[batchOrder] ${symbolData.name} 下单成功`);
+                    } else {
+                        failCount++;
+                        results.push(`❌ ${symbolData.name}: ${result.error || '失败'}`);
+                        console.error(`[batchOrder] ${symbolData.name} 下单失败:`, result.error);
+                    }
+                    
+                    // 延迟100ms，避免请求过快
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                } catch (error) {
+                    failCount++;
+                    results.push(`❌ ${symbolData.name}: ${error.message || '异常'}`);
+                    console.error(`[batchOrder] ${symbolData.name} 下单异常:`, error);
+                }
+            }
+            
+            // 显示结果
+            const resultMsg = `${emoji} 批量开仓完成\n\n` +
+                `【结果统计】\n` +
+                `  • 成功: ${successCount} 个\n` +
+                `  • 失败: ${failCount} 个\n\n` +
+                `【详细结果】\n${results.join('\n')}`;
+            
+            alert(resultMsg);
+            
+            // 刷新账户信息和持仓
+            await refreshAccountData();
+            await loadPendingOrders();
+        }
+
+        // 批量开仓 - 涨幅前8名策略
+        async function batchOrderTop8(direction, percentPerCoin) {
+            console.log(`[batchOrderTop8] 开始批量开仓前8: direction=${direction}, percentPerCoin=${percentPerCoin}%`);
+            
+            const account = accounts.find(acc => acc.id === currentAccount);
+            
+            if (!account || !account.apiKey || !account.apiSecret || !account.passphrase) {
+                alert('❌ 请先配置账户API凭证！');
+                return;
+            }
+            
+            // 获取可用余额
+            const balance = account.balance || 0;
+            if (balance <= 0) {
+                alert('❌ 账户余额不足！');
+                return;
+            }
+            
+            // 只从收藏的币种中选择
+            const favoriteSymbolsData = symbols.filter(s => favoriteSymbols.includes(s.symbol));
+            
+            if (favoriteSymbolsData.length === 0) {
+                alert('❌ 请先收藏一些常用币种！\n\n在交易对列表中点击⭐按钮添加收藏。');
+                return;
+            }
+            
+            console.log('[batchOrderTop8] 常用币种数量:', favoriteSymbolsData.length);
+            
+            // 从常用币种中按涨跌幅排序，获取前8名
+            const sortedSymbols = [...favoriteSymbolsData].sort((a, b) => b.change - a.change);
+            const top8Symbols = sortedSymbols.slice(0, 8);
+            
+            if (top8Symbols.length < 8) {
+                alert(`❌ 常用币种不足8个！\n\n当前常用币种：${favoriteSymbolsData.length}个\n请至少收藏8个币种才能使用此策略。`);
+                return;
+            }
+            
+            console.log('[batchOrderTop8] 常用币种涨幅前8:', top8Symbols.map(s => `${s.name} (${s.change}%)`));
+            
+            // 计算每个币的保证金占用
+            const marginPerCoin = (balance * percentPerCoin / 100).toFixed(2);
+            const totalMargin = (marginPerCoin * 8).toFixed(2);
+            const contractValuePerCoin = (parseFloat(marginPerCoin) * 10).toFixed(2);
+            const totalContractValue = (parseFloat(contractValuePerCoin) * 8).toFixed(2);
+            
+            console.log(`[batchOrderTop8] 余额检查: 可用=${balance.toFixed(2)}, 每币保证金=${marginPerCoin}, 总保证金=${totalMargin}`);
+            
+            // 检查余额是否足够
+            const requiredBalance = parseFloat(totalMargin) * 1.2;
+            if (balance < requiredBalance) {
+                alert(`❌ 余额不足！\n\n` +
+                    `【资金需求】\n` +
+                    `  • 每个币保证金: ${marginPerCoin} USDT (${percentPerCoin}%)\n` +
+                    `  • 每个币合约价值: ${contractValuePerCoin} USDT (10x杠杆)\n` +
+                    `  • 8个币总保证金: ${totalMargin} USDT\n` +
+                    `  • 建议余额: ${requiredBalance.toFixed(2)} USDT\n\n` +
+                    `【当前状态】\n` +
+                    `  • 可用余额: ${balance.toFixed(2)} USDT\n` +
+                    `  • 缺少: ${(requiredBalance - balance).toFixed(2)} USDT`);
+                return;
+            }
+            
+            // 确认对话框
+            const directionText = direction === 'long' ? '做多' : '做空';
+            const emoji = direction === 'long' ? '📈' : '📉';
+            const strategyName = direction === 'long' ? '多单' : '空单';
+            
+            const symbolsList = top8Symbols.map(s => 
+                `  • ${s.name}: $${s.price.toFixed(2)} (${s.change >= 0 ? '+' : ''}${s.change}%)`
+            ).join('\n');
+            
+            const confirmMsg = `${emoji} 涨幅前8批量${strategyName}策略\n\n` +
+                `【常用币涨幅前8】\n${symbolsList}\n\n` +
+                `【开仓参数】\n` +
+                `  • 方向: ${directionText}\n` +
+                `  • 杠杆: 10x\n` +
+                `  • 订单类型: 市价单\n\n` +
+                `【资金分配】\n` +
+                `  • 每个币保证金: ${marginPerCoin} USDT (${percentPerCoin}%)\n` +
+                `  • 每个币合约价值: ${contractValuePerCoin} USDT\n` +
+                `  • 总保证金: ${totalMargin} USDT\n` +
+                `  • 总合约价值: ${totalContractValue} USDT\n` +
+                `  • 可用余额: ${balance.toFixed(2)} USDT\n\n` +
+                `确认批量开仓？`;
+            
+            if (!confirm(confirmMsg)) {
+                console.log('[batchOrderTop8] 用户取消批量开仓');
+                return;
+            }
+            
+            // 开始批量下单
+            console.log('[batchOrderTop8] 开始批量下单...');
+            let successCount = 0;
+            let failCount = 0;
+            const results = [];
+            
+            for (const symbolData of top8Symbols) {
+                try {
+                    console.log(`[batchOrderTop8] 正在下单: ${symbolData.name}...`);
+                    
+                    const orderData = {
+                        instId: symbolData.symbol,
+                        side: direction === 'long' ? 'buy' : 'sell',
+                        posSide: direction,
+                        ordType: 'market',
+                        sz: contractValuePerCoin,
+                        lever: '10'
+                    };
+                    
+                    const response = await fetch('/api/okx-trading/place-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            apiKey: account.apiKey,
+                            apiSecret: account.apiSecret,
+                            passphrase: account.passphrase,
+                            ...orderData
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        successCount++;
+                        results.push(`✅ ${symbolData.name}: 成功`);
+                        console.log(`[batchOrderTop8] ${symbolData.name} 下单成功`);
+                    } else {
+                        failCount++;
+                        results.push(`❌ ${symbolData.name}: ${result.message || '失败'}`);
+                        console.error(`[batchOrderTop8] ${symbolData.name} 下单失败:`, result);
+                    }
+                    
+                    // 延迟100ms避免请求过快
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                } catch (error) {
+                    failCount++;
+                    results.push(`❌ ${symbolData.name}: ${error.message}`);
+                    console.error(`[batchOrderTop8] ${symbolData.name} 异常:`, error);
+                }
+            }
+            
+            // 显示结果
+            const resultMsg = `${emoji} 批量开仓完成\n\n` +
+                `成功: ${successCount}/${top8Symbols.length}\n` +
+                `失败: ${failCount}/${top8Symbols.length}\n\n` +
+                `详细结果:\n${results.join('\n')}`;
+            
+            alert(resultMsg);
+            console.log('[batchOrderTop8] 批量开仓完成:', { successCount, failCount });
+            
+            // 刷新数据
+            await refreshAccountData();
+        }
+
+        // 批量开仓 - 涨幅后8名策略
+        async function batchOrderBottom8(direction, percentPerCoin) {
+            console.log(`[batchOrderBottom8] 开始批量开仓后8: direction=${direction}, percentPerCoin=${percentPerCoin}%`);
+            
+            const account = accounts.find(acc => acc.id === currentAccount);
+            
+            if (!account || !account.apiKey || !account.apiSecret || !account.passphrase) {
+                alert('❌ 请先配置账户API凭证！');
+                return;
+            }
+            
+            // 获取可用余额
+            const balance = account.balance || 0;
+            if (balance <= 0) {
+                alert('❌ 账户余额不足！');
+                return;
+            }
+            
+            // 只从收藏的币种中选择
+            const favoriteSymbolsData = symbols.filter(s => favoriteSymbols.includes(s.symbol));
+            
+            if (favoriteSymbolsData.length === 0) {
+                alert('❌ 请先收藏一些常用币种！\n\n在交易对列表中点击⭐按钮添加收藏。');
+                return;
+            }
+            
+            console.log('[batchOrderBottom8] 常用币种数量:', favoriteSymbolsData.length);
+            
+            // 从常用币种中按涨跌幅排序，获取后8名（跌幅最大）
+            const sortedSymbols = [...favoriteSymbolsData].sort((a, b) => a.change - b.change);
+            const bottom8Symbols = sortedSymbols.slice(0, 8);
+            
+            if (bottom8Symbols.length < 8) {
+                alert(`❌ 常用币种不足8个！\n\n当前常用币种：${favoriteSymbolsData.length}个\n请至少收藏8个币种才能使用此策略。`);
+                return;
+            }
+            
+            console.log('[batchOrderBottom8] 常用币种涨幅后8:', bottom8Symbols.map(s => `${s.name} (${s.change}%)`));
+            
+            // 计算每个币的保证金占用
+            const marginPerCoin = (balance * percentPerCoin / 100).toFixed(2);
+            const totalMargin = (marginPerCoin * 8).toFixed(2);
+            const contractValuePerCoin = (parseFloat(marginPerCoin) * 10).toFixed(2);
+            const totalContractValue = (parseFloat(contractValuePerCoin) * 8).toFixed(2);
+            
+            console.log(`[batchOrderBottom8] 余额检查: 可用=${balance.toFixed(2)}, 每币保证金=${marginPerCoin}, 总保证金=${totalMargin}`);
+            
+            // 检查余额是否足够
+            const requiredBalance = parseFloat(totalMargin) * 1.2;
+            if (balance < requiredBalance) {
+                alert(`❌ 余额不足！\n\n` +
+                    `【资金需求】\n` +
+                    `  • 每个币保证金: ${marginPerCoin} USDT (${percentPerCoin}%)\n` +
+                    `  • 每个币合约价值: ${contractValuePerCoin} USDT (10x杠杆)\n` +
+                    `  • 8个币总保证金: ${totalMargin} USDT\n` +
+                    `  • 建议余额: ${requiredBalance.toFixed(2)} USDT\n\n` +
+                    `【当前状态】\n` +
+                    `  • 可用余额: ${balance.toFixed(2)} USDT\n` +
+                    `  • 缺少: ${(requiredBalance - balance).toFixed(2)} USDT`);
+                return;
+            }
+            
+            // 风险警告
+            const riskWarning = `⚠️ 高风险策略警告\n\n` +
+                `此策略针对跌幅最大的币种，波动性极高！\n\n` +
+                `【涨幅后8名 = 跌幅最大】\n` +
+                bottom8Symbols.map(s => 
+                    `  • ${s.name}: ${s.change >= 0 ? '+' : ''}${s.change}%`
+                ).join('\n') + '\n\n' +
+                `⚠️ 这些币种可能：\n` +
+                `  • 继续下跌（空单获利）\n` +
+                `  • 超跌反弹（多单获利）\n` +
+                `  • 剧烈波动（高风险）\n\n` +
+                `确定要继续吗？`;
+            
+            if (!confirm(riskWarning)) {
+                console.log('[batchOrderBottom8] 用户取消（风险警告）');
+                return;
+            }
+            
+            // 确认对话框
+            const directionText = direction === 'long' ? '做多（预期反弹）' : '做空（预期延续）';
+            const emoji = direction === 'long' ? '📈' : '📉';
+            const strategyName = direction === 'long' ? '多单' : '空单';
+            
+            const symbolsList = bottom8Symbols.map(s => 
+                `  • ${s.name}: $${s.price.toFixed(2)} (${s.change >= 0 ? '+' : ''}${s.change}%)`
+            ).join('\n');
+            
+            const confirmMsg = `${emoji} 涨幅后8批量${strategyName}策略\n\n` +
+                `【常用币涨幅后8（跌幅最大）】\n${symbolsList}\n\n` +
+                `【开仓参数】\n` +
+                `  • 方向: ${directionText}\n` +
+                `  • 杠杆: 10x\n` +
+                `  • 订单类型: 市价单\n\n` +
+                `【资金分配】\n` +
+                `  • 每个币保证金: ${marginPerCoin} USDT (${percentPerCoin}%)\n` +
+                `  • 每个币合约价值: ${contractValuePerCoin} USDT\n` +
+                `  • 总保证金: ${totalMargin} USDT\n` +
+                `  • 总合约价值: ${totalContractValue} USDT\n` +
+                `  • 可用余额: ${balance.toFixed(2)} USDT\n\n` +
+                `⚠️ 最后确认：这是高风险策略！`;
+            
+            if (!confirm(confirmMsg)) {
+                console.log('[batchOrderBottom8] 用户取消批量开仓');
+                return;
+            }
+            
+            // 开始批量下单
+            console.log('[batchOrderBottom8] 开始批量下单...');
+            let successCount = 0;
+            let failCount = 0;
+            const results = [];
+            
+            for (const symbolData of bottom8Symbols) {
+                try {
+                    console.log(`[batchOrderBottom8] 正在下单: ${symbolData.name}...`);
+                    
+                    const orderData = {
+                        instId: symbolData.symbol,
+                        side: direction === 'long' ? 'buy' : 'sell',
+                        posSide: direction,
+                        ordType: 'market',
+                        sz: contractValuePerCoin,
+                        lever: '10'
+                    };
+                    
+                    const response = await fetch('/api/okx-trading/place-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            apiKey: account.apiKey,
+                            apiSecret: account.apiSecret,
+                            passphrase: account.passphrase,
+                            ...orderData
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        successCount++;
+                        results.push(`✅ ${symbolData.name}: 成功`);
+                        console.log(`[batchOrderBottom8] ${symbolData.name} 下单成功`);
+                    } else {
+                        failCount++;
+                        results.push(`❌ ${symbolData.name}: ${result.message || '失败'}`);
+                        console.error(`[batchOrderBottom8] ${symbolData.name} 下单失败:`, result);
+                    }
+                    
+                    // 延迟100ms避免请求过快
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                } catch (error) {
+                    failCount++;
+                    results.push(`❌ ${symbolData.name}: ${error.message}`);
+                    console.error(`[batchOrderBottom8] ${symbolData.name} 异常:`, error);
+                }
+            }
+            
+            // 显示结果
+            const resultMsg = `${emoji} 批量开仓完成\n\n` +
+                `成功: ${successCount}/${bottom8Symbols.length}\n` +
+                `失败: ${failCount}/${bottom8Symbols.length}\n\n` +
+                `详细结果:\n${results.join('\n')}`;
+            
+            alert(resultMsg);
+            console.log('[batchOrderBottom8] 批量开仓完成:', { successCount, failCount });
+            
+            // 刷新数据
+            await refreshAccountData();
+        }
+
+        // 一键全平所有账户的所有持仓
+        async function closeAllAccountsPositions() {
+            console.log('[closeAllAccountsPositions] 开始一键全平所有账户持仓');
+            
+            // 获取所有账户
+            if (!accounts || accounts.length === 0) {
+                alert('❌ 没有找到任何账户！\n\n请先在账户管理中添加账户。');
+                return;
+            }
+            
+            // 筛选出有API凭证的账户
+            const validAccounts = accounts.filter(acc => 
+                acc.apiKey && acc.apiSecret && acc.passphrase
+            );
+            
+            if (validAccounts.length === 0) {
+                alert('❌ 没有配置完整API凭证的账户！\n\n请在账户管理中完善账户的API配置：\n- API Key\n- API Secret\n- Passphrase');
+                return;
+            }
+            
+            console.log(`[closeAllAccountsPositions] 找到 ${validAccounts.length} 个有效账户`);
+            
+            // 首先显示确认对话框
+            const confirmMsg = `🚨 一键全平所有账户持仓\n\n` +
+                `即将平掉以下账户的所有持仓：\n\n` +
+                validAccounts.map(acc => `  • ${acc.name || acc.id}`).join('\n') +
+                `\n\n⚠️ 警告：此操作将平掉所有账户的所有多单和空单！\n` +
+                `\n❓ 是否继续？`;
+            
+            const confirmed = await showConfirmDialog(confirmMsg, '🚨 一键全平确认');
+            if (!confirmed) {
+                console.log('[closeAllAccountsPositions] 用户取消操作');
+                return;
+            }
+            
+            // 收集所有账户的所有持仓
+            let totalPositionsCount = 0;
+            let totalSuccess = 0;
+            let totalFail = 0;
+            const accountResults = [];
+            
+            for (const account of validAccounts) {
+                console.log(`[closeAllAccountsPositions] 处理账户: ${account.name || account.id}`);
+                
+                try {
+                    // 获取账户持仓
+                    const response = await fetch('/api/okx-trading/positions', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            apiKey: account.apiKey,
+                            apiSecret: account.apiSecret,
+                            passphrase: account.passphrase
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (!result.success || !result.data) {
+                        console.error(`[closeAllAccountsPositions] 账户 ${account.name} 获取持仓失败:`, result.error);
+                        accountResults.push({
+                            account: account.name || account.id,
+                            success: 0,
+                            fail: 0,
+                            error: result.error || '获取持仓失败'
+                        });
+                        continue;
+                    }
+                    
+                    const positions = result.data;
+                    console.log(`[closeAllAccountsPositions] 账户 ${account.name} 有 ${positions.length} 个持仓`);
+                    
+                    if (positions.length === 0) {
+                        accountResults.push({
+                            account: account.name || account.id,
+                            success: 0,
+                            fail: 0,
+                            message: '无持仓'
+                        });
+                        continue;
+                    }
+                    
+                    totalPositionsCount += positions.length;
+                    
+                    // 逐个平仓
+                    let accountSuccess = 0;
+                    let accountFail = 0;
+                    
+                    for (const position of positions) {
+                        try {
+                            const coinName = position.instId.replace('-USDT-SWAP', '');
+                            console.log(`[closeAllAccountsPositions] 平仓 ${account.name} - ${coinName} ${position.posSide}...`);
+                            
+                            const closeResponse = await fetch('/api/okx-trading/close-position', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    apiKey: account.apiKey,
+                                    apiSecret: account.apiSecret,
+                                    passphrase: account.passphrase,
+                                    instId: position.instId,
+                                    posSide: position.posSide,
+                                    closeSize: position.posSize
+                                })
+                            });
+                            
+                            const closeResult = await closeResponse.json();
+                            
+                            if (closeResult.success) {
+                                accountSuccess++;
+                                totalSuccess++;
+                                console.log(`[closeAllAccountsPositions] ✅ ${coinName} 平仓成功`);
+                            } else {
+                                accountFail++;
+                                totalFail++;
+                                console.error(`[closeAllAccountsPositions] ❌ ${coinName} 平仓失败:`, closeResult.error);
+                            }
+                            
+                            // 添加小延迟避免请求过快
+                            await new Promise(resolve => setTimeout(resolve, 200));
+                            
+                        } catch (error) {
+                            accountFail++;
+                            totalFail++;
+                            console.error(`[closeAllAccountsPositions] 平仓异常:`, error);
+                        }
+                    }
+                    
+                    accountResults.push({
+                        account: account.name || account.id,
+                        success: accountSuccess,
+                        fail: accountFail,
+                        total: positions.length
+                    });
+                    
+                    // 账户之间添加1秒延迟，避免API冲突
+                    console.log(`[closeAllAccountsPositions] 账户 ${account.name} 处理完成，等待1秒后处理下一个账户...`);
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                } catch (error) {
+                    console.error(`[closeAllAccountsPositions] 账户 ${account.name} 处理异常:`, error);
+                    accountResults.push({
+                        account: account.name || account.id,
+                        success: 0,
+                        fail: 0,
+                        error: error.message || '处理异常'
+                    });
+                    
+                    // 即使出错也添加延迟
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+            }
+            
+            // 显示结果
+            const resultLines = accountResults.map(r => {
+                if (r.error) {
+                    return `  ❌ ${r.account}: ${r.error}`;
+                } else if (r.message) {
+                    return `  ⚪ ${r.account}: ${r.message}`;
+                } else {
+                    const emoji = r.fail === 0 ? '✅' : (r.success > 0 ? '⚠️' : '❌');
+                    return `  ${emoji} ${r.account}: 成功${r.success}/${r.total}`;
+                }
+            }).join('\n');
+            
+            const resultMsg = `🚨 一键全平完成\n\n` +
+                `【总计】\n` +
+                `  • 处理账户: ${validAccounts.length} 个\n` +
+                `  • 总持仓数: ${totalPositionsCount} 个\n` +
+                `  • 成功平仓: ${totalSuccess} 个\n` +
+                `  • 失败: ${totalFail} 个\n\n` +
+                `【各账户详情】\n${resultLines}`;
+            
+            alert(resultMsg);
+            
+            // 刷新当前账户数据
+            await refreshAccountData();
+            await loadPendingOrders();
+            
+            console.log('[closeAllAccountsPositions] 一键全平完成');
+        }
+
+        // 批量平仓函数
+        async function batchClosePositions(posSide, ratio) {
+            console.log(`========== [batchClosePositions] 开始批量平仓 ==========`);
+            console.log(`[batchClosePositions] 参数: posSide=${posSide}, ratio=${ratio}`);
+            console.log(`[batchClosePositions] 全局变量 currentAccount=${currentAccount}`);
+            console.log(`[batchClosePositions] 全局变量 accounts=`, accounts);
+            console.log(`[batchClosePositions] accounts 长度=${accounts.length}`);
+            
+            // 获取当前账户
+            const account = accounts.find(acc => acc.id === currentAccount);
+            console.log(`[batchClosePositions] 查找账户: currentAccount=${currentAccount}`);
+            console.log(`[batchClosePositions] 找到的账户=`, account);
+            
+            if (!account) {
+                const availableAccounts = accounts.map(a => `${a.name}(${a.id})`).join(', ');
+                alert(`❌ 未找到账户！\n\n当前账户ID: ${currentAccount}\n可用账户: ${availableAccounts}\n\n请在账户管理中检查账户配置。`);
+                console.error(`[batchClosePositions] 错误: 未找到账户 currentAccount=${currentAccount}`);
+                return;
+            }
+            
+            console.log(`[batchClosePositions] ✅ 成功找到账户: ${account.name} (${account.id})`);
+            console.log(`[batchClosePositions] API凭证检查: hasApiKey=${!!account.apiKey}, hasApiSecret=${!!account.apiSecret}, hasPassphrase=${!!account.passphrase}`);
+            
+            if (!account.apiKey || !account.apiSecret || !account.passphrase) {
+                alert(`❌ 账户 "${account.name || account.id}" 未配置API凭证！\n\n请在账户管理中完善API配置：\n- API Key\n- API Secret\n- Passphrase`);
+                console.error(`[batchClosePositions] 错误: 账户凭证不完整`);
+                return;
+            }
+            
+            // 获取当前持仓
+            try {
+                console.log(`[batchClosePositions] 准备调用API获取持仓...`);
+                console.log(`[batchClosePositions] API请求参数:`, {
+                    apiKey: account.apiKey.substring(0, 8) + '...',
+                    hasApiSecret: !!account.apiSecret,
+                    hasPassphrase: !!account.passphrase
+                });
+                
+                const response = await fetch('/api/okx-trading/positions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        apiKey: account.apiKey,
+                        apiSecret: account.apiSecret,
+                        passphrase: account.passphrase
+                    })
+                });
+                
+                console.log(`[batchClosePositions] API响应状态: ${response.status}`);
+                
+                const result = await response.json();
+                console.log(`[batchClosePositions] API响应数据:`, result);
+                
+                if (!result.success || !result.data) {
+                    console.error(`[batchClosePositions] API返回失败:`, result);
+                    alert(`❌ 获取持仓失败: ${result.error || '未知错误'}`);
+                    return;
+                }
+                
+                console.log(`[batchClosePositions] 获取到持仓数量: ${result.data.length}`);
+                console.log(`[batchClosePositions] 全部持仓:`, result.data.map(p => ({
+                    instId: p.instId,
+                    posSide: p.posSide,
+                    posSize: p.posSize
+                })));
+                
+                // 筛选出指定方向的持仓
+                const targetPositions = result.data.filter(pos => pos.posSide === posSide);
+                console.log(`[batchClosePositions] 筛选 posSide=${posSide} 后的持仓数量: ${targetPositions.length}`);
+                
+                if (targetPositions.length === 0) {
+                    const directionText = posSide === 'long' ? '多单' : '空单';
+                    console.warn(`[batchClosePositions] 没有找到${directionText}持仓`);
+                    alert(`⚠️ 当前没有${directionText}持仓！`);
+                    return;
+                }
+                
+                console.log(`[batchClosePositions] 找到 ${targetPositions.length} 个${posSide}持仓`);
+                
+                // 构建确认信息
+                const directionText = posSide === 'long' ? '多单' : '空单';
+                const ratioText = ratio === 1 ? '全部' : '一半';
+                const emoji = posSide === 'long' ? '📉' : '📈';
+                
+                const positionsList = targetPositions.map(pos => {
+                    const closeSize = ratio === 1 ? pos.posSize : Math.floor(pos.posSize / 2);
+                    const unrealizedPnl = pos.unrealizedPnl || 0;
+                    const pnlColor = unrealizedPnl >= 0 ? '🟢' : '🔴';
+                    return `  ${pnlColor} ${pos.instId.replace('-USDT-SWAP', '')}: ${closeSize}张 (盈亏: ${unrealizedPnl >= 0 ? '+' : ''}${unrealizedPnl.toFixed(2)} USDT)`;
+                }).join('\n');
+                
+                const totalUnrealizedPnl = targetPositions.reduce((sum, pos) => sum + (pos.unrealizedPnl || 0), 0);
+                const totalMargin = targetPositions.reduce((sum, pos) => sum + (pos.margin || 0), 0);
+                
+                const confirmMsg = `${emoji} 批量平${ratioText}${directionText}\n\n` +
+                    `【持仓列表】\n${positionsList}\n\n` +
+                    `【统计信息】\n` +
+                    `  • 持仓数量: ${targetPositions.length} 个\n` +
+                    `  • 总保证金: ${totalMargin.toFixed(2)} USDT\n` +
+                    `  • 总浮动盈亏: ${totalUnrealizedPnl >= 0 ? '+' : ''}${totalUnrealizedPnl.toFixed(2)} USDT\n` +
+                    `  • 平仓比例: ${ratio === 1 ? '100%' : '50%'}\n\n` +
+                    `确认批量平仓？`;
+                
+                // 使用自定义确认对话框
+                const confirmed = await showConfirmDialog(confirmMsg, '🔔 批量平仓确认');
+                if (!confirmed) {
+                    console.log('[batchClosePositions] 用户取消批量平仓');
+                    return;
+                }
+                
+                // 开始批量平仓
+                console.log('[batchClosePositions] 开始批量平仓...');
+                let successCount = 0;
+                let failCount = 0;
+                const results = [];
+                
+                for (const position of targetPositions) {
+                    try {
+                        const coinName = position.instId.replace('-USDT-SWAP', '');
+                        console.log(`[batchClosePositions] 正在平仓: ${coinName}...`);
+                        
+                        // 计算平仓数量
+                        let closeSize = position.posSize;
+                        if (ratio !== 1) {
+                            // 平一半：向下取整
+                            closeSize = Math.floor(position.posSize / 2);
+                            // 至少平1张
+                            if (closeSize < 1) {
+                                closeSize = 1;
+                            }
+                        }
+                        
+                        // 调用平仓API
+                        const closeResponse = await fetch('/api/okx-trading/close-position', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                apiKey: account.apiKey,
+                                apiSecret: account.apiSecret,
+                                passphrase: account.passphrase,
+                                instId: position.instId,
+                                posSide: position.posSide,
+                                closeSize: closeSize  // 指定平仓数量
+                            })
+                        });
+                        
+                        const closeResult = await closeResponse.json();
+                        
+                        if (closeResult.success) {
+                            successCount++;
+                            const pnl = position.unrealizedPnl || 0;
+                            results.push(`✅ ${coinName}: ${closeSize}张 (${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)} USDT)`);
+                            console.log(`[batchClosePositions] ${coinName} 平仓成功`);
+                        } else {
+                            failCount++;
+                            results.push(`❌ ${coinName}: ${closeResult.error || '失败'}`);
+                            console.error(`[batchClosePositions] ${coinName} 平仓失败:`, closeResult.error);
+                        }
+                        
+                        // 延迟100ms，避免请求过快
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        
+                    } catch (error) {
+                        failCount++;
+                        const coinName = position.instId.replace('-USDT-SWAP', '');
+                        results.push(`❌ ${coinName}: ${error.message || '异常'}`);
+                        console.error(`[batchClosePositions] ${coinName} 平仓异常:`, error);
+                    }
+                }
+                
+                // 显示结果
+                const resultMsg = `${emoji} 批量平仓完成\n\n` +
+                    `【结果统计】\n` +
+                    `  • 成功: ${successCount} 个\n` +
+                    `  • 失败: ${failCount} 个\n\n` +
+                    `【详细结果】\n${results.join('\n')}`;
+                
+                alert(resultMsg);
+                
+                // 刷新账户信息和持仓
+                await refreshAccountData();
+                
+            } catch (error) {
+                console.error('[batchClosePositions] 批量平仓异常:', error);
+                alert(`❌ 批量平仓异常: ${error.message}`);
+            }
+        }
+
+        // 1:1对冲配对函数
+        async function hedgePositions(basePosSide) {
+            console.log(`[hedgePositions] 开始对冲配对: basePosSide=${basePosSide}`);
+            
+            // 获取当前账户
+            const account = accounts.find(acc => acc.id === currentAccount);
+            if (!account) {
+                alert('❌ 请先选择账户！');
+                return;
+            }
+            
+            if (!account.apiKey || !account.apiSecret || !account.passphrase) {
+                alert('❌ 请先配置账户API凭证！');
+                return;
+            }
+            
+            // 获取当前持仓
+            try {
+                const response = await fetch('/api/okx-trading/positions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        apiKey: account.apiKey,
+                        apiSecret: account.apiSecret,
+                        passphrase: account.passphrase
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (!result.success || !result.data) {
+                    alert(`❌ 获取持仓失败: ${result.error || '未知错误'}`);
+                    return;
+                }
+                
+                // 筛选出指定方向的持仓
+                const basePositions = result.data.filter(pos => pos.posSide === basePosSide);
+                
+                if (basePositions.length === 0) {
+                    const directionText = basePosSide === 'long' ? '多单' : '空单';
+                    alert(`⚠️ 当前没有${directionText}持仓，无法进行对冲配对！`);
+                    return;
+                }
+                
+                console.log(`[hedgePositions] 找到 ${basePositions.length} 个${basePosSide}持仓`);
+                
+                // 获取账户余额
+                const balanceResponse = await fetch('/api/okx-trading/account', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        apiKey: account.apiKey,
+                        apiSecret: account.apiSecret,
+                        passphrase: account.passphrase
+                    })
+                });
+                
+                const balanceResult = await balanceResponse.json();
+                let availableBalance = 0;
+                if (balanceResult.success && balanceResult.data) {
+                    availableBalance = parseFloat(balanceResult.data.availBal || 0);
+                }
+                
+                // 计算对冲所需的总金额（实际占用保证金，10x杠杆）
+                const totalMarginNeeded = basePositions.reduce((sum, pos) => sum + (pos.margin || 0), 0);
+                
+                // 检查余额是否足够（留20%缓冲）
+                const requiredBalance = totalMarginNeeded * 1.2;
+                if (availableBalance < requiredBalance) {
+                    alert(`❌ 余额不足！\n\n` +
+                        `【资金需求】\n` +
+                        `  • 对冲所需保证金: ${totalMarginNeeded.toFixed(2)} USDT\n` +
+                        `  • 建议余额: ${requiredBalance.toFixed(2)} USDT\n\n` +
+                        `【当前状态】\n` +
+                        `  • 可用余额: ${availableBalance.toFixed(2)} USDT\n` +
+                        `  • 缺少: ${(requiredBalance - availableBalance).toFixed(2)} USDT\n\n` +
+                        `💡 建议：增加账户余额或先平掉部分持仓`);
+                    return;
+                }
+                
+                // 构建确认信息
+                const baseDirectionText = basePosSide === 'long' ? '多单' : '空单';
+                const hedgeDirectionText = basePosSide === 'long' ? '空单' : '多单';
+                const emoji = basePosSide === 'long' ? '⚖️' : '⚖️';
+                
+                const positionsList = basePositions.map(pos => {
+                    const coinName = pos.instId.replace('-USDT-SWAP', '');
+                    // 计算合约价值（张数 × 每张价值）
+                    const contractValue = pos.posSize * pos.avgPrice * (pos.instId.includes('BTC') ? 0.01 : pos.instId.includes('ETH') ? 0.1 : 1.0);
+                    return `  • ${coinName}: ${pos.posSize}张 ≈ ${contractValue.toFixed(2)} USDT (保证金: ${pos.margin.toFixed(2)} USDT)`;
+                }).join('\n');
+                
+                const totalContractValue = basePositions.reduce((sum, pos) => {
+                    const contractValue = pos.posSize * pos.avgPrice * (pos.instId.includes('BTC') ? 0.01 : pos.instId.includes('ETH') ? 0.1 : 1.0);
+                    return sum + contractValue;
+                }, 0);
+                
+                const confirmMsg = `${emoji} 1:1对冲配对\n\n` +
+                    `【现有${baseDirectionText}持仓】\n${positionsList}\n\n` +
+                    `【对冲方案】\n` +
+                    `  • 持仓数量: ${basePositions.length} 个\n` +
+                    `  • 合约总值: ${totalContractValue.toFixed(2)} USDT\n` +
+                    `  • 需要保证金: ${totalMarginNeeded.toFixed(2)} USDT (10x杠杆)\n` +
+                    `  • 可用余额: ${availableBalance.toFixed(2)} USDT\n\n` +
+                    `【对冲操作】\n` +
+                    `  将开${basePositions.length}个${hedgeDirectionText}，每个币种开等额对冲仓位\n\n` +
+                    `⚠️ 对冲后将锁定当前盈亏，双向持仓！\n\n` +
+                    `确认执行对冲配对？`;
+                
+                if (!confirm(confirmMsg)) {
+                    console.log('[hedgePositions] 用户取消对冲配对');
+                    return;
+                }
+                
+                // 开始批量对冲开仓
+                console.log('[hedgePositions] 开始批量对冲开仓...');
+                let successCount = 0;
+                let failCount = 0;
+                const results = [];
+                
+                // 对冲方向：多单配空单，空单配多单
+                const hedgeDirection = basePosSide === 'long' ? 'short' : 'long';
+                
+                for (const position of basePositions) {
+                    try {
+                        const coinName = position.instId.replace('-USDT-SWAP', '');
+                        console.log(`[hedgePositions] 正在对冲: ${coinName}...`);
+                        
+                        // 计算对冲金额（使用相同的保证金）
+                        const hedgeAmount = position.margin.toFixed(2);
+                        
+                        // 构建订单数据
+                        const orderData = {
+                            instId: position.instId,
+                            side: hedgeDirection === 'long' ? 'buy' : 'sell',
+                            posSide: hedgeDirection,
+                            ordType: 'market',
+                            sz: hedgeAmount,  // USDT金额
+                            lever: '10'
+                        };
+                        
+                        // 发送订单请求
+                        const orderResponse = await fetch('/api/okx-trading/place-order', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                apiKey: account.apiKey,
+                                apiSecret: account.apiSecret,
+                                passphrase: account.passphrase,
+                                ...orderData
+                            })
+                        });
+                        
+                        const orderResult = await orderResponse.json();
+                        
+                        if (orderResult.success) {
+                            successCount++;
+                            results.push(`✅ ${coinName}: ${hedgeAmount} USDT`);
+                            console.log(`[hedgePositions] ${coinName} 对冲成功`);
+                        } else {
+                            failCount++;
+                            results.push(`❌ ${coinName}: ${orderResult.error || '失败'}`);
+                            console.error(`[hedgePositions] ${coinName} 对冲失败:`, orderResult.error);
+                        }
+                        
+                        // 延迟100ms，避免请求过快
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        
+                    } catch (error) {
+                        failCount++;
+                        const coinName = position.instId.replace('-USDT-SWAP', '');
+                        results.push(`❌ ${coinName}: ${error.message || '异常'}`);
+                        console.error(`[hedgePositions] ${coinName} 对冲异常:`, error);
+                    }
+                }
+                
+                // 显示结果
+                const resultMsg = `${emoji} 对冲配对完成\n\n` +
+                    `【结果统计】\n` +
+                    `  • 成功: ${successCount} 个\n` +
+                    `  • 失败: ${failCount} 个\n\n` +
+                    `【详细结果】\n${results.join('\n')}\n\n` +
+                    `✅ 对冲后持仓：${baseDirectionText} ${basePositions.length}个 + ${hedgeDirectionText} ${successCount}个`;
+                
+                alert(resultMsg);
+                
+                // 刷新账户信息、持仓和日志
+                await refreshAccountData();
+                await loadTradingLogs();
+                
+            } catch (error) {
+                console.error('[hedgePositions] 对冲配对异常:', error);
+                alert(`❌ 对冲配对异常: ${error.message}`);
+            }
+        }
+
+        // 提交订单
+        // 提交订单
+        async function submitOrder(event) {
+            event.preventDefault();
+            
+            const amount = document.getElementById('orderAmount').value;
+            const priceType = document.getElementById('priceType').value;
+            
+            if (!amount || parseFloat(amount) <= 0) {
+                alert('请输入有效的交易数量');
+                return;
+            }
+            
+            const symbolData = symbols.find(s => s.symbol === currentSymbol);
+            const account = accounts.find(acc => acc.id === currentAccount);
+            
+            if (!account || !account.apiKey || !account.apiSecret || !account.passphrase) {
+                alert('请先配置账户API凭证！');
+                return;
+            }
+            
+            // 构建订单数据
+            const orderData = {
+                instId: currentSymbol,  // 交易对
+                side: currentDirection === 'long' ? 'buy' : 'sell',  // buy/sell
+                posSide: currentDirection,  // long/short
+                ordType: priceType,  // market/limit
+                sz: parseFloat(amount),  // 数量（USDT）
+                lever: currentLeverage  // 杠杆倍数
+            };
+            
+            // 限价单需要价格
+            if (priceType === 'limit') {
+                orderData.px = symbolData.price;
+            }
+            
+            console.log('准备提交订单:', orderData);
+            
+            const confirmMsg = `确认${currentDirection === 'long' ? '做多' : '做空'} ${symbolData.name}？
+交易对: ${currentSymbol}
+开仓金额: ${amount} USDT
+杠杆: ${currentLeverage}x
+占用保证金: ${(parseFloat(amount) / currentLeverage).toFixed(2)} USDT
+${priceType === 'limit' ? '价格: ' + symbolData.price : '市价单'}
+
+⚠️ 这将在OKX真实下单，请确认无误！`;
+            
+            if (!confirm(confirmMsg)) {
+                return;
+            }
+            
+            try {
+                // 调用真实下单API
+                const response = await fetch('/api/okx-trading/place-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        apiKey: account.apiKey,
+                        apiSecret: account.apiSecret,
+                        passphrase: account.passphrase,
+                        ...orderData
+                    })
+                });
+                
+                const result = await response.json();
+                console.log('下单响应:', result);
+                
+                if (result.success) {
+                    const data = result.data;
+                    alert(`✅ 订单提交成功！
+
+订单ID: ${data.ordId || ''}
+合约张数: ${data.contracts || ''} 张
+开仓金额: ${data.inputUsdt} USDT
+占用保证金: ${data.actualUsdt || (data.inputUsdt / data.leverage).toFixed(2)} USDT
+杠杆倍数: ${data.leverage || currentLeverage}x
+当前价格: ${data.price || ''}
+
+${data.sMsg || result.message || ''}`);
+                    
+                    // 下单成功后刷新账户信息和持仓
+                    await refreshAccountData();
+                    
+                    // 清空输入框
+                    document.getElementById('orderAmount').value = '';
+                } else {
+                    alert(`❌ 下单失败: ${result.error || '未知错误'}
+错误代码: ${result.code || ''}`);
+                }
+            } catch (error) {
+                console.error('下单异常:', error);
+                alert(`❌ 下单异常: ${error.message || error}`);
+            }
+        }
+
+        // 加载账户数据
+        function loadAccountData() {
+            // 这里应该从API加载真实数据
+            console.log('加载账户数据...');
+        }
+
+        // 刷新数据
+        function refreshData() {
+            console.log('刷新数据...');
+            loadAccountData();
+        }
+
+        // 搜索交易对
+        document.getElementById('symbolSearch').addEventListener('input', function(e) {
+            const search = e.target.value.toLowerCase();
+            document.querySelectorAll('.symbol-item').forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(search) ? 'block' : 'none';
+            });
+        });
+
+        // 页面加载时初始化
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+
+    <!-- 账户管理对话框 -->
+    <div class="modal" id="accountModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚙️ 账户管理</h2>
+                <button class="btn-close" onclick="closeAccountModal()">×</button>
+            </div>
+            
+            <div class="account-list" id="accountList">
+                <!-- 账户列表将通过JavaScript动态加载 -->
+            </div>
+
+            <button class="btn-add-account" onclick="showAddAccountForm()">
+                ➕ 添加新账户
+            </button>
+            
+            <!-- 快速配置POIT账户按钮 -->
+            <button class="btn-add-account" onclick="quickAddPoitAccount()" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); margin-top: 10px;">
+                ⚡ 快速配置POIT子账户
+            </button>
+
+            <!-- 添加/编辑账户表单 -->
+            <div class="account-form" id="accountForm" style="display: none;">
+                <h3 style="margin-bottom: 15px; color: #2d3748;" id="formTitle">添加账户</h3>
+                <form onsubmit="saveAccount(event)">
+                    <input type="hidden" id="editAccountId">
+                    <div class="form-group">
+                        <label for="accountName">账户名称</label>
+                        <input type="text" id="accountName" required placeholder="例如：主账户、子账户1">
+                    </div>
+                    <div class="form-group">
+                        <label for="apiKey">API Key</label>
+                        <input type="text" id="apiKey" placeholder="输入OKX API Key">
+                    </div>
+                    <div class="form-group">
+                        <label for="apiSecret">API Secret</label>
+                        <input type="password" id="apiSecret" placeholder="输入OKX API Secret">
+                    </div>
+                    <div class="form-group">
+                        <label for="passphrase">Passphrase</label>
+                        <input type="password" id="passphrase" placeholder="输入OKX Passphrase">
+                    </div>
+                    <div class="form-group">
+                        <label for="accountBalance">账户余额 (USDT) <small style="color: #888;">[可选，配置API后自动获取]</small></label>
+                        <input type="number" id="accountBalance" placeholder="配置API凭证后将自动获取余额" step="0.01" min="0" style="background-color: #f7fafc;">
+                        <small style="color: #888; display: block; margin-top: 5px;">
+                            💡 提示：填写API Key、Secret和Passphrase后，系统会自动从OKX获取最新余额
+                        </small>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="hideAccountForm()">取消</button>
+                        <button type="submit" class="btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 自定义确认对话框 -->
+    <div class="modal" id="confirmDialog">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header" style="border-bottom: none; padding-bottom: 10px;">
+                <h2 id="confirmDialogTitle" style="font-size: 18px;">⚠️ 确认操作</h2>
+            </div>
+            <div id="confirmDialogMessage" style="white-space: pre-wrap; line-height: 1.8; color: #2d3748; margin: 20px 0; font-size: 14px;">
+                <!-- 消息内容 -->
+            </div>
+            <div class="form-actions" style="margin-top: 25px; gap: 10px;">
+                <button type="button" class="btn-secondary" onclick="closeConfirmDialog(false)" style="flex: 1;">取消</button>
+                <button type="button" class="btn-primary" onclick="closeConfirmDialog(true)" style="flex: 1;">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 自定义确认对话框
+        let confirmDialogResolve = null;
+
+        function showConfirmDialog(message, title = '⚠️ 确认操作') {
+            return new Promise((resolve) => {
+                confirmDialogResolve = resolve;
+                document.getElementById('confirmDialogTitle').textContent = title;
+                document.getElementById('confirmDialogMessage').textContent = message;
+                document.getElementById('confirmDialog').classList.add('active');
+            });
+        }
+
+        function closeConfirmDialog(result) {
+            document.getElementById('confirmDialog').classList.remove('active');
+            if (confirmDialogResolve) {
+                confirmDialogResolve(result);
+                confirmDialogResolve = null;
+            }
+        }
+
+        // 点击对话框外部关闭
+        document.getElementById('confirmDialog').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeConfirmDialog(false);
+            }
+        });
+        
+        // 打开账户管理对话框
+        function openAccountModal() {
+            document.getElementById('accountModal').classList.add('active');
+            renderAccountList();
+        }
+
+        // 关闭账户管理对话框
+        function closeAccountModal() {
+            document.getElementById('accountModal').classList.remove('active');
+            hideAccountForm();
+        }
+
+        // 刷新账户余额
+        async function refreshAccountBalance(accountId) {
+            const account = accounts.find(a => a.id === accountId);
+            if (!account) {
+                alert('账户不存在！');
+                return;
+            }
+            
+            if (!account.apiKey || !account.apiSecret || !account.passphrase) {
+                alert('该账户未配置API凭证，无法自动获取余额！');
+                return;
+            }
+            
+            const balance = await fetchAccountBalance(account.apiKey, account.apiSecret, account.passphrase);
+            
+            if (balance > 0) {
+                account.balance = balance;
+                localStorage.setItem('okx_accounts', JSON.stringify(accounts));
+                renderAccountList();
+                renderAccountTabs();
+                
+                // 如果是当前账户，更新余额显示
+                if (accountId === currentAccount) {
+                    updateAccountBalance();
+                }
+                
+                alert(`余额刷新成功！当前余额: ${balance.toFixed(2)} USDT`);
+            } else {
+                alert('获取余额失败，请检查API凭证是否正确！');
+            }
+        }
+
+        // 渲染账户列表
+        function renderAccountList() {
+            const accountList = document.getElementById('accountList');
+            accountList.innerHTML = accounts.map((account, index) => {
+                const hasApi = account.apiKey && account.apiSecret && account.passphrase;
+                const apiStatus = hasApi ? 
+                    '<span style="color: #10b981; font-size: 12px;">✓ API已配置</span>' : 
+                    '<span style="color: #ef4444; font-size: 12px;">✗ API未配置</span>';
+                return `
+                <div class="account-item">
+                    <div class="account-item-info">
+                        <div class="account-item-name">${account.name}</div>
+                        <div class="account-item-balance">${account.balance.toFixed(2)} USDT</div>
+                        <div style="margin-top: 4px;">${apiStatus}</div>
+                    </div>
+                    <div class="account-item-actions">
+                        ${hasApi ? `<button class="btn-small" onclick="refreshAccountBalance('${account.id}')" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); margin-bottom: 5px;">🔄 刷新余额</button>` : ''}
+                        <button class="btn-small btn-edit" onclick="editAccount('${account.id}')">编辑</button>
+                        ${accounts.length > 1 ? `<button class="btn-small btn-delete" onclick="deleteAccount('${account.id}')">删除</button>` : ''}
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        // 显示添加账户表单
+        function showAddAccountForm() {
+            document.getElementById('formTitle').textContent = '添加账户';
+            document.getElementById('editAccountId').value = '';
+            document.getElementById('accountName').value = '';
+            document.getElementById('apiKey').value = '';
+            document.getElementById('apiSecret').value = '';
+            document.getElementById('passphrase').value = '';
+            document.getElementById('accountBalance').value = '';
+            document.getElementById('accountForm').style.display = 'block';
+        }
+
+        // 隐藏账户表单
+        function hideAccountForm() {
+            document.getElementById('accountForm').style.display = 'none';
+        }
+
+        // 编辑账户
+        function editAccount(accountId) {
+            const account = accounts.find(a => a.id === accountId);
+            if (!account) return;
+
+            document.getElementById('formTitle').textContent = '编辑账户';
+            document.getElementById('editAccountId').value = accountId;
+            document.getElementById('accountName').value = account.name;
+            document.getElementById('apiKey').value = account.apiKey || '';
+            document.getElementById('apiSecret').value = account.apiSecret || '';
+            document.getElementById('passphrase').value = account.passphrase || '';
+            document.getElementById('accountBalance').value = account.balance;
+            document.getElementById('accountForm').style.display = 'block';
+        }
+
+        // 删除账户
+        function deleteAccount(accountId) {
+            if (accounts.length <= 1) {
+                alert('至少需要保留一个账户！');
+                return;
+            }
+
+            if (!confirm('确定要删除这个账户吗？')) return;
+
+            accounts = accounts.filter(a => a.id !== accountId);
+            
+            // 如果删除的是当前账户，切换到第一个账户
+            if (currentAccount === accountId) {
+                currentAccount = accounts[0].id;
+                selectAccount(currentAccount);
+            }
+
+            localStorage.setItem('okx_accounts', JSON.stringify(accounts));
+            renderAccountList();
+            renderAccountTabs();
+        }
+
+        // 从API获取账户余额
+        async function fetchAccountBalance(apiKey, apiSecret, passphrase) {
+            try {
+                const response = await fetch('/api/okx-trading/account-balance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        apiKey: apiKey,
+                        apiSecret: apiSecret,
+                        passphrase: passphrase
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    return result.balance;
+                } else {
+                    console.error('获取余额失败:', result.error);
+                    return 0;
+                }
+            } catch (error) {
+                console.error('获取余额异常:', error);
+                return 0;
+            }
+        }
+
+        // 保存账户
+        async function saveAccount(event) {
+            event.preventDefault();
+
+            const accountId = document.getElementById('editAccountId').value;
+            const name = document.getElementById('accountName').value.trim();
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const apiSecret = document.getElementById('apiSecret').value.trim();
+            const passphrase = document.getElementById('passphrase').value.trim();
+
+            if (!name) {
+                alert('请填写账户名称！');
+                return;
+            }
+
+            // 如果提供了API凭证，自动获取余额
+            let balance = 0;
+            if (apiKey && apiSecret && passphrase) {
+                // 显示加载提示
+                const submitBtn = event.target.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = '正在获取余额...';
+                submitBtn.disabled = true;
+                
+                balance = await fetchAccountBalance(apiKey, apiSecret, passphrase);
+                
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                
+                if (balance === 0) {
+                    const confirm = window.confirm('无法获取账户余额，可能是API凭证错误。是否继续保存？');
+                    if (!confirm) {
+                        return;
+                    }
+                }
+            } else {
+                // 如果没有API凭证，使用手动输入的余额（如果有）
+                const balanceInput = document.getElementById('accountBalance');
+                if (balanceInput && balanceInput.value) {
+                    balance = parseFloat(balanceInput.value);
+                }
+            }
+
+            if (accountId) {
+                // 编辑现有账户
+                const account = accounts.find(a => a.id === accountId);
+                if (account) {
+                    account.name = name;
+                    account.apiKey = apiKey;
+                    account.apiSecret = apiSecret;
+                    account.passphrase = passphrase;
+                    account.balance = balance;
+                }
+            } else {
+                // 添加新账户
+                const newId = 'account_' + Date.now();
+                accounts.push({
+                    id: newId,
+                    name: name,
+                    apiKey: apiKey,
+                    apiSecret: apiSecret,
+                    passphrase: passphrase,
+                    balance: balance
+                });
+            }
+
+            localStorage.setItem('okx_accounts', JSON.stringify(accounts));
+            renderAccountList();
+            renderAccountTabs();
+            hideAccountForm();
+            
+            // 如果编辑的是当前账户，更新余额显示
+            if (accountId === currentAccount) {
+                updateAccountBalance();
+            }
+            
+            alert(`账户保存成功！${balance > 0 ? `当前余额: ${balance.toFixed(2)} USDT` : '未获取到余额'}`);
+        }
+
+        // 快速配置POIT子账户
+        async function quickAddPoitAccount() {
+            const confirmed = confirm('确认要快速配置POIT子账户吗？\n\n账户信息：\n- 账户名称: POIT (子账户)\n- API Key: 8650e46c-***\n- 系统将自动从OKX获取账户余额');
+            
+            if (!confirmed) return;
+            
+            // POIT账户配置
+            const poitAccount = {
+                id: 'account_poit_' + Date.now(),
+                name: 'POIT (子账户)',
+                apiKey: '8650e46c-059b-431d-93cf-55f8c79babdb',
+                apiSecret: '4C2BD2AC6A08615EA7F36A6251857FCE',
+                passphrase: 'Wu666666.',
+                balance: 0
+            };
+            
+            // 检查是否已存在
+            const existingIndex = accounts.findIndex(acc => 
+                acc.apiKey === poitAccount.apiKey || acc.name === poitAccount.name
+            );
+            
+            if (existingIndex > -1) {
+                const update = confirm('检测到同名或相同API Key的账户，是否更新？');
+                if (!update) return;
+                
+                accounts[existingIndex] = poitAccount;
+                console.log('✅ POIT账户已更新');
+            } else {
+                accounts.push(poitAccount);
+                console.log('✅ POIT账户已添加');
+            }
+            
+            // 获取账户余额
+            alert('正在从OKX获取账户余额，请稍候...');
+            const balance = await fetchAccountBalance(
+                poitAccount.apiKey,
+                poitAccount.apiSecret,
+                poitAccount.passphrase
+            );
+            
+            if (balance > 0) {
+                poitAccount.balance = balance;
+                alert(`✅ POIT子账户配置成功！\n\n账户余额: ${balance.toFixed(2)} USDT`);
+            } else {
+                alert('⚠️ POIT子账户已添加，但无法获取余额。\n请检查API权限设置。\n\n账户已保存，您可以稍后手动刷新余额。');
+            }
+            
+            // 保存并刷新
+            localStorage.setItem('okx_accounts', JSON.stringify(accounts));
+            renderAccountList();
+            renderAccountTabs();
+            
+            // 切换到POIT账户
+            if (existingIndex > -1) {
+                selectAccount(accounts[existingIndex].id);
+            } else {
+                selectAccount(accounts[accounts.length - 1].id);
+            }
+            
+            // 关闭对话框
+            closeAccountModal();
+        }
+        
+        // 点击对话框外部关闭
+        document.getElementById('accountModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAccountModal();
+            }
+        });
+
+        // ==================== 预警功能 ====================
+        
+        // 加载预警设置
+        async function loadAlertSettingsOKX() {
+            try {
+                const response = await fetch('/api/coin-tracker/alert-settings');
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success && result.settings) {
+                        const settings = result.settings;
+                        
+                        // 更新UI
+                        document.getElementById('upperThreshold').value = settings.upperThreshold || 30;
+                        document.getElementById('lowerThreshold').value = settings.lowerThreshold || -40;
+                        document.getElementById('upperAlertSwitch').checked = settings.upperEnabled || false;
+                        document.getElementById('lowerAlertSwitch').checked = settings.lowerEnabled || false;
+                        
+                        console.log('✅ OKX页面：预警设置已加载', settings);
+                    }
+                }
+            } catch (e) {
+                console.warn('⚠️ OKX页面：加载预警设置失败', e);
+            }
+        }
+        
+        // 保存预警设置
+        async function saveAlertSettingsOKX() {
+            try {
+                const settings = {
+                    upperThreshold: parseFloat(document.getElementById('upperThreshold').value),
+                    lowerThreshold: parseFloat(document.getElementById('lowerThreshold').value),
+                    upperEnabled: document.getElementById('upperAlertSwitch').checked,
+                    lowerEnabled: document.getElementById('lowerAlertSwitch').checked,
+                    tgEnabled: false, // OKX页面默认不启用TG通知
+                    upperTriggered: false,
+                    lowerTriggered: false,
+                    lastCheckTime: null
+                };
+                
+                const response = await fetch('/api/coin-tracker/alert-settings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(settings)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        alert('✅ 预警设置已保存！');
+                        console.log('✅ OKX页面：预警设置已保存', settings);
+                    }
+                }
+            } catch (e) {
+                console.error('❌ OKX页面：保存预警设置失败', e);
+                alert('❌ 保存失败，请重试');
+            }
+        }
+        
+        // 更新总涨跌幅显示
+        async function updateTotalChangeOKX() {
+            try {
+                const response = await fetch('/api/coin-change-tracker/latest');
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success && result.data) {
+                        const totalChange = result.data.total_change;
+                        const element = document.getElementById('totalChangePercent');
+                        if (element) {
+                            element.textContent = `${totalChange > 0 ? '+' : ''}${totalChange.toFixed(2)}%`;
+                            element.style.color = totalChange > 0 ? '#10b981' : totalChange < 0 ? '#ef4444' : '#6b7280';
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('⚠️ OKX页面：更新总涨跌幅失败', e);
+            }
+        }
+        
+        // 页面加载完成后初始化
+        init();
+        
+        // 加载预警设置
+        loadAlertSettingsOKX();
+        
+        // 更新总涨跌幅
+        updateTotalChangeOKX();
+
+        // 定时刷新账户数据（每30秒）
+        setInterval(() => {
+            refreshAccountData();
+            updateTotalChangeOKX(); // 同时更新涨跌幅
+        }, 30000);
+    </script>
+</body>
+</html>

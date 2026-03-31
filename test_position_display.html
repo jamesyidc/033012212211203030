@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Position Display Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow">
+        <h2 class="text-lg font-bold mb-4">BTC Position Test</h2>
+        <div class="mb-4">
+            <div class="text-sm text-gray-500">日内位置:</div>
+            <div id="btcPosition" class="text-sm font-bold text-gray-400">--</div>
+        </div>
+        <button onclick="updatePosition()" class="bg-blue-500 text-white px-4 py-2 rounded">
+            Update Position
+        </button>
+    </div>
+
+    <script>
+        function updatePosition() {
+            const btcData = {
+                high_price: 71842.5,
+                low_price: 70466.8,
+                current_price: 70696.2
+            };
+            
+            const range = btcData.high_price - btcData.low_price;
+            if (range > 0) {
+                const position = ((btcData.current_price - btcData.low_price) / range) * 100;
+                console.log('Position calculated:', position.toFixed(2) + '%');
+                
+                const posEl = document.getElementById('btcPosition');
+                posEl.textContent = `${position.toFixed(2)}%`;
+                
+                // Set color
+                if (position >= 80) {
+                    posEl.className = 'text-sm font-bold text-emerald-600';
+                } else if (position >= 60) {
+                    posEl.className = 'text-sm font-bold text-green-600';
+                } else if (position >= 40) {
+                    posEl.className = 'text-sm font-bold text-blue-600';
+                } else if (position >= 20) {
+                    posEl.className = 'text-sm font-bold text-orange-600';
+                } else {
+                    posEl.className = 'text-sm font-bold text-red-600';
+                }
+                
+                console.log('Position element updated:', posEl.textContent, posEl.className);
+            }
+        }
+        
+        // Auto update on page load
+        setTimeout(updatePosition, 1000);
+    </script>
+</body>
+</html>

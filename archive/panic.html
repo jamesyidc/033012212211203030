@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>恐慌贪婪指数 - 加密货币数据分析</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* 顶部导航 */
+        .top-nav {
+            background: #2a2d47;
+            padding: 12px 20px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #3b7dff;
+            padding: 6px 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .nav-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .home-btn {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%);
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+        
+        .home-btn:hover {
+            background: linear-gradient(135deg, #0099ff 0%, #00d4ff 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.4);
+        }
+        
+        /* 主内容区 */
+        .main-content {
+            display: grid;
+            gap: 30px;
+        }
+        
+        /* 指数卡片 */
+        .index-card {
+            background: rgba(42, 45, 71, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+        
+        .index-title {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: #00d4ff;
+        }
+        
+        .index-value {
+            font-size: 5rem;
+            font-weight: 700;
+            margin: 20px 0;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        
+        .index-level {
+            font-size: 2rem;
+            margin: 20px 0;
+            padding: 10px 30px;
+            border-radius: 50px;
+            display: inline-block;
+        }
+        
+        .update-time {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.6);
+            margin-top: 20px;
+        }
+        
+        /* 颜色等级 */
+        .level-extreme-fear { background: linear-gradient(135deg, #ff4444, #cc0000); }
+        .level-fear { background: linear-gradient(135deg, #ff8844, #ff4444); }
+        .level-neutral { background: linear-gradient(135deg, #ffcc44, #ff8844); }
+        .level-greed { background: linear-gradient(135deg, #88ff44, #44cc00); }
+        .level-extreme-greed { background: linear-gradient(135deg, #44ff44, #00cc00); }
+        
+        .color-extreme-fear { color: #ff4444; }
+        .color-fear { color: #ff8844; }
+        .color-neutral { color: #ffcc44; }
+        .color-greed { color: #88ff44; }
+        .color-extreme-greed { color: #44ff44; }
+        
+        /* 加载状态 */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        /* 双列布局 */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .index-value {
+                font-size: 3rem;
+            }
+            
+            .index-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部导航 -->
+        <div class="top-nav">
+            <div class="nav-left">
+                <div class="nav-brand">
+                    <span>😱</span> 恐慌贪婪指数
+                </div>
+                <div class="nav-title">市场情绪实时监控</div>
+            </div>
+            <a href="/" class="home-btn">
+                <span>🏠</span> 返回首页
+            </a>
+        </div>
+        
+        <!-- 主内容 -->
+        <div class="main-content">
+            <div id="loadingState" class="loading">
+                正在加载数据...
+            </div>
+            
+            <div id="dataContent" class="grid-2" style="display: none;">
+                <!-- 恐慌指数卡片 -->
+                <div class="index-card">
+                    <h2 class="index-title">😱 恐慌指数</h2>
+                    <div id="panicValue" class="index-value color-neutral">--</div>
+                    <div id="panicLevel" class="index-level level-neutral">加载中...</div>
+                    <div id="panicTime" class="update-time">更新时间: --</div>
+                </div>
+                
+                <!-- 清洗指数卡片 -->
+                <div class="index-card">
+                    <h2 class="index-title">🌊 清洗指数</h2>
+                    <div id="washValue" class="index-value color-neutral">--</div>
+                    <div id="washLevel" class="index-level level-neutral">加载中...</div>
+                    <div id="washTime" class="update-time">更新时间: --</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 加载数据
+        async function loadPanicData() {
+            try {
+                const response = await fetch('/api/panic/latest');
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    const data = result.data;
+                    
+                    // 显示数据区域，隐藏加载状态
+                    document.getElementById('loadingState').style.display = 'none';
+                    document.getElementById('dataContent').style.display = 'grid';
+                    
+                    // 更新恐慌清洗指数
+                    document.getElementById('panicValue').textContent = data.panic_index ? data.panic_index.toFixed(2) + '%' : '--';
+                    document.getElementById('panicLevel').textContent = data.panic_level || '未知';
+                    document.getElementById('panicTime').textContent = '更新时间: ' + (data.record_time || '--');
+                    
+                    // 更新市场数据
+                    document.getElementById('washValue').textContent = data.market_zone || '--';
+                    document.getElementById('washLevel').textContent = `24h爆仓: ${data.hour_24_people}万人 | 全网持仓: ${data.total_position}亿美元`;
+                    document.getElementById('washTime').textContent = '更新时间: ' + (data.record_time || '--');
+                    
+                    // 设置颜色
+                    setLevelColor('panic', data.level_color || 'gray');
+                    setLevelColor('wash', data.level_color || 'gray');
+                } else {
+                    showError('暂无数据');
+                }
+            } catch (error) {
+                console.error('加载失败:', error);
+                showError('加载失败: ' + error.message);
+            }
+        }
+        
+        // 设置等级颜色
+        function setLevelColor(type, color) {
+            const valueEl = document.getElementById(type + 'Value');
+            const levelEl = document.getElementById(type + 'Level');
+            
+            if (!valueEl || !levelEl) return;
+            
+            // 移除所有颜色类
+            const colorClasses = ['color-extreme-fear', 'color-fear', 'color-neutral', 'color-greed', 'color-extreme-greed'];
+            const levelClasses = ['level-extreme-fear', 'level-fear', 'level-neutral', 'level-greed', 'level-extreme-greed'];
+            
+            valueEl.classList.remove(...colorClasses);
+            levelEl.classList.remove(...levelClasses);
+            
+            // 根据颜色添加样式
+            if (color === 'green') {
+                valueEl.classList.add('color-greed');
+                levelEl.classList.add('level-greed');
+            } else if (color === 'yellow') {
+                valueEl.classList.add('color-neutral');
+                levelEl.classList.add('level-neutral');
+            } else if (color === 'red') {
+                valueEl.classList.add('color-extreme-fear');
+                levelEl.classList.add('level-extreme-fear');
+            }
+        }
+        
+        // 显示错误
+        function showError(message) {
+            document.getElementById('loadingState').innerHTML = '⚠️ ' + message;
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('dataContent').style.display = 'none';
+        }
+        
+        // 页面加载时获取数据
+        loadPanicData();
+        
+        // 每30秒刷新一次
+        setInterval(loadPanicData, 30000);
+    </script>
+</body>
+</html>

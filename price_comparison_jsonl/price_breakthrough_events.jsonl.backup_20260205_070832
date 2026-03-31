@@ -1,0 +1,652 @@
+{"id": 105, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.747, "previous_extreme_price": 1.749, "event_time": "2026-01-17 01:25:41"}
+{"id": 104, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.749, "previous_extreme_price": 1.75, "event_time": "2026-01-17 01:25:05"}
+{"id": 103, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.75, "previous_extreme_price": 1.751, "event_time": "2026-01-16 23:49:13"}
+{"id": 102, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.129, "previous_extreme_price": 5.132, "event_time": "2026-01-16 23:48:01"}
+{"id": 101, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11438, "previous_extreme_price": 0.11457, "event_time": "2026-01-16 23:48:01"}
+{"id": 100, "symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 12.23, "previous_extreme_price": 12.27, "event_time": "2026-01-16 23:48:01"}
+{"id": 99, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.751, "previous_extreme_price": 1.752, "event_time": "2026-01-16 23:48:01"}
+{"id": 98, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.132, "previous_extreme_price": 5.146, "event_time": "2026-01-16 23:47:25"}
+{"id": 97, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11457, "previous_extreme_price": 0.11482, "event_time": "2026-01-16 23:47:25"}
+{"id": 96, "symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 12.27, "previous_extreme_price": 12.29, "event_time": "2026-01-16 23:47:25"}
+{"id": 95, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.752, "previous_extreme_price": 1.753, "event_time": "2026-01-16 23:47:25"}
+{"id": 94, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.146, "previous_extreme_price": 5.15, "event_time": "2026-01-16 23:46:48"}
+{"id": 93, "symbol": "LTC-USDT-SWAP", "event_type": "new_low", "price": 71.09, "previous_extreme_price": 71.13, "event_time": "2026-01-16 23:34:06"}
+{"id": 92, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.15, "previous_extreme_price": 5.172, "event_time": "2026-01-16 23:33:30"}
+{"id": 91, "symbol": "LTC-USDT-SWAP", "event_type": "new_low", "price": 71.13, "previous_extreme_price": 71.38, "event_time": "2026-01-16 23:33:30"}
+{"id": 90, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11482, "previous_extreme_price": 0.1152, "event_time": "2026-01-16 23:33:30"}
+{"id": 89, "symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 12.29, "previous_extreme_price": 12.36, "event_time": "2026-01-16 23:33:30"}
+{"id": 88, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.753, "previous_extreme_price": 1.756, "event_time": "2026-01-16 23:33:30"}
+{"id": 87, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.172, "previous_extreme_price": 5.188, "event_time": "2026-01-16 23:32:54"}
+{"id": 86, "symbol": "LTC-USDT-SWAP", "event_type": "new_low", "price": 71.38, "previous_extreme_price": 71.69, "event_time": "2026-01-16 23:32:54"}
+{"id": 85, "symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 12.36, "previous_extreme_price": 12.37, "event_time": "2026-01-16 23:32:54"}
+{"id": 84, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.756, "previous_extreme_price": 1.759, "event_time": "2026-01-16 23:32:54"}
+{"id": 83, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.188, "previous_extreme_price": 5.199, "event_time": "2026-01-16 23:32:17"}
+{"id": 82, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.1152, "previous_extreme_price": 0.11537, "event_time": "2026-01-16 23:32:17"}
+{"id": 81, "symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 12.37, "previous_extreme_price": 12.4, "event_time": "2026-01-16 23:32:17"}
+{"id": 80, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.759, "previous_extreme_price": 1.762, "event_time": "2026-01-16 23:32:17"}
+{"id": 78, "symbol": "LTC-USDT-SWAP", "event_type": "new_low", "price": 71.69, "previous_extreme_price": 71.76, "event_time": "2026-01-16 23:32:17"}
+{"id": 79, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.199, "previous_extreme_price": 5.204, "event_time": "2026-01-16 23:31:41"}
+{"id": 77, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.762, "previous_extreme_price": 1.763, "event_time": "2026-01-16 23:31:41"}
+{"id": 76, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11537, "previous_extreme_price": 0.11546, "event_time": "2026-01-16 23:31:41"}
+{"id": 75, "symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 12.4, "previous_extreme_price": 12.41, "event_time": "2026-01-16 23:31:41"}
+{"id": 74, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.204, "previous_extreme_price": 5.205, "event_time": "2026-01-16 23:31:04"}
+{"id": 73, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11546, "previous_extreme_price": 0.11547, "event_time": "2026-01-16 23:31:04"}
+{"id": 72, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.205, "previous_extreme_price": 5.207, "event_time": "2026-01-16 23:29:50"}
+{"id": 71, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11547, "previous_extreme_price": 0.11548, "event_time": "2026-01-16 23:29:50"}
+{"id": 70, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.207, "previous_extreme_price": 5.214, "event_time": "2026-01-16 23:29:14"}
+{"id": 69, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11548, "previous_extreme_price": 0.11579, "event_time": "2026-01-16 23:29:14"}
+{"id": 68, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.763, "previous_extreme_price": 1.767, "event_time": "2026-01-16 23:29:14"}
+{"id": 67, "symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 12.41, "previous_extreme_price": 12.44, "event_time": "2026-01-16 23:29:14"}
+{"id": 66, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11579, "previous_extreme_price": 0.11586, "event_time": "2026-01-16 23:28:38"}
+{"id": 65, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11586, "previous_extreme_price": 0.11591, "event_time": "2026-01-16 23:26:49"}
+{"id": 64, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.767, "previous_extreme_price": 1.769, "event_time": "2026-01-16 23:22:35"}
+{"id": 63, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.214, "previous_extreme_price": 5.233, "event_time": "2026-01-16 23:21:59"}
+{"id": 62, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11591, "previous_extreme_price": 0.11598, "event_time": "2026-01-16 23:21:59"}
+{"id": 61, "symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 12.44, "previous_extreme_price": 12.46, "event_time": "2026-01-16 23:21:59"}
+{"id": 60, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.769, "previous_extreme_price": 1.771, "event_time": "2026-01-16 23:21:59"}
+{"id": 59, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.233, "previous_extreme_price": 5.236, "event_time": "2026-01-16 23:20:11"}
+{"id": 58, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.771, "previous_extreme_price": 1.773, "event_time": "2026-01-16 23:20:11"}
+{"id": 57, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11598, "previous_extreme_price": 0.11599, "event_time": "2026-01-16 23:20:11"}
+{"id": 56, "symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 12.46, "previous_extreme_price": 12.49, "event_time": "2026-01-16 23:20:11"}
+{"id": 55, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.236, "previous_extreme_price": 5.246, "event_time": "2026-01-16 23:19:34"}
+{"id": 54, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.773, "previous_extreme_price": 1.775, "event_time": "2026-01-16 23:19:34"}
+{"id": 53, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.246, "previous_extreme_price": 5.251, "event_time": "2026-01-16 23:18:58"}
+{"id": 52, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.251, "previous_extreme_price": 5.252, "event_time": "2026-01-16 23:18:22"}
+{"id": 51, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11599, "previous_extreme_price": 0.11601, "event_time": "2026-01-16 23:02:19"}
+{"id": 50, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.252, "previous_extreme_price": 5.262, "event_time": "2026-01-16 21:39:37"}
+{"id": 49, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11601, "previous_extreme_price": 0.11621, "event_time": "2026-01-16 21:39:37"}
+{"id": 48, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.775, "previous_extreme_price": 1.776, "event_time": "2026-01-16 21:39:37"}
+{"id": 47, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.262, "previous_extreme_price": 5.263, "event_time": "2026-01-16 21:39:00"}
+{"id": 46, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11621, "previous_extreme_price": 0.11624, "event_time": "2026-01-16 21:39:00"}
+{"id": 45, "symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 12.49, "previous_extreme_price": 12.5, "event_time": "2026-01-16 21:37:11"}
+{"id": 44, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.776, "previous_extreme_price": 1.778, "event_time": "2026-01-16 21:34:09"}
+{"id": 43, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.263, "previous_extreme_price": 5.265, "event_time": "2026-01-16 21:34:09"}
+{"id": 42, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11624, "previous_extreme_price": 0.11632, "event_time": "2026-01-16 21:34:09"}
+{"id": 41, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11632, "previous_extreme_price": 0.11634, "event_time": "2026-01-16 21:33:33"}
+{"id": 40, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.778, "previous_extreme_price": 1.779, "event_time": "2026-01-16 21:33:33"}
+{"id": 39, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.779, "previous_extreme_price": 1.78, "event_time": "2026-01-16 21:20:11"}
+{"id": 38, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.265, "previous_extreme_price": 5.268, "event_time": "2026-01-16 21:16:35"}
+{"id": 37, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.268, "previous_extreme_price": 5.282, "event_time": "2026-01-16 21:15:58"}
+{"id": 36, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11634, "previous_extreme_price": 0.1164, "event_time": "2026-01-16 21:08:08"}
+{"id": 35, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.1164, "previous_extreme_price": 0.11657, "event_time": "2026-01-16 21:07:32"}
+{"id": 34, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.78, "previous_extreme_price": 1.781, "event_time": "2026-01-16 21:07:32"}
+{"id": 33, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11657, "previous_extreme_price": 0.11658, "event_time": "2026-01-16 21:06:55"}
+{"id": 32, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.781, "previous_extreme_price": 1.783, "event_time": "2026-01-16 20:38:33"}
+{"id": 31, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.783, "previous_extreme_price": 1.784, "event_time": "2026-01-16 20:36:45"}
+{"id": 30, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.784, "previous_extreme_price": 1.785, "event_time": "2026-01-16 20:34:20"}
+{"id": 29, "symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 12.5, "previous_extreme_price": 12.51, "event_time": "2026-01-16 19:15:40"}
+{"id": 28, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11658, "previous_extreme_price": 0.11669, "event_time": "2026-01-16 19:15:03"}
+{"id": 27, "symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 12.51, "previous_extreme_price": 12.52, "event_time": "2026-01-16 18:26:17"}
+{"id": 26, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11669, "previous_extreme_price": 0.11675, "event_time": "2026-01-16 18:17:23"}
+{"id": 25, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11675, "previous_extreme_price": 0.11684, "event_time": "2026-01-16 18:16:48"}
+{"id": 24, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11684, "previous_extreme_price": 0.11692, "event_time": "2026-01-16 18:16:12"}
+{"id": 23, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11692, "previous_extreme_price": 0.11694, "event_time": "2026-01-16 18:15:37"}
+{"id": 22, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11694, "previous_extreme_price": 0.11695, "event_time": "2026-01-16 18:10:53"}
+{"id": 21, "symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 12.52, "previous_extreme_price": 12.53, "event_time": "2026-01-16 17:47:50"}
+{"id": 20, "symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 12.53, "previous_extreme_price": 12.54, "event_time": "2026-01-16 17:46:40"}
+{"id": 19, "symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 12.54, "previous_extreme_price": 12.55, "event_time": "2026-01-16 17:19:29"}
+{"id": 18, "symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 12.55, "previous_extreme_price": 12.56, "event_time": "2026-01-16 15:44:11"}
+{"id": 17, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.785, "previous_extreme_price": 1.789, "event_time": "2026-01-16 13:29:56"}
+{"id": 16, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.282, "previous_extreme_price": 5.289, "event_time": "2026-01-16 13:24:38"}
+{"id": 15, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11695, "previous_extreme_price": 0.11701, "event_time": "2026-01-16 13:24:38"}
+{"id": 14, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11701, "previous_extreme_price": 0.11705, "event_time": "2026-01-16 13:23:27"}
+{"id": 13, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11705, "previous_extreme_price": 0.11708, "event_time": "2026-01-16 13:22:52"}
+{"id": 12, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11708, "previous_extreme_price": 0.11709, "event_time": "2026-01-16 13:22:17"}
+{"id": 11, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.289, "previous_extreme_price": 5.293, "event_time": "2026-01-16 13:16:22"}
+{"id": 10, "symbol": "LTC-USDT-SWAP", "event_type": "new_low", "price": 71.76, "previous_extreme_price": 71.79, "event_time": "2026-01-16 13:16:22"}
+{"id": 9, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11709, "previous_extreme_price": 0.11724, "event_time": "2026-01-16 13:16:22"}
+{"id": 8, "symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 12.56, "previous_extreme_price": 12.57, "event_time": "2026-01-16 13:16:22"}
+{"id": 7, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.789, "previous_extreme_price": 1.791, "event_time": "2026-01-16 13:16:22"}
+{"id": 6, "symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 12.57, "previous_extreme_price": 12.58, "event_time": "2026-01-16 13:14:36"}
+{"id": 5, "symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.293, "previous_extreme_price": 5.37062, "event_time": "2026-01-16 13:14:00"}
+{"id": 4, "symbol": "LTC-USDT-SWAP", "event_type": "new_low", "price": 71.79, "previous_extreme_price": 74.85493, "event_time": "2026-01-16 13:14:00"}
+{"id": 3, "symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11724, "previous_extreme_price": 0.12379, "event_time": "2026-01-16 13:14:00"}
+{"id": 2, "symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 12.58, "previous_extreme_price": 12.67108, "event_time": "2026-01-16 13:14:00"}
+{"id": 1, "symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.791, "previous_extreme_price": 1.81623, "event_time": "2026-01-16 13:14:00"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11416, "previous_extreme_price": 0.11438, "event_time": "2026-01-19 07:29:56"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11412, "previous_extreme_price": 0.11416, "event_time": "2026-01-19 07:30:33"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11398, "previous_extreme_price": 0.11412, "event_time": "2026-01-19 07:34:51"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11393, "previous_extreme_price": 0.11398, "event_time": "2026-01-19 07:35:29"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.1139, "previous_extreme_price": 0.11393, "event_time": "2026-01-19 07:38:33"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11378, "previous_extreme_price": 0.1139, "event_time": "2026-01-19 07:39:10"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11354, "previous_extreme_price": 0.11378, "event_time": "2026-01-19 07:39:47"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11343, "previous_extreme_price": 0.11354, "event_time": "2026-01-19 07:40:24"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11332, "previous_extreme_price": 0.11343, "event_time": "2026-01-19 07:45:59"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11261, "previous_extreme_price": 0.11332, "event_time": "2026-01-19 07:47:13"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.13164, "previous_extreme_price": 0.13187, "event_time": "2026-01-19 07:47:50"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11222, "previous_extreme_price": 0.11261, "event_time": "2026-01-19 07:47:50"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.116, "previous_extreme_price": 5.129, "event_time": "2026-01-19 07:47:50"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_low", "price": 0.2186, "previous_extreme_price": 0.21873, "event_time": "2026-01-19 07:47:50"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.74, "previous_extreme_price": 1.747, "event_time": "2026-01-19 07:48:27"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.13156, "previous_extreme_price": 0.13164, "event_time": "2026-01-19 07:48:27"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.105, "previous_extreme_price": 5.116, "event_time": "2026-01-19 07:48:27"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_low", "price": 0.21832, "previous_extreme_price": 0.2186, "event_time": "2026-01-19 07:48:27"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.1121, "previous_extreme_price": 0.11222, "event_time": "2026-01-19 07:49:04"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_low", "price": 0.21829, "previous_extreme_price": 0.21832, "event_time": "2026-01-19 07:49:04"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.738, "previous_extreme_price": 1.74, "event_time": "2026-01-19 07:53:23"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_low", "price": 0.21821, "previous_extreme_price": 0.21829, "event_time": "2026-01-19 07:53:23"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.737, "previous_extreme_price": 1.738, "event_time": "2026-01-19 07:54:00"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_low", "price": 0.21795, "previous_extreme_price": 0.21821, "event_time": "2026-01-19 07:54:00"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.735, "previous_extreme_price": 1.737, "event_time": "2026-01-19 07:54:37"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_low", "price": 0.21793, "previous_extreme_price": 0.21795, "event_time": "2026-01-19 07:54:37"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.731, "previous_extreme_price": 1.735, "event_time": "2026-01-19 07:55:14"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.73, "previous_extreme_price": 1.731, "event_time": "2026-01-19 07:55:52"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.726, "previous_extreme_price": 1.73, "event_time": "2026-01-19 07:56:28"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11197, "previous_extreme_price": 0.1121, "event_time": "2026-01-19 07:56:28"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.098, "previous_extreme_price": 5.105, "event_time": "2026-01-19 07:56:28"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.721, "previous_extreme_price": 1.726, "event_time": "2026-01-19 07:57:05"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11179, "previous_extreme_price": 0.11197, "event_time": "2026-01-19 07:57:05"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.097, "previous_extreme_price": 5.098, "event_time": "2026-01-19 07:57:05"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.1315, "previous_extreme_price": 0.13156, "event_time": "2026-01-19 07:57:42"}
+{"symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 12.21, "previous_extreme_price": 12.23, "event_time": "2026-01-19 07:57:42"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11161, "previous_extreme_price": 0.11179, "event_time": "2026-01-19 07:57:42"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.096, "previous_extreme_price": 5.097, "event_time": "2026-01-19 07:57:42"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_low", "price": 0.2178, "previous_extreme_price": 0.21793, "event_time": "2026-01-19 07:57:42"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.093, "previous_extreme_price": 5.096, "event_time": "2026-01-19 07:58:57"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.13149, "previous_extreme_price": 0.1315, "event_time": "2026-01-19 07:59:34"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.09, "previous_extreme_price": 5.093, "event_time": "2026-01-19 07:59:34"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.705, "previous_extreme_price": 1.721, "event_time": "2026-01-19 08:00:11"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.1312, "previous_extreme_price": 0.13149, "event_time": "2026-01-19 08:00:11"}
+{"symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 12.16, "previous_extreme_price": 12.21, "event_time": "2026-01-19 08:00:11"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.11106, "previous_extreme_price": 0.11161, "event_time": "2026-01-19 08:00:11"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 5.047, "previous_extreme_price": 5.09, "event_time": "2026-01-19 08:00:11"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_low", "price": 0.21685, "previous_extreme_price": 0.2178, "event_time": "2026-01-19 08:00:11"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.639, "previous_extreme_price": 1.705, "event_time": "2026-01-19 08:00:48"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.12877, "previous_extreme_price": 0.1312, "event_time": "2026-01-19 08:00:48"}
+{"symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 11.89, "previous_extreme_price": 12.16, "event_time": "2026-01-19 08:00:48"}
+{"symbol": "FIL-USDT-SWAP", "event_type": "new_low", "price": 1.357, "previous_extreme_price": 1.42787, "event_time": "2026-01-19 08:00:48"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.10991, "previous_extreme_price": 0.11106, "event_time": "2026-01-19 08:00:48"}
+{"symbol": "LTC-USDT-SWAP", "event_type": "new_low", "price": 70.58, "previous_extreme_price": 71.09, "event_time": "2026-01-19 08:00:48"}
+{"symbol": "NEAR-USDT-SWAP", "event_type": "new_low", "price": 1.569, "previous_extreme_price": 1.59283, "event_time": "2026-01-19 08:00:48"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 4.953, "previous_extreme_price": 5.047, "event_time": "2026-01-19 08:00:48"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_low", "price": 0.21165, "previous_extreme_price": 0.21685, "event_time": "2026-01-19 08:00:48"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.12714, "previous_extreme_price": 0.12877, "event_time": "2026-01-19 08:01:25"}
+{"symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 11.8, "previous_extreme_price": 11.89, "event_time": "2026-01-19 08:01:25"}
+{"symbol": "FIL-USDT-SWAP", "event_type": "new_low", "price": 1.344, "previous_extreme_price": 1.357, "event_time": "2026-01-19 08:01:25"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.10936, "previous_extreme_price": 0.10991, "event_time": "2026-01-19 08:01:25"}
+{"symbol": "LTC-USDT-SWAP", "event_type": "new_low", "price": 70.26, "previous_extreme_price": 70.58, "event_time": "2026-01-19 08:01:25"}
+{"symbol": "TAO-USDT-SWAP", "event_type": "new_low", "price": 254.8, "previous_extreme_price": 255.50563, "event_time": "2026-01-19 08:00:48"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_low", "price": 0.21044, "previous_extreme_price": 0.21165, "event_time": "2026-01-19 08:01:25"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.595, "previous_extreme_price": 1.639, "event_time": "2026-01-19 08:01:25"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.12247, "previous_extreme_price": 0.12714, "event_time": "2026-01-19 08:02:02"}
+{"symbol": "DOT-USDT-SWAP", "event_type": "new_low", "price": 1.943, "previous_extreme_price": 1.97723, "event_time": "2026-01-19 08:01:25"}
+{"symbol": "LDO-USDT-SWAP", "event_type": "new_low", "price": 0.529, "previous_extreme_price": 0.55338, "event_time": "2026-01-19 08:01:25"}
+{"symbol": "LTC-USDT-SWAP", "event_type": "new_low", "price": 67.88, "previous_extreme_price": 70.26, "event_time": "2026-01-19 08:02:02"}
+{"symbol": "NEAR-USDT-SWAP", "event_type": "new_low", "price": 1.528, "previous_extreme_price": 1.569, "event_time": "2026-01-19 08:01:25"}
+{"symbol": "TAO-USDT-SWAP", "event_type": "new_low", "price": 243.3, "previous_extreme_price": 254.8, "event_time": "2026-01-19 08:01:25"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 4.817, "previous_extreme_price": 4.953, "event_time": "2026-01-19 08:01:25"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.594, "previous_extreme_price": 1.595, "event_time": "2026-01-19 08:02:02"}
+{"symbol": "DOT-USDT-SWAP", "event_type": "new_low", "price": 1.921, "previous_extreme_price": 1.943, "event_time": "2026-01-19 08:02:02"}
+{"symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 11.47, "previous_extreme_price": 11.8, "event_time": "2026-01-19 08:02:02"}
+{"symbol": "FIL-USDT-SWAP", "event_type": "new_low", "price": 1.3, "previous_extreme_price": 1.344, "event_time": "2026-01-19 08:02:02"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.10602, "previous_extreme_price": 0.10936, "event_time": "2026-01-19 08:02:02"}
+{"symbol": "NEAR-USDT-SWAP", "event_type": "new_low", "price": 1.519, "previous_extreme_price": 1.528, "event_time": "2026-01-19 08:02:02"}
+{"symbol": "TAO-USDT-SWAP", "event_type": "new_low", "price": 241.9, "previous_extreme_price": 243.3, "event_time": "2026-01-19 08:02:02"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_low", "price": 0.20831, "previous_extreme_price": 0.21044, "event_time": "2026-01-19 08:02:02"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.539, "previous_extreme_price": 1.594, "event_time": "2026-01-19 08:02:39"}
+{"symbol": "CRV-USDT-SWAP", "event_type": "new_low", "price": 0.361, "previous_extreme_price": 0.36473, "event_time": "2026-01-19 08:02:39"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.12237, "previous_extreme_price": 0.12247, "event_time": "2026-01-19 08:02:39"}
+{"symbol": "DOT-USDT-SWAP", "event_type": "new_low", "price": 1.843, "previous_extreme_price": 1.921, "event_time": "2026-01-19 08:02:39"}
+{"symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 11.17, "previous_extreme_price": 11.47, "event_time": "2026-01-19 08:02:39"}
+{"symbol": "FIL-USDT-SWAP", "event_type": "new_low", "price": 1.264, "previous_extreme_price": 1.3, "event_time": "2026-01-19 08:02:39"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.10302, "previous_extreme_price": 0.10602, "event_time": "2026-01-19 08:02:39"}
+{"symbol": "LDO-USDT-SWAP", "event_type": "new_low", "price": 0.5239, "previous_extreme_price": 0.529, "event_time": "2026-01-19 08:02:39"}
+{"symbol": "LTC-USDT-SWAP", "event_type": "new_low", "price": 67.24, "previous_extreme_price": 67.88, "event_time": "2026-01-19 08:02:39"}
+{"symbol": "NEAR-USDT-SWAP", "event_type": "new_low", "price": 1.468, "previous_extreme_price": 1.519, "event_time": "2026-01-19 08:02:39"}
+{"symbol": "TAO-USDT-SWAP", "event_type": "new_low", "price": 236.8, "previous_extreme_price": 241.9, "event_time": "2026-01-19 08:02:39"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 4.633, "previous_extreme_price": 4.817, "event_time": "2026-01-19 08:02:39"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_low", "price": 0.20293, "previous_extreme_price": 0.20831, "event_time": "2026-01-19 08:02:39"}
+{"symbol": "BTC-USDT-SWAP", "event_type": "new_high", "price": 76748.4, "previous_extreme_price": 76706.0, "event_time": "2026-02-04 12:11:30"}
+{"symbol": "ETH-USDT-SWAP", "event_type": "new_high", "price": 2285.73, "previous_extreme_price": 2285.19, "event_time": "2026-02-04 12:11:30"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_high", "price": 1.6006, "previous_extreme_price": 1.5998, "event_time": "2026-02-04 12:11:30"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_high", "price": 99.13, "previous_extreme_price": 99.03, "event_time": "2026-02-04 12:11:31"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_high", "price": 762.5, "previous_extreme_price": 762.0, "event_time": "2026-02-04 12:11:31"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_high", "price": 0.10894, "previous_extreme_price": 0.10886, "event_time": "2026-02-04 12:11:31"}
+{"symbol": "LINK-USDT-SWAP", "event_type": "new_high", "price": 9.742, "previous_extreme_price": 9.731, "event_time": "2026-02-04 12:11:32"}
+{"symbol": "DOT-USDT-SWAP", "event_type": "new_high", "price": 1.527, "previous_extreme_price": 1.526, "event_time": "2026-02-04 12:11:32"}
+{"symbol": "LTC-USDT-SWAP", "event_type": "new_high", "price": 60.8, "previous_extreme_price": 60.73, "event_time": "2026-02-04 12:11:32"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_high", "price": 3.947, "previous_extreme_price": 3.944, "event_time": "2026-02-04 12:11:33"}
+{"symbol": "ETC-USDT-SWAP", "event_type": "new_high", "price": 9.73, "previous_extreme_price": 9.72, "event_time": "2026-02-04 12:11:34"}
+{"symbol": "CRV-USDT-SWAP", "event_type": "new_high", "price": 0.2848, "previous_extreme_price": 0.2847, "event_time": "2026-02-04 12:11:34"}
+{"symbol": "CRO-USDT-SWAP", "event_type": "new_high", "price": 0.08364, "previous_extreme_price": 0.08354, "event_time": "2026-02-04 12:11:34"}
+{"symbol": "BCH-USDT-SWAP", "event_type": "new_high", "price": 533.2, "previous_extreme_price": 533.1, "event_time": "2026-02-04 12:11:34"}
+{"symbol": "SUI-USDT-SWAP", "event_type": "new_high", "price": 1.1297, "previous_extreme_price": 1.1293, "event_time": "2026-02-04 12:11:35"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_high", "price": 0.17786, "previous_extreme_price": 0.17775, "event_time": "2026-02-04 12:11:35"}
+{"symbol": "OKB-USDT-SWAP", "event_type": "new_high", "price": 86.43, "previous_extreme_price": 86.41, "event_time": "2026-02-04 12:11:35"}
+{"symbol": "ADA-USDT-SWAP", "event_type": "new_high", "price": 0.3018, "previous_extreme_price": 0.3015, "event_time": "2026-02-04 12:11:36"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_high", "price": 0.09151, "previous_extreme_price": 0.09143, "event_time": "2026-02-04 12:11:36"}
+{"symbol": "CFX-USDT-SWAP", "event_type": "new_high", "price": 0.05644, "previous_extreme_price": 0.05638, "event_time": "2026-02-04 12:11:36"}
+{"symbol": "AAVE-USDT-SWAP", "event_type": "new_high", "price": 128.08, "previous_extreme_price": 127.96, "event_time": "2026-02-04 12:11:37"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_high", "price": 0.3013, "previous_extreme_price": 0.3007, "event_time": "2026-02-04 12:11:37"}
+{"symbol": "TAO-USDT-SWAP", "event_type": "new_high", "price": 197.5, "previous_extreme_price": 197.4, "event_time": "2026-02-04 12:11:37"}
+{"symbol": "LDO-USDT-SWAP", "event_type": "new_high", "price": 0.4187, "previous_extreme_price": 0.4183, "event_time": "2026-02-04 12:11:38"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_high", "price": 0.10896, "previous_extreme_price": 0.10894, "event_time": "2026-02-04 12:12:30"}
+{"symbol": "LTC-USDT-SWAP", "event_type": "new_high", "price": 60.81, "previous_extreme_price": 60.8, "event_time": "2026-02-04 12:12:30"}
+{"symbol": "NEAR-USDT-SWAP", "event_type": "new_high", "price": 1.2, "previous_extreme_price": 1.199, "event_time": "2026-02-04 12:12:31"}
+{"symbol": "OKB-USDT-SWAP", "event_type": "new_low", "price": 86.35, "previous_extreme_price": 86.41, "event_time": "2026-02-04 12:12:33"}
+{"symbol": "TON-USDT-SWAP", "event_type": "new_high", "price": 1.399, "previous_extreme_price": 1.398, "event_time": "2026-02-04 12:12:34"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_high", "price": 1.27, "previous_extreme_price": 1.269, "event_time": "2026-02-04 12:12:34"}
+{"symbol": "AAVE-USDT-SWAP", "event_type": "new_high", "price": 128.09, "previous_extreme_price": 128.08, "event_time": "2026-02-04 12:12:35"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_high", "price": 0.3014, "previous_extreme_price": 0.3013, "event_time": "2026-02-04 12:12:35"}
+{"symbol": "LDO-USDT-SWAP", "event_type": "new_high", "price": 0.4188, "previous_extreme_price": 0.4187, "event_time": "2026-02-04 12:12:35"}
+{"symbol": "LINK-USDT-SWAP", "event_type": "new_high", "price": 9.743, "previous_extreme_price": 9.742, "event_time": "2026-02-04 12:13:37"}
+{"symbol": "DOT-USDT-SWAP", "event_type": "new_high", "price": 1.528, "previous_extreme_price": 1.527, "event_time": "2026-02-04 12:13:37"}
+{"symbol": "LTC-USDT-SWAP", "event_type": "new_high", "price": 60.86, "previous_extreme_price": 60.81, "event_time": "2026-02-04 12:13:38"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_high", "price": 3.948, "previous_extreme_price": 3.947, "event_time": "2026-02-04 12:13:38"}
+{"symbol": "CRV-USDT-SWAP", "event_type": "new_high", "price": 0.2849, "previous_extreme_price": 0.2848, "event_time": "2026-02-04 12:13:39"}
+{"symbol": "CRO-USDT-SWAP", "event_type": "new_high", "price": 0.08365, "previous_extreme_price": 0.08364, "event_time": "2026-02-04 12:13:39"}
+{"symbol": "BCH-USDT-SWAP", "event_type": "new_high", "price": 533.4, "previous_extreme_price": 533.2, "event_time": "2026-02-04 12:13:39"}
+{"symbol": "TRX-USDT-SWAP", "event_type": "new_high", "price": 0.28699, "previous_extreme_price": 0.28689, "event_time": "2026-02-04 12:13:40"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_high", "price": 0.17787, "previous_extreme_price": 0.17786, "event_time": "2026-02-04 12:13:40"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_high", "price": 0.09152, "previous_extreme_price": 0.09151, "event_time": "2026-02-04 12:13:41"}
+{"symbol": "TON-USDT-SWAP", "event_type": "new_high", "price": 1.4, "previous_extreme_price": 1.399, "event_time": "2026-02-04 12:13:41"}
+{"symbol": "CFX-USDT-SWAP", "event_type": "new_high", "price": 0.05647, "previous_extreme_price": 0.05644, "event_time": "2026-02-04 12:13:41"}
+{"symbol": "AAVE-USDT-SWAP", "event_type": "new_high", "price": 128.12, "previous_extreme_price": 128.09, "event_time": "2026-02-04 12:13:42"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_high", "price": 0.3016, "previous_extreme_price": 0.3014, "event_time": "2026-02-04 12:13:42"}
+{"symbol": "TAO-USDT-SWAP", "event_type": "new_high", "price": 197.6, "previous_extreme_price": 197.5, "event_time": "2026-02-04 12:13:42"}
+{"symbol": "LDO-USDT-SWAP", "event_type": "new_high", "price": 0.4189, "previous_extreme_price": 0.4188, "event_time": "2026-02-04 12:13:43"}
+{"symbol": "BTC-USDT-SWAP", "event_type": "new_low", "price": 76649.4, "previous_extreme_price": 76706.0, "event_time": "2026-02-04 12:14:43"}
+{"symbol": "ETH-USDT-SWAP", "event_type": "new_low", "price": 2282.38, "previous_extreme_price": 2285.19, "event_time": "2026-02-04 12:14:43"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.5984, "previous_extreme_price": 1.5998, "event_time": "2026-02-04 12:14:43"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 98.99, "previous_extreme_price": 99.03, "event_time": "2026-02-04 12:14:44"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 761.5, "previous_extreme_price": 762.0, "event_time": "2026-02-04 12:14:44"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.1088, "previous_extreme_price": 0.10886, "event_time": "2026-02-04 12:14:44"}
+{"symbol": "LINK-USDT-SWAP", "event_type": "new_low", "price": 9.73, "previous_extreme_price": 9.731, "event_time": "2026-02-04 12:14:44"}
+{"symbol": "NEAR-USDT-SWAP", "event_type": "new_low", "price": 1.198, "previous_extreme_price": 1.199, "event_time": "2026-02-04 12:14:45"}
+{"symbol": "CRV-USDT-SWAP", "event_type": "new_low", "price": 0.2846, "previous_extreme_price": 0.2847, "event_time": "2026-02-04 12:14:46"}
+{"symbol": "CRO-USDT-SWAP", "event_type": "new_low", "price": 0.08352, "previous_extreme_price": 0.08354, "event_time": "2026-02-04 12:14:46"}
+{"symbol": "BCH-USDT-SWAP", "event_type": "new_low", "price": 532.9, "previous_extreme_price": 533.1, "event_time": "2026-02-04 12:14:47"}
+{"symbol": "SUI-USDT-SWAP", "event_type": "new_low", "price": 1.1292, "previous_extreme_price": 1.1293, "event_time": "2026-02-04 12:14:47"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_low", "price": 0.17774, "previous_extreme_price": 0.17775, "event_time": "2026-02-04 12:14:47"}
+{"symbol": "ADA-USDT-SWAP", "event_type": "new_low", "price": 0.3014, "previous_extreme_price": 0.3015, "event_time": "2026-02-04 12:14:48"}
+{"symbol": "BTC-USDT-SWAP", "event_type": "new_low", "price": 76679.3, "previous_extreme_price": 76706.0, "event_time": "2026-02-04 12:14:55"}
+{"symbol": "ETH-USDT-SWAP", "event_type": "new_low", "price": 2283.16, "previous_extreme_price": 2285.19, "event_time": "2026-02-04 12:14:55"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.5997, "previous_extreme_price": 1.5998, "event_time": "2026-02-04 12:14:56"}
+{"symbol": "FIL-USDT-SWAP", "event_type": "new_high", "price": 1.091, "previous_extreme_price": 1.09, "event_time": "2026-02-04 12:14:59"}
+{"symbol": "CRO-USDT-SWAP", "event_type": "new_low", "price": 0.08352, "previous_extreme_price": 0.08354, "event_time": "2026-02-04 12:15:00"}
+{"symbol": "SUI-USDT-SWAP", "event_type": "new_high", "price": 1.1303, "previous_extreme_price": 1.1297, "event_time": "2026-02-04 12:15:00"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_high", "price": 0.17788, "previous_extreme_price": 0.17787, "event_time": "2026-02-04 12:15:03"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_high", "price": 0.09156, "previous_extreme_price": 0.09152, "event_time": "2026-02-04 12:15:04"}
+{"symbol": "TON-USDT-SWAP", "event_type": "new_high", "price": 1.401, "previous_extreme_price": 1.4, "event_time": "2026-02-04 12:15:04"}
+{"symbol": "CFX-USDT-SWAP", "event_type": "new_high", "price": 0.05649, "previous_extreme_price": 0.05647, "event_time": "2026-02-04 12:15:04"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_high", "price": 1.271, "previous_extreme_price": 1.27, "event_time": "2026-02-04 12:15:05"}
+{"symbol": "AAVE-USDT-SWAP", "event_type": "new_high", "price": 128.14, "previous_extreme_price": 128.12, "event_time": "2026-02-04 12:15:05"}
+{"symbol": "LDO-USDT-SWAP", "event_type": "new_high", "price": 0.419, "previous_extreme_price": 0.4189, "event_time": "2026-02-04 12:15:06"}
+{"symbol": "BTC-USDT-SWAP", "event_type": "new_low", "price": 76620.1, "previous_extreme_price": 76679.3, "event_time": "2026-02-04 12:16:06"}
+{"symbol": "ETH-USDT-SWAP", "event_type": "new_low", "price": 2281.39, "previous_extreme_price": 2283.16, "event_time": "2026-02-04 12:16:06"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.5992, "previous_extreme_price": 1.5997, "event_time": "2026-02-04 12:16:07"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 98.97, "previous_extreme_price": 99.03, "event_time": "2026-02-04 12:16:07"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 761.4, "previous_extreme_price": 762.0, "event_time": "2026-02-04 12:16:07"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.10875, "previous_extreme_price": 0.10886, "event_time": "2026-02-04 12:16:07"}
+{"symbol": "LINK-USDT-SWAP", "event_type": "new_low", "price": 9.724, "previous_extreme_price": 9.731, "event_time": "2026-02-04 12:16:08"}
+{"symbol": "NEAR-USDT-SWAP", "event_type": "new_low", "price": 1.198, "previous_extreme_price": 1.199, "event_time": "2026-02-04 12:16:09"}
+{"symbol": "CRV-USDT-SWAP", "event_type": "new_low", "price": 0.2845, "previous_extreme_price": 0.2847, "event_time": "2026-02-04 12:16:09"}
+{"symbol": "CRO-USDT-SWAP", "event_type": "new_low", "price": 0.08344, "previous_extreme_price": 0.08352, "event_time": "2026-02-04 12:16:10"}
+{"symbol": "BCH-USDT-SWAP", "event_type": "new_low", "price": 532.7, "previous_extreme_price": 533.1, "event_time": "2026-02-04 12:16:10"}
+{"symbol": "SUI-USDT-SWAP", "event_type": "new_low", "price": 1.1284, "previous_extreme_price": 1.1293, "event_time": "2026-02-04 12:16:10"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_low", "price": 0.17762, "previous_extreme_price": 0.17775, "event_time": "2026-02-04 12:16:11"}
+{"symbol": "OKB-USDT-SWAP", "event_type": "new_low", "price": 86.3, "previous_extreme_price": 86.35, "event_time": "2026-02-04 12:16:11"}
+{"symbol": "ADA-USDT-SWAP", "event_type": "new_low", "price": 0.3012, "previous_extreme_price": 0.3015, "event_time": "2026-02-04 12:16:11"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.09138, "previous_extreme_price": 0.09143, "event_time": "2026-02-04 12:16:11"}
+{"symbol": "TON-USDT-SWAP", "event_type": "new_low", "price": 1.397, "previous_extreme_price": 1.398, "event_time": "2026-02-04 12:16:12"}
+{"symbol": "AAVE-USDT-SWAP", "event_type": "new_low", "price": 127.83, "previous_extreme_price": 127.96, "event_time": "2026-02-04 12:16:12"}
+{"symbol": "TAO-USDT-SWAP", "event_type": "new_low", "price": 197.3, "previous_extreme_price": 197.4, "event_time": "2026-02-04 12:16:13"}
+{"symbol": "LDO-USDT-SWAP", "event_type": "new_low", "price": 0.418, "previous_extreme_price": 0.4183, "event_time": "2026-02-04 12:16:13"}
+{"symbol": "BTC-USDT-SWAP", "event_type": "new_low", "price": 76584.6, "previous_extreme_price": 76620.1, "event_time": "2026-02-04 12:17:13"}
+{"symbol": "ETH-USDT-SWAP", "event_type": "new_low", "price": 2280.13, "previous_extreme_price": 2281.39, "event_time": "2026-02-04 12:17:13"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.5989, "previous_extreme_price": 1.5992, "event_time": "2026-02-04 12:17:14"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 98.91, "previous_extreme_price": 98.97, "event_time": "2026-02-04 12:17:14"}
+{"symbol": "LINK-USDT-SWAP", "event_type": "new_low", "price": 9.723, "previous_extreme_price": 9.724, "event_time": "2026-02-04 12:17:15"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 3.943, "previous_extreme_price": 3.944, "event_time": "2026-02-04 12:17:15"}
+{"symbol": "LINK-USDT-SWAP", "event_type": "new_low", "price": 9.722, "previous_extreme_price": 9.723, "event_time": "2026-02-04 12:18:22"}
+{"symbol": "ADA-USDT-SWAP", "event_type": "new_low", "price": 0.3009, "previous_extreme_price": 0.3012, "event_time": "2026-02-04 12:18:25"}
+{"symbol": "ETH-USDT-SWAP", "event_type": "new_low", "price": 2280.1, "previous_extreme_price": 2280.13, "event_time": "2026-02-04 12:19:28"}
+{"symbol": "LINK-USDT-SWAP", "event_type": "new_low", "price": 9.718, "previous_extreme_price": 9.722, "event_time": "2026-02-04 12:19:29"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 3.942, "previous_extreme_price": 3.943, "event_time": "2026-02-04 12:19:30"}
+{"symbol": "FIL-USDT-SWAP", "event_type": "new_low", "price": 1.089, "previous_extreme_price": 1.09, "event_time": "2026-02-04 12:19:31"}
+{"symbol": "CRV-USDT-SWAP", "event_type": "new_low", "price": 0.2843, "previous_extreme_price": 0.2845, "event_time": "2026-02-04 12:19:31"}
+{"symbol": "SUI-USDT-SWAP", "event_type": "new_low", "price": 1.1283, "previous_extreme_price": 1.1284, "event_time": "2026-02-04 12:19:32"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_low", "price": 0.3002, "previous_extreme_price": 0.3007, "event_time": "2026-02-04 12:19:34"}
+{"symbol": "ETC-USDT-SWAP", "event_type": "new_high", "price": 9.74, "previous_extreme_price": 9.73, "event_time": "2026-02-04 12:20:40"}
+{"symbol": "CFX-USDT-SWAP", "event_type": "new_high", "price": 0.0565, "previous_extreme_price": 0.05649, "event_time": "2026-02-04 12:20:43"}
+{"symbol": "ETH-USDT-SWAP", "event_type": "new_low", "price": 2279.4, "previous_extreme_price": 2280.1, "event_time": "2026-02-04 12:21:44"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 98.85, "previous_extreme_price": 98.91, "event_time": "2026-02-04 12:21:45"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 761.1, "previous_extreme_price": 761.4, "event_time": "2026-02-04 12:21:45"}
+{"symbol": "DOT-USDT-SWAP", "event_type": "new_low", "price": 1.525, "previous_extreme_price": 1.526, "event_time": "2026-02-04 12:21:46"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 3.941, "previous_extreme_price": 3.942, "event_time": "2026-02-04 12:21:46"}
+{"symbol": "NEAR-USDT-SWAP", "event_type": "new_low", "price": 1.197, "previous_extreme_price": 1.198, "event_time": "2026-02-04 12:21:47"}
+{"symbol": "CRV-USDT-SWAP", "event_type": "new_low", "price": 0.2841, "previous_extreme_price": 0.2843, "event_time": "2026-02-04 12:21:47"}
+{"symbol": "BCH-USDT-SWAP", "event_type": "new_low", "price": 532.5, "previous_extreme_price": 532.7, "event_time": "2026-02-04 12:21:48"}
+{"symbol": "SUI-USDT-SWAP", "event_type": "new_low", "price": 1.1269, "previous_extreme_price": 1.1283, "event_time": "2026-02-04 12:21:48"}
+{"symbol": "ADA-USDT-SWAP", "event_type": "new_low", "price": 0.3008, "previous_extreme_price": 0.3009, "event_time": "2026-02-04 12:22:57"}
+{"symbol": "ADA-USDT-SWAP", "event_type": "new_low", "price": 0.3006, "previous_extreme_price": 0.3008, "event_time": "2026-02-04 12:24:04"}
+{"symbol": "CFX-USDT-SWAP", "event_type": "new_high", "price": 0.05653, "previous_extreme_price": 0.0565, "event_time": "2026-02-04 12:24:05"}
+{"symbol": "TAO-USDT-SWAP", "event_type": "new_low", "price": 197.2, "previous_extreme_price": 197.3, "event_time": "2026-02-04 12:24:06"}
+{"symbol": "BTC-USDT-SWAP", "event_type": "new_low", "price": 76566.2, "previous_extreme_price": 76584.6, "event_time": "2026-02-04 12:25:07"}
+{"symbol": "ETH-USDT-SWAP", "event_type": "new_low", "price": 2276.31, "previous_extreme_price": 2279.4, "event_time": "2026-02-04 12:25:07"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.5965, "previous_extreme_price": 1.5989, "event_time": "2026-02-04 12:25:07"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 98.76, "previous_extreme_price": 98.85, "event_time": "2026-02-04 12:25:08"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 760.6, "previous_extreme_price": 761.1, "event_time": "2026-02-04 12:25:08"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.10871, "previous_extreme_price": 0.10875, "event_time": "2026-02-04 12:25:08"}
+{"symbol": "LINK-USDT-SWAP", "event_type": "new_low", "price": 9.703, "previous_extreme_price": 9.718, "event_time": "2026-02-04 12:25:08"}
+{"symbol": "DOT-USDT-SWAP", "event_type": "new_low", "price": 1.523, "previous_extreme_price": 1.525, "event_time": "2026-02-04 12:25:09"}
+{"symbol": "LTC-USDT-SWAP", "event_type": "new_low", "price": 60.7, "previous_extreme_price": 60.73, "event_time": "2026-02-04 12:25:09"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 3.938, "previous_extreme_price": 3.941, "event_time": "2026-02-04 12:25:09"}
+{"symbol": "NEAR-USDT-SWAP", "event_type": "new_low", "price": 1.196, "previous_extreme_price": 1.197, "event_time": "2026-02-04 12:25:09"}
+{"symbol": "CRO-USDT-SWAP", "event_type": "new_low", "price": 0.08341, "previous_extreme_price": 0.08344, "event_time": "2026-02-04 12:25:10"}
+{"symbol": "SUI-USDT-SWAP", "event_type": "new_low", "price": 1.1264, "previous_extreme_price": 1.1269, "event_time": "2026-02-04 12:25:11"}
+{"symbol": "TRX-USDT-SWAP", "event_type": "new_low", "price": 0.28683, "previous_extreme_price": 0.28689, "event_time": "2026-02-04 12:25:11"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_low", "price": 0.17757, "previous_extreme_price": 0.17762, "event_time": "2026-02-04 12:25:11"}
+{"symbol": "OKB-USDT-SWAP", "event_type": "new_low", "price": 86.23, "previous_extreme_price": 86.3, "event_time": "2026-02-04 12:25:12"}
+{"symbol": "ADA-USDT-SWAP", "event_type": "new_low", "price": 0.3, "previous_extreme_price": 0.3006, "event_time": "2026-02-04 12:25:12"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.09133, "previous_extreme_price": 0.09138, "event_time": "2026-02-04 12:25:13"}
+{"symbol": "AAVE-USDT-SWAP", "event_type": "new_low", "price": 127.77, "previous_extreme_price": 127.83, "event_time": "2026-02-04 12:25:14"}
+{"symbol": "TAO-USDT-SWAP", "event_type": "new_low", "price": 196.9, "previous_extreme_price": 197.2, "event_time": "2026-02-04 12:25:14"}
+{"symbol": "ETH-USDT-SWAP", "event_type": "new_low", "price": 2276.12, "previous_extreme_price": 2276.31, "event_time": "2026-02-04 12:26:15"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.5964, "previous_extreme_price": 1.5965, "event_time": "2026-02-04 12:26:15"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 98.72, "previous_extreme_price": 98.76, "event_time": "2026-02-04 12:26:16"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 760.4, "previous_extreme_price": 760.6, "event_time": "2026-02-04 12:26:16"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.10868, "previous_extreme_price": 0.10871, "event_time": "2026-02-04 12:26:16"}
+{"symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 9.71, "previous_extreme_price": 9.72, "event_time": "2026-02-04 12:26:18"}
+{"symbol": "BCH-USDT-SWAP", "event_type": "new_low", "price": 532.0, "previous_extreme_price": 532.5, "event_time": "2026-02-04 12:26:19"}
+{"symbol": "SUI-USDT-SWAP", "event_type": "new_low", "price": 1.1262, "previous_extreme_price": 1.1264, "event_time": "2026-02-04 12:26:19"}
+{"symbol": "OKB-USDT-SWAP", "event_type": "new_low", "price": 86.19, "previous_extreme_price": 86.23, "event_time": "2026-02-04 12:26:20"}
+{"symbol": "AAVE-USDT-SWAP", "event_type": "new_low", "price": 127.76, "previous_extreme_price": 127.77, "event_time": "2026-02-04 12:26:21"}
+{"symbol": "BTC-USDT-SWAP", "event_type": "new_low", "price": 76541.0, "previous_extreme_price": 76566.2, "event_time": "2026-02-04 12:27:23"}
+{"symbol": "ETH-USDT-SWAP", "event_type": "new_low", "price": 2275.25, "previous_extreme_price": 2276.12, "event_time": "2026-02-04 12:27:23"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 98.68, "previous_extreme_price": 98.72, "event_time": "2026-02-04 12:27:23"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 760.3, "previous_extreme_price": 760.4, "event_time": "2026-02-04 12:27:24"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.10865, "previous_extreme_price": 0.10868, "event_time": "2026-02-04 12:27:24"}
+{"symbol": "LINK-USDT-SWAP", "event_type": "new_low", "price": 9.699, "previous_extreme_price": 9.703, "event_time": "2026-02-04 12:27:24"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 3.937, "previous_extreme_price": 3.938, "event_time": "2026-02-04 12:27:25"}
+{"symbol": "SUI-USDT-SWAP", "event_type": "new_low", "price": 1.1256, "previous_extreme_price": 1.1262, "event_time": "2026-02-04 12:27:27"}
+{"symbol": "AAVE-USDT-SWAP", "event_type": "new_low", "price": 127.74, "previous_extreme_price": 127.76, "event_time": "2026-02-04 12:27:29"}
+{"symbol": "TAO-USDT-SWAP", "event_type": "new_low", "price": 196.8, "previous_extreme_price": 196.9, "event_time": "2026-02-04 12:27:29"}
+{"symbol": "CFX-USDT-SWAP", "event_type": "new_high", "price": 0.05654, "previous_extreme_price": 0.05653, "event_time": "2026-02-04 12:28:35"}
+{"symbol": "BTC-USDT-SWAP", "event_type": "new_low", "price": 76524.5, "previous_extreme_price": 76541.0, "event_time": "2026-02-04 12:29:37"}
+{"symbol": "ETH-USDT-SWAP", "event_type": "new_low", "price": 2272.9, "previous_extreme_price": 2275.25, "event_time": "2026-02-04 12:29:37"}
+{"symbol": "LINK-USDT-SWAP", "event_type": "new_low", "price": 9.693, "previous_extreme_price": 9.699, "event_time": "2026-02-04 12:29:38"}
+{"symbol": "LTC-USDT-SWAP", "event_type": "new_low", "price": 60.68, "previous_extreme_price": 60.7, "event_time": "2026-02-04 12:29:39"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 3.934, "previous_extreme_price": 3.937, "event_time": "2026-02-04 12:29:39"}
+{"symbol": "FIL-USDT-SWAP", "event_type": "new_low", "price": 1.088, "previous_extreme_price": 1.089, "event_time": "2026-02-04 12:29:40"}
+{"symbol": "CRO-USDT-SWAP", "event_type": "new_low", "price": 0.08325, "previous_extreme_price": 0.08341, "event_time": "2026-02-04 12:29:40"}
+{"symbol": "BCH-USDT-SWAP", "event_type": "new_low", "price": 531.9, "previous_extreme_price": 532.0, "event_time": "2026-02-04 12:29:41"}
+{"symbol": "TRX-USDT-SWAP", "event_type": "new_low", "price": 0.28678, "previous_extreme_price": 0.28683, "event_time": "2026-02-04 12:29:41"}
+{"symbol": "OKB-USDT-SWAP", "event_type": "new_low", "price": 86.15, "previous_extreme_price": 86.19, "event_time": "2026-02-04 12:29:42"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.09132, "previous_extreme_price": 0.09133, "event_time": "2026-02-04 12:29:42"}
+{"symbol": "AAVE-USDT-SWAP", "event_type": "new_low", "price": 127.71, "previous_extreme_price": 127.74, "event_time": "2026-02-04 12:29:43"}
+{"symbol": "TAO-USDT-SWAP", "event_type": "new_low", "price": 196.7, "previous_extreme_price": 196.8, "event_time": "2026-02-04 12:29:44"}
+{"symbol": "LDO-USDT-SWAP", "event_type": "new_low", "price": 0.4179, "previous_extreme_price": 0.418, "event_time": "2026-02-04 12:29:44"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.10861, "previous_extreme_price": 0.10865, "event_time": "2026-02-04 12:30:46"}
+{"symbol": "CRV-USDT-SWAP", "event_type": "new_low", "price": 0.284, "previous_extreme_price": 0.2841, "event_time": "2026-02-04 12:30:59"}
+{"symbol": "CRO-USDT-SWAP", "event_type": "new_low", "price": 0.08321, "previous_extreme_price": 0.08325, "event_time": "2026-02-04 12:30:59"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.268, "previous_extreme_price": 1.269, "event_time": "2026-02-04 12:31:02"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.10858, "previous_extreme_price": 0.10861, "event_time": "2026-02-04 12:32:04"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 3.933, "previous_extreme_price": 3.934, "event_time": "2026-02-04 12:32:05"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.267, "previous_extreme_price": 1.268, "event_time": "2026-02-04 12:32:09"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.10853, "previous_extreme_price": 0.10858, "event_time": "2026-02-04 12:33:12"}
+{"symbol": "NEAR-USDT-SWAP", "event_type": "new_low", "price": 1.195, "previous_extreme_price": 1.196, "event_time": "2026-02-04 12:33:13"}
+{"symbol": "BCH-USDT-SWAP", "event_type": "new_low", "price": 531.5, "previous_extreme_price": 531.9, "event_time": "2026-02-04 12:33:14"}
+{"symbol": "ADA-USDT-SWAP", "event_type": "new_low", "price": 0.2999, "previous_extreme_price": 0.3, "event_time": "2026-02-04 12:33:16"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.266, "previous_extreme_price": 1.267, "event_time": "2026-02-04 12:33:17"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_low", "price": 0.3001, "previous_extreme_price": 0.3002, "event_time": "2026-02-04 12:33:18"}
+{"symbol": "TAO-USDT-SWAP", "event_type": "new_low", "price": 196.6, "previous_extreme_price": 196.7, "event_time": "2026-02-04 12:33:18"}
+{"symbol": "DOT-USDT-SWAP", "event_type": "new_low", "price": 1.522, "previous_extreme_price": 1.523, "event_time": "2026-02-04 12:34:20"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 3.932, "previous_extreme_price": 3.933, "event_time": "2026-02-04 12:34:21"}
+{"symbol": "CRV-USDT-SWAP", "event_type": "new_low", "price": 0.2838, "previous_extreme_price": 0.284, "event_time": "2026-02-04 12:34:22"}
+{"symbol": "BCH-USDT-SWAP", "event_type": "new_low", "price": 531.4, "previous_extreme_price": 531.5, "event_time": "2026-02-04 12:34:22"}
+{"symbol": "SUI-USDT-SWAP", "event_type": "new_low", "price": 1.1255, "previous_extreme_price": 1.1256, "event_time": "2026-02-04 12:34:23"}
+{"symbol": "TRX-USDT-SWAP", "event_type": "new_low", "price": 0.28674, "previous_extreme_price": 0.28678, "event_time": "2026-02-04 12:34:23"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.596, "previous_extreme_price": 1.5964, "event_time": "2026-02-04 12:37:43"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_low", "price": 0.17756, "previous_extreme_price": 0.17757, "event_time": "2026-02-04 12:38:54"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_low", "price": 0.2999, "previous_extreme_price": 0.3001, "event_time": "2026-02-04 12:40:07"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 98.66, "previous_extreme_price": 98.68, "event_time": "2026-02-04 12:41:09"}
+{"symbol": "TRX-USDT-SWAP", "event_type": "new_low", "price": 0.28665, "previous_extreme_price": 0.28674, "event_time": "2026-02-04 12:41:12"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_low", "price": 0.2997, "previous_extreme_price": 0.2999, "event_time": "2026-02-04 12:41:15"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_low", "price": 0.17742, "previous_extreme_price": 0.17756, "event_time": "2026-02-04 12:42:20"}
+{"symbol": "TON-USDT-SWAP", "event_type": "new_high", "price": 1.402, "previous_extreme_price": 1.401, "event_time": "2026-02-04 12:42:21"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_low", "price": 0.2995, "previous_extreme_price": 0.2997, "event_time": "2026-02-04 12:42:22"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.5958, "previous_extreme_price": 1.596, "event_time": "2026-02-04 12:43:23"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 98.56, "previous_extreme_price": 98.66, "event_time": "2026-02-04 12:43:23"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 760.2, "previous_extreme_price": 760.3, "event_time": "2026-02-04 12:43:24"}
+{"symbol": "LTC-USDT-SWAP", "event_type": "new_low", "price": 60.67, "previous_extreme_price": 60.68, "event_time": "2026-02-04 12:43:25"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 3.931, "previous_extreme_price": 3.932, "event_time": "2026-02-04 12:43:25"}
+{"symbol": "TRX-USDT-SWAP", "event_type": "new_low", "price": 0.28661, "previous_extreme_price": 0.28665, "event_time": "2026-02-04 12:43:37"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_low", "price": 0.17715, "previous_extreme_price": 0.17742, "event_time": "2026-02-04 12:43:37"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_low", "price": 0.2992, "previous_extreme_price": 0.2995, "event_time": "2026-02-04 12:43:39"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.5955, "previous_extreme_price": 1.5958, "event_time": "2026-02-04 12:44:40"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 98.48, "previous_extreme_price": 98.56, "event_time": "2026-02-04 12:44:40"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 759.8, "previous_extreme_price": 760.2, "event_time": "2026-02-04 12:44:41"}
+{"symbol": "LINK-USDT-SWAP", "event_type": "new_low", "price": 9.69, "previous_extreme_price": 9.693, "event_time": "2026-02-04 12:44:41"}
+{"symbol": "LTC-USDT-SWAP", "event_type": "new_low", "price": 60.66, "previous_extreme_price": 60.67, "event_time": "2026-02-04 12:44:43"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 3.93, "previous_extreme_price": 3.931, "event_time": "2026-02-04 12:44:44"}
+{"symbol": "CRV-USDT-SWAP", "event_type": "new_low", "price": 0.2837, "previous_extreme_price": 0.2838, "event_time": "2026-02-04 12:44:45"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_low", "price": 0.2991, "previous_extreme_price": 0.2992, "event_time": "2026-02-04 12:44:48"}
+{"symbol": "BTC-USDT-SWAP", "event_type": "new_low", "price": 76519.5, "previous_extreme_price": 76524.5, "event_time": "2026-02-04 12:45:49"}
+{"symbol": "ETH-USDT-SWAP", "event_type": "new_low", "price": 2272.51, "previous_extreme_price": 2272.9, "event_time": "2026-02-04 12:45:49"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.5945, "previous_extreme_price": 1.5955, "event_time": "2026-02-04 12:45:49"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 98.35, "previous_extreme_price": 98.48, "event_time": "2026-02-04 12:45:49"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 759.3, "previous_extreme_price": 759.8, "event_time": "2026-02-04 12:45:50"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.10844, "previous_extreme_price": 0.10853, "event_time": "2026-02-04 12:45:50"}
+{"symbol": "LINK-USDT-SWAP", "event_type": "new_low", "price": 9.684, "previous_extreme_price": 9.69, "event_time": "2026-02-04 12:45:50"}
+{"symbol": "DOT-USDT-SWAP", "event_type": "new_low", "price": 1.521, "previous_extreme_price": 1.522, "event_time": "2026-02-04 12:45:50"}
+{"symbol": "LTC-USDT-SWAP", "event_type": "new_low", "price": 60.63, "previous_extreme_price": 60.66, "event_time": "2026-02-04 12:45:51"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 3.927, "previous_extreme_price": 3.93, "event_time": "2026-02-04 12:45:51"}
+{"symbol": "CRV-USDT-SWAP", "event_type": "new_low", "price": 0.2836, "previous_extreme_price": 0.2837, "event_time": "2026-02-04 12:45:52"}
+{"symbol": "BCH-USDT-SWAP", "event_type": "new_low", "price": 531.1, "previous_extreme_price": 531.4, "event_time": "2026-02-04 12:45:52"}
+{"symbol": "SUI-USDT-SWAP", "event_type": "new_low", "price": 1.1251, "previous_extreme_price": 1.1255, "event_time": "2026-02-04 12:45:53"}
+{"symbol": "TRX-USDT-SWAP", "event_type": "new_low", "price": 0.2866, "previous_extreme_price": 0.28661, "event_time": "2026-02-04 12:45:53"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_low", "price": 0.17704, "previous_extreme_price": 0.17715, "event_time": "2026-02-04 12:45:53"}
+{"symbol": "OKB-USDT-SWAP", "event_type": "new_low", "price": 86.12, "previous_extreme_price": 86.15, "event_time": "2026-02-04 12:45:53"}
+{"symbol": "ADA-USDT-SWAP", "event_type": "new_low", "price": 0.2998, "previous_extreme_price": 0.2999, "event_time": "2026-02-04 12:45:54"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.0913, "previous_extreme_price": 0.09132, "event_time": "2026-02-04 12:45:54"}
+{"symbol": "CFX-USDT-SWAP", "event_type": "new_low", "price": 0.05636, "previous_extreme_price": 0.05638, "event_time": "2026-02-04 12:45:54"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.265, "previous_extreme_price": 1.266, "event_time": "2026-02-04 12:45:55"}
+{"symbol": "AAVE-USDT-SWAP", "event_type": "new_low", "price": 127.61, "previous_extreme_price": 127.71, "event_time": "2026-02-04 12:45:55"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_low", "price": 0.2984, "previous_extreme_price": 0.2991, "event_time": "2026-02-04 12:45:55"}
+{"symbol": "LDO-USDT-SWAP", "event_type": "new_low", "price": 0.4177, "previous_extreme_price": 0.4179, "event_time": "2026-02-04 12:45:56"}
+{"symbol": "BTC-USDT-SWAP", "event_type": "new_low", "price": 76481.0, "previous_extreme_price": 76519.5, "event_time": "2026-02-04 12:46:56"}
+{"symbol": "ETH-USDT-SWAP", "event_type": "new_low", "price": 2271.33, "previous_extreme_price": 2272.51, "event_time": "2026-02-04 12:46:56"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.593, "previous_extreme_price": 1.5945, "event_time": "2026-02-04 12:46:56"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 98.2, "previous_extreme_price": 98.35, "event_time": "2026-02-04 12:46:57"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 759.0, "previous_extreme_price": 759.3, "event_time": "2026-02-04 12:46:57"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.10838, "previous_extreme_price": 0.10844, "event_time": "2026-02-04 12:46:57"}
+{"symbol": "LINK-USDT-SWAP", "event_type": "new_low", "price": 9.68, "previous_extreme_price": 9.684, "event_time": "2026-02-04 12:46:57"}
+{"symbol": "LTC-USDT-SWAP", "event_type": "new_low", "price": 60.61, "previous_extreme_price": 60.63, "event_time": "2026-02-04 12:46:58"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 3.924, "previous_extreme_price": 3.927, "event_time": "2026-02-04 12:46:58"}
+{"symbol": "FIL-USDT-SWAP", "event_type": "new_low", "price": 1.087, "previous_extreme_price": 1.088, "event_time": "2026-02-04 12:46:59"}
+{"symbol": "CRV-USDT-SWAP", "event_type": "new_low", "price": 0.2835, "previous_extreme_price": 0.2836, "event_time": "2026-02-04 12:46:59"}
+{"symbol": "CRO-USDT-SWAP", "event_type": "new_low", "price": 0.08319, "previous_extreme_price": 0.08321, "event_time": "2026-02-04 12:47:00"}
+{"symbol": "SUI-USDT-SWAP", "event_type": "new_low", "price": 1.1249, "previous_extreme_price": 1.1251, "event_time": "2026-02-04 12:47:00"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_low", "price": 0.17686, "previous_extreme_price": 0.17704, "event_time": "2026-02-04 12:47:01"}
+{"symbol": "OKB-USDT-SWAP", "event_type": "new_low", "price": 86.09, "previous_extreme_price": 86.12, "event_time": "2026-02-04 12:47:01"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.09127, "previous_extreme_price": 0.0913, "event_time": "2026-02-04 12:47:02"}
+{"symbol": "CFX-USDT-SWAP", "event_type": "new_low", "price": 0.05633, "previous_extreme_price": 0.05636, "event_time": "2026-02-04 12:47:02"}
+{"symbol": "AAVE-USDT-SWAP", "event_type": "new_low", "price": 127.58, "previous_extreme_price": 127.61, "event_time": "2026-02-04 12:47:03"}
+{"symbol": "TAO-USDT-SWAP", "event_type": "new_low", "price": 196.5, "previous_extreme_price": 196.6, "event_time": "2026-02-04 12:47:03"}
+{"symbol": "BCH-USDT-SWAP", "event_type": "new_low", "price": 531.0, "previous_extreme_price": 531.1, "event_time": "2026-02-04 12:48:07"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_low", "price": 0.2983, "previous_extreme_price": 0.2984, "event_time": "2026-02-04 12:51:34"}
+{"symbol": "BTC-USDT-SWAP", "event_type": "new_low", "price": 76446.1, "previous_extreme_price": 76481.0, "event_time": "2026-02-04 12:52:35"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 98.12, "previous_extreme_price": 98.2, "event_time": "2026-02-04 12:52:36"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 758.7, "previous_extreme_price": 759.0, "event_time": "2026-02-04 12:52:36"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.10836, "previous_extreme_price": 0.10838, "event_time": "2026-02-04 12:52:36"}
+{"symbol": "LINK-USDT-SWAP", "event_type": "new_low", "price": 9.676, "previous_extreme_price": 9.68, "event_time": "2026-02-04 12:52:36"}
+{"symbol": "DOT-USDT-SWAP", "event_type": "new_low", "price": 1.519, "previous_extreme_price": 1.521, "event_time": "2026-02-04 12:52:37"}
+{"symbol": "NEAR-USDT-SWAP", "event_type": "new_low", "price": 1.194, "previous_extreme_price": 1.195, "event_time": "2026-02-04 12:52:37"}
+{"symbol": "ADA-USDT-SWAP", "event_type": "new_low", "price": 0.2997, "previous_extreme_price": 0.2998, "event_time": "2026-02-04 12:52:40"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.09126, "previous_extreme_price": 0.09127, "event_time": "2026-02-04 12:52:40"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_low", "price": 0.2982, "previous_extreme_price": 0.2983, "event_time": "2026-02-04 12:52:41"}
+{"symbol": "LDO-USDT-SWAP", "event_type": "new_low", "price": 0.4176, "previous_extreme_price": 0.4177, "event_time": "2026-02-04 12:52:42"}
+{"symbol": "BTC-USDT-SWAP", "event_type": "new_low", "price": 76429.9, "previous_extreme_price": 76446.1, "event_time": "2026-02-04 12:53:42"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 98.1, "previous_extreme_price": 98.12, "event_time": "2026-02-04 12:53:43"}
+{"symbol": "LINK-USDT-SWAP", "event_type": "new_low", "price": 9.674, "previous_extreme_price": 9.676, "event_time": "2026-02-04 12:53:44"}
+{"symbol": "CRO-USDT-SWAP", "event_type": "new_low", "price": 0.08315, "previous_extreme_price": 0.08319, "event_time": "2026-02-04 12:53:46"}
+{"symbol": "OKB-USDT-SWAP", "event_type": "new_low", "price": 86.04, "previous_extreme_price": 86.09, "event_time": "2026-02-04 12:53:47"}
+{"symbol": "AAVE-USDT-SWAP", "event_type": "new_low", "price": 127.55, "previous_extreme_price": 127.58, "event_time": "2026-02-04 12:53:48"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_low", "price": 0.2974, "previous_extreme_price": 0.2982, "event_time": "2026-02-04 12:53:49"}
+{"symbol": "TAO-USDT-SWAP", "event_type": "new_low", "price": 196.4, "previous_extreme_price": 196.5, "event_time": "2026-02-04 12:53:49"}
+{"symbol": "LDO-USDT-SWAP", "event_type": "new_low", "price": 0.4175, "previous_extreme_price": 0.4176, "event_time": "2026-02-04 12:53:49"}
+{"symbol": "BTC-USDT-SWAP", "event_type": "new_low", "price": 76428.8, "previous_extreme_price": 76429.9, "event_time": "2026-02-04 12:54:49"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 758.6, "previous_extreme_price": 758.7, "event_time": "2026-02-04 12:54:50"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.10834, "previous_extreme_price": 0.10836, "event_time": "2026-02-04 12:54:51"}
+{"symbol": "NEAR-USDT-SWAP", "event_type": "new_low", "price": 1.193, "previous_extreme_price": 1.194, "event_time": "2026-02-04 12:54:52"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.09124, "previous_extreme_price": 0.09126, "event_time": "2026-02-04 12:54:55"}
+{"symbol": "LTC-USDT-SWAP", "event_type": "new_low", "price": 60.58, "previous_extreme_price": 60.61, "event_time": "2026-02-04 12:55:58"}
+{"symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 9.7, "previous_extreme_price": 9.71, "event_time": "2026-02-04 12:55:59"}
+{"symbol": "LTC-USDT-SWAP", "event_type": "new_low", "price": 60.56, "previous_extreme_price": 60.58, "event_time": "2026-02-04 12:57:06"}
+{"symbol": "ADA-USDT-SWAP", "event_type": "new_low", "price": 0.2996, "previous_extreme_price": 0.2997, "event_time": "2026-02-04 12:57:09"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 98.09, "previous_extreme_price": 98.1, "event_time": "2026-02-04 12:58:11"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 758.5, "previous_extreme_price": 758.6, "event_time": "2026-02-04 12:58:12"}
+{"symbol": "DOT-USDT-SWAP", "event_type": "new_low", "price": 1.518, "previous_extreme_price": 1.519, "event_time": "2026-02-04 12:58:12"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 98.03, "previous_extreme_price": 98.09, "event_time": "2026-02-04 12:59:19"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 758.2, "previous_extreme_price": 758.5, "event_time": "2026-02-04 12:59:19"}
+{"symbol": "LINK-USDT-SWAP", "event_type": "new_low", "price": 9.669, "previous_extreme_price": 9.674, "event_time": "2026-02-04 12:59:20"}
+{"symbol": "ADA-USDT-SWAP", "event_type": "new_low", "price": 0.2994, "previous_extreme_price": 0.2996, "event_time": "2026-02-04 12:59:23"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.09123, "previous_extreme_price": 0.09124, "event_time": "2026-02-04 12:59:23"}
+{"symbol": "CFX-USDT-SWAP", "event_type": "new_low", "price": 0.05632, "previous_extreme_price": 0.05633, "event_time": "2026-02-04 12:59:24"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 97.99, "previous_extreme_price": 98.03, "event_time": "2026-02-04 13:00:26"}
+{"symbol": "DOT-USDT-SWAP", "event_type": "new_low", "price": 1.517, "previous_extreme_price": 1.518, "event_time": "2026-02-04 13:00:27"}
+{"symbol": "LTC-USDT-SWAP", "event_type": "new_low", "price": 60.54, "previous_extreme_price": 60.56, "event_time": "2026-02-04 13:00:27"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 97.98, "previous_extreme_price": 97.99, "event_time": "2026-02-04 13:01:33"}
+{"symbol": "OKB-USDT-SWAP", "event_type": "new_high", "price": 86.45, "previous_extreme_price": 86.43, "event_time": "2026-02-04 13:01:37"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_low", "price": 0.2972, "previous_extreme_price": 0.2974, "event_time": "2026-02-04 13:01:39"}
+{"symbol": "BTC-USDT-SWAP", "event_type": "new_low", "price": 76416.2, "previous_extreme_price": 76428.8, "event_time": "2026-02-04 13:02:40"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.5927, "previous_extreme_price": 1.593, "event_time": "2026-02-04 13:02:40"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 97.84, "previous_extreme_price": 97.98, "event_time": "2026-02-04 13:02:40"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 757.9, "previous_extreme_price": 758.2, "event_time": "2026-02-04 13:02:42"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 3.923, "previous_extreme_price": 3.924, "event_time": "2026-02-04 13:02:43"}
+{"symbol": "BCH-USDT-SWAP", "event_type": "new_low", "price": 530.9, "previous_extreme_price": 531.0, "event_time": "2026-02-04 13:02:45"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_low", "price": 0.297, "previous_extreme_price": 0.2972, "event_time": "2026-02-04 13:02:48"}
+{"symbol": "ETH-USDT-SWAP", "event_type": "new_low", "price": 2271.29, "previous_extreme_price": 2271.33, "event_time": "2026-02-04 13:03:49"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.5924, "previous_extreme_price": 1.5927, "event_time": "2026-02-04 13:03:49"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 97.82, "previous_extreme_price": 97.84, "event_time": "2026-02-04 13:03:49"}
+{"symbol": "DOT-USDT-SWAP", "event_type": "new_low", "price": 1.516, "previous_extreme_price": 1.517, "event_time": "2026-02-04 13:03:51"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_low", "price": 0.2966, "previous_extreme_price": 0.297, "event_time": "2026-02-04 13:03:55"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_low", "price": 0.2965, "previous_extreme_price": 0.2966, "event_time": "2026-02-04 13:05:03"}
+{"symbol": "BTC-USDT-SWAP", "event_type": "new_low", "price": 76395.9, "previous_extreme_price": 76416.2, "event_time": "2026-02-04 13:06:04"}
+{"symbol": "ETH-USDT-SWAP", "event_type": "new_low", "price": 2270.69, "previous_extreme_price": 2271.29, "event_time": "2026-02-04 13:06:04"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.5919, "previous_extreme_price": 1.5924, "event_time": "2026-02-04 13:06:05"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 97.72, "previous_extreme_price": 97.82, "event_time": "2026-02-04 13:06:05"}
+{"symbol": "ADA-USDT-SWAP", "event_type": "new_low", "price": 0.2993, "previous_extreme_price": 0.2994, "event_time": "2026-02-04 13:06:09"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_low", "price": 0.2961, "previous_extreme_price": 0.2965, "event_time": "2026-02-04 13:06:11"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.5913, "previous_extreme_price": 1.5919, "event_time": "2026-02-04 13:08:19"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 757.6, "previous_extreme_price": 757.9, "event_time": "2026-02-04 13:08:20"}
+{"symbol": "LTC-USDT-SWAP", "event_type": "new_low", "price": 60.5, "previous_extreme_price": 60.54, "event_time": "2026-02-04 13:08:21"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_low", "price": 0.17681, "previous_extreme_price": 0.17686, "event_time": "2026-02-04 13:08:23"}
+{"symbol": "ADA-USDT-SWAP", "event_type": "new_low", "price": 0.2992, "previous_extreme_price": 0.2993, "event_time": "2026-02-04 13:08:24"}
+{"symbol": "HBAR-USDT-SWAP", "event_type": "new_low", "price": 0.09121, "previous_extreme_price": 0.09123, "event_time": "2026-02-04 13:08:24"}
+{"symbol": "CFX-USDT-SWAP", "event_type": "new_low", "price": 0.05631, "previous_extreme_price": 0.05632, "event_time": "2026-02-04 13:08:24"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_low", "price": 0.296, "previous_extreme_price": 0.2961, "event_time": "2026-02-04 13:08:25"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 97.95, "previous_extreme_price": 116.0, "event_time": "2026-02-04 13:10:01"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.10842, "previous_extreme_price": 0.25, "event_time": "2026-02-04 13:10:01"}
+{"symbol": "LINK-USDT-SWAP", "event_type": "new_low", "price": 9.672, "previous_extreme_price": 11.2, "event_time": "2026-02-04 13:10:01"}
+{"symbol": "DOT-USDT-SWAP", "event_type": "new_low", "price": 1.516, "previous_extreme_price": 4.05, "event_time": "2026-02-04 13:10:02"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 3.926, "previous_extreme_price": 5.0, "event_time": "2026-02-04 13:10:02"}
+{"symbol": "NEAR-USDT-SWAP", "event_type": "new_low", "price": 1.194, "previous_extreme_price": 3.35, "event_time": "2026-02-04 13:10:02"}
+{"symbol": "FIL-USDT-SWAP", "event_type": "new_low", "price": 1.088, "previous_extreme_price": 2.7, "event_time": "2026-02-04 13:10:03"}
+{"symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 9.7, "previous_extreme_price": 15.5, "event_time": "2026-02-04 13:10:03"}
+{"symbol": "OKB-USDT-SWAP", "event_type": "new_high", "price": 86.31, "previous_extreme_price": 73.0, "event_time": "2026-02-04 13:10:05"}
+{"symbol": "CFX-USDT-SWAP", "event_type": "new_low", "price": 0.05633, "previous_extreme_price": 0.09, "event_time": "2026-02-04 13:10:06"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.267, "previous_extreme_price": 3.7, "event_time": "2026-02-04 13:10:06"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_low", "price": 0.2962, "previous_extreme_price": 0.41, "event_time": "2026-02-04 13:10:06"}
+{"symbol": "LDO-USDT-SWAP", "event_type": "new_low", "price": 0.4182, "previous_extreme_price": 0.83, "event_time": "2026-02-04 13:10:07"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 97.88, "previous_extreme_price": 97.95, "event_time": "2026-02-04 13:20:08"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.10828, "previous_extreme_price": 0.10842, "event_time": "2026-02-04 13:20:08"}
+{"symbol": "LINK-USDT-SWAP", "event_type": "new_low", "price": 9.658, "previous_extreme_price": 9.672, "event_time": "2026-02-04 13:20:09"}
+{"symbol": "DOT-USDT-SWAP", "event_type": "new_low", "price": 1.513, "previous_extreme_price": 1.516, "event_time": "2026-02-04 13:20:09"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 3.919, "previous_extreme_price": 3.926, "event_time": "2026-02-04 13:20:09"}
+{"symbol": "NEAR-USDT-SWAP", "event_type": "new_low", "price": 1.192, "previous_extreme_price": 1.194, "event_time": "2026-02-04 13:20:10"}
+{"symbol": "FIL-USDT-SWAP", "event_type": "new_low", "price": 1.087, "previous_extreme_price": 1.088, "event_time": "2026-02-04 13:20:10"}
+{"symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 9.69, "previous_extreme_price": 9.7, "event_time": "2026-02-04 13:20:10"}
+{"symbol": "CFX-USDT-SWAP", "event_type": "new_low", "price": 0.05627, "previous_extreme_price": 0.05633, "event_time": "2026-02-04 13:20:13"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.266, "previous_extreme_price": 1.267, "event_time": "2026-02-04 13:20:13"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_low", "price": 0.2942, "previous_extreme_price": 0.2962, "event_time": "2026-02-04 13:20:14"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.10819, "previous_extreme_price": 0.10828, "event_time": "2026-02-04 13:30:16"}
+{"symbol": "LINK-USDT-SWAP", "event_type": "new_low", "price": 9.646, "previous_extreme_price": 9.658, "event_time": "2026-02-04 13:30:16"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 3.918, "previous_extreme_price": 3.919, "event_time": "2026-02-04 13:30:17"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 97.85, "previous_extreme_price": 97.88, "event_time": "2026-02-04 13:40:22"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.108, "previous_extreme_price": 0.10819, "event_time": "2026-02-04 13:40:23"}
+{"symbol": "LINK-USDT-SWAP", "event_type": "new_low", "price": 9.63, "previous_extreme_price": 9.646, "event_time": "2026-02-04 13:40:23"}
+{"symbol": "DOT-USDT-SWAP", "event_type": "new_low", "price": 1.512, "previous_extreme_price": 1.513, "event_time": "2026-02-04 13:40:23"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 3.913, "previous_extreme_price": 3.918, "event_time": "2026-02-04 13:40:24"}
+{"symbol": "NEAR-USDT-SWAP", "event_type": "new_low", "price": 1.19, "previous_extreme_price": 1.192, "event_time": "2026-02-04 13:40:24"}
+{"symbol": "FIL-USDT-SWAP", "event_type": "new_low", "price": 1.086, "previous_extreme_price": 1.087, "event_time": "2026-02-04 13:40:24"}
+{"symbol": "CFX-USDT-SWAP", "event_type": "new_low", "price": 0.05624, "previous_extreme_price": 0.05627, "event_time": "2026-02-04 13:40:27"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_low", "price": 0.2933, "previous_extreme_price": 0.2942, "event_time": "2026-02-04 13:40:28"}
+{"symbol": "LDO-USDT-SWAP", "event_type": "new_low", "price": 0.4176, "previous_extreme_price": 0.4182, "event_time": "2026-02-04 13:40:28"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 97.56, "previous_extreme_price": 97.85, "event_time": "2026-02-04 13:50:29"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.10785, "previous_extreme_price": 0.108, "event_time": "2026-02-04 13:50:30"}
+{"symbol": "LINK-USDT-SWAP", "event_type": "new_low", "price": 9.629, "previous_extreme_price": 9.63, "event_time": "2026-02-04 13:50:30"}
+{"symbol": "DOT-USDT-SWAP", "event_type": "new_low", "price": 1.51, "previous_extreme_price": 1.512, "event_time": "2026-02-04 13:50:30"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 3.91, "previous_extreme_price": 3.913, "event_time": "2026-02-04 13:50:31"}
+{"symbol": "NEAR-USDT-SWAP", "event_type": "new_low", "price": 1.189, "previous_extreme_price": 1.19, "event_time": "2026-02-04 13:50:31"}
+{"symbol": "CFX-USDT-SWAP", "event_type": "new_low", "price": 0.05609, "previous_extreme_price": 0.05624, "event_time": "2026-02-04 13:50:34"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.263, "previous_extreme_price": 1.266, "event_time": "2026-02-04 13:50:35"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_low", "price": 0.2921, "previous_extreme_price": 0.2933, "event_time": "2026-02-04 13:50:35"}
+{"symbol": "LDO-USDT-SWAP", "event_type": "new_low", "price": 0.4171, "previous_extreme_price": 0.4176, "event_time": "2026-02-04 13:50:36"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 96.89, "previous_extreme_price": 97.56, "event_time": "2026-02-04 14:00:37"}
+{"symbol": "DOGE-USDT-SWAP", "event_type": "new_low", "price": 0.10761, "previous_extreme_price": 0.10785, "event_time": "2026-02-04 14:00:37"}
+{"symbol": "LINK-USDT-SWAP", "event_type": "new_low", "price": 9.603, "previous_extreme_price": 9.629, "event_time": "2026-02-04 14:00:37"}
+{"symbol": "DOT-USDT-SWAP", "event_type": "new_low", "price": 1.506, "previous_extreme_price": 1.51, "event_time": "2026-02-04 14:00:38"}
+{"symbol": "UNI-USDT-SWAP", "event_type": "new_low", "price": 3.902, "previous_extreme_price": 3.91, "event_time": "2026-02-04 14:00:38"}
+{"symbol": "NEAR-USDT-SWAP", "event_type": "new_low", "price": 1.186, "previous_extreme_price": 1.189, "event_time": "2026-02-04 14:00:38"}
+{"symbol": "FIL-USDT-SWAP", "event_type": "new_low", "price": 1.081, "previous_extreme_price": 1.086, "event_time": "2026-02-04 14:00:39"}
+{"symbol": "ETC-USDT-SWAP", "event_type": "new_low", "price": 9.66, "previous_extreme_price": 9.69, "event_time": "2026-02-04 14:00:39"}
+{"symbol": "CFX-USDT-SWAP", "event_type": "new_low", "price": 0.05591, "previous_extreme_price": 0.05609, "event_time": "2026-02-04 14:00:42"}
+{"symbol": "APT-USDT-SWAP", "event_type": "new_low", "price": 1.26, "previous_extreme_price": 1.263, "event_time": "2026-02-04 14:00:42"}
+{"symbol": "STX-USDT-SWAP", "event_type": "new_low", "price": 0.2919, "previous_extreme_price": 0.2921, "event_time": "2026-02-04 14:00:42"}
+{"symbol": "LDO-USDT-SWAP", "event_type": "new_low", "price": 0.416, "previous_extreme_price": 0.4171, "event_time": "2026-02-04 14:00:43"}
+{"symbol": "OKB-USDT-SWAP", "event_type": "new_high", "price": 86.37, "previous_extreme_price": 86.31, "event_time": "2026-02-04 14:51:17"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 94.33, "previous_extreme_price": 94.44085, "event_time": "2026-02-04 22:00:27"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 93.87, "previous_extreme_price": 94.33, "event_time": "2026-02-04 22:10:35"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 92.85, "previous_extreme_price": 93.87, "event_time": "2026-02-04 23:01:13"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 92.76, "previous_extreme_price": 92.85, "event_time": "2026-02-04 23:33:23"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 92.49, "previous_extreme_price": 92.76, "event_time": "2026-02-04 23:43:30"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 92.33, "previous_extreme_price": 92.49, "event_time": "2026-02-04 23:53:38"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 92.11, "previous_extreme_price": 92.33, "event_time": "2026-02-05 00:24:01"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 91.86, "previous_extreme_price": 92.11, "event_time": "2026-02-05 00:34:08"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 91.25, "previous_extreme_price": 91.86, "event_time": "2026-02-05 00:44:16"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 91.09, "previous_extreme_price": 91.25, "event_time": "2026-02-05 01:24:46"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 90.97, "previous_extreme_price": 91.09, "event_time": "2026-02-05 01:34:53"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 90.88, "previous_extreme_price": 90.97, "event_time": "2026-02-05 01:45:01"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 90.83, "previous_extreme_price": 90.88, "event_time": "2026-02-05 02:05:40"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 711.8, "previous_extreme_price": 714.21127, "event_time": "2026-02-05 02:05:41"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 90.56, "previous_extreme_price": 90.83, "event_time": "2026-02-05 02:16:05"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 708.5, "previous_extreme_price": 711.8, "event_time": "2026-02-05 02:16:06"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 706.7, "previous_extreme_price": 708.5, "event_time": "2026-02-05 05:23:12"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 703.6, "previous_extreme_price": 706.7, "event_time": "2026-02-05 05:44:00"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 699.8, "previous_extreme_price": 703.6, "event_time": "2026-02-05 05:54:24"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 90.34, "previous_extreme_price": 90.56, "event_time": "2026-02-05 06:04:49"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 699.3, "previous_extreme_price": 699.8, "event_time": "2026-02-05 06:04:49"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 690.9, "previous_extreme_price": 699.3, "event_time": "2026-02-05 06:15:11"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.488, "previous_extreme_price": 1.4972, "event_time": "2026-02-05 09:01:43"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.4654, "previous_extreme_price": 1.488, "event_time": "2026-02-05 09:21:58"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 690.6, "previous_extreme_price": 690.9, "event_time": "2026-02-05 09:21:59"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.4645, "previous_extreme_price": 1.4654, "event_time": "2026-02-05 10:12:46"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.4615, "previous_extreme_price": 1.4645, "event_time": "2026-02-05 10:53:15"}
+{"symbol": "BTC-USDT-SWAP", "event_type": "new_low", "price": 71608.1, "previous_extreme_price": 71649.95634, "event_time": "2026-02-05 11:03:22"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.4574, "previous_extreme_price": 1.4615, "event_time": "2026-02-05 11:03:23"}
+{"symbol": "BTC-USDT-SWAP", "event_type": "new_low", "price": 71546.1, "previous_extreme_price": 71608.1, "event_time": "2026-02-05 11:13:30"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.4563, "previous_extreme_price": 1.4574, "event_time": "2026-02-05 11:13:30"}
+{"symbol": "BTC-USDT-SWAP", "event_type": "new_low", "price": 71414.2, "previous_extreme_price": 71546.1, "event_time": "2026-02-05 11:33:45"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.4463, "previous_extreme_price": 1.4563, "event_time": "2026-02-05 11:33:55"}
+{"symbol": "BTC-USDT-SWAP", "event_type": "new_low", "price": 71153.6, "previous_extreme_price": 71414.2, "event_time": "2026-02-05 12:24:42"}
+{"symbol": "BTC-USDT-SWAP", "event_type": "new_low", "price": 70855.1, "previous_extreme_price": 71153.6, "event_time": "2026-02-05 12:34:49"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.4425, "previous_extreme_price": 1.4463, "event_time": "2026-02-05 12:34:49"}
+{"symbol": "OKB-USDT-SWAP", "event_type": "new_low", "price": 79.11, "previous_extreme_price": 79.83521, "event_time": "2026-02-05 12:34:54"}
+{"symbol": "BTC-USDT-SWAP", "event_type": "new_low", "price": 70829.8, "previous_extreme_price": 70855.1, "event_time": "2026-02-05 13:15:44"}
+{"symbol": "BTC-USDT-SWAP", "event_type": "new_low", "price": 70198.9, "previous_extreme_price": 70829.8, "event_time": "2026-02-05 13:25:51"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.4331, "previous_extreme_price": 1.4425, "event_time": "2026-02-05 13:25:52"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 90.19, "previous_extreme_price": 90.34, "event_time": "2026-02-05 13:25:52"}
+{"symbol": "BNB-USDT-SWAP", "event_type": "new_low", "price": 687.2, "previous_extreme_price": 690.6, "event_time": "2026-02-05 13:25:52"}
+{"symbol": "CRV-USDT-SWAP", "event_type": "new_low", "price": 0.2603, "previous_extreme_price": 0.26111, "event_time": "2026-02-05 13:25:55"}
+{"symbol": "OKB-USDT-SWAP", "event_type": "new_low", "price": 77.61, "previous_extreme_price": 79.11, "event_time": "2026-02-05 13:25:56"}
+{"symbol": "OKB-USDT-SWAP", "event_type": "new_low", "price": 77.34, "previous_extreme_price": 77.61, "event_time": "2026-02-05 13:36:03"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.4294, "previous_extreme_price": 1.4331, "event_time": "2026-02-05 14:06:21"}
+{"symbol": "SOL-USDT-SWAP", "event_type": "new_low", "price": 89.88, "previous_extreme_price": 90.19, "event_time": "2026-02-05 14:06:21"}
+{"symbol": "OKB-USDT-SWAP", "event_type": "new_low", "price": 77.2, "previous_extreme_price": 77.34, "event_time": "2026-02-05 14:06:25"}
+{"symbol": "XRP-USDT-SWAP", "event_type": "new_low", "price": 1.4212, "previous_extreme_price": 1.4294, "event_time": "2026-02-05 14:26:35"}
+{"symbol": "SUI-USDT-SWAP", "event_type": "new_low", "price": 1.0429, "previous_extreme_price": 1.04376, "event_time": "2026-02-05 14:26:39"}
+{"symbol": "OKB-USDT-SWAP", "event_type": "new_low", "price": 77.14, "previous_extreme_price": 77.2, "event_time": "2026-02-05 14:26:40"}
+{"symbol": "SUI-USDT-SWAP", "event_type": "new_low", "price": 1.0421, "previous_extreme_price": 1.0429, "event_time": "2026-02-05 14:57:01"}
+{"symbol": "XLM-USDT-SWAP", "event_type": "new_low", "price": 0.1636, "previous_extreme_price": 0.16438, "event_time": "2026-02-05 14:57:02"}

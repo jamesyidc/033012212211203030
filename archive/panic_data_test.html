@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panic数据测试页面 - 数据验证</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .header p {
+            color: #718096;
+            font-size: 14px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card h3 {
+            color: #718096;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .value {
+            color: #2d3748;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card .label {
+            color: #a0aec0;
+            font-size: 12px;
+        }
+        
+        .stat-card.success .value {
+            color: #48bb78;
+        }
+        
+        .stat-card.warning .value {
+            color: #ed8936;
+        }
+        
+        .stat-card.info .value {
+            color: #4299e1;
+        }
+        
+        .data-table {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .data-table h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        th {
+            background: #f7fafc;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        td {
+            color: #2d3748;
+            font-size: 14px;
+        }
+        
+        tr:hover {
+            background: #f7fafc;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+        
+        .success-badge {
+            display: inline-block;
+            background: #48bb78;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .date-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .date-item {
+            background: #f7fafc;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 3px solid #4299e1;
+        }
+        
+        .date-item .date {
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .date-item .count {
+            color: #4299e1;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .api-test {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .api-result {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .api-result pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .btn {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        
+        .btn:hover {
+            background: #3182ce;
+        }
+        
+        .highlight-feb {
+            background: #fef5e7 !important;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Panic 数据修复验证页面</h1>
+            <p>验证历史数据回填（2月1-10日）及 btc126 真实数据集成</p>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card success">
+                <h3>总记录数</h3>
+                <div class="value" id="totalRecords">--</div>
+                <div class="label">从 API 加载</div>
+            </div>
+            
+            <div class="stat-card info">
+                <h3>2月1-10日数据</h3>
+                <div class="value" id="febRecords">--</div>
+                <div class="label">历史回填记录</div>
+            </div>
+            
+            <div class="stat-card warning">
+                <h3>最新1小时爆仓</h3>
+                <div class="value" id="hour1Amount">--</div>
+                <div class="label">万美元</div>
+            </div>
+            
+            <div class="stat-card info">
+                <h3>最新24小时爆仓</h3>
+                <div class="value" id="hour24Amount">--</div>
+                <div class="label">万美元</div>
+            </div>
+        </div>
+        
+        <div class="data-table">
+            <h2>📅 按日期统计（最近30天）</h2>
+            <div id="dateStats" class="date-stats">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+        
+        <div class="data-table">
+            <h2>📊 最新20条记录（包含2月1-10日数据）</h2>
+            <div id="tableLoading" class="loading">加载中...</div>
+            <table id="dataTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>时间</th>
+                        <th>1h爆仓(万$)</th>
+                        <th>24h爆仓(万$)</th>
+                        <th>24h人数(万)</th>
+                        <th>全网持仓(亿$)</th>
+                        <th>恐慌指数</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="api-test">
+            <h2>🔍 API 测试</h2>
+            <p style="color: #718096; margin-bottom: 15px;">点击按钮测试各个 API 端点</p>
+            <button class="btn" onclick="testAPI('latest')">测试 /api/panic/latest</button>
+            <button class="btn" onclick="testAPI('history')">测试 /api/liquidation-1h/history (limit=50)</button>
+            <button class="btn" onclick="testAPI('curve')">测试 /api/panic/hour1-curve (240小时)</button>
+            <div id="apiResult" class="api-result" style="display: none;">
+                <pre id="apiResultContent"></pre>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 加载数据
+        async function loadData() {
+            try {
+                // 加载历史数据
+                const response = await fetch('/api/liquidation-1h/history?limit=10000');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const records = data.data;
+                    
+                    // 更新总记录数
+                    document.getElementById('totalRecords').textContent = records.length.toLocaleString();
+                    
+                    // 按日期统计
+                    const dateStats = {};
+                    records.forEach(record => {
+                        const date = record.record_time.split(' ')[0];
+                        dateStats[date] = (dateStats[date] || 0) + 1;
+                    });
+                    
+                    // 统计2月1-10日的记录数
+                    let febCount = 0;
+                    for (let i = 1; i <= 10; i++) {
+                        const date = `2026-02-${i.toString().padStart(2, '0')}`;
+                        if (dateStats[date]) {
+                            febCount += dateStats[date];
+                        }
+                    }
+                    document.getElementById('febRecords').textContent = febCount;
+                    
+                    // 显示最近30天的日期统计
+                    const sortedDates = Object.keys(dateStats).sort().reverse().slice(0, 30);
+                    const dateStatsHtml = sortedDates.map(date => {
+                        const isFeb = date >= '2026-02-01' && date <= '2026-02-10';
+                        return `
+                            <div class="date-item" style="${isFeb ? 'border-left-color: #48bb78; background: #f0fff4;' : ''}">
+                                <div class="date">${date}${isFeb ? ' ✓' : ''}</div>
+                                <div class="count">${dateStats[date]}</div>
+                            </div>
+                        `;
+                    }).join('');
+                    document.getElementById('dateStats').innerHTML = dateStatsHtml;
+                    
+                    // 显示最新20条记录
+                    const latest20 = records.slice(-20).reverse();
+                    const tableHtml = latest20.map((record, index) => {
+                        const isFeb = record.record_time >= '2026-02-01' && record.record_time <= '2026-02-11';
+                        return `
+                            <tr class="${isFeb ? 'highlight-feb' : ''}">
+                                <td>${index + 1}</td>
+                                <td>${record.record_time}${isFeb && record.record_time <= '2026-02-10 23:59:59' ? ' <span class="success-badge">回填</span>' : ''}</td>
+                                <td>${record.hour_1_amount.toFixed(2)}</td>
+                                <td>${record.hour_24_amount.toFixed(2)}</td>
+                                <td>${record.hour_24_people.toFixed(2)}</td>
+                                <td>${record.total_position.toFixed(2)}</td>
+                                <td>${record.panic_index.toFixed(2)}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                    document.getElementById('tableBody').innerHTML = tableHtml;
+                    document.getElementById('tableLoading').style.display = 'none';
+                    document.getElementById('dataTable').style.display = 'table';
+                    
+                    // 加载最新数据
+                    const latestResponse = await fetch('/api/panic/latest');
+                    const latestData = await latestResponse.json();
+                    if (latestData.success) {
+                        document.getElementById('hour1Amount').textContent = latestData.data.hour_1_amount.toFixed(2);
+                        document.getElementById('hour24Amount').textContent = latestData.data.hour_24_amount.toFixed(2);
+                    }
+                }
+            } catch (error) {
+                console.error('加载数据失败:', error);
+                document.getElementById('tableLoading').textContent = '加载失败: ' + error.message;
+            }
+        }
+        
+        // 测试API
+        async function testAPI(type) {
+            const resultDiv = document.getElementById('apiResult');
+            const contentDiv = document.getElementById('apiResultContent');
+            
+            resultDiv.style.display = 'block';
+            contentDiv.textContent = '正在请求...';
+            
+            let url;
+            switch(type) {
+                case 'latest':
+                    url = '/api/panic/latest';
+                    break;
+                case 'history':
+                    url = '/api/liquidation-1h/history?limit=50';
+                    break;
+                case 'curve':
+                    url = '/api/panic/hour1-curve?hours=240';
+                    break;
+            }
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                contentDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                contentDiv.textContent = '请求失败: ' + error.message;
+            }
+        }
+        
+        // 页面加载时执行
+        loadData();
+    </script>
+</body>
+</html>

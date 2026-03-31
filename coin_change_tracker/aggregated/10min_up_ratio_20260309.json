@@ -1,0 +1,975 @@
+{
+  "date": "20260309",
+  "type": "10min_up_ratio",
+  "generated_at": "2026-03-13T17:56:39.757906+08:00",
+  "data": [
+    {
+      "time_range": "00:00",
+      "avg_up_ratio": 42.0,
+      "count": 7,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 0
+    },
+    {
+      "time_range": "00:10",
+      "avg_up_ratio": 20.69,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 1
+    },
+    {
+      "time_range": "00:20",
+      "avg_up_ratio": 22.9,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 2
+    },
+    {
+      "time_range": "00:30",
+      "avg_up_ratio": 9.84,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 3
+    },
+    {
+      "time_range": "00:40",
+      "avg_up_ratio": 11.22,
+      "count": 9,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 4
+    },
+    {
+      "time_range": "00:50",
+      "avg_up_ratio": 7.4,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 5
+    },
+    {
+      "time_range": "01:00",
+      "avg_up_ratio": 48.25,
+      "count": 8,
+      "color": "yellow",
+      "status": "震荡",
+      "group_index": 6
+    },
+    {
+      "time_range": "01:10",
+      "avg_up_ratio": 40.33,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 7
+    },
+    {
+      "time_range": "01:20",
+      "avg_up_ratio": 38.08,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 8
+    },
+    {
+      "time_range": "01:30",
+      "avg_up_ratio": 27.56,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 9
+    },
+    {
+      "time_range": "01:40",
+      "avg_up_ratio": 23.71,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 10
+    },
+    {
+      "time_range": "01:50",
+      "avg_up_ratio": 25.67,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 11
+    },
+    {
+      "time_range": "02:00",
+      "avg_up_ratio": 27.79,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 12
+    },
+    {
+      "time_range": "02:10",
+      "avg_up_ratio": 21.96,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 13
+    },
+    {
+      "time_range": "02:20",
+      "avg_up_ratio": 21.36,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 14
+    },
+    {
+      "time_range": "02:30",
+      "avg_up_ratio": 25.91,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 15
+    },
+    {
+      "time_range": "02:40",
+      "avg_up_ratio": 20.81,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 16
+    },
+    {
+      "time_range": "02:50",
+      "avg_up_ratio": 23.88,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 17
+    },
+    {
+      "time_range": "03:00",
+      "avg_up_ratio": 33.88,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 18
+    },
+    {
+      "time_range": "03:10",
+      "avg_up_ratio": 74.59,
+      "count": 9,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 19
+    },
+    {
+      "time_range": "03:20",
+      "avg_up_ratio": 97.36,
+      "count": 7,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 20
+    },
+    {
+      "time_range": "03:30",
+      "avg_up_ratio": 100.0,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 21
+    },
+    {
+      "time_range": "03:40",
+      "avg_up_ratio": 100.0,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 22
+    },
+    {
+      "time_range": "03:50",
+      "avg_up_ratio": 100.0,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 23
+    },
+    {
+      "time_range": "04:00",
+      "avg_up_ratio": 95.84,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 24
+    },
+    {
+      "time_range": "04:10",
+      "avg_up_ratio": 93.95,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 25
+    },
+    {
+      "time_range": "04:20",
+      "avg_up_ratio": 93.52,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 26
+    },
+    {
+      "time_range": "04:30",
+      "avg_up_ratio": 99.54,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 27
+    },
+    {
+      "time_range": "04:40",
+      "avg_up_ratio": 100.0,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 28
+    },
+    {
+      "time_range": "04:50",
+      "avg_up_ratio": 99.54,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 29
+    },
+    {
+      "time_range": "05:00",
+      "avg_up_ratio": 95.8,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 30
+    },
+    {
+      "time_range": "05:10",
+      "avg_up_ratio": 70.53,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 31
+    },
+    {
+      "time_range": "05:20",
+      "avg_up_ratio": 83.97,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 32
+    },
+    {
+      "time_range": "05:30",
+      "avg_up_ratio": 84.16,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 33
+    },
+    {
+      "time_range": "05:40",
+      "avg_up_ratio": 90.66,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 34
+    },
+    {
+      "time_range": "05:50",
+      "avg_up_ratio": 88.22,
+      "count": 9,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 35
+    },
+    {
+      "time_range": "06:00",
+      "avg_up_ratio": 19.43,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 36
+    },
+    {
+      "time_range": "06:10",
+      "avg_up_ratio": 12.54,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 37
+    },
+    {
+      "time_range": "06:20",
+      "avg_up_ratio": 10.26,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 38
+    },
+    {
+      "time_range": "06:30",
+      "avg_up_ratio": 25.12,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 39
+    },
+    {
+      "time_range": "06:40",
+      "avg_up_ratio": 40.96,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 40
+    },
+    {
+      "time_range": "06:50",
+      "avg_up_ratio": 44.54,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 41
+    },
+    {
+      "time_range": "07:00",
+      "avg_up_ratio": 61.85,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 42
+    },
+    {
+      "time_range": "07:10",
+      "avg_up_ratio": 54.12,
+      "count": 8,
+      "color": "yellow",
+      "status": "震荡",
+      "group_index": 43
+    },
+    {
+      "time_range": "07:20",
+      "avg_up_ratio": 60.76,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 44
+    },
+    {
+      "time_range": "07:30",
+      "avg_up_ratio": 56.2,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 45
+    },
+    {
+      "time_range": "07:40",
+      "avg_up_ratio": 19.75,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 46
+    },
+    {
+      "time_range": "07:50",
+      "avg_up_ratio": 21.29,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 47
+    },
+    {
+      "time_range": "08:00",
+      "avg_up_ratio": 41.9,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 48
+    },
+    {
+      "time_range": "08:10",
+      "avg_up_ratio": 68.09,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 49
+    },
+    {
+      "time_range": "08:20",
+      "avg_up_ratio": 48.56,
+      "count": 9,
+      "color": "yellow",
+      "status": "震荡",
+      "group_index": 50
+    },
+    {
+      "time_range": "08:30",
+      "avg_up_ratio": 90.15,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 51
+    },
+    {
+      "time_range": "08:40",
+      "avg_up_ratio": 87.98,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 52
+    },
+    {
+      "time_range": "08:50",
+      "avg_up_ratio": 77.45,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 53
+    },
+    {
+      "time_range": "09:00",
+      "avg_up_ratio": 56.56,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 54
+    },
+    {
+      "time_range": "09:10",
+      "avg_up_ratio": 58.74,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 55
+    },
+    {
+      "time_range": "09:20",
+      "avg_up_ratio": 77.6,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 56
+    },
+    {
+      "time_range": "09:30",
+      "avg_up_ratio": 84.05,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 57
+    },
+    {
+      "time_range": "09:40",
+      "avg_up_ratio": 85.06,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 58
+    },
+    {
+      "time_range": "09:50",
+      "avg_up_ratio": 58.31,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 59
+    },
+    {
+      "time_range": "10:00",
+      "avg_up_ratio": 35.77,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 60
+    },
+    {
+      "time_range": "10:10",
+      "avg_up_ratio": 33.9,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 61
+    },
+    {
+      "time_range": "10:20",
+      "avg_up_ratio": 28.34,
+      "count": 8,
+      "color": "red",
+      "status": "空头强势",
+      "group_index": 62
+    },
+    {
+      "time_range": "10:30",
+      "avg_up_ratio": 54.93,
+      "count": 9,
+      "color": "yellow",
+      "status": "震荡",
+      "group_index": 63
+    },
+    {
+      "time_range": "10:40",
+      "avg_up_ratio": 87.9,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 64
+    },
+    {
+      "time_range": "10:50",
+      "avg_up_ratio": 91.49,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 65
+    },
+    {
+      "time_range": "11:00",
+      "avg_up_ratio": 95.8,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 66
+    },
+    {
+      "time_range": "11:10",
+      "avg_up_ratio": 100.0,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 67
+    },
+    {
+      "time_range": "11:20",
+      "avg_up_ratio": 97.69,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 68
+    },
+    {
+      "time_range": "11:30",
+      "avg_up_ratio": 99.54,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 69
+    },
+    {
+      "time_range": "11:40",
+      "avg_up_ratio": 96.3,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 70
+    },
+    {
+      "time_range": "11:50",
+      "avg_up_ratio": 97.22,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 71
+    },
+    {
+      "time_range": "12:00",
+      "avg_up_ratio": 100.0,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 72
+    },
+    {
+      "time_range": "12:10",
+      "avg_up_ratio": 93.96,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 73
+    },
+    {
+      "time_range": "16:10",
+      "avg_up_ratio": 84.46,
+      "count": 5,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 97
+    },
+    {
+      "time_range": "16:20",
+      "avg_up_ratio": 93.94,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 98
+    },
+    {
+      "time_range": "16:30",
+      "avg_up_ratio": 96.3,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 99
+    },
+    {
+      "time_range": "16:40",
+      "avg_up_ratio": 92.6,
+      "count": 9,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 100
+    },
+    {
+      "time_range": "16:50",
+      "avg_up_ratio": 94.9,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 101
+    },
+    {
+      "time_range": "17:00",
+      "avg_up_ratio": 89.69,
+      "count": 9,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 102
+    },
+    {
+      "time_range": "17:10",
+      "avg_up_ratio": 92.51,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 103
+    },
+    {
+      "time_range": "17:20",
+      "avg_up_ratio": 96.3,
+      "count": 9,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 104
+    },
+    {
+      "time_range": "17:30",
+      "avg_up_ratio": 96.3,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 105
+    },
+    {
+      "time_range": "17:40",
+      "avg_up_ratio": 96.3,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 106
+    },
+    {
+      "time_range": "17:50",
+      "avg_up_ratio": 96.3,
+      "count": 9,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 107
+    },
+    {
+      "time_range": "18:00",
+      "avg_up_ratio": 94.9,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 108
+    },
+    {
+      "time_range": "18:10",
+      "avg_up_ratio": 93.42,
+      "count": 9,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 109
+    },
+    {
+      "time_range": "18:20",
+      "avg_up_ratio": 92.6,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 110
+    },
+    {
+      "time_range": "18:30",
+      "avg_up_ratio": 92.6,
+      "count": 9,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 111
+    },
+    {
+      "time_range": "18:40",
+      "avg_up_ratio": 92.6,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 112
+    },
+    {
+      "time_range": "18:50",
+      "avg_up_ratio": 91.67,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 113
+    },
+    {
+      "time_range": "19:00",
+      "avg_up_ratio": 92.19,
+      "count": 9,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 114
+    },
+    {
+      "time_range": "19:10",
+      "avg_up_ratio": 84.74,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 115
+    },
+    {
+      "time_range": "19:20",
+      "avg_up_ratio": 69.58,
+      "count": 9,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 116
+    },
+    {
+      "time_range": "19:30",
+      "avg_up_ratio": 80.45,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 117
+    },
+    {
+      "time_range": "19:40",
+      "avg_up_ratio": 84.08,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 118
+    },
+    {
+      "time_range": "19:50",
+      "avg_up_ratio": 85.48,
+      "count": 9,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 119
+    },
+    {
+      "time_range": "20:00",
+      "avg_up_ratio": 92.08,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 120
+    },
+    {
+      "time_range": "20:10",
+      "avg_up_ratio": 90.74,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 121
+    },
+    {
+      "time_range": "20:20",
+      "avg_up_ratio": 93.36,
+      "count": 9,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 122
+    },
+    {
+      "time_range": "20:30",
+      "avg_up_ratio": 89.83,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 123
+    },
+    {
+      "time_range": "20:40",
+      "avg_up_ratio": 89.83,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 124
+    },
+    {
+      "time_range": "20:50",
+      "avg_up_ratio": 89.66,
+      "count": 9,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 125
+    },
+    {
+      "time_range": "21:00",
+      "avg_up_ratio": 92.6,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 126
+    },
+    {
+      "time_range": "21:10",
+      "avg_up_ratio": 94.24,
+      "count": 9,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 127
+    },
+    {
+      "time_range": "21:20",
+      "avg_up_ratio": 93.06,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 128
+    },
+    {
+      "time_range": "21:30",
+      "avg_up_ratio": 96.3,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 129
+    },
+    {
+      "time_range": "21:40",
+      "avg_up_ratio": 96.3,
+      "count": 9,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 130
+    },
+    {
+      "time_range": "21:50",
+      "avg_up_ratio": 96.3,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 131
+    },
+    {
+      "time_range": "22:00",
+      "avg_up_ratio": 96.3,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 132
+    },
+    {
+      "time_range": "22:10",
+      "avg_up_ratio": 95.89,
+      "count": 9,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 133
+    },
+    {
+      "time_range": "22:20",
+      "avg_up_ratio": 96.3,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 134
+    },
+    {
+      "time_range": "22:30",
+      "avg_up_ratio": 96.3,
+      "count": 9,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 135
+    },
+    {
+      "time_range": "22:40",
+      "avg_up_ratio": 96.3,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 136
+    },
+    {
+      "time_range": "22:50",
+      "avg_up_ratio": 94.91,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 137
+    },
+    {
+      "time_range": "23:00",
+      "avg_up_ratio": 94.2,
+      "count": 9,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 138
+    },
+    {
+      "time_range": "23:10",
+      "avg_up_ratio": 90.37,
+      "count": 7,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 139
+    },
+    {
+      "time_range": "23:20",
+      "avg_up_ratio": 92.56,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 140
+    },
+    {
+      "time_range": "23:30",
+      "avg_up_ratio": 88.9,
+      "count": 9,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 141
+    },
+    {
+      "time_range": "23:40",
+      "avg_up_ratio": 92.6,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 142
+    },
+    {
+      "time_range": "23:50",
+      "avg_up_ratio": 92.6,
+      "count": 8,
+      "color": "green",
+      "status": "多头强势",
+      "group_index": 143
+    }
+  ]
+}

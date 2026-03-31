@@ -1,0 +1,192 @@
+{"timestamp": 1770855806944, "beijing_time": "2026-02-12 08:23:26", "bullish_count": 5, "bearish_count": 0, "bullish_symbols": [{"symbol": "DOGE", "ratio": 83.3}, {"symbol": "LINK", "ratio": 83.3}, {"symbol": "NEAR", "ratio": 87.5}, {"symbol": "SUI", "ratio": 83.3}, {"symbol": "TAO", "ratio": 83.3}], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770855900082, "beijing_time": "2026-02-12 08:25:00", "bullish_count": 5, "bearish_count": 0, "bullish_symbols": [{"symbol": "DOGE", "ratio": 83.3}, {"symbol": "LINK", "ratio": 83.3}, {"symbol": "NEAR", "ratio": 87.5}, {"symbol": "SUI", "ratio": 83.3}, {"symbol": "TAO", "ratio": 83.3}], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770856200098, "beijing_time": "2026-02-12 08:30:00", "bullish_count": 7, "bearish_count": 0, "bullish_symbols": [{"symbol": "CFX", "ratio": 83.3}, {"symbol": "DOGE", "ratio": 83.3}, {"symbol": "LINK", "ratio": 83.3}, {"symbol": "NEAR", "ratio": 91.7}, {"symbol": "SUI", "ratio": 83.3}, {"symbol": "TAO", "ratio": 83.3}, {"symbol": "XLM", "ratio": 83.3}], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770856500099, "beijing_time": "2026-02-12 08:35:00", "bullish_count": 7, "bearish_count": 0, "bullish_symbols": [{"symbol": "CFX", "ratio": 83.3}, {"symbol": "DOGE", "ratio": 83.3}, {"symbol": "LINK", "ratio": 83.3}, {"symbol": "NEAR", "ratio": 91.7}, {"symbol": "SUI", "ratio": 87.5}, {"symbol": "TAO", "ratio": 87.5}, {"symbol": "XLM", "ratio": 83.3}], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770856800118, "beijing_time": "2026-02-12 08:40:00", "bullish_count": 10, "bearish_count": 0, "bullish_symbols": [{"symbol": "CFX", "ratio": 87.5}, {"symbol": "CRO", "ratio": 83.3}, {"symbol": "DOGE", "ratio": 87.5}, {"symbol": "DOT", "ratio": 83.3}, {"symbol": "LDO", "ratio": 83.3}, {"symbol": "LINK", "ratio": 87.5}, {"symbol": "NEAR", "ratio": 95.8}, {"symbol": "SUI", "ratio": 91.7}, {"symbol": "TAO", "ratio": 91.7}, {"symbol": "XLM", "ratio": 87.5}], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770857100121, "beijing_time": "2026-02-12 08:45:00", "bullish_count": 10, "bearish_count": 0, "bullish_symbols": [{"symbol": "CFX", "ratio": 87.5}, {"symbol": "CRO", "ratio": 87.5}, {"symbol": "DOGE", "ratio": 87.5}, {"symbol": "DOT", "ratio": 83.3}, {"symbol": "LDO", "ratio": 83.3}, {"symbol": "LINK", "ratio": 87.5}, {"symbol": "NEAR", "ratio": 95.8}, {"symbol": "SUI", "ratio": 91.7}, {"symbol": "TAO", "ratio": 87.5}, {"symbol": "XLM", "ratio": 91.7}], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770857400119, "beijing_time": "2026-02-12 08:50:00", "bullish_count": 11, "bearish_count": 0, "bullish_symbols": [{"symbol": "CFX", "ratio": 87.5}, {"symbol": "CRO", "ratio": 91.7}, {"symbol": "DOGE", "ratio": 87.5}, {"symbol": "DOT", "ratio": 83.3}, {"symbol": "LDO", "ratio": 83.3}, {"symbol": "LINK", "ratio": 87.5}, {"symbol": "NEAR", "ratio": 95.8}, {"symbol": "SUI", "ratio": 91.7}, {"symbol": "TAO", "ratio": 83.3}, {"symbol": "TON", "ratio": 83.3}, {"symbol": "XLM", "ratio": 91.7}], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770857700122, "beijing_time": "2026-02-12 08:55:00", "bullish_count": 8, "bearish_count": 0, "bullish_symbols": [{"symbol": "CFX", "ratio": 83.3}, {"symbol": "CRO", "ratio": 87.5}, {"symbol": "DOGE", "ratio": 83.3}, {"symbol": "LINK", "ratio": 83.3}, {"symbol": "NEAR", "ratio": 91.7}, {"symbol": "SUI", "ratio": 87.5}, {"symbol": "TON", "ratio": 83.3}, {"symbol": "XLM", "ratio": 87.5}], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770858000122, "beijing_time": "2026-02-12 09:00:00", "bullish_count": 5, "bearish_count": 0, "bullish_symbols": [{"symbol": "CRO", "ratio": 83.3}, {"symbol": "NEAR", "ratio": 87.5}, {"symbol": "SUI", "ratio": 83.3}, {"symbol": "TON", "ratio": 87.5}, {"symbol": "XLM", "ratio": 83.3}], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770858300110, "beijing_time": "2026-02-12 09:05:00", "bullish_count": 3, "bearish_count": 0, "bullish_symbols": [{"symbol": "CRO", "ratio": 83.3}, {"symbol": "NEAR", "ratio": 83.3}, {"symbol": "TON", "ratio": 91.7}], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770858600119, "beijing_time": "2026-02-12 09:10:00", "bullish_count": 3, "bearish_count": 0, "bullish_symbols": [{"symbol": "CRO", "ratio": 83.3}, {"symbol": "NEAR", "ratio": 83.3}, {"symbol": "TON", "ratio": 91.7}], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770858900357, "beijing_time": "2026-02-12 09:15:00", "bullish_count": 3, "bearish_count": 0, "bullish_symbols": [{"symbol": "CRO", "ratio": 83.3}, {"symbol": "NEAR", "ratio": 83.3}, {"symbol": "TON", "ratio": 91.7}], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770859200350, "beijing_time": "2026-02-12 09:20:00", "bullish_count": 4, "bearish_count": 0, "bullish_symbols": [{"symbol": "CRO", "ratio": 83.3}, {"symbol": "CRV", "ratio": 83.3}, {"symbol": "NEAR", "ratio": 83.3}, {"symbol": "TON", "ratio": 87.5}], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770859500116, "beijing_time": "2026-02-12 09:25:00", "bullish_count": 2, "bearish_count": 0, "bullish_symbols": [{"symbol": "CRV", "ratio": 83.3}, {"symbol": "TON", "ratio": 83.3}], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770859800122, "beijing_time": "2026-02-12 09:30:00", "bullish_count": 2, "bearish_count": 0, "bullish_symbols": [{"symbol": "CRV", "ratio": 83.3}, {"symbol": "TON", "ratio": 83.3}], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770860100120, "beijing_time": "2026-02-12 09:35:00", "bullish_count": 2, "bearish_count": 0, "bullish_symbols": [{"symbol": "CRV", "ratio": 83.3}, {"symbol": "TON", "ratio": 83.3}], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770860400116, "beijing_time": "2026-02-12 09:40:00", "bullish_count": 2, "bearish_count": 0, "bullish_symbols": [{"symbol": "CRV", "ratio": 83.3}, {"symbol": "TON", "ratio": 83.3}], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770860700119, "beijing_time": "2026-02-12 09:45:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770861000121, "beijing_time": "2026-02-12 09:50:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770861300129, "beijing_time": "2026-02-12 09:55:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770861600116, "beijing_time": "2026-02-12 10:00:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770861900124, "beijing_time": "2026-02-12 10:05:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770862200132, "beijing_time": "2026-02-12 10:10:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770862500122, "beijing_time": "2026-02-12 10:15:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770862800129, "beijing_time": "2026-02-12 10:20:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770863100127, "beijing_time": "2026-02-12 10:25:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770863400134, "beijing_time": "2026-02-12 10:30:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770863700126, "beijing_time": "2026-02-12 10:35:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770864000127, "beijing_time": "2026-02-12 10:40:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770864300128, "beijing_time": "2026-02-12 10:45:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770864600162, "beijing_time": "2026-02-12 10:50:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770864900166, "beijing_time": "2026-02-12 10:55:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770865200124, "beijing_time": "2026-02-12 11:00:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770865500118, "beijing_time": "2026-02-12 11:05:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770865800100, "beijing_time": "2026-02-12 11:10:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770866100102, "beijing_time": "2026-02-12 11:15:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770866400124, "beijing_time": "2026-02-12 11:20:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770866700094, "beijing_time": "2026-02-12 11:25:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770867000098, "beijing_time": "2026-02-12 11:30:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770867300132, "beijing_time": "2026-02-12 11:35:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770867600118, "beijing_time": "2026-02-12 11:40:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770867908891, "beijing_time": "2026-02-12 11:45:08", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770868203401, "beijing_time": "2026-02-12 11:50:03", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770868511386, "beijing_time": "2026-02-12 11:55:11", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770868812642, "beijing_time": "2026-02-12 12:00:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770869108448, "beijing_time": "2026-02-12 12:05:08", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770869405916, "beijing_time": "2026-02-12 12:10:05", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770869712927, "beijing_time": "2026-02-12 12:15:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770870012504, "beijing_time": "2026-02-12 12:20:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770870312295, "beijing_time": "2026-02-12 12:25:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770870612197, "beijing_time": "2026-02-12 12:30:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770870911699, "beijing_time": "2026-02-12 12:35:11", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770871212603, "beijing_time": "2026-02-12 12:40:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770871512276, "beijing_time": "2026-02-12 12:45:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770871813216, "beijing_time": "2026-02-12 12:50:13", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770872112499, "beijing_time": "2026-02-12 12:55:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770872411844, "beijing_time": "2026-02-12 13:00:11", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770872712973, "beijing_time": "2026-02-12 13:05:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770873012376, "beijing_time": "2026-02-12 13:10:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770873348149, "beijing_time": "2026-02-12 13:15:48", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770873602794, "beijing_time": "2026-02-12 13:20:02", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770873904519, "beijing_time": "2026-02-12 13:25:04", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770874212456, "beijing_time": "2026-02-12 13:30:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770874512231, "beijing_time": "2026-02-12 13:35:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770874812150, "beijing_time": "2026-02-12 13:40:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770875113049, "beijing_time": "2026-02-12 13:45:13", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770875412655, "beijing_time": "2026-02-12 13:50:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770875712225, "beijing_time": "2026-02-12 13:55:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770876009202, "beijing_time": "2026-02-12 14:00:09", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770876305086, "beijing_time": "2026-02-12 14:05:05", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770876602791, "beijing_time": "2026-02-12 14:10:02", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770876900063, "beijing_time": "2026-02-12 14:15:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770877212267, "beijing_time": "2026-02-12 14:20:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770877511921, "beijing_time": "2026-02-12 14:25:11", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770877812794, "beijing_time": "2026-02-12 14:30:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770878112431, "beijing_time": "2026-02-12 14:35:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770878412380, "beijing_time": "2026-02-12 14:40:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770878711971, "beijing_time": "2026-02-12 14:45:11", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770879012808, "beijing_time": "2026-02-12 14:50:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770879312561, "beijing_time": "2026-02-12 14:55:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770879612225, "beijing_time": "2026-02-12 15:00:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770879911994, "beijing_time": "2026-02-12 15:05:11", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770880212706, "beijing_time": "2026-02-12 15:10:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770880512614, "beijing_time": "2026-02-12 15:15:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770880812355, "beijing_time": "2026-02-12 15:20:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770881105285, "beijing_time": "2026-02-12 15:25:05", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770881409017, "beijing_time": "2026-02-12 15:30:09", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770881704660, "beijing_time": "2026-02-12 15:35:04", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770882010583, "beijing_time": "2026-02-12 15:40:10", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770882300198, "beijing_time": "2026-02-12 15:45:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770882612165, "beijing_time": "2026-02-12 15:50:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770882911916, "beijing_time": "2026-02-12 15:55:11", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770883212896, "beijing_time": "2026-02-12 16:00:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770883512510, "beijing_time": "2026-02-12 16:05:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770883811859, "beijing_time": "2026-02-12 16:10:11", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770884103040, "beijing_time": "2026-02-12 16:15:03", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770884411788, "beijing_time": "2026-02-12 16:20:11", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770884712657, "beijing_time": "2026-02-12 16:25:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770885002489, "beijing_time": "2026-02-12 16:30:02", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770885302967, "beijing_time": "2026-02-12 16:35:02", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770885611784, "beijing_time": "2026-02-12 16:40:11", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770885912460, "beijing_time": "2026-02-12 16:45:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770886212272, "beijing_time": "2026-02-12 16:50:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770886511028, "beijing_time": "2026-02-12 16:55:11", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770886803759, "beijing_time": "2026-02-12 17:00:03", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770887111429, "beijing_time": "2026-02-12 17:05:11", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770887403645, "beijing_time": "2026-02-12 17:10:03", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770887712064, "beijing_time": "2026-02-12 17:15:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770888000189, "beijing_time": "2026-02-12 17:20:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770888312708, "beijing_time": "2026-02-12 17:25:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770888605235, "beijing_time": "2026-02-12 17:30:05", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770888909402, "beijing_time": "2026-02-12 17:35:09", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770889212061, "beijing_time": "2026-02-12 17:40:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770889503735, "beijing_time": "2026-02-12 17:45:03", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770889811459, "beijing_time": "2026-02-12 17:50:11", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770890112166, "beijing_time": "2026-02-12 17:55:12", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770890411782, "beijing_time": "2026-02-12 18:00:11", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770890700146, "beijing_time": "2026-02-12 18:05:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770891000127, "beijing_time": "2026-02-12 18:10:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770891300119, "beijing_time": "2026-02-12 18:15:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770891600123, "beijing_time": "2026-02-12 18:20:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770891900123, "beijing_time": "2026-02-12 18:25:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770892200120, "beijing_time": "2026-02-12 18:30:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770892500123, "beijing_time": "2026-02-12 18:35:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770892800133, "beijing_time": "2026-02-12 18:40:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770893100130, "beijing_time": "2026-02-12 18:45:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770893400130, "beijing_time": "2026-02-12 18:50:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770893700129, "beijing_time": "2026-02-12 18:55:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770894000122, "beijing_time": "2026-02-12 19:00:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770894300122, "beijing_time": "2026-02-12 19:05:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770894600135, "beijing_time": "2026-02-12 19:10:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770894900135, "beijing_time": "2026-02-12 19:15:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770895200121, "beijing_time": "2026-02-12 19:20:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770895500119, "beijing_time": "2026-02-12 19:25:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770895800127, "beijing_time": "2026-02-12 19:30:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770896100146, "beijing_time": "2026-02-12 19:35:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770896400136, "beijing_time": "2026-02-12 19:40:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770896700132, "beijing_time": "2026-02-12 19:45:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770897000128, "beijing_time": "2026-02-12 19:50:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770897300114, "beijing_time": "2026-02-12 19:55:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770897600125, "beijing_time": "2026-02-12 20:00:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770897900130, "beijing_time": "2026-02-12 20:05:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770898200130, "beijing_time": "2026-02-12 20:10:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770898500097, "beijing_time": "2026-02-12 20:15:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770898800572, "beijing_time": "2026-02-12 20:20:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770899100599, "beijing_time": "2026-02-12 20:25:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770899400123, "beijing_time": "2026-02-12 20:30:00", "bullish_count": 0, "bearish_count": 1, "bullish_symbols": [], "bearish_symbols": [{"symbol": "CFX", "ratio": 83.3}], "total_monitored": 28}
+{"timestamp": 1770899700128, "beijing_time": "2026-02-12 20:35:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770900000092, "beijing_time": "2026-02-12 20:40:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770900300095, "beijing_time": "2026-02-12 20:45:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770900600134, "beijing_time": "2026-02-12 20:50:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770900900126, "beijing_time": "2026-02-12 20:55:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770901200121, "beijing_time": "2026-02-12 21:00:00", "bullish_count": 0, "bearish_count": 2, "bullish_symbols": [], "bearish_symbols": [{"symbol": "CFX", "ratio": 83.3}, {"symbol": "NEAR", "ratio": 83.3}], "total_monitored": 28}
+{"timestamp": 1770901500127, "beijing_time": "2026-02-12 21:05:00", "bullish_count": 0, "bearish_count": 2, "bullish_symbols": [], "bearish_symbols": [{"symbol": "CFX", "ratio": 83.3}, {"symbol": "NEAR", "ratio": 87.5}], "total_monitored": 28}
+{"timestamp": 1770901800125, "beijing_time": "2026-02-12 21:10:00", "bullish_count": 0, "bearish_count": 2, "bullish_symbols": [], "bearish_symbols": [{"symbol": "CFX", "ratio": 87.5}, {"symbol": "NEAR", "ratio": 87.5}], "total_monitored": 28}
+{"timestamp": 1770902100122, "beijing_time": "2026-02-12 21:15:00", "bullish_count": 0, "bearish_count": 2, "bullish_symbols": [], "bearish_symbols": [{"symbol": "CFX", "ratio": 83.3}, {"symbol": "NEAR", "ratio": 83.3}], "total_monitored": 28}
+{"timestamp": 1770902400301, "beijing_time": "2026-02-12 21:20:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770902700297, "beijing_time": "2026-02-12 21:25:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770903000090, "beijing_time": "2026-02-12 21:30:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770903300103, "beijing_time": "2026-02-12 21:35:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770903600150, "beijing_time": "2026-02-12 21:40:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770903900147, "beijing_time": "2026-02-12 21:45:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770904200134, "beijing_time": "2026-02-12 21:50:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770904500141, "beijing_time": "2026-02-12 21:55:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770904811859, "beijing_time": "2026-02-12 22:00:11", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770905100167, "beijing_time": "2026-02-12 22:05:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770905400126, "beijing_time": "2026-02-12 22:10:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770905700140, "beijing_time": "2026-02-12 22:15:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770906000131, "beijing_time": "2026-02-12 22:20:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770906300111, "beijing_time": "2026-02-12 22:25:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770906600119, "beijing_time": "2026-02-12 22:30:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770906900125, "beijing_time": "2026-02-12 22:35:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770907200118, "beijing_time": "2026-02-12 22:40:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770907500225, "beijing_time": "2026-02-12 22:45:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770907800232, "beijing_time": "2026-02-12 22:50:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770908100142, "beijing_time": "2026-02-12 22:55:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770908400139, "beijing_time": "2026-02-12 23:00:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770908700126, "beijing_time": "2026-02-12 23:05:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770909000127, "beijing_time": "2026-02-12 23:10:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770909300128, "beijing_time": "2026-02-12 23:15:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770909600124, "beijing_time": "2026-02-12 23:20:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770909900129, "beijing_time": "2026-02-12 23:25:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770910200128, "beijing_time": "2026-02-12 23:30:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770910500130, "beijing_time": "2026-02-12 23:35:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770910800130, "beijing_time": "2026-02-12 23:40:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770911100128, "beijing_time": "2026-02-12 23:45:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770911400126, "beijing_time": "2026-02-12 23:50:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770911700121, "beijing_time": "2026-02-12 23:55:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770911760183, "beijing_time": "2026-02-12 23:56:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770911820249, "beijing_time": "2026-02-12 23:57:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770911880292, "beijing_time": "2026-02-12 23:58:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}
+{"timestamp": 1770911940360, "beijing_time": "2026-02-12 23:59:00", "bullish_count": 0, "bearish_count": 0, "bullish_symbols": [], "bearish_symbols": [], "total_monitored": 28}

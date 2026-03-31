@@ -1,0 +1,20 @@
+{
+  "date": "2026-03-02",
+  "total_bullish": 1,
+  "total_bearish": 23,
+  "total_points": 293,
+  "unique_bullish_symbols": [
+    "TON"
+  ],
+  "unique_bearish_symbols": [
+    "CRO",
+    "CRV",
+    "DOT",
+    "SOL",
+    "XLM",
+    "XRP"
+  ],
+  "unique_bullish_count": 1,
+  "unique_bearish_count": 6,
+  "generated_at": "2026-03-03 00:05:49"
+}

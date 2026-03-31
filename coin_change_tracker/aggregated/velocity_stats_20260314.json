@@ -1,0 +1,6907 @@
+{
+  "date": "20260314",
+  "type": "velocity_stats",
+  "generated_at": "2026-03-14T23:58:53.764081+08:00",
+  "data": [
+    {
+      "time": "2026-03-14 00:10:32",
+      "total_change": 1.38,
+      "cumulative_pct": 1.38,
+      "velocity": 1.38
+    },
+    {
+      "time": "2026-03-14 00:11:56",
+      "total_change": 4.33,
+      "cumulative_pct": 4.33,
+      "velocity": 4.33
+    },
+    {
+      "time": "2026-03-14 00:13:08",
+      "total_change": 3.18,
+      "cumulative_pct": 3.18,
+      "velocity": 3.18
+    },
+    {
+      "time": "2026-03-14 00:14:19",
+      "total_change": 0.37,
+      "cumulative_pct": 0.37,
+      "velocity": 0.37
+    },
+    {
+      "time": "2026-03-14 00:15:31",
+      "total_change": 2.01,
+      "cumulative_pct": 2.01,
+      "velocity": 2.01
+    },
+    {
+      "time": "2026-03-14 00:16:43",
+      "total_change": -4.13,
+      "cumulative_pct": -4.13,
+      "velocity": 4.13
+    },
+    {
+      "time": "2026-03-14 00:18:07",
+      "total_change": -2.14,
+      "cumulative_pct": -2.14,
+      "velocity": 2.14
+    },
+    {
+      "time": "2026-03-14 00:19:19",
+      "total_change": -5.25,
+      "cumulative_pct": -5.25,
+      "velocity": 5.25
+    },
+    {
+      "time": "2026-03-14 00:20:31",
+      "total_change": -4.33,
+      "cumulative_pct": -4.33,
+      "velocity": 4.33
+    },
+    {
+      "time": "2026-03-14 00:21:43",
+      "total_change": -7.58,
+      "cumulative_pct": -7.58,
+      "velocity": 7.58
+    },
+    {
+      "time": "2026-03-14 00:22:54",
+      "total_change": -4.78,
+      "cumulative_pct": -4.78,
+      "velocity": 4.78
+    },
+    {
+      "time": "2026-03-14 00:24:18",
+      "total_change": -4.05,
+      "cumulative_pct": -4.05,
+      "velocity": 4.05
+    },
+    {
+      "time": "2026-03-14 00:25:30",
+      "total_change": -5.1,
+      "cumulative_pct": -5.1,
+      "velocity": 5.1
+    },
+    {
+      "time": "2026-03-14 00:26:43",
+      "total_change": -13.15,
+      "cumulative_pct": -13.15,
+      "velocity": 13.15
+    },
+    {
+      "time": "2026-03-14 00:27:54",
+      "total_change": -5.95,
+      "cumulative_pct": -5.95,
+      "velocity": 5.95
+    },
+    {
+      "time": "2026-03-14 00:29:18",
+      "total_change": -5.42,
+      "cumulative_pct": -5.42,
+      "velocity": 5.42
+    },
+    {
+      "time": "2026-03-14 00:30:30",
+      "total_change": 0.4,
+      "cumulative_pct": 0.4,
+      "velocity": 0.4
+    },
+    {
+      "time": "2026-03-14 00:31:42",
+      "total_change": -0.63,
+      "cumulative_pct": -0.63,
+      "velocity": 0.63
+    },
+    {
+      "time": "2026-03-14 00:32:54",
+      "total_change": 0.89,
+      "cumulative_pct": 0.89,
+      "velocity": 0.89
+    },
+    {
+      "time": "2026-03-14 00:34:06",
+      "total_change": 3.55,
+      "cumulative_pct": 3.55,
+      "velocity": 3.55
+    },
+    {
+      "time": "2026-03-14 00:35:31",
+      "total_change": 3.87,
+      "cumulative_pct": 3.87,
+      "velocity": 3.87
+    },
+    {
+      "time": "2026-03-14 00:36:43",
+      "total_change": 8.15,
+      "cumulative_pct": 8.15,
+      "velocity": 8.15
+    },
+    {
+      "time": "2026-03-14 00:37:55",
+      "total_change": 9.16,
+      "cumulative_pct": 9.16,
+      "velocity": 9.16
+    },
+    {
+      "time": "2026-03-14 00:39:07",
+      "total_change": 7.15,
+      "cumulative_pct": 7.15,
+      "velocity": 7.15
+    },
+    {
+      "time": "2026-03-14 00:40:31",
+      "total_change": 7.88,
+      "cumulative_pct": 7.88,
+      "velocity": 7.88
+    },
+    {
+      "time": "2026-03-14 00:41:43",
+      "total_change": 10.19,
+      "cumulative_pct": 10.19,
+      "velocity": 10.19
+    },
+    {
+      "time": "2026-03-14 00:42:56",
+      "total_change": 10.72,
+      "cumulative_pct": 10.72,
+      "velocity": 10.72
+    },
+    {
+      "time": "2026-03-14 00:44:08",
+      "total_change": 11.01,
+      "cumulative_pct": 11.01,
+      "velocity": 11.01
+    },
+    {
+      "time": "2026-03-14 00:45:32",
+      "total_change": 10.11,
+      "cumulative_pct": 10.11,
+      "velocity": 10.11
+    },
+    {
+      "time": "2026-03-14 00:46:44",
+      "total_change": 10.64,
+      "cumulative_pct": 10.64,
+      "velocity": 10.64
+    },
+    {
+      "time": "2026-03-14 00:47:56",
+      "total_change": 10.39,
+      "cumulative_pct": 10.39,
+      "velocity": 10.39
+    },
+    {
+      "time": "2026-03-14 00:49:07",
+      "total_change": 10.84,
+      "cumulative_pct": 10.84,
+      "velocity": 10.84
+    },
+    {
+      "time": "2026-03-14 00:50:19",
+      "total_change": 11.88,
+      "cumulative_pct": 11.88,
+      "velocity": 11.88
+    },
+    {
+      "time": "2026-03-14 00:51:43",
+      "total_change": 11.72,
+      "cumulative_pct": 11.72,
+      "velocity": 11.72
+    },
+    {
+      "time": "2026-03-14 00:52:55",
+      "total_change": 11.73,
+      "cumulative_pct": 11.73,
+      "velocity": 11.73
+    },
+    {
+      "time": "2026-03-14 00:54:07",
+      "total_change": 13.29,
+      "cumulative_pct": 13.29,
+      "velocity": 13.29
+    },
+    {
+      "time": "2026-03-14 00:55:19",
+      "total_change": 12.13,
+      "cumulative_pct": 12.13,
+      "velocity": 12.13
+    },
+    {
+      "time": "2026-03-14 00:56:31",
+      "total_change": 8.61,
+      "cumulative_pct": 8.61,
+      "velocity": 8.61
+    },
+    {
+      "time": "2026-03-14 00:57:54",
+      "total_change": 9.43,
+      "cumulative_pct": 9.43,
+      "velocity": 9.43
+    },
+    {
+      "time": "2026-03-14 00:59:06",
+      "total_change": 8.14,
+      "cumulative_pct": 8.14,
+      "velocity": 8.14
+    },
+    {
+      "time": "2026-03-14 01:00:18",
+      "total_change": 8.35,
+      "cumulative_pct": 8.35,
+      "velocity": 8.35
+    },
+    {
+      "time": "2026-03-14 01:01:30",
+      "total_change": 10.97,
+      "cumulative_pct": 10.97,
+      "velocity": 10.97
+    },
+    {
+      "time": "2026-03-14 01:02:42",
+      "total_change": 7.14,
+      "cumulative_pct": 7.14,
+      "velocity": 7.14
+    },
+    {
+      "time": "2026-03-14 01:04:16",
+      "total_change": 7.17,
+      "cumulative_pct": 7.17,
+      "velocity": 7.17
+    },
+    {
+      "time": "2026-03-14 01:05:28",
+      "total_change": 8.04,
+      "cumulative_pct": 8.04,
+      "velocity": 8.04
+    },
+    {
+      "time": "2026-03-14 01:06:40",
+      "total_change": 8.56,
+      "cumulative_pct": 8.56,
+      "velocity": 8.56
+    },
+    {
+      "time": "2026-03-14 01:07:51",
+      "total_change": 8.09,
+      "cumulative_pct": 8.09,
+      "velocity": 8.09
+    },
+    {
+      "time": "2026-03-14 01:09:19",
+      "total_change": 10.72,
+      "cumulative_pct": 10.72,
+      "velocity": 10.72
+    },
+    {
+      "time": "2026-03-14 01:10:31",
+      "total_change": 8.93,
+      "cumulative_pct": 8.93,
+      "velocity": 8.93
+    },
+    {
+      "time": "2026-03-14 01:11:42",
+      "total_change": 8.05,
+      "cumulative_pct": 8.05,
+      "velocity": 8.05
+    },
+    {
+      "time": "2026-03-14 01:12:54",
+      "total_change": 10.87,
+      "cumulative_pct": 10.87,
+      "velocity": 10.87
+    },
+    {
+      "time": "2026-03-14 01:14:19",
+      "total_change": 9.52,
+      "cumulative_pct": 9.52,
+      "velocity": 9.52
+    },
+    {
+      "time": "2026-03-14 01:15:31",
+      "total_change": 12.61,
+      "cumulative_pct": 12.61,
+      "velocity": 12.61
+    },
+    {
+      "time": "2026-03-14 01:16:43",
+      "total_change": 13.67,
+      "cumulative_pct": 13.67,
+      "velocity": 13.67
+    },
+    {
+      "time": "2026-03-14 01:17:54",
+      "total_change": 10.8,
+      "cumulative_pct": 10.8,
+      "velocity": 10.8
+    },
+    {
+      "time": "2026-03-14 01:19:18",
+      "total_change": 9.87,
+      "cumulative_pct": 9.87,
+      "velocity": 9.87
+    },
+    {
+      "time": "2026-03-14 01:20:30",
+      "total_change": 11.97,
+      "cumulative_pct": 11.97,
+      "velocity": 11.97
+    },
+    {
+      "time": "2026-03-14 01:21:42",
+      "total_change": 7.05,
+      "cumulative_pct": 7.05,
+      "velocity": 7.05
+    },
+    {
+      "time": "2026-03-14 01:22:54",
+      "total_change": 4.9,
+      "cumulative_pct": 4.9,
+      "velocity": 4.9
+    },
+    {
+      "time": "2026-03-14 01:24:06",
+      "total_change": 5.49,
+      "cumulative_pct": 5.49,
+      "velocity": 5.49
+    },
+    {
+      "time": "2026-03-14 01:25:30",
+      "total_change": 0.29,
+      "cumulative_pct": 0.29,
+      "velocity": 0.29
+    },
+    {
+      "time": "2026-03-14 01:26:42",
+      "total_change": 0.35,
+      "cumulative_pct": 0.35,
+      "velocity": 0.35
+    },
+    {
+      "time": "2026-03-14 01:27:54",
+      "total_change": -6.76,
+      "cumulative_pct": -6.76,
+      "velocity": 6.76
+    },
+    {
+      "time": "2026-03-14 01:29:06",
+      "total_change": -7.35,
+      "cumulative_pct": -7.35,
+      "velocity": 7.35
+    },
+    {
+      "time": "2026-03-14 01:30:22",
+      "total_change": -6.7,
+      "cumulative_pct": -6.7,
+      "velocity": 6.7
+    },
+    {
+      "time": "2026-03-14 01:31:48",
+      "total_change": -7.98,
+      "cumulative_pct": -7.98,
+      "velocity": 7.98
+    },
+    {
+      "time": "2026-03-14 01:33:00",
+      "total_change": -7.84,
+      "cumulative_pct": -7.84,
+      "velocity": 7.84
+    },
+    {
+      "time": "2026-03-14 01:34:12",
+      "total_change": -7.03,
+      "cumulative_pct": -7.03,
+      "velocity": 7.03
+    },
+    {
+      "time": "2026-03-14 01:35:24",
+      "total_change": -10.57,
+      "cumulative_pct": -10.57,
+      "velocity": 10.57
+    },
+    {
+      "time": "2026-03-14 01:36:47",
+      "total_change": -10.33,
+      "cumulative_pct": -10.33,
+      "velocity": 10.33
+    },
+    {
+      "time": "2026-03-14 01:37:59",
+      "total_change": -14.8,
+      "cumulative_pct": -14.8,
+      "velocity": 14.8
+    },
+    {
+      "time": "2026-03-14 01:39:11",
+      "total_change": -12.71,
+      "cumulative_pct": -12.71,
+      "velocity": 12.71
+    },
+    {
+      "time": "2026-03-14 01:40:23",
+      "total_change": -14.16,
+      "cumulative_pct": -14.16,
+      "velocity": 14.16
+    },
+    {
+      "time": "2026-03-14 01:41:35",
+      "total_change": -16.51,
+      "cumulative_pct": -16.51,
+      "velocity": 16.51
+    },
+    {
+      "time": "2026-03-14 01:42:59",
+      "total_change": -19.32,
+      "cumulative_pct": -19.32,
+      "velocity": 19.32
+    },
+    {
+      "time": "2026-03-14 01:44:10",
+      "total_change": -22.44,
+      "cumulative_pct": -22.44,
+      "velocity": 22.44
+    },
+    {
+      "time": "2026-03-14 01:45:22",
+      "total_change": -20.74,
+      "cumulative_pct": -20.74,
+      "velocity": 20.74
+    },
+    {
+      "time": "2026-03-14 01:46:34",
+      "total_change": -26.03,
+      "cumulative_pct": -26.03,
+      "velocity": 26.03
+    },
+    {
+      "time": "2026-03-14 01:47:46",
+      "total_change": -27.63,
+      "cumulative_pct": -27.63,
+      "velocity": 27.63
+    },
+    {
+      "time": "2026-03-14 01:49:10",
+      "total_change": -25.07,
+      "cumulative_pct": -25.07,
+      "velocity": 25.07
+    },
+    {
+      "time": "2026-03-14 01:50:22",
+      "total_change": -29.94,
+      "cumulative_pct": -29.94,
+      "velocity": 29.94
+    },
+    {
+      "time": "2026-03-14 01:51:34",
+      "total_change": -29.46,
+      "cumulative_pct": -29.46,
+      "velocity": 29.46
+    },
+    {
+      "time": "2026-03-14 01:52:46",
+      "total_change": -27.39,
+      "cumulative_pct": -27.39,
+      "velocity": 27.39
+    },
+    {
+      "time": "2026-03-14 01:53:58",
+      "total_change": -23.73,
+      "cumulative_pct": -23.73,
+      "velocity": 23.73
+    },
+    {
+      "time": "2026-03-14 01:55:21",
+      "total_change": -24.95,
+      "cumulative_pct": -24.95,
+      "velocity": 24.95
+    },
+    {
+      "time": "2026-03-14 01:56:33",
+      "total_change": -21.65,
+      "cumulative_pct": -21.65,
+      "velocity": 21.65
+    },
+    {
+      "time": "2026-03-14 01:57:45",
+      "total_change": -28.63,
+      "cumulative_pct": -28.63,
+      "velocity": 28.63
+    },
+    {
+      "time": "2026-03-14 01:58:57",
+      "total_change": -24.53,
+      "cumulative_pct": -24.53,
+      "velocity": 24.53
+    },
+    {
+      "time": "2026-03-14 02:00:08",
+      "total_change": -22.57,
+      "cumulative_pct": -22.57,
+      "velocity": 22.57
+    },
+    {
+      "time": "2026-03-14 02:01:33",
+      "total_change": -21.52,
+      "cumulative_pct": -21.52,
+      "velocity": 21.52
+    },
+    {
+      "time": "2026-03-14 02:02:44",
+      "total_change": -21.73,
+      "cumulative_pct": -21.73,
+      "velocity": 21.73
+    },
+    {
+      "time": "2026-03-14 02:03:56",
+      "total_change": -21.22,
+      "cumulative_pct": -21.22,
+      "velocity": 21.22
+    },
+    {
+      "time": "2026-03-14 02:05:08",
+      "total_change": -20.54,
+      "cumulative_pct": -20.54,
+      "velocity": 20.54
+    },
+    {
+      "time": "2026-03-14 02:06:20",
+      "total_change": -20.53,
+      "cumulative_pct": -20.53,
+      "velocity": 20.53
+    },
+    {
+      "time": "2026-03-14 02:07:44",
+      "total_change": -22.26,
+      "cumulative_pct": -22.26,
+      "velocity": 22.26
+    },
+    {
+      "time": "2026-03-14 02:08:56",
+      "total_change": -21.95,
+      "cumulative_pct": -21.95,
+      "velocity": 21.95
+    },
+    {
+      "time": "2026-03-14 02:10:08",
+      "total_change": -21.67,
+      "cumulative_pct": -21.67,
+      "velocity": 21.67
+    },
+    {
+      "time": "2026-03-14 02:11:20",
+      "total_change": -24.81,
+      "cumulative_pct": -24.81,
+      "velocity": 24.81
+    },
+    {
+      "time": "2026-03-14 02:12:32",
+      "total_change": -23.98,
+      "cumulative_pct": -23.98,
+      "velocity": 23.98
+    },
+    {
+      "time": "2026-03-14 02:13:55",
+      "total_change": -18.0,
+      "cumulative_pct": -18.0,
+      "velocity": 18.0
+    },
+    {
+      "time": "2026-03-14 02:15:07",
+      "total_change": -17.51,
+      "cumulative_pct": -17.51,
+      "velocity": 17.51
+    },
+    {
+      "time": "2026-03-14 02:16:19",
+      "total_change": -17.42,
+      "cumulative_pct": -17.42,
+      "velocity": 17.42
+    },
+    {
+      "time": "2026-03-14 02:17:31",
+      "total_change": -18.51,
+      "cumulative_pct": -18.51,
+      "velocity": 18.51
+    },
+    {
+      "time": "2026-03-14 02:18:43",
+      "total_change": -25.3,
+      "cumulative_pct": -25.3,
+      "velocity": 25.3
+    },
+    {
+      "time": "2026-03-14 02:20:08",
+      "total_change": -26.12,
+      "cumulative_pct": -26.12,
+      "velocity": 26.12
+    },
+    {
+      "time": "2026-03-14 02:21:20",
+      "total_change": -25.61,
+      "cumulative_pct": -25.61,
+      "velocity": 25.61
+    },
+    {
+      "time": "2026-03-14 02:22:32",
+      "total_change": -26.71,
+      "cumulative_pct": -26.71,
+      "velocity": 26.71
+    },
+    {
+      "time": "2026-03-14 02:23:44",
+      "total_change": -30.06,
+      "cumulative_pct": -30.06,
+      "velocity": 30.06
+    },
+    {
+      "time": "2026-03-14 02:25:08",
+      "total_change": -30.36,
+      "cumulative_pct": -30.36,
+      "velocity": 30.36
+    },
+    {
+      "time": "2026-03-14 02:26:20",
+      "total_change": -29.14,
+      "cumulative_pct": -29.14,
+      "velocity": 29.14
+    },
+    {
+      "time": "2026-03-14 02:27:31",
+      "total_change": -29.42,
+      "cumulative_pct": -29.42,
+      "velocity": 29.42
+    },
+    {
+      "time": "2026-03-14 02:28:43",
+      "total_change": -26.49,
+      "cumulative_pct": -26.49,
+      "velocity": 26.49
+    },
+    {
+      "time": "2026-03-14 02:29:55",
+      "total_change": -21.48,
+      "cumulative_pct": -21.48,
+      "velocity": 21.48
+    },
+    {
+      "time": "2026-03-14 02:31:19",
+      "total_change": -19.17,
+      "cumulative_pct": -19.17,
+      "velocity": 19.17
+    },
+    {
+      "time": "2026-03-14 02:32:31",
+      "total_change": -19.23,
+      "cumulative_pct": -19.23,
+      "velocity": 19.23
+    },
+    {
+      "time": "2026-03-14 02:33:43",
+      "total_change": -20.58,
+      "cumulative_pct": -20.58,
+      "velocity": 20.58
+    },
+    {
+      "time": "2026-03-14 02:34:55",
+      "total_change": -18.43,
+      "cumulative_pct": -18.43,
+      "velocity": 18.43
+    },
+    {
+      "time": "2026-03-14 02:36:07",
+      "total_change": -18.2,
+      "cumulative_pct": -18.2,
+      "velocity": 18.2
+    },
+    {
+      "time": "2026-03-14 02:37:30",
+      "total_change": -18.2,
+      "cumulative_pct": -18.2,
+      "velocity": 18.2
+    },
+    {
+      "time": "2026-03-14 02:38:42",
+      "total_change": -19.63,
+      "cumulative_pct": -19.63,
+      "velocity": 19.63
+    },
+    {
+      "time": "2026-03-14 02:39:54",
+      "total_change": -18.44,
+      "cumulative_pct": -18.44,
+      "velocity": 18.44
+    },
+    {
+      "time": "2026-03-14 02:41:06",
+      "total_change": -17.92,
+      "cumulative_pct": -17.92,
+      "velocity": 17.92
+    },
+    {
+      "time": "2026-03-14 02:42:18",
+      "total_change": -18.92,
+      "cumulative_pct": -18.92,
+      "velocity": 18.92
+    },
+    {
+      "time": "2026-03-14 02:43:47",
+      "total_change": -15.05,
+      "cumulative_pct": -15.05,
+      "velocity": 15.05
+    },
+    {
+      "time": "2026-03-14 02:44:58",
+      "total_change": -18.08,
+      "cumulative_pct": -18.08,
+      "velocity": 18.08
+    },
+    {
+      "time": "2026-03-14 02:46:12",
+      "total_change": -19.35,
+      "cumulative_pct": -19.35,
+      "velocity": 19.35
+    },
+    {
+      "time": "2026-03-14 02:47:24",
+      "total_change": -20.99,
+      "cumulative_pct": -20.99,
+      "velocity": 20.99
+    },
+    {
+      "time": "2026-03-14 02:48:47",
+      "total_change": -22.35,
+      "cumulative_pct": -22.35,
+      "velocity": 22.35
+    },
+    {
+      "time": "2026-03-14 02:49:59",
+      "total_change": -21.09,
+      "cumulative_pct": -21.09,
+      "velocity": 21.09
+    },
+    {
+      "time": "2026-03-14 02:51:11",
+      "total_change": -22.66,
+      "cumulative_pct": -22.66,
+      "velocity": 22.66
+    },
+    {
+      "time": "2026-03-14 02:52:23",
+      "total_change": -23.06,
+      "cumulative_pct": -23.06,
+      "velocity": 23.06
+    },
+    {
+      "time": "2026-03-14 02:53:35",
+      "total_change": -26.56,
+      "cumulative_pct": -26.56,
+      "velocity": 26.56
+    },
+    {
+      "time": "2026-03-14 02:54:58",
+      "total_change": -23.29,
+      "cumulative_pct": -23.29,
+      "velocity": 23.29
+    },
+    {
+      "time": "2026-03-14 02:56:10",
+      "total_change": -24.44,
+      "cumulative_pct": -24.44,
+      "velocity": 24.44
+    },
+    {
+      "time": "2026-03-14 02:57:22",
+      "total_change": -24.03,
+      "cumulative_pct": -24.03,
+      "velocity": 24.03
+    },
+    {
+      "time": "2026-03-14 02:58:34",
+      "total_change": -25.33,
+      "cumulative_pct": -25.33,
+      "velocity": 25.33
+    },
+    {
+      "time": "2026-03-14 02:59:46",
+      "total_change": -24.99,
+      "cumulative_pct": -24.99,
+      "velocity": 24.99
+    },
+    {
+      "time": "2026-03-14 03:01:10",
+      "total_change": -26.59,
+      "cumulative_pct": -26.59,
+      "velocity": 26.59
+    },
+    {
+      "time": "2026-03-14 03:02:21",
+      "total_change": -27.03,
+      "cumulative_pct": -27.03,
+      "velocity": 27.03
+    },
+    {
+      "time": "2026-03-14 03:03:33",
+      "total_change": -27.8,
+      "cumulative_pct": -27.8,
+      "velocity": 27.8
+    },
+    {
+      "time": "2026-03-14 03:04:45",
+      "total_change": -29.62,
+      "cumulative_pct": -29.62,
+      "velocity": 29.62
+    },
+    {
+      "time": "2026-03-14 03:06:01",
+      "total_change": -29.96,
+      "cumulative_pct": -29.96,
+      "velocity": 29.96
+    },
+    {
+      "time": "2026-03-14 03:07:38",
+      "total_change": -27.93,
+      "cumulative_pct": -27.93,
+      "velocity": 27.93
+    },
+    {
+      "time": "2026-03-14 03:08:50",
+      "total_change": -22.79,
+      "cumulative_pct": -22.79,
+      "velocity": 22.79
+    },
+    {
+      "time": "2026-03-14 03:10:02",
+      "total_change": -23.52,
+      "cumulative_pct": -23.52,
+      "velocity": 23.52
+    },
+    {
+      "time": "2026-03-14 03:12:48",
+      "total_change": -22.29,
+      "cumulative_pct": -22.29,
+      "velocity": 22.29
+    },
+    {
+      "time": "2026-03-14 03:14:00",
+      "total_change": -23.61,
+      "cumulative_pct": -23.61,
+      "velocity": 23.61
+    },
+    {
+      "time": "2026-03-14 03:15:12",
+      "total_change": -21.69,
+      "cumulative_pct": -21.69,
+      "velocity": 21.69
+    },
+    {
+      "time": "2026-03-14 03:16:24",
+      "total_change": -20.69,
+      "cumulative_pct": -20.69,
+      "velocity": 20.69
+    },
+    {
+      "time": "2026-03-14 03:17:47",
+      "total_change": -21.06,
+      "cumulative_pct": -21.06,
+      "velocity": 21.06
+    },
+    {
+      "time": "2026-03-14 03:18:59",
+      "total_change": -21.54,
+      "cumulative_pct": -21.54,
+      "velocity": 21.54
+    },
+    {
+      "time": "2026-03-14 03:20:11",
+      "total_change": -22.89,
+      "cumulative_pct": -22.89,
+      "velocity": 22.89
+    },
+    {
+      "time": "2026-03-14 03:21:23",
+      "total_change": -27.01,
+      "cumulative_pct": -27.01,
+      "velocity": 27.01
+    },
+    {
+      "time": "2026-03-14 03:22:35",
+      "total_change": -25.67,
+      "cumulative_pct": -25.67,
+      "velocity": 25.67
+    },
+    {
+      "time": "2026-03-14 03:23:59",
+      "total_change": -24.24,
+      "cumulative_pct": -24.24,
+      "velocity": 24.24
+    },
+    {
+      "time": "2026-03-14 03:25:11",
+      "total_change": -24.18,
+      "cumulative_pct": -24.18,
+      "velocity": 24.18
+    },
+    {
+      "time": "2026-03-14 03:26:22",
+      "total_change": -27.83,
+      "cumulative_pct": -27.83,
+      "velocity": 27.83
+    },
+    {
+      "time": "2026-03-14 03:27:34",
+      "total_change": -29.01,
+      "cumulative_pct": -29.01,
+      "velocity": 29.01
+    },
+    {
+      "time": "2026-03-14 03:28:46",
+      "total_change": -28.78,
+      "cumulative_pct": -28.78,
+      "velocity": 28.78
+    },
+    {
+      "time": "2026-03-14 03:30:09",
+      "total_change": -27.55,
+      "cumulative_pct": -27.55,
+      "velocity": 27.55
+    },
+    {
+      "time": "2026-03-14 03:31:21",
+      "total_change": -23.98,
+      "cumulative_pct": -23.98,
+      "velocity": 23.98
+    },
+    {
+      "time": "2026-03-14 03:32:33",
+      "total_change": -24.79,
+      "cumulative_pct": -24.79,
+      "velocity": 24.79
+    },
+    {
+      "time": "2026-03-14 03:33:45",
+      "total_change": -27.32,
+      "cumulative_pct": -27.32,
+      "velocity": 27.32
+    },
+    {
+      "time": "2026-03-14 03:34:57",
+      "total_change": -26.62,
+      "cumulative_pct": -26.62,
+      "velocity": 26.62
+    },
+    {
+      "time": "2026-03-14 03:36:21",
+      "total_change": -27.16,
+      "cumulative_pct": -27.16,
+      "velocity": 27.16
+    },
+    {
+      "time": "2026-03-14 03:37:32",
+      "total_change": -27.16,
+      "cumulative_pct": -27.16,
+      "velocity": 27.16
+    },
+    {
+      "time": "2026-03-14 03:38:44",
+      "total_change": -26.33,
+      "cumulative_pct": -26.33,
+      "velocity": 26.33
+    },
+    {
+      "time": "2026-03-14 03:39:57",
+      "total_change": -28.03,
+      "cumulative_pct": -28.03,
+      "velocity": 28.03
+    },
+    {
+      "time": "2026-03-14 03:41:09",
+      "total_change": -28.52,
+      "cumulative_pct": -28.52,
+      "velocity": 28.52
+    },
+    {
+      "time": "2026-03-14 03:42:33",
+      "total_change": -29.18,
+      "cumulative_pct": -29.18,
+      "velocity": 29.18
+    },
+    {
+      "time": "2026-03-14 03:43:45",
+      "total_change": -28.2,
+      "cumulative_pct": -28.2,
+      "velocity": 28.2
+    },
+    {
+      "time": "2026-03-14 03:44:57",
+      "total_change": -26.27,
+      "cumulative_pct": -26.27,
+      "velocity": 26.27
+    },
+    {
+      "time": "2026-03-14 03:46:09",
+      "total_change": -26.41,
+      "cumulative_pct": -26.41,
+      "velocity": 26.41
+    },
+    {
+      "time": "2026-03-14 03:47:21",
+      "total_change": -26.05,
+      "cumulative_pct": -26.05,
+      "velocity": 26.05
+    },
+    {
+      "time": "2026-03-14 03:48:45",
+      "total_change": -24.93,
+      "cumulative_pct": -24.93,
+      "velocity": 24.93
+    },
+    {
+      "time": "2026-03-14 03:49:56",
+      "total_change": -25.56,
+      "cumulative_pct": -25.56,
+      "velocity": 25.56
+    },
+    {
+      "time": "2026-03-14 03:51:08",
+      "total_change": -27.05,
+      "cumulative_pct": -27.05,
+      "velocity": 27.05
+    },
+    {
+      "time": "2026-03-14 03:52:20",
+      "total_change": -25.21,
+      "cumulative_pct": -25.21,
+      "velocity": 25.21
+    },
+    {
+      "time": "2026-03-14 03:53:32",
+      "total_change": -23.59,
+      "cumulative_pct": -23.59,
+      "velocity": 23.59
+    },
+    {
+      "time": "2026-03-14 03:54:56",
+      "total_change": -23.71,
+      "cumulative_pct": -23.71,
+      "velocity": 23.71
+    },
+    {
+      "time": "2026-03-14 03:56:08",
+      "total_change": -23.12,
+      "cumulative_pct": -23.12,
+      "velocity": 23.12
+    },
+    {
+      "time": "2026-03-14 03:57:20",
+      "total_change": -23.0,
+      "cumulative_pct": -23.0,
+      "velocity": 23.0
+    },
+    {
+      "time": "2026-03-14 03:58:31",
+      "total_change": -25.77,
+      "cumulative_pct": -25.77,
+      "velocity": 25.77
+    },
+    {
+      "time": "2026-03-14 03:59:43",
+      "total_change": -25.7,
+      "cumulative_pct": -25.7,
+      "velocity": 25.7
+    },
+    {
+      "time": "2026-03-14 04:01:07",
+      "total_change": -26.95,
+      "cumulative_pct": -26.95,
+      "velocity": 26.95
+    },
+    {
+      "time": "2026-03-14 04:02:19",
+      "total_change": -24.76,
+      "cumulative_pct": -24.76,
+      "velocity": 24.76
+    },
+    {
+      "time": "2026-03-14 04:03:31",
+      "total_change": -26.24,
+      "cumulative_pct": -26.24,
+      "velocity": 26.24
+    },
+    {
+      "time": "2026-03-14 04:04:43",
+      "total_change": -27.85,
+      "cumulative_pct": -27.85,
+      "velocity": 27.85
+    },
+    {
+      "time": "2026-03-14 04:05:55",
+      "total_change": -26.75,
+      "cumulative_pct": -26.75,
+      "velocity": 26.75
+    },
+    {
+      "time": "2026-03-14 04:07:18",
+      "total_change": -27.21,
+      "cumulative_pct": -27.21,
+      "velocity": 27.21
+    },
+    {
+      "time": "2026-03-14 04:08:30",
+      "total_change": -25.66,
+      "cumulative_pct": -25.66,
+      "velocity": 25.66
+    },
+    {
+      "time": "2026-03-14 04:09:42",
+      "total_change": -25.91,
+      "cumulative_pct": -25.91,
+      "velocity": 25.91
+    },
+    {
+      "time": "2026-03-14 04:10:54",
+      "total_change": -25.45,
+      "cumulative_pct": -25.45,
+      "velocity": 25.45
+    },
+    {
+      "time": "2026-03-14 04:12:06",
+      "total_change": -26.07,
+      "cumulative_pct": -26.07,
+      "velocity": 26.07
+    },
+    {
+      "time": "2026-03-14 04:13:30",
+      "total_change": -24.69,
+      "cumulative_pct": -24.69,
+      "velocity": 24.69
+    },
+    {
+      "time": "2026-03-14 04:14:41",
+      "total_change": -22.51,
+      "cumulative_pct": -22.51,
+      "velocity": 22.51
+    },
+    {
+      "time": "2026-03-14 04:15:53",
+      "total_change": -22.41,
+      "cumulative_pct": -22.41,
+      "velocity": 22.41
+    },
+    {
+      "time": "2026-03-14 04:17:05",
+      "total_change": -20.59,
+      "cumulative_pct": -20.59,
+      "velocity": 20.59
+    },
+    {
+      "time": "2026-03-14 04:18:17",
+      "total_change": -21.35,
+      "cumulative_pct": -21.35,
+      "velocity": 21.35
+    },
+    {
+      "time": "2026-03-14 04:19:41",
+      "total_change": -19.7,
+      "cumulative_pct": -19.7,
+      "velocity": 19.7
+    },
+    {
+      "time": "2026-03-14 04:20:53",
+      "total_change": -20.44,
+      "cumulative_pct": -20.44,
+      "velocity": 20.44
+    },
+    {
+      "time": "2026-03-14 04:22:05",
+      "total_change": -19.91,
+      "cumulative_pct": -19.91,
+      "velocity": 19.91
+    },
+    {
+      "time": "2026-03-14 04:23:16",
+      "total_change": -19.87,
+      "cumulative_pct": -19.87,
+      "velocity": 19.87
+    },
+    {
+      "time": "2026-03-14 04:24:28",
+      "total_change": -18.67,
+      "cumulative_pct": -18.67,
+      "velocity": 18.67
+    },
+    {
+      "time": "2026-03-14 04:25:52",
+      "total_change": -19.92,
+      "cumulative_pct": -19.92,
+      "velocity": 19.92
+    },
+    {
+      "time": "2026-03-14 04:27:04",
+      "total_change": -23.5,
+      "cumulative_pct": -23.5,
+      "velocity": 23.5
+    },
+    {
+      "time": "2026-03-14 04:28:15",
+      "total_change": -22.76,
+      "cumulative_pct": -22.76,
+      "velocity": 22.76
+    },
+    {
+      "time": "2026-03-14 04:29:27",
+      "total_change": -22.94,
+      "cumulative_pct": -22.94,
+      "velocity": 22.94
+    },
+    {
+      "time": "2026-03-14 04:30:39",
+      "total_change": -21.55,
+      "cumulative_pct": -21.55,
+      "velocity": 21.55
+    },
+    {
+      "time": "2026-03-14 04:32:03",
+      "total_change": -22.11,
+      "cumulative_pct": -22.11,
+      "velocity": 22.11
+    },
+    {
+      "time": "2026-03-14 04:33:15",
+      "total_change": -21.8,
+      "cumulative_pct": -21.8,
+      "velocity": 21.8
+    },
+    {
+      "time": "2026-03-14 04:34:27",
+      "total_change": -21.11,
+      "cumulative_pct": -21.11,
+      "velocity": 21.11
+    },
+    {
+      "time": "2026-03-14 04:35:39",
+      "total_change": -21.88,
+      "cumulative_pct": -21.88,
+      "velocity": 21.88
+    },
+    {
+      "time": "2026-03-14 04:36:51",
+      "total_change": -21.79,
+      "cumulative_pct": -21.79,
+      "velocity": 21.79
+    },
+    {
+      "time": "2026-03-14 04:38:14",
+      "total_change": -21.62,
+      "cumulative_pct": -21.62,
+      "velocity": 21.62
+    },
+    {
+      "time": "2026-03-14 04:39:26",
+      "total_change": -20.72,
+      "cumulative_pct": -20.72,
+      "velocity": 20.72
+    },
+    {
+      "time": "2026-03-14 04:40:38",
+      "total_change": -22.66,
+      "cumulative_pct": -22.66,
+      "velocity": 22.66
+    },
+    {
+      "time": "2026-03-14 04:41:50",
+      "total_change": -22.29,
+      "cumulative_pct": -22.29,
+      "velocity": 22.29
+    },
+    {
+      "time": "2026-03-14 04:43:02",
+      "total_change": -22.38,
+      "cumulative_pct": -22.38,
+      "velocity": 22.38
+    },
+    {
+      "time": "2026-03-14 04:44:26",
+      "total_change": -22.58,
+      "cumulative_pct": -22.58,
+      "velocity": 22.58
+    },
+    {
+      "time": "2026-03-14 04:45:37",
+      "total_change": -21.81,
+      "cumulative_pct": -21.81,
+      "velocity": 21.81
+    },
+    {
+      "time": "2026-03-14 04:46:49",
+      "total_change": -21.39,
+      "cumulative_pct": -21.39,
+      "velocity": 21.39
+    },
+    {
+      "time": "2026-03-14 04:48:01",
+      "total_change": -20.48,
+      "cumulative_pct": -20.48,
+      "velocity": 20.48
+    },
+    {
+      "time": "2026-03-14 04:49:13",
+      "total_change": -18.96,
+      "cumulative_pct": -18.96,
+      "velocity": 18.96
+    },
+    {
+      "time": "2026-03-14 04:50:36",
+      "total_change": -19.37,
+      "cumulative_pct": -19.37,
+      "velocity": 19.37
+    },
+    {
+      "time": "2026-03-14 04:51:48",
+      "total_change": -19.67,
+      "cumulative_pct": -19.67,
+      "velocity": 19.67
+    },
+    {
+      "time": "2026-03-14 04:53:00",
+      "total_change": -17.35,
+      "cumulative_pct": -17.35,
+      "velocity": 17.35
+    },
+    {
+      "time": "2026-03-14 04:54:12",
+      "total_change": -17.43,
+      "cumulative_pct": -17.43,
+      "velocity": 17.43
+    },
+    {
+      "time": "2026-03-14 04:55:24",
+      "total_change": -17.72,
+      "cumulative_pct": -17.72,
+      "velocity": 17.72
+    },
+    {
+      "time": "2026-03-14 04:56:47",
+      "total_change": -17.45,
+      "cumulative_pct": -17.45,
+      "velocity": 17.45
+    },
+    {
+      "time": "2026-03-14 04:57:59",
+      "total_change": -17.57,
+      "cumulative_pct": -17.57,
+      "velocity": 17.57
+    },
+    {
+      "time": "2026-03-14 04:59:11",
+      "total_change": -17.79,
+      "cumulative_pct": -17.79,
+      "velocity": 17.79
+    },
+    {
+      "time": "2026-03-14 05:00:23",
+      "total_change": -16.58,
+      "cumulative_pct": -16.58,
+      "velocity": 16.58
+    },
+    {
+      "time": "2026-03-14 05:01:35",
+      "total_change": -14.53,
+      "cumulative_pct": -14.53,
+      "velocity": 14.53
+    },
+    {
+      "time": "2026-03-14 05:02:59",
+      "total_change": -14.73,
+      "cumulative_pct": -14.73,
+      "velocity": 14.73
+    },
+    {
+      "time": "2026-03-14 05:04:11",
+      "total_change": -12.7,
+      "cumulative_pct": -12.7,
+      "velocity": 12.7
+    },
+    {
+      "time": "2026-03-14 05:05:23",
+      "total_change": -10.18,
+      "cumulative_pct": -10.18,
+      "velocity": 10.18
+    },
+    {
+      "time": "2026-03-14 05:06:35",
+      "total_change": -11.06,
+      "cumulative_pct": -11.06,
+      "velocity": 11.06
+    },
+    {
+      "time": "2026-03-14 05:07:47",
+      "total_change": -10.19,
+      "cumulative_pct": -10.19,
+      "velocity": 10.19
+    },
+    {
+      "time": "2026-03-14 05:09:10",
+      "total_change": -8.23,
+      "cumulative_pct": -8.23,
+      "velocity": 8.23
+    },
+    {
+      "time": "2026-03-14 05:10:22",
+      "total_change": -8.1,
+      "cumulative_pct": -8.1,
+      "velocity": 8.1
+    },
+    {
+      "time": "2026-03-14 05:11:34",
+      "total_change": -8.65,
+      "cumulative_pct": -8.65,
+      "velocity": 8.65
+    },
+    {
+      "time": "2026-03-14 05:12:46",
+      "total_change": -8.71,
+      "cumulative_pct": -8.71,
+      "velocity": 8.71
+    },
+    {
+      "time": "2026-03-14 05:13:58",
+      "total_change": -12.81,
+      "cumulative_pct": -12.81,
+      "velocity": 12.81
+    },
+    {
+      "time": "2026-03-14 05:15:22",
+      "total_change": -11.69,
+      "cumulative_pct": -11.69,
+      "velocity": 11.69
+    },
+    {
+      "time": "2026-03-14 05:16:33",
+      "total_change": -11.98,
+      "cumulative_pct": -11.98,
+      "velocity": 11.98
+    },
+    {
+      "time": "2026-03-14 05:17:45",
+      "total_change": -13.22,
+      "cumulative_pct": -13.22,
+      "velocity": 13.22
+    },
+    {
+      "time": "2026-03-14 05:18:57",
+      "total_change": -11.4,
+      "cumulative_pct": -11.4,
+      "velocity": 11.4
+    },
+    {
+      "time": "2026-03-14 05:20:09",
+      "total_change": -11.03,
+      "cumulative_pct": -11.03,
+      "velocity": 11.03
+    },
+    {
+      "time": "2026-03-14 05:21:32",
+      "total_change": -12.31,
+      "cumulative_pct": -12.31,
+      "velocity": 12.31
+    },
+    {
+      "time": "2026-03-14 05:22:44",
+      "total_change": -13.83,
+      "cumulative_pct": -13.83,
+      "velocity": 13.83
+    },
+    {
+      "time": "2026-03-14 05:23:56",
+      "total_change": -12.81,
+      "cumulative_pct": -12.81,
+      "velocity": 12.81
+    },
+    {
+      "time": "2026-03-14 05:25:08",
+      "total_change": -12.64,
+      "cumulative_pct": -12.64,
+      "velocity": 12.64
+    },
+    {
+      "time": "2026-03-14 05:26:20",
+      "total_change": -14.75,
+      "cumulative_pct": -14.75,
+      "velocity": 14.75
+    },
+    {
+      "time": "2026-03-14 05:27:43",
+      "total_change": -17.6,
+      "cumulative_pct": -17.6,
+      "velocity": 17.6
+    },
+    {
+      "time": "2026-03-14 05:28:55",
+      "total_change": -22.0,
+      "cumulative_pct": -22.0,
+      "velocity": 22.0
+    },
+    {
+      "time": "2026-03-14 05:30:07",
+      "total_change": -21.34,
+      "cumulative_pct": -21.34,
+      "velocity": 21.34
+    },
+    {
+      "time": "2026-03-14 05:31:19",
+      "total_change": -21.43,
+      "cumulative_pct": -21.43,
+      "velocity": 21.43
+    },
+    {
+      "time": "2026-03-14 05:32:31",
+      "total_change": -22.26,
+      "cumulative_pct": -22.26,
+      "velocity": 22.26
+    },
+    {
+      "time": "2026-03-14 05:33:55",
+      "total_change": -20.54,
+      "cumulative_pct": -20.54,
+      "velocity": 20.54
+    },
+    {
+      "time": "2026-03-14 05:35:06",
+      "total_change": -20.57,
+      "cumulative_pct": -20.57,
+      "velocity": 20.57
+    },
+    {
+      "time": "2026-03-14 05:36:18",
+      "total_change": -20.04,
+      "cumulative_pct": -20.04,
+      "velocity": 20.04
+    },
+    {
+      "time": "2026-03-14 05:37:30",
+      "total_change": -19.54,
+      "cumulative_pct": -19.54,
+      "velocity": 19.54
+    },
+    {
+      "time": "2026-03-14 05:38:42",
+      "total_change": -23.16,
+      "cumulative_pct": -23.16,
+      "velocity": 23.16
+    },
+    {
+      "time": "2026-03-14 05:40:05",
+      "total_change": -27.89,
+      "cumulative_pct": -27.89,
+      "velocity": 27.89
+    },
+    {
+      "time": "2026-03-14 05:41:17",
+      "total_change": -24.38,
+      "cumulative_pct": -24.38,
+      "velocity": 24.38
+    },
+    {
+      "time": "2026-03-14 05:42:29",
+      "total_change": -23.42,
+      "cumulative_pct": -23.42,
+      "velocity": 23.42
+    },
+    {
+      "time": "2026-03-14 05:43:41",
+      "total_change": -22.66,
+      "cumulative_pct": -22.66,
+      "velocity": 22.66
+    },
+    {
+      "time": "2026-03-14 05:44:53",
+      "total_change": -23.27,
+      "cumulative_pct": -23.27,
+      "velocity": 23.27
+    },
+    {
+      "time": "2026-03-14 05:46:16",
+      "total_change": -21.56,
+      "cumulative_pct": -21.56,
+      "velocity": 21.56
+    },
+    {
+      "time": "2026-03-14 05:47:28",
+      "total_change": -20.89,
+      "cumulative_pct": -20.89,
+      "velocity": 20.89
+    },
+    {
+      "time": "2026-03-14 05:48:40",
+      "total_change": -19.76,
+      "cumulative_pct": -19.76,
+      "velocity": 19.76
+    },
+    {
+      "time": "2026-03-14 05:49:52",
+      "total_change": -19.78,
+      "cumulative_pct": -19.78,
+      "velocity": 19.78
+    },
+    {
+      "time": "2026-03-14 05:51:04",
+      "total_change": -20.14,
+      "cumulative_pct": -20.14,
+      "velocity": 20.14
+    },
+    {
+      "time": "2026-03-14 05:52:27",
+      "total_change": -20.35,
+      "cumulative_pct": -20.35,
+      "velocity": 20.35
+    },
+    {
+      "time": "2026-03-14 05:53:39",
+      "total_change": -20.23,
+      "cumulative_pct": -20.23,
+      "velocity": 20.23
+    },
+    {
+      "time": "2026-03-14 05:54:51",
+      "total_change": -19.12,
+      "cumulative_pct": -19.12,
+      "velocity": 19.12
+    },
+    {
+      "time": "2026-03-14 05:56:03",
+      "total_change": -21.6,
+      "cumulative_pct": -21.6,
+      "velocity": 21.6
+    },
+    {
+      "time": "2026-03-14 05:57:15",
+      "total_change": -20.99,
+      "cumulative_pct": -20.99,
+      "velocity": 20.99
+    },
+    {
+      "time": "2026-03-14 05:58:39",
+      "total_change": -19.41,
+      "cumulative_pct": -19.41,
+      "velocity": 19.41
+    },
+    {
+      "time": "2026-03-14 05:59:50",
+      "total_change": -21.92,
+      "cumulative_pct": -21.92,
+      "velocity": 21.92
+    },
+    {
+      "time": "2026-03-14 06:01:03",
+      "total_change": -24.77,
+      "cumulative_pct": -24.77,
+      "velocity": 24.77
+    },
+    {
+      "time": "2026-03-14 06:02:15",
+      "total_change": -30.89,
+      "cumulative_pct": -30.89,
+      "velocity": 30.89
+    },
+    {
+      "time": "2026-03-14 06:03:26",
+      "total_change": -41.1,
+      "cumulative_pct": -41.1,
+      "velocity": 41.1
+    },
+    {
+      "time": "2026-03-14 06:04:50",
+      "total_change": -35.28,
+      "cumulative_pct": -35.28,
+      "velocity": 35.28
+    },
+    {
+      "time": "2026-03-14 06:06:02",
+      "total_change": -33.8,
+      "cumulative_pct": -33.8,
+      "velocity": 33.8
+    },
+    {
+      "time": "2026-03-14 06:07:14",
+      "total_change": -33.9,
+      "cumulative_pct": -33.9,
+      "velocity": 33.9
+    },
+    {
+      "time": "2026-03-14 06:08:26",
+      "total_change": -35.13,
+      "cumulative_pct": -35.13,
+      "velocity": 35.13
+    },
+    {
+      "time": "2026-03-14 06:09:38",
+      "total_change": -35.61,
+      "cumulative_pct": -35.61,
+      "velocity": 35.61
+    },
+    {
+      "time": "2026-03-14 06:11:02",
+      "total_change": -31.43,
+      "cumulative_pct": -31.43,
+      "velocity": 31.43
+    },
+    {
+      "time": "2026-03-14 06:12:13",
+      "total_change": -32.12,
+      "cumulative_pct": -32.12,
+      "velocity": 32.12
+    },
+    {
+      "time": "2026-03-14 06:13:25",
+      "total_change": -32.8,
+      "cumulative_pct": -32.8,
+      "velocity": 32.8
+    },
+    {
+      "time": "2026-03-14 06:14:37",
+      "total_change": -33.59,
+      "cumulative_pct": -33.59,
+      "velocity": 33.59
+    },
+    {
+      "time": "2026-03-14 06:15:49",
+      "total_change": -37.02,
+      "cumulative_pct": -37.02,
+      "velocity": 37.02
+    },
+    {
+      "time": "2026-03-14 06:17:12",
+      "total_change": -36.86,
+      "cumulative_pct": -36.86,
+      "velocity": 36.86
+    },
+    {
+      "time": "2026-03-14 06:18:24",
+      "total_change": -39.65,
+      "cumulative_pct": -39.65,
+      "velocity": 39.65
+    },
+    {
+      "time": "2026-03-14 06:19:36",
+      "total_change": -38.61,
+      "cumulative_pct": -38.61,
+      "velocity": 38.61
+    },
+    {
+      "time": "2026-03-14 06:20:48",
+      "total_change": -40.11,
+      "cumulative_pct": -40.11,
+      "velocity": 40.11
+    },
+    {
+      "time": "2026-03-14 06:22:00",
+      "total_change": -43.32,
+      "cumulative_pct": -43.32,
+      "velocity": 43.32
+    },
+    {
+      "time": "2026-03-14 06:23:23",
+      "total_change": -43.63,
+      "cumulative_pct": -43.63,
+      "velocity": 43.63
+    },
+    {
+      "time": "2026-03-14 06:24:35",
+      "total_change": -43.57,
+      "cumulative_pct": -43.57,
+      "velocity": 43.57
+    },
+    {
+      "time": "2026-03-14 06:25:47",
+      "total_change": -45.61,
+      "cumulative_pct": -45.61,
+      "velocity": 45.61
+    },
+    {
+      "time": "2026-03-14 06:26:58",
+      "total_change": -45.92,
+      "cumulative_pct": -45.92,
+      "velocity": 45.92
+    },
+    {
+      "time": "2026-03-14 06:28:10",
+      "total_change": -44.68,
+      "cumulative_pct": -44.68,
+      "velocity": 44.68
+    },
+    {
+      "time": "2026-03-14 06:29:34",
+      "total_change": -46.03,
+      "cumulative_pct": -46.03,
+      "velocity": 46.03
+    },
+    {
+      "time": "2026-03-14 06:30:45",
+      "total_change": -47.24,
+      "cumulative_pct": -47.24,
+      "velocity": 47.24
+    },
+    {
+      "time": "2026-03-14 06:31:57",
+      "total_change": -48.07,
+      "cumulative_pct": -48.07,
+      "velocity": 48.07
+    },
+    {
+      "time": "2026-03-14 06:33:08",
+      "total_change": -49.56,
+      "cumulative_pct": -49.56,
+      "velocity": 49.56
+    },
+    {
+      "time": "2026-03-14 06:34:20",
+      "total_change": -46.62,
+      "cumulative_pct": -46.62,
+      "velocity": 46.62
+    },
+    {
+      "time": "2026-03-14 06:35:44",
+      "total_change": -45.45,
+      "cumulative_pct": -45.45,
+      "velocity": 45.45
+    },
+    {
+      "time": "2026-03-14 06:36:56",
+      "total_change": -46.33,
+      "cumulative_pct": -46.33,
+      "velocity": 46.33
+    },
+    {
+      "time": "2026-03-14 06:38:07",
+      "total_change": -46.95,
+      "cumulative_pct": -46.95,
+      "velocity": 46.95
+    },
+    {
+      "time": "2026-03-14 06:39:19",
+      "total_change": -47.23,
+      "cumulative_pct": -47.23,
+      "velocity": 47.23
+    },
+    {
+      "time": "2026-03-14 06:40:30",
+      "total_change": -45.94,
+      "cumulative_pct": -45.94,
+      "velocity": 45.94
+    },
+    {
+      "time": "2026-03-14 06:41:59",
+      "total_change": -45.57,
+      "cumulative_pct": -45.57,
+      "velocity": 45.57
+    },
+    {
+      "time": "2026-03-14 06:43:11",
+      "total_change": -45.29,
+      "cumulative_pct": -45.29,
+      "velocity": 45.29
+    },
+    {
+      "time": "2026-03-14 06:44:22",
+      "total_change": -43.96,
+      "cumulative_pct": -43.96,
+      "velocity": 43.96
+    },
+    {
+      "time": "2026-03-14 06:45:34",
+      "total_change": -44.56,
+      "cumulative_pct": -44.56,
+      "velocity": 44.56
+    },
+    {
+      "time": "2026-03-14 06:46:58",
+      "total_change": -45.02,
+      "cumulative_pct": -45.02,
+      "velocity": 45.02
+    },
+    {
+      "time": "2026-03-14 06:48:09",
+      "total_change": -44.01,
+      "cumulative_pct": -44.01,
+      "velocity": 44.01
+    },
+    {
+      "time": "2026-03-14 06:49:21",
+      "total_change": -44.23,
+      "cumulative_pct": -44.23,
+      "velocity": 44.23
+    },
+    {
+      "time": "2026-03-14 06:50:33",
+      "total_change": -45.21,
+      "cumulative_pct": -45.21,
+      "velocity": 45.21
+    },
+    {
+      "time": "2026-03-14 06:51:45",
+      "total_change": -45.17,
+      "cumulative_pct": -45.17,
+      "velocity": 45.17
+    },
+    {
+      "time": "2026-03-14 06:53:08",
+      "total_change": -42.44,
+      "cumulative_pct": -42.44,
+      "velocity": 42.44
+    },
+    {
+      "time": "2026-03-14 06:54:20",
+      "total_change": -41.66,
+      "cumulative_pct": -41.66,
+      "velocity": 41.66
+    },
+    {
+      "time": "2026-03-14 06:55:32",
+      "total_change": -38.57,
+      "cumulative_pct": -38.57,
+      "velocity": 38.57
+    },
+    {
+      "time": "2026-03-14 06:56:44",
+      "total_change": -39.28,
+      "cumulative_pct": -39.28,
+      "velocity": 39.28
+    },
+    {
+      "time": "2026-03-14 06:57:55",
+      "total_change": -39.66,
+      "cumulative_pct": -39.66,
+      "velocity": 39.66
+    },
+    {
+      "time": "2026-03-14 06:59:19",
+      "total_change": -38.35,
+      "cumulative_pct": -38.35,
+      "velocity": 38.35
+    },
+    {
+      "time": "2026-03-14 07:00:31",
+      "total_change": -39.94,
+      "cumulative_pct": -39.94,
+      "velocity": 39.94
+    },
+    {
+      "time": "2026-03-14 07:01:43",
+      "total_change": -39.07,
+      "cumulative_pct": -39.07,
+      "velocity": 39.07
+    },
+    {
+      "time": "2026-03-14 07:02:54",
+      "total_change": -39.96,
+      "cumulative_pct": -39.96,
+      "velocity": 39.96
+    },
+    {
+      "time": "2026-03-14 07:04:06",
+      "total_change": -38.71,
+      "cumulative_pct": -38.71,
+      "velocity": 38.71
+    },
+    {
+      "time": "2026-03-14 07:05:29",
+      "total_change": -36.56,
+      "cumulative_pct": -36.56,
+      "velocity": 36.56
+    },
+    {
+      "time": "2026-03-14 07:06:41",
+      "total_change": -36.76,
+      "cumulative_pct": -36.76,
+      "velocity": 36.76
+    },
+    {
+      "time": "2026-03-14 07:07:53",
+      "total_change": -39.11,
+      "cumulative_pct": -39.11,
+      "velocity": 39.11
+    },
+    {
+      "time": "2026-03-14 07:09:04",
+      "total_change": -37.86,
+      "cumulative_pct": -37.86,
+      "velocity": 37.86
+    },
+    {
+      "time": "2026-03-14 07:10:16",
+      "total_change": -35.41,
+      "cumulative_pct": -35.41,
+      "velocity": 35.41
+    },
+    {
+      "time": "2026-03-14 07:11:43",
+      "total_change": -35.41,
+      "cumulative_pct": -35.41,
+      "velocity": 35.41
+    },
+    {
+      "time": "2026-03-14 07:12:55",
+      "total_change": -36.18,
+      "cumulative_pct": -36.18,
+      "velocity": 36.18
+    },
+    {
+      "time": "2026-03-14 07:14:07",
+      "total_change": -36.07,
+      "cumulative_pct": -36.07,
+      "velocity": 36.07
+    },
+    {
+      "time": "2026-03-14 07:15:19",
+      "total_change": -35.47,
+      "cumulative_pct": -35.47,
+      "velocity": 35.47
+    },
+    {
+      "time": "2026-03-14 07:16:42",
+      "total_change": -34.7,
+      "cumulative_pct": -34.7,
+      "velocity": 34.7
+    },
+    {
+      "time": "2026-03-14 07:17:54",
+      "total_change": -36.76,
+      "cumulative_pct": -36.76,
+      "velocity": 36.76
+    },
+    {
+      "time": "2026-03-14 07:19:06",
+      "total_change": -33.57,
+      "cumulative_pct": -33.57,
+      "velocity": 33.57
+    },
+    {
+      "time": "2026-03-14 07:20:18",
+      "total_change": -34.37,
+      "cumulative_pct": -34.37,
+      "velocity": 34.37
+    },
+    {
+      "time": "2026-03-14 07:21:29",
+      "total_change": -33.31,
+      "cumulative_pct": -33.31,
+      "velocity": 33.31
+    },
+    {
+      "time": "2026-03-14 07:22:53",
+      "total_change": -33.81,
+      "cumulative_pct": -33.81,
+      "velocity": 33.81
+    },
+    {
+      "time": "2026-03-14 07:24:05",
+      "total_change": -33.64,
+      "cumulative_pct": -33.64,
+      "velocity": 33.64
+    },
+    {
+      "time": "2026-03-14 07:25:17",
+      "total_change": -31.67,
+      "cumulative_pct": -31.67,
+      "velocity": 31.67
+    },
+    {
+      "time": "2026-03-14 07:26:28",
+      "total_change": -29.88,
+      "cumulative_pct": -29.88,
+      "velocity": 29.88
+    },
+    {
+      "time": "2026-03-14 07:27:40",
+      "total_change": -29.15,
+      "cumulative_pct": -29.15,
+      "velocity": 29.15
+    },
+    {
+      "time": "2026-03-14 07:29:03",
+      "total_change": -30.43,
+      "cumulative_pct": -30.43,
+      "velocity": 30.43
+    },
+    {
+      "time": "2026-03-14 07:30:15",
+      "total_change": -33.57,
+      "cumulative_pct": -33.57,
+      "velocity": 33.57
+    },
+    {
+      "time": "2026-03-14 07:31:27",
+      "total_change": -32.99,
+      "cumulative_pct": -32.99,
+      "velocity": 32.99
+    },
+    {
+      "time": "2026-03-14 07:32:39",
+      "total_change": -31.93,
+      "cumulative_pct": -31.93,
+      "velocity": 31.93
+    },
+    {
+      "time": "2026-03-14 07:33:50",
+      "total_change": -32.07,
+      "cumulative_pct": -32.07,
+      "velocity": 32.07
+    },
+    {
+      "time": "2026-03-14 07:35:14",
+      "total_change": -32.87,
+      "cumulative_pct": -32.87,
+      "velocity": 32.87
+    },
+    {
+      "time": "2026-03-14 07:36:25",
+      "total_change": -31.77,
+      "cumulative_pct": -31.77,
+      "velocity": 31.77
+    },
+    {
+      "time": "2026-03-14 07:37:37",
+      "total_change": -31.92,
+      "cumulative_pct": -31.92,
+      "velocity": 31.92
+    },
+    {
+      "time": "2026-03-14 07:38:49",
+      "total_change": -31.47,
+      "cumulative_pct": -31.47,
+      "velocity": 31.47
+    },
+    {
+      "time": "2026-03-14 07:40:00",
+      "total_change": -32.11,
+      "cumulative_pct": -32.11,
+      "velocity": 32.11
+    },
+    {
+      "time": "2026-03-14 07:41:24",
+      "total_change": -32.6,
+      "cumulative_pct": -32.6,
+      "velocity": 32.6
+    },
+    {
+      "time": "2026-03-14 07:42:41",
+      "total_change": -31.92,
+      "cumulative_pct": -31.92,
+      "velocity": 31.92
+    },
+    {
+      "time": "2026-03-14 07:43:52",
+      "total_change": -32.35,
+      "cumulative_pct": -32.35,
+      "velocity": 32.35
+    },
+    {
+      "time": "2026-03-14 07:45:04",
+      "total_change": -33.17,
+      "cumulative_pct": -33.17,
+      "velocity": 33.17
+    },
+    {
+      "time": "2026-03-14 07:46:27",
+      "total_change": -32.92,
+      "cumulative_pct": -32.92,
+      "velocity": 32.92
+    },
+    {
+      "time": "2026-03-14 07:47:39",
+      "total_change": -32.23,
+      "cumulative_pct": -32.23,
+      "velocity": 32.23
+    },
+    {
+      "time": "2026-03-14 07:48:51",
+      "total_change": -32.53,
+      "cumulative_pct": -32.53,
+      "velocity": 32.53
+    },
+    {
+      "time": "2026-03-14 07:50:03",
+      "total_change": -34.86,
+      "cumulative_pct": -34.86,
+      "velocity": 34.86
+    },
+    {
+      "time": "2026-03-14 07:51:15",
+      "total_change": -34.46,
+      "cumulative_pct": -34.46,
+      "velocity": 34.46
+    },
+    {
+      "time": "2026-03-14 07:52:38",
+      "total_change": -34.4,
+      "cumulative_pct": -34.4,
+      "velocity": 34.4
+    },
+    {
+      "time": "2026-03-14 07:53:50",
+      "total_change": -33.97,
+      "cumulative_pct": -33.97,
+      "velocity": 33.97
+    },
+    {
+      "time": "2026-03-14 07:55:02",
+      "total_change": -33.38,
+      "cumulative_pct": -33.38,
+      "velocity": 33.38
+    },
+    {
+      "time": "2026-03-14 07:56:13",
+      "total_change": -32.57,
+      "cumulative_pct": -32.57,
+      "velocity": 32.57
+    },
+    {
+      "time": "2026-03-14 07:57:25",
+      "total_change": -32.67,
+      "cumulative_pct": -32.67,
+      "velocity": 32.67
+    },
+    {
+      "time": "2026-03-14 07:58:48",
+      "total_change": -32.46,
+      "cumulative_pct": -32.46,
+      "velocity": 32.46
+    },
+    {
+      "time": "2026-03-14 08:00:00",
+      "total_change": -33.82,
+      "cumulative_pct": -33.82,
+      "velocity": 33.82
+    },
+    {
+      "time": "2026-03-14 08:01:12",
+      "total_change": -34.74,
+      "cumulative_pct": -34.74,
+      "velocity": 34.74
+    },
+    {
+      "time": "2026-03-14 08:02:24",
+      "total_change": -38.65,
+      "cumulative_pct": -38.65,
+      "velocity": 38.65
+    },
+    {
+      "time": "2026-03-14 08:03:35",
+      "total_change": -39.31,
+      "cumulative_pct": -39.31,
+      "velocity": 39.31
+    },
+    {
+      "time": "2026-03-14 08:04:59",
+      "total_change": -38.04,
+      "cumulative_pct": -38.04,
+      "velocity": 38.04
+    },
+    {
+      "time": "2026-03-14 08:06:10",
+      "total_change": -37.31,
+      "cumulative_pct": -37.31,
+      "velocity": 37.31
+    },
+    {
+      "time": "2026-03-14 08:07:22",
+      "total_change": -37.52,
+      "cumulative_pct": -37.52,
+      "velocity": 37.52
+    },
+    {
+      "time": "2026-03-14 08:08:34",
+      "total_change": -39.09,
+      "cumulative_pct": -39.09,
+      "velocity": 39.09
+    },
+    {
+      "time": "2026-03-14 08:09:46",
+      "total_change": -37.89,
+      "cumulative_pct": -37.89,
+      "velocity": 37.89
+    },
+    {
+      "time": "2026-03-14 08:11:10",
+      "total_change": -38.19,
+      "cumulative_pct": -38.19,
+      "velocity": 38.19
+    },
+    {
+      "time": "2026-03-14 08:12:21",
+      "total_change": -38.35,
+      "cumulative_pct": -38.35,
+      "velocity": 38.35
+    },
+    {
+      "time": "2026-03-14 08:13:33",
+      "total_change": -38.56,
+      "cumulative_pct": -38.56,
+      "velocity": 38.56
+    },
+    {
+      "time": "2026-03-14 08:14:45",
+      "total_change": -36.47,
+      "cumulative_pct": -36.47,
+      "velocity": 36.47
+    },
+    {
+      "time": "2026-03-14 08:15:57",
+      "total_change": -35.61,
+      "cumulative_pct": -35.61,
+      "velocity": 35.61
+    },
+    {
+      "time": "2026-03-14 08:17:20",
+      "total_change": -36.75,
+      "cumulative_pct": -36.75,
+      "velocity": 36.75
+    },
+    {
+      "time": "2026-03-14 08:18:32",
+      "total_change": -38.35,
+      "cumulative_pct": -38.35,
+      "velocity": 38.35
+    },
+    {
+      "time": "2026-03-14 08:19:48",
+      "total_change": -35.88,
+      "cumulative_pct": -35.88,
+      "velocity": 35.88
+    },
+    {
+      "time": "2026-03-14 08:21:00",
+      "total_change": -34.32,
+      "cumulative_pct": -34.32,
+      "velocity": 34.32
+    },
+    {
+      "time": "2026-03-14 08:22:24",
+      "total_change": -33.37,
+      "cumulative_pct": -33.37,
+      "velocity": 33.37
+    },
+    {
+      "time": "2026-03-14 08:23:35",
+      "total_change": -33.25,
+      "cumulative_pct": -33.25,
+      "velocity": 33.25
+    },
+    {
+      "time": "2026-03-14 08:24:47",
+      "total_change": -33.04,
+      "cumulative_pct": -33.04,
+      "velocity": 33.04
+    },
+    {
+      "time": "2026-03-14 08:25:59",
+      "total_change": -35.17,
+      "cumulative_pct": -35.17,
+      "velocity": 35.17
+    },
+    {
+      "time": "2026-03-14 08:27:11",
+      "total_change": -36.17,
+      "cumulative_pct": -36.17,
+      "velocity": 36.17
+    },
+    {
+      "time": "2026-03-14 08:28:34",
+      "total_change": -33.79,
+      "cumulative_pct": -33.79,
+      "velocity": 33.79
+    },
+    {
+      "time": "2026-03-14 08:29:46",
+      "total_change": -33.93,
+      "cumulative_pct": -33.93,
+      "velocity": 33.93
+    },
+    {
+      "time": "2026-03-14 08:30:58",
+      "total_change": -35.66,
+      "cumulative_pct": -35.66,
+      "velocity": 35.66
+    },
+    {
+      "time": "2026-03-14 08:32:10",
+      "total_change": -34.73,
+      "cumulative_pct": -34.73,
+      "velocity": 34.73
+    },
+    {
+      "time": "2026-03-14 08:33:22",
+      "total_change": -33.33,
+      "cumulative_pct": -33.33,
+      "velocity": 33.33
+    },
+    {
+      "time": "2026-03-14 08:34:45",
+      "total_change": -33.04,
+      "cumulative_pct": -33.04,
+      "velocity": 33.04
+    },
+    {
+      "time": "2026-03-14 08:35:57",
+      "total_change": -32.89,
+      "cumulative_pct": -32.89,
+      "velocity": 32.89
+    },
+    {
+      "time": "2026-03-14 08:37:09",
+      "total_change": -33.17,
+      "cumulative_pct": -33.17,
+      "velocity": 33.17
+    },
+    {
+      "time": "2026-03-14 08:38:20",
+      "total_change": -34.84,
+      "cumulative_pct": -34.84,
+      "velocity": 34.84
+    },
+    {
+      "time": "2026-03-14 08:39:32",
+      "total_change": -39.39,
+      "cumulative_pct": -39.39,
+      "velocity": 39.39
+    },
+    {
+      "time": "2026-03-14 08:40:56",
+      "total_change": -38.21,
+      "cumulative_pct": -38.21,
+      "velocity": 38.21
+    },
+    {
+      "time": "2026-03-14 08:42:07",
+      "total_change": -39.28,
+      "cumulative_pct": -39.28,
+      "velocity": 39.28
+    },
+    {
+      "time": "2026-03-14 08:43:19",
+      "total_change": -38.31,
+      "cumulative_pct": -38.31,
+      "velocity": 38.31
+    },
+    {
+      "time": "2026-03-14 08:44:31",
+      "total_change": -45.68,
+      "cumulative_pct": -45.68,
+      "velocity": 45.68
+    },
+    {
+      "time": "2026-03-14 08:45:43",
+      "total_change": -45.92,
+      "cumulative_pct": -45.92,
+      "velocity": 45.92
+    },
+    {
+      "time": "2026-03-14 08:47:06",
+      "total_change": -47.46,
+      "cumulative_pct": -47.46,
+      "velocity": 47.46
+    },
+    {
+      "time": "2026-03-14 08:48:18",
+      "total_change": -45.53,
+      "cumulative_pct": -45.53,
+      "velocity": 45.53
+    },
+    {
+      "time": "2026-03-14 08:49:30",
+      "total_change": -48.62,
+      "cumulative_pct": -48.62,
+      "velocity": 48.62
+    },
+    {
+      "time": "2026-03-14 08:50:42",
+      "total_change": -48.39,
+      "cumulative_pct": -48.39,
+      "velocity": 48.39
+    },
+    {
+      "time": "2026-03-14 08:51:53",
+      "total_change": -48.05,
+      "cumulative_pct": -48.05,
+      "velocity": 48.05
+    },
+    {
+      "time": "2026-03-14 08:53:17",
+      "total_change": -49.37,
+      "cumulative_pct": -49.37,
+      "velocity": 49.37
+    },
+    {
+      "time": "2026-03-14 08:54:28",
+      "total_change": -49.28,
+      "cumulative_pct": -49.28,
+      "velocity": 49.28
+    },
+    {
+      "time": "2026-03-14 08:55:40",
+      "total_change": -48.24,
+      "cumulative_pct": -48.24,
+      "velocity": 48.24
+    },
+    {
+      "time": "2026-03-14 08:56:52",
+      "total_change": -47.16,
+      "cumulative_pct": -47.16,
+      "velocity": 47.16
+    },
+    {
+      "time": "2026-03-14 08:58:04",
+      "total_change": -47.44,
+      "cumulative_pct": -47.44,
+      "velocity": 47.44
+    },
+    {
+      "time": "2026-03-14 08:59:27",
+      "total_change": -47.62,
+      "cumulative_pct": -47.62,
+      "velocity": 47.62
+    },
+    {
+      "time": "2026-03-14 09:00:39",
+      "total_change": -47.47,
+      "cumulative_pct": -47.47,
+      "velocity": 47.47
+    },
+    {
+      "time": "2026-03-14 09:01:51",
+      "total_change": -46.59,
+      "cumulative_pct": -46.59,
+      "velocity": 46.59
+    },
+    {
+      "time": "2026-03-14 09:03:02",
+      "total_change": -44.76,
+      "cumulative_pct": -44.76,
+      "velocity": 44.76
+    },
+    {
+      "time": "2026-03-14 09:04:14",
+      "total_change": -42.44,
+      "cumulative_pct": -42.44,
+      "velocity": 42.44
+    },
+    {
+      "time": "2026-03-14 09:05:38",
+      "total_change": -44.02,
+      "cumulative_pct": -44.02,
+      "velocity": 44.02
+    },
+    {
+      "time": "2026-03-14 09:06:50",
+      "total_change": -44.19,
+      "cumulative_pct": -44.19,
+      "velocity": 44.19
+    },
+    {
+      "time": "2026-03-14 09:08:02",
+      "total_change": -44.36,
+      "cumulative_pct": -44.36,
+      "velocity": 44.36
+    },
+    {
+      "time": "2026-03-14 09:09:14",
+      "total_change": -43.19,
+      "cumulative_pct": -43.19,
+      "velocity": 43.19
+    },
+    {
+      "time": "2026-03-14 09:10:25",
+      "total_change": -43.31,
+      "cumulative_pct": -43.31,
+      "velocity": 43.31
+    },
+    {
+      "time": "2026-03-14 09:11:49",
+      "total_change": -49.3,
+      "cumulative_pct": -49.3,
+      "velocity": 49.3
+    },
+    {
+      "time": "2026-03-14 09:13:01",
+      "total_change": -48.48,
+      "cumulative_pct": -48.48,
+      "velocity": 48.48
+    },
+    {
+      "time": "2026-03-14 09:14:12",
+      "total_change": -49.2,
+      "cumulative_pct": -49.2,
+      "velocity": 49.2
+    },
+    {
+      "time": "2026-03-14 09:15:24",
+      "total_change": -45.95,
+      "cumulative_pct": -45.95,
+      "velocity": 45.95
+    },
+    {
+      "time": "2026-03-14 09:16:36",
+      "total_change": -45.36,
+      "cumulative_pct": -45.36,
+      "velocity": 45.36
+    },
+    {
+      "time": "2026-03-14 09:17:59",
+      "total_change": -43.85,
+      "cumulative_pct": -43.85,
+      "velocity": 43.85
+    },
+    {
+      "time": "2026-03-14 09:19:11",
+      "total_change": -42.62,
+      "cumulative_pct": -42.62,
+      "velocity": 42.62
+    },
+    {
+      "time": "2026-03-14 09:20:23",
+      "total_change": -41.14,
+      "cumulative_pct": -41.14,
+      "velocity": 41.14
+    },
+    {
+      "time": "2026-03-14 09:21:35",
+      "total_change": -40.7,
+      "cumulative_pct": -40.7,
+      "velocity": 40.7
+    },
+    {
+      "time": "2026-03-14 09:22:46",
+      "total_change": -39.77,
+      "cumulative_pct": -39.77,
+      "velocity": 39.77
+    },
+    {
+      "time": "2026-03-14 09:24:10",
+      "total_change": -39.31,
+      "cumulative_pct": -39.31,
+      "velocity": 39.31
+    },
+    {
+      "time": "2026-03-14 09:25:22",
+      "total_change": -38.81,
+      "cumulative_pct": -38.81,
+      "velocity": 38.81
+    },
+    {
+      "time": "2026-03-14 09:26:35",
+      "total_change": -38.3,
+      "cumulative_pct": -38.3,
+      "velocity": 38.3
+    },
+    {
+      "time": "2026-03-14 09:27:46",
+      "total_change": -38.4,
+      "cumulative_pct": -38.4,
+      "velocity": 38.4
+    },
+    {
+      "time": "2026-03-14 09:28:58",
+      "total_change": -38.58,
+      "cumulative_pct": -38.58,
+      "velocity": 38.58
+    },
+    {
+      "time": "2026-03-14 09:30:21",
+      "total_change": -39.26,
+      "cumulative_pct": -39.26,
+      "velocity": 39.26
+    },
+    {
+      "time": "2026-03-14 09:31:33",
+      "total_change": -38.32,
+      "cumulative_pct": -38.32,
+      "velocity": 38.32
+    },
+    {
+      "time": "2026-03-14 09:32:45",
+      "total_change": -38.83,
+      "cumulative_pct": -38.83,
+      "velocity": 38.83
+    },
+    {
+      "time": "2026-03-14 09:33:57",
+      "total_change": -41.87,
+      "cumulative_pct": -41.87,
+      "velocity": 41.87
+    },
+    {
+      "time": "2026-03-14 09:35:08",
+      "total_change": -43.25,
+      "cumulative_pct": -43.25,
+      "velocity": 43.25
+    },
+    {
+      "time": "2026-03-14 09:36:32",
+      "total_change": -44.37,
+      "cumulative_pct": -44.37,
+      "velocity": 44.37
+    },
+    {
+      "time": "2026-03-14 09:37:44",
+      "total_change": -47.66,
+      "cumulative_pct": -47.66,
+      "velocity": 47.66
+    },
+    {
+      "time": "2026-03-14 09:38:56",
+      "total_change": -49.17,
+      "cumulative_pct": -49.17,
+      "velocity": 49.17
+    },
+    {
+      "time": "2026-03-14 09:40:08",
+      "total_change": -44.46,
+      "cumulative_pct": -44.46,
+      "velocity": 44.46
+    },
+    {
+      "time": "2026-03-14 09:41:20",
+      "total_change": -41.27,
+      "cumulative_pct": -41.27,
+      "velocity": 41.27
+    },
+    {
+      "time": "2026-03-14 09:42:43",
+      "total_change": -41.25,
+      "cumulative_pct": -41.25,
+      "velocity": 41.25
+    },
+    {
+      "time": "2026-03-14 09:43:55",
+      "total_change": -41.39,
+      "cumulative_pct": -41.39,
+      "velocity": 41.39
+    },
+    {
+      "time": "2026-03-14 09:45:06",
+      "total_change": -40.71,
+      "cumulative_pct": -40.71,
+      "velocity": 40.71
+    },
+    {
+      "time": "2026-03-14 09:46:18",
+      "total_change": -40.07,
+      "cumulative_pct": -40.07,
+      "velocity": 40.07
+    },
+    {
+      "time": "2026-03-14 09:47:30",
+      "total_change": -39.42,
+      "cumulative_pct": -39.42,
+      "velocity": 39.42
+    },
+    {
+      "time": "2026-03-14 09:48:53",
+      "total_change": -37.83,
+      "cumulative_pct": -37.83,
+      "velocity": 37.83
+    },
+    {
+      "time": "2026-03-14 09:50:05",
+      "total_change": -36.54,
+      "cumulative_pct": -36.54,
+      "velocity": 36.54
+    },
+    {
+      "time": "2026-03-14 09:51:17",
+      "total_change": -35.75,
+      "cumulative_pct": -35.75,
+      "velocity": 35.75
+    },
+    {
+      "time": "2026-03-14 09:52:28",
+      "total_change": -36.64,
+      "cumulative_pct": -36.64,
+      "velocity": 36.64
+    },
+    {
+      "time": "2026-03-14 09:53:40",
+      "total_change": -36.92,
+      "cumulative_pct": -36.92,
+      "velocity": 36.92
+    },
+    {
+      "time": "2026-03-14 09:55:03",
+      "total_change": -35.29,
+      "cumulative_pct": -35.29,
+      "velocity": 35.29
+    },
+    {
+      "time": "2026-03-14 09:56:15",
+      "total_change": -36.95,
+      "cumulative_pct": -36.95,
+      "velocity": 36.95
+    },
+    {
+      "time": "2026-03-14 09:57:27",
+      "total_change": -36.02,
+      "cumulative_pct": -36.02,
+      "velocity": 36.02
+    },
+    {
+      "time": "2026-03-14 09:58:39",
+      "total_change": -35.59,
+      "cumulative_pct": -35.59,
+      "velocity": 35.59
+    },
+    {
+      "time": "2026-03-14 09:59:51",
+      "total_change": -36.58,
+      "cumulative_pct": -36.58,
+      "velocity": 36.58
+    },
+    {
+      "time": "2026-03-14 10:01:14",
+      "total_change": -36.44,
+      "cumulative_pct": -36.44,
+      "velocity": 36.44
+    },
+    {
+      "time": "2026-03-14 10:02:26",
+      "total_change": -38.21,
+      "cumulative_pct": -38.21,
+      "velocity": 38.21
+    },
+    {
+      "time": "2026-03-14 10:03:38",
+      "total_change": -37.21,
+      "cumulative_pct": -37.21,
+      "velocity": 37.21
+    },
+    {
+      "time": "2026-03-14 10:04:50",
+      "total_change": -36.74,
+      "cumulative_pct": -36.74,
+      "velocity": 36.74
+    },
+    {
+      "time": "2026-03-14 10:06:01",
+      "total_change": -35.82,
+      "cumulative_pct": -35.82,
+      "velocity": 35.82
+    },
+    {
+      "time": "2026-03-14 10:07:26",
+      "total_change": -37.17,
+      "cumulative_pct": -37.17,
+      "velocity": 37.17
+    },
+    {
+      "time": "2026-03-14 10:08:38",
+      "total_change": -37.98,
+      "cumulative_pct": -37.98,
+      "velocity": 37.98
+    },
+    {
+      "time": "2026-03-14 10:09:49",
+      "total_change": -39.14,
+      "cumulative_pct": -39.14,
+      "velocity": 39.14
+    },
+    {
+      "time": "2026-03-14 10:11:01",
+      "total_change": -39.29,
+      "cumulative_pct": -39.29,
+      "velocity": 39.29
+    },
+    {
+      "time": "2026-03-14 10:12:13",
+      "total_change": -38.71,
+      "cumulative_pct": -38.71,
+      "velocity": 38.71
+    },
+    {
+      "time": "2026-03-14 10:13:36",
+      "total_change": -37.6,
+      "cumulative_pct": -37.6,
+      "velocity": 37.6
+    },
+    {
+      "time": "2026-03-14 10:14:48",
+      "total_change": -37.35,
+      "cumulative_pct": -37.35,
+      "velocity": 37.35
+    },
+    {
+      "time": "2026-03-14 10:16:00",
+      "total_change": -37.08,
+      "cumulative_pct": -37.08,
+      "velocity": 37.08
+    },
+    {
+      "time": "2026-03-14 10:17:12",
+      "total_change": -36.79,
+      "cumulative_pct": -36.79,
+      "velocity": 36.79
+    },
+    {
+      "time": "2026-03-14 10:18:24",
+      "total_change": -36.27,
+      "cumulative_pct": -36.27,
+      "velocity": 36.27
+    },
+    {
+      "time": "2026-03-14 10:19:47",
+      "total_change": -37.13,
+      "cumulative_pct": -37.13,
+      "velocity": 37.13
+    },
+    {
+      "time": "2026-03-14 10:20:59",
+      "total_change": -40.15,
+      "cumulative_pct": -40.15,
+      "velocity": 40.15
+    },
+    {
+      "time": "2026-03-14 10:22:10",
+      "total_change": -40.82,
+      "cumulative_pct": -40.82,
+      "velocity": 40.82
+    },
+    {
+      "time": "2026-03-14 10:23:22",
+      "total_change": -41.56,
+      "cumulative_pct": -41.56,
+      "velocity": 41.56
+    },
+    {
+      "time": "2026-03-14 10:24:34",
+      "total_change": -40.7,
+      "cumulative_pct": -40.7,
+      "velocity": 40.7
+    },
+    {
+      "time": "2026-03-14 10:25:58",
+      "total_change": -41.74,
+      "cumulative_pct": -41.74,
+      "velocity": 41.74
+    },
+    {
+      "time": "2026-03-14 10:27:09",
+      "total_change": -41.62,
+      "cumulative_pct": -41.62,
+      "velocity": 41.62
+    },
+    {
+      "time": "2026-03-14 10:28:22",
+      "total_change": -41.09,
+      "cumulative_pct": -41.09,
+      "velocity": 41.09
+    },
+    {
+      "time": "2026-03-14 10:29:34",
+      "total_change": -41.52,
+      "cumulative_pct": -41.52,
+      "velocity": 41.52
+    },
+    {
+      "time": "2026-03-14 10:30:45",
+      "total_change": -41.64,
+      "cumulative_pct": -41.64,
+      "velocity": 41.64
+    },
+    {
+      "time": "2026-03-14 10:32:09",
+      "total_change": -42.21,
+      "cumulative_pct": -42.21,
+      "velocity": 42.21
+    },
+    {
+      "time": "2026-03-14 10:33:20",
+      "total_change": -43.13,
+      "cumulative_pct": -43.13,
+      "velocity": 43.13
+    },
+    {
+      "time": "2026-03-14 10:34:32",
+      "total_change": -40.99,
+      "cumulative_pct": -40.99,
+      "velocity": 40.99
+    },
+    {
+      "time": "2026-03-14 10:35:44",
+      "total_change": -39.86,
+      "cumulative_pct": -39.86,
+      "velocity": 39.86
+    },
+    {
+      "time": "2026-03-14 10:36:56",
+      "total_change": -42.49,
+      "cumulative_pct": -42.49,
+      "velocity": 42.49
+    },
+    {
+      "time": "2026-03-14 10:38:19",
+      "total_change": -43.64,
+      "cumulative_pct": -43.64,
+      "velocity": 43.64
+    },
+    {
+      "time": "2026-03-14 10:39:31",
+      "total_change": -42.4,
+      "cumulative_pct": -42.4,
+      "velocity": 42.4
+    },
+    {
+      "time": "2026-03-14 10:40:42",
+      "total_change": -40.96,
+      "cumulative_pct": -40.96,
+      "velocity": 40.96
+    },
+    {
+      "time": "2026-03-14 10:41:54",
+      "total_change": -41.76,
+      "cumulative_pct": -41.76,
+      "velocity": 41.76
+    },
+    {
+      "time": "2026-03-14 10:43:06",
+      "total_change": -42.76,
+      "cumulative_pct": -42.76,
+      "velocity": 42.76
+    },
+    {
+      "time": "2026-03-14 10:44:29",
+      "total_change": -42.76,
+      "cumulative_pct": -42.76,
+      "velocity": 42.76
+    },
+    {
+      "time": "2026-03-14 10:45:41",
+      "total_change": -42.26,
+      "cumulative_pct": -42.26,
+      "velocity": 42.26
+    },
+    {
+      "time": "2026-03-14 10:46:53",
+      "total_change": -42.33,
+      "cumulative_pct": -42.33,
+      "velocity": 42.33
+    },
+    {
+      "time": "2026-03-14 10:48:04",
+      "total_change": -41.93,
+      "cumulative_pct": -41.93,
+      "velocity": 41.93
+    },
+    {
+      "time": "2026-03-14 10:49:16",
+      "total_change": -41.22,
+      "cumulative_pct": -41.22,
+      "velocity": 41.22
+    },
+    {
+      "time": "2026-03-14 10:50:39",
+      "total_change": -39.43,
+      "cumulative_pct": -39.43,
+      "velocity": 39.43
+    },
+    {
+      "time": "2026-03-14 10:51:51",
+      "total_change": -38.85,
+      "cumulative_pct": -38.85,
+      "velocity": 38.85
+    },
+    {
+      "time": "2026-03-14 10:53:03",
+      "total_change": -36.54,
+      "cumulative_pct": -36.54,
+      "velocity": 36.54
+    },
+    {
+      "time": "2026-03-14 10:54:15",
+      "total_change": -36.78,
+      "cumulative_pct": -36.78,
+      "velocity": 36.78
+    },
+    {
+      "time": "2026-03-14 10:55:27",
+      "total_change": -35.32,
+      "cumulative_pct": -35.32,
+      "velocity": 35.32
+    },
+    {
+      "time": "2026-03-14 10:56:50",
+      "total_change": -36.16,
+      "cumulative_pct": -36.16,
+      "velocity": 36.16
+    },
+    {
+      "time": "2026-03-14 10:58:02",
+      "total_change": -37.17,
+      "cumulative_pct": -37.17,
+      "velocity": 37.17
+    },
+    {
+      "time": "2026-03-14 10:59:13",
+      "total_change": -36.35,
+      "cumulative_pct": -36.35,
+      "velocity": 36.35
+    },
+    {
+      "time": "2026-03-14 11:00:25",
+      "total_change": -37.92,
+      "cumulative_pct": -37.92,
+      "velocity": 37.92
+    },
+    {
+      "time": "2026-03-14 11:01:37",
+      "total_change": -37.97,
+      "cumulative_pct": -37.97,
+      "velocity": 37.97
+    },
+    {
+      "time": "2026-03-14 11:03:00",
+      "total_change": -38.9,
+      "cumulative_pct": -38.9,
+      "velocity": 38.9
+    },
+    {
+      "time": "2026-03-14 11:04:12",
+      "total_change": -39.07,
+      "cumulative_pct": -39.07,
+      "velocity": 39.07
+    },
+    {
+      "time": "2026-03-14 11:05:24",
+      "total_change": -36.76,
+      "cumulative_pct": -36.76,
+      "velocity": 36.76
+    },
+    {
+      "time": "2026-03-14 11:06:35",
+      "total_change": -34.93,
+      "cumulative_pct": -34.93,
+      "velocity": 34.93
+    },
+    {
+      "time": "2026-03-14 11:07:47",
+      "total_change": -33.53,
+      "cumulative_pct": -33.53,
+      "velocity": 33.53
+    },
+    {
+      "time": "2026-03-14 11:09:11",
+      "total_change": -33.31,
+      "cumulative_pct": -33.31,
+      "velocity": 33.31
+    },
+    {
+      "time": "2026-03-14 11:10:23",
+      "total_change": -33.22,
+      "cumulative_pct": -33.22,
+      "velocity": 33.22
+    },
+    {
+      "time": "2026-03-14 11:11:34",
+      "total_change": -32.33,
+      "cumulative_pct": -32.33,
+      "velocity": 32.33
+    },
+    {
+      "time": "2026-03-14 11:12:57",
+      "total_change": -31.89,
+      "cumulative_pct": -31.89,
+      "velocity": 31.89
+    },
+    {
+      "time": "2026-03-14 11:14:20",
+      "total_change": -31.7,
+      "cumulative_pct": -31.7,
+      "velocity": 31.7
+    },
+    {
+      "time": "2026-03-14 11:15:31",
+      "total_change": -31.15,
+      "cumulative_pct": -31.15,
+      "velocity": 31.15
+    },
+    {
+      "time": "2026-03-14 11:16:43",
+      "total_change": -29.37,
+      "cumulative_pct": -29.37,
+      "velocity": 29.37
+    },
+    {
+      "time": "2026-03-14 11:17:55",
+      "total_change": -28.56,
+      "cumulative_pct": -28.56,
+      "velocity": 28.56
+    },
+    {
+      "time": "2026-03-14 11:19:07",
+      "total_change": -28.63,
+      "cumulative_pct": -28.63,
+      "velocity": 28.63
+    },
+    {
+      "time": "2026-03-14 11:20:30",
+      "total_change": -30.8,
+      "cumulative_pct": -30.8,
+      "velocity": 30.8
+    },
+    {
+      "time": "2026-03-14 11:21:42",
+      "total_change": -32.05,
+      "cumulative_pct": -32.05,
+      "velocity": 32.05
+    },
+    {
+      "time": "2026-03-14 11:22:53",
+      "total_change": -32.49,
+      "cumulative_pct": -32.49,
+      "velocity": 32.49
+    },
+    {
+      "time": "2026-03-14 11:24:05",
+      "total_change": -32.24,
+      "cumulative_pct": -32.24,
+      "velocity": 32.24
+    },
+    {
+      "time": "2026-03-14 11:25:17",
+      "total_change": -30.22,
+      "cumulative_pct": -30.22,
+      "velocity": 30.22
+    },
+    {
+      "time": "2026-03-14 11:26:40",
+      "total_change": -30.17,
+      "cumulative_pct": -30.17,
+      "velocity": 30.17
+    },
+    {
+      "time": "2026-03-14 11:27:52",
+      "total_change": -29.01,
+      "cumulative_pct": -29.01,
+      "velocity": 29.01
+    },
+    {
+      "time": "2026-03-14 11:29:03",
+      "total_change": -28.84,
+      "cumulative_pct": -28.84,
+      "velocity": 28.84
+    },
+    {
+      "time": "2026-03-14 11:30:15",
+      "total_change": -28.58,
+      "cumulative_pct": -28.58,
+      "velocity": 28.58
+    },
+    {
+      "time": "2026-03-14 11:31:27",
+      "total_change": -28.44,
+      "cumulative_pct": -28.44,
+      "velocity": 28.44
+    },
+    {
+      "time": "2026-03-14 11:32:50",
+      "total_change": -27.12,
+      "cumulative_pct": -27.12,
+      "velocity": 27.12
+    },
+    {
+      "time": "2026-03-14 11:34:02",
+      "total_change": -24.64,
+      "cumulative_pct": -24.64,
+      "velocity": 24.64
+    },
+    {
+      "time": "2026-03-14 11:35:13",
+      "total_change": -26.08,
+      "cumulative_pct": -26.08,
+      "velocity": 26.08
+    },
+    {
+      "time": "2026-03-14 11:36:25",
+      "total_change": -27.32,
+      "cumulative_pct": -27.32,
+      "velocity": 27.32
+    },
+    {
+      "time": "2026-03-14 11:37:37",
+      "total_change": -26.99,
+      "cumulative_pct": -26.99,
+      "velocity": 26.99
+    },
+    {
+      "time": "2026-03-14 11:39:00",
+      "total_change": -27.86,
+      "cumulative_pct": -27.86,
+      "velocity": 27.86
+    },
+    {
+      "time": "2026-03-14 11:40:11",
+      "total_change": -26.13,
+      "cumulative_pct": -26.13,
+      "velocity": 26.13
+    },
+    {
+      "time": "2026-03-14 11:41:23",
+      "total_change": -25.48,
+      "cumulative_pct": -25.48,
+      "velocity": 25.48
+    },
+    {
+      "time": "2026-03-14 11:42:35",
+      "total_change": -25.77,
+      "cumulative_pct": -25.77,
+      "velocity": 25.77
+    },
+    {
+      "time": "2026-03-14 11:43:46",
+      "total_change": -26.05,
+      "cumulative_pct": -26.05,
+      "velocity": 26.05
+    },
+    {
+      "time": "2026-03-14 11:45:10",
+      "total_change": -28.16,
+      "cumulative_pct": -28.16,
+      "velocity": 28.16
+    },
+    {
+      "time": "2026-03-14 11:46:21",
+      "total_change": -28.66,
+      "cumulative_pct": -28.66,
+      "velocity": 28.66
+    },
+    {
+      "time": "2026-03-14 11:47:33",
+      "total_change": -28.11,
+      "cumulative_pct": -28.11,
+      "velocity": 28.11
+    },
+    {
+      "time": "2026-03-14 11:48:45",
+      "total_change": -28.26,
+      "cumulative_pct": -28.26,
+      "velocity": 28.26
+    },
+    {
+      "time": "2026-03-14 11:49:56",
+      "total_change": -28.34,
+      "cumulative_pct": -28.34,
+      "velocity": 28.34
+    },
+    {
+      "time": "2026-03-14 11:51:20",
+      "total_change": -28.49,
+      "cumulative_pct": -28.49,
+      "velocity": 28.49
+    },
+    {
+      "time": "2026-03-14 11:52:31",
+      "total_change": -28.92,
+      "cumulative_pct": -28.92,
+      "velocity": 28.92
+    },
+    {
+      "time": "2026-03-14 11:53:43",
+      "total_change": -29.0,
+      "cumulative_pct": -29.0,
+      "velocity": 29.0
+    },
+    {
+      "time": "2026-03-14 11:54:54",
+      "total_change": -28.64,
+      "cumulative_pct": -28.64,
+      "velocity": 28.64
+    },
+    {
+      "time": "2026-03-14 11:56:06",
+      "total_change": -29.67,
+      "cumulative_pct": -29.67,
+      "velocity": 29.67
+    },
+    {
+      "time": "2026-03-14 11:57:30",
+      "total_change": -29.1,
+      "cumulative_pct": -29.1,
+      "velocity": 29.1
+    },
+    {
+      "time": "2026-03-14 11:58:41",
+      "total_change": -28.62,
+      "cumulative_pct": -28.62,
+      "velocity": 28.62
+    },
+    {
+      "time": "2026-03-14 11:59:53",
+      "total_change": -28.41,
+      "cumulative_pct": -28.41,
+      "velocity": 28.41
+    },
+    {
+      "time": "2026-03-14 12:01:05",
+      "total_change": -29.5,
+      "cumulative_pct": -29.5,
+      "velocity": 29.5
+    },
+    {
+      "time": "2026-03-14 12:02:16",
+      "total_change": -29.68,
+      "cumulative_pct": -29.68,
+      "velocity": 29.68
+    },
+    {
+      "time": "2026-03-14 12:03:40",
+      "total_change": -28.44,
+      "cumulative_pct": -28.44,
+      "velocity": 28.44
+    },
+    {
+      "time": "2026-03-14 12:04:51",
+      "total_change": -26.75,
+      "cumulative_pct": -26.75,
+      "velocity": 26.75
+    },
+    {
+      "time": "2026-03-14 12:06:03",
+      "total_change": -27.18,
+      "cumulative_pct": -27.18,
+      "velocity": 27.18
+    },
+    {
+      "time": "2026-03-14 12:07:15",
+      "total_change": -27.04,
+      "cumulative_pct": -27.04,
+      "velocity": 27.04
+    },
+    {
+      "time": "2026-03-14 12:08:26",
+      "total_change": -25.66,
+      "cumulative_pct": -25.66,
+      "velocity": 25.66
+    },
+    {
+      "time": "2026-03-14 12:09:50",
+      "total_change": -25.64,
+      "cumulative_pct": -25.64,
+      "velocity": 25.64
+    },
+    {
+      "time": "2026-03-14 12:11:01",
+      "total_change": -26.23,
+      "cumulative_pct": -26.23,
+      "velocity": 26.23
+    },
+    {
+      "time": "2026-03-14 12:12:13",
+      "total_change": -26.45,
+      "cumulative_pct": -26.45,
+      "velocity": 26.45
+    },
+    {
+      "time": "2026-03-14 12:13:25",
+      "total_change": -27.17,
+      "cumulative_pct": -27.17,
+      "velocity": 27.17
+    },
+    {
+      "time": "2026-03-14 12:14:36",
+      "total_change": -26.94,
+      "cumulative_pct": -26.94,
+      "velocity": 26.94
+    },
+    {
+      "time": "2026-03-14 12:16:00",
+      "total_change": -30.28,
+      "cumulative_pct": -30.28,
+      "velocity": 30.28
+    },
+    {
+      "time": "2026-03-14 12:17:12",
+      "total_change": -31.51,
+      "cumulative_pct": -31.51,
+      "velocity": 31.51
+    },
+    {
+      "time": "2026-03-14 12:18:23",
+      "total_change": -30.04,
+      "cumulative_pct": -30.04,
+      "velocity": 30.04
+    },
+    {
+      "time": "2026-03-14 12:19:35",
+      "total_change": -29.98,
+      "cumulative_pct": -29.98,
+      "velocity": 29.98
+    },
+    {
+      "time": "2026-03-14 12:20:47",
+      "total_change": -30.36,
+      "cumulative_pct": -30.36,
+      "velocity": 30.36
+    },
+    {
+      "time": "2026-03-14 12:22:10",
+      "total_change": -31.74,
+      "cumulative_pct": -31.74,
+      "velocity": 31.74
+    },
+    {
+      "time": "2026-03-14 12:23:22",
+      "total_change": -31.18,
+      "cumulative_pct": -31.18,
+      "velocity": 31.18
+    },
+    {
+      "time": "2026-03-14 12:24:34",
+      "total_change": -32.24,
+      "cumulative_pct": -32.24,
+      "velocity": 32.24
+    },
+    {
+      "time": "2026-03-14 12:25:46",
+      "total_change": -32.24,
+      "cumulative_pct": -32.24,
+      "velocity": 32.24
+    },
+    {
+      "time": "2026-03-14 12:26:58",
+      "total_change": -30.79,
+      "cumulative_pct": -30.79,
+      "velocity": 30.79
+    },
+    {
+      "time": "2026-03-14 12:28:21",
+      "total_change": -29.19,
+      "cumulative_pct": -29.19,
+      "velocity": 29.19
+    },
+    {
+      "time": "2026-03-14 12:29:34",
+      "total_change": -27.57,
+      "cumulative_pct": -27.57,
+      "velocity": 27.57
+    },
+    {
+      "time": "2026-03-14 12:30:45",
+      "total_change": -28.63,
+      "cumulative_pct": -28.63,
+      "velocity": 28.63
+    },
+    {
+      "time": "2026-03-14 12:31:57",
+      "total_change": -28.87,
+      "cumulative_pct": -28.87,
+      "velocity": 28.87
+    },
+    {
+      "time": "2026-03-14 12:33:09",
+      "total_change": -28.98,
+      "cumulative_pct": -28.98,
+      "velocity": 28.98
+    },
+    {
+      "time": "2026-03-14 12:34:32",
+      "total_change": -26.26,
+      "cumulative_pct": -26.26,
+      "velocity": 26.26
+    },
+    {
+      "time": "2026-03-14 12:35:43",
+      "total_change": -25.94,
+      "cumulative_pct": -25.94,
+      "velocity": 25.94
+    },
+    {
+      "time": "2026-03-14 12:36:55",
+      "total_change": -25.52,
+      "cumulative_pct": -25.52,
+      "velocity": 25.52
+    },
+    {
+      "time": "2026-03-14 12:38:07",
+      "total_change": -22.42,
+      "cumulative_pct": -22.42,
+      "velocity": 22.42
+    },
+    {
+      "time": "2026-03-14 12:39:18",
+      "total_change": -22.75,
+      "cumulative_pct": -22.75,
+      "velocity": 22.75
+    },
+    {
+      "time": "2026-03-14 12:40:47",
+      "total_change": -23.34,
+      "cumulative_pct": -23.34,
+      "velocity": 23.34
+    },
+    {
+      "time": "2026-03-14 12:41:58",
+      "total_change": -23.18,
+      "cumulative_pct": -23.18,
+      "velocity": 23.18
+    },
+    {
+      "time": "2026-03-14 12:43:10",
+      "total_change": -23.09,
+      "cumulative_pct": -23.09,
+      "velocity": 23.09
+    },
+    {
+      "time": "2026-03-14 12:44:22",
+      "total_change": -23.19,
+      "cumulative_pct": -23.19,
+      "velocity": 23.19
+    },
+    {
+      "time": "2026-03-14 12:45:45",
+      "total_change": -23.44,
+      "cumulative_pct": -23.44,
+      "velocity": 23.44
+    },
+    {
+      "time": "2026-03-14 12:46:57",
+      "total_change": -25.23,
+      "cumulative_pct": -25.23,
+      "velocity": 25.23
+    },
+    {
+      "time": "2026-03-14 12:48:08",
+      "total_change": -24.35,
+      "cumulative_pct": -24.35,
+      "velocity": 24.35
+    },
+    {
+      "time": "2026-03-14 12:49:20",
+      "total_change": -23.83,
+      "cumulative_pct": -23.83,
+      "velocity": 23.83
+    },
+    {
+      "time": "2026-03-14 12:50:32",
+      "total_change": -22.8,
+      "cumulative_pct": -22.8,
+      "velocity": 22.8
+    },
+    {
+      "time": "2026-03-14 12:51:55",
+      "total_change": -27.76,
+      "cumulative_pct": -27.76,
+      "velocity": 27.76
+    },
+    {
+      "time": "2026-03-14 12:53:07",
+      "total_change": -35.91,
+      "cumulative_pct": -35.91,
+      "velocity": 35.91
+    },
+    {
+      "time": "2026-03-14 12:54:18",
+      "total_change": -34.98,
+      "cumulative_pct": -34.98,
+      "velocity": 34.98
+    },
+    {
+      "time": "2026-03-14 12:55:30",
+      "total_change": -36.16,
+      "cumulative_pct": -36.16,
+      "velocity": 36.16
+    },
+    {
+      "time": "2026-03-14 12:56:42",
+      "total_change": -37.87,
+      "cumulative_pct": -37.87,
+      "velocity": 37.87
+    },
+    {
+      "time": "2026-03-14 12:58:05",
+      "total_change": -37.99,
+      "cumulative_pct": -37.99,
+      "velocity": 37.99
+    },
+    {
+      "time": "2026-03-14 12:59:17",
+      "total_change": -37.27,
+      "cumulative_pct": -37.27,
+      "velocity": 37.27
+    },
+    {
+      "time": "2026-03-14 13:00:28",
+      "total_change": -36.14,
+      "cumulative_pct": -36.14,
+      "velocity": 36.14
+    },
+    {
+      "time": "2026-03-14 13:01:40",
+      "total_change": -36.76,
+      "cumulative_pct": -36.76,
+      "velocity": 36.76
+    },
+    {
+      "time": "2026-03-14 13:02:52",
+      "total_change": -35.33,
+      "cumulative_pct": -35.33,
+      "velocity": 35.33
+    },
+    {
+      "time": "2026-03-14 13:04:15",
+      "total_change": -35.94,
+      "cumulative_pct": -35.94,
+      "velocity": 35.94
+    },
+    {
+      "time": "2026-03-14 13:05:27",
+      "total_change": -37.92,
+      "cumulative_pct": -37.92,
+      "velocity": 37.92
+    },
+    {
+      "time": "2026-03-14 13:06:39",
+      "total_change": -40.46,
+      "cumulative_pct": -40.46,
+      "velocity": 40.46
+    },
+    {
+      "time": "2026-03-14 13:07:50",
+      "total_change": -36.28,
+      "cumulative_pct": -36.28,
+      "velocity": 36.28
+    },
+    {
+      "time": "2026-03-14 13:09:02",
+      "total_change": -38.42,
+      "cumulative_pct": -38.42,
+      "velocity": 38.42
+    },
+    {
+      "time": "2026-03-14 13:10:25",
+      "total_change": -38.57,
+      "cumulative_pct": -38.57,
+      "velocity": 38.57
+    },
+    {
+      "time": "2026-03-14 13:11:37",
+      "total_change": -38.73,
+      "cumulative_pct": -38.73,
+      "velocity": 38.73
+    },
+    {
+      "time": "2026-03-14 13:12:49",
+      "total_change": -38.64,
+      "cumulative_pct": -38.64,
+      "velocity": 38.64
+    },
+    {
+      "time": "2026-03-14 13:14:00",
+      "total_change": -38.49,
+      "cumulative_pct": -38.49,
+      "velocity": 38.49
+    },
+    {
+      "time": "2026-03-14 13:15:12",
+      "total_change": -38.48,
+      "cumulative_pct": -38.48,
+      "velocity": 38.48
+    },
+    {
+      "time": "2026-03-14 13:16:36",
+      "total_change": -37.94,
+      "cumulative_pct": -37.94,
+      "velocity": 37.94
+    },
+    {
+      "time": "2026-03-14 13:17:47",
+      "total_change": -39.89,
+      "cumulative_pct": -39.89,
+      "velocity": 39.89
+    },
+    {
+      "time": "2026-03-14 13:18:59",
+      "total_change": -40.03,
+      "cumulative_pct": -40.03,
+      "velocity": 40.03
+    },
+    {
+      "time": "2026-03-14 13:20:11",
+      "total_change": -39.04,
+      "cumulative_pct": -39.04,
+      "velocity": 39.04
+    },
+    {
+      "time": "2026-03-14 13:21:23",
+      "total_change": -38.64,
+      "cumulative_pct": -38.64,
+      "velocity": 38.64
+    },
+    {
+      "time": "2026-03-14 13:22:46",
+      "total_change": -39.43,
+      "cumulative_pct": -39.43,
+      "velocity": 39.43
+    },
+    {
+      "time": "2026-03-14 13:23:58",
+      "total_change": -38.53,
+      "cumulative_pct": -38.53,
+      "velocity": 38.53
+    },
+    {
+      "time": "2026-03-14 13:25:10",
+      "total_change": -38.31,
+      "cumulative_pct": -38.31,
+      "velocity": 38.31
+    },
+    {
+      "time": "2026-03-14 13:26:22",
+      "total_change": -37.42,
+      "cumulative_pct": -37.42,
+      "velocity": 37.42
+    },
+    {
+      "time": "2026-03-14 13:27:33",
+      "total_change": -38.36,
+      "cumulative_pct": -38.36,
+      "velocity": 38.36
+    },
+    {
+      "time": "2026-03-14 13:28:57",
+      "total_change": -39.22,
+      "cumulative_pct": -39.22,
+      "velocity": 39.22
+    },
+    {
+      "time": "2026-03-14 13:30:08",
+      "total_change": -40.0,
+      "cumulative_pct": -40.0,
+      "velocity": 40.0
+    },
+    {
+      "time": "2026-03-14 13:31:20",
+      "total_change": -41.7,
+      "cumulative_pct": -41.7,
+      "velocity": 41.7
+    },
+    {
+      "time": "2026-03-14 13:32:31",
+      "total_change": -42.63,
+      "cumulative_pct": -42.63,
+      "velocity": 42.63
+    },
+    {
+      "time": "2026-03-14 13:33:43",
+      "total_change": -46.86,
+      "cumulative_pct": -46.86,
+      "velocity": 46.86
+    },
+    {
+      "time": "2026-03-14 13:35:07",
+      "total_change": -46.3,
+      "cumulative_pct": -46.3,
+      "velocity": 46.3
+    },
+    {
+      "time": "2026-03-14 13:36:18",
+      "total_change": -48.67,
+      "cumulative_pct": -48.67,
+      "velocity": 48.67
+    },
+    {
+      "time": "2026-03-14 13:37:30",
+      "total_change": -47.67,
+      "cumulative_pct": -47.67,
+      "velocity": 47.67
+    },
+    {
+      "time": "2026-03-14 13:38:41",
+      "total_change": -47.15,
+      "cumulative_pct": -47.15,
+      "velocity": 47.15
+    },
+    {
+      "time": "2026-03-14 13:39:53",
+      "total_change": -45.51,
+      "cumulative_pct": -45.51,
+      "velocity": 45.51
+    },
+    {
+      "time": "2026-03-14 13:41:16",
+      "total_change": -46.47,
+      "cumulative_pct": -46.47,
+      "velocity": 46.47
+    },
+    {
+      "time": "2026-03-14 13:42:28",
+      "total_change": -47.22,
+      "cumulative_pct": -47.22,
+      "velocity": 47.22
+    },
+    {
+      "time": "2026-03-14 13:43:39",
+      "total_change": -46.52,
+      "cumulative_pct": -46.52,
+      "velocity": 46.52
+    },
+    {
+      "time": "2026-03-14 13:44:51",
+      "total_change": -45.36,
+      "cumulative_pct": -45.36,
+      "velocity": 45.36
+    },
+    {
+      "time": "2026-03-14 13:46:03",
+      "total_change": -45.61,
+      "cumulative_pct": -45.61,
+      "velocity": 45.61
+    },
+    {
+      "time": "2026-03-14 13:47:26",
+      "total_change": -45.89,
+      "cumulative_pct": -45.89,
+      "velocity": 45.89
+    },
+    {
+      "time": "2026-03-14 13:48:38",
+      "total_change": -45.69,
+      "cumulative_pct": -45.69,
+      "velocity": 45.69
+    },
+    {
+      "time": "2026-03-14 13:49:50",
+      "total_change": -45.01,
+      "cumulative_pct": -45.01,
+      "velocity": 45.01
+    },
+    {
+      "time": "2026-03-14 13:51:01",
+      "total_change": -45.48,
+      "cumulative_pct": -45.48,
+      "velocity": 45.48
+    },
+    {
+      "time": "2026-03-14 13:52:13",
+      "total_change": -45.23,
+      "cumulative_pct": -45.23,
+      "velocity": 45.23
+    },
+    {
+      "time": "2026-03-14 13:53:36",
+      "total_change": -44.77,
+      "cumulative_pct": -44.77,
+      "velocity": 44.77
+    },
+    {
+      "time": "2026-03-14 13:54:48",
+      "total_change": -43.35,
+      "cumulative_pct": -43.35,
+      "velocity": 43.35
+    },
+    {
+      "time": "2026-03-14 13:55:59",
+      "total_change": -43.49,
+      "cumulative_pct": -43.49,
+      "velocity": 43.49
+    },
+    {
+      "time": "2026-03-14 13:57:11",
+      "total_change": -43.99,
+      "cumulative_pct": -43.99,
+      "velocity": 43.99
+    },
+    {
+      "time": "2026-03-14 13:58:22",
+      "total_change": -43.59,
+      "cumulative_pct": -43.59,
+      "velocity": 43.59
+    },
+    {
+      "time": "2026-03-14 13:59:46",
+      "total_change": -43.92,
+      "cumulative_pct": -43.92,
+      "velocity": 43.92
+    },
+    {
+      "time": "2026-03-14 14:00:58",
+      "total_change": -46.27,
+      "cumulative_pct": -46.27,
+      "velocity": 46.27
+    },
+    {
+      "time": "2026-03-14 14:02:09",
+      "total_change": -45.92,
+      "cumulative_pct": -45.92,
+      "velocity": 45.92
+    },
+    {
+      "time": "2026-03-14 14:03:21",
+      "total_change": -46.28,
+      "cumulative_pct": -46.28,
+      "velocity": 46.28
+    },
+    {
+      "time": "2026-03-14 14:04:33",
+      "total_change": -47.34,
+      "cumulative_pct": -47.34,
+      "velocity": 47.34
+    },
+    {
+      "time": "2026-03-14 14:05:56",
+      "total_change": -47.15,
+      "cumulative_pct": -47.15,
+      "velocity": 47.15
+    },
+    {
+      "time": "2026-03-14 14:07:07",
+      "total_change": -47.26,
+      "cumulative_pct": -47.26,
+      "velocity": 47.26
+    },
+    {
+      "time": "2026-03-14 14:08:19",
+      "total_change": -47.29,
+      "cumulative_pct": -47.29,
+      "velocity": 47.29
+    },
+    {
+      "time": "2026-03-14 14:09:30",
+      "total_change": -46.98,
+      "cumulative_pct": -46.98,
+      "velocity": 46.98
+    },
+    {
+      "time": "2026-03-14 14:10:42",
+      "total_change": -47.02,
+      "cumulative_pct": -47.02,
+      "velocity": 47.02
+    },
+    {
+      "time": "2026-03-14 14:12:05",
+      "total_change": -47.52,
+      "cumulative_pct": -47.52,
+      "velocity": 47.52
+    },
+    {
+      "time": "2026-03-14 14:13:17",
+      "total_change": -47.44,
+      "cumulative_pct": -47.44,
+      "velocity": 47.44
+    },
+    {
+      "time": "2026-03-14 14:14:29",
+      "total_change": -47.24,
+      "cumulative_pct": -47.24,
+      "velocity": 47.24
+    },
+    {
+      "time": "2026-03-14 14:15:40",
+      "total_change": -47.48,
+      "cumulative_pct": -47.48,
+      "velocity": 47.48
+    },
+    {
+      "time": "2026-03-14 14:16:52",
+      "total_change": -51.05,
+      "cumulative_pct": -51.05,
+      "velocity": 51.05
+    },
+    {
+      "time": "2026-03-14 14:18:15",
+      "total_change": -53.93,
+      "cumulative_pct": -53.93,
+      "velocity": 53.93
+    },
+    {
+      "time": "2026-03-14 14:19:27",
+      "total_change": -52.43,
+      "cumulative_pct": -52.43,
+      "velocity": 52.43
+    },
+    {
+      "time": "2026-03-14 14:20:39",
+      "total_change": -54.29,
+      "cumulative_pct": -54.29,
+      "velocity": 54.29
+    },
+    {
+      "time": "2026-03-14 14:21:50",
+      "total_change": -52.93,
+      "cumulative_pct": -52.93,
+      "velocity": 52.93
+    },
+    {
+      "time": "2026-03-14 14:23:02",
+      "total_change": -53.29,
+      "cumulative_pct": -53.29,
+      "velocity": 53.29
+    },
+    {
+      "time": "2026-03-14 14:24:25",
+      "total_change": -58.49,
+      "cumulative_pct": -58.49,
+      "velocity": 58.49
+    },
+    {
+      "time": "2026-03-14 14:25:37",
+      "total_change": -59.35,
+      "cumulative_pct": -59.35,
+      "velocity": 59.35
+    },
+    {
+      "time": "2026-03-14 14:26:48",
+      "total_change": -61.11,
+      "cumulative_pct": -61.11,
+      "velocity": 61.11
+    },
+    {
+      "time": "2026-03-14 14:28:00",
+      "total_change": -60.7,
+      "cumulative_pct": -60.7,
+      "velocity": 60.7
+    },
+    {
+      "time": "2026-03-14 14:29:11",
+      "total_change": -60.22,
+      "cumulative_pct": -60.22,
+      "velocity": 60.22
+    },
+    {
+      "time": "2026-03-14 14:30:35",
+      "total_change": -61.89,
+      "cumulative_pct": -61.89,
+      "velocity": 61.89
+    },
+    {
+      "time": "2026-03-14 14:31:46",
+      "total_change": -62.11,
+      "cumulative_pct": -62.11,
+      "velocity": 62.11
+    },
+    {
+      "time": "2026-03-14 14:32:58",
+      "total_change": -62.43,
+      "cumulative_pct": -62.43,
+      "velocity": 62.43
+    },
+    {
+      "time": "2026-03-14 14:34:10",
+      "total_change": -63.67,
+      "cumulative_pct": -63.67,
+      "velocity": 63.67
+    },
+    {
+      "time": "2026-03-14 14:35:21",
+      "total_change": -62.33,
+      "cumulative_pct": -62.33,
+      "velocity": 62.33
+    },
+    {
+      "time": "2026-03-14 14:36:44",
+      "total_change": -62.95,
+      "cumulative_pct": -62.95,
+      "velocity": 62.95
+    },
+    {
+      "time": "2026-03-14 14:37:56",
+      "total_change": -66.79,
+      "cumulative_pct": -66.79,
+      "velocity": 66.79
+    },
+    {
+      "time": "2026-03-14 14:39:08",
+      "total_change": -68.82,
+      "cumulative_pct": -68.82,
+      "velocity": 68.82
+    },
+    {
+      "time": "2026-03-14 14:40:19",
+      "total_change": -67.54,
+      "cumulative_pct": -67.54,
+      "velocity": 67.54
+    },
+    {
+      "time": "2026-03-14 14:41:31",
+      "total_change": -69.34,
+      "cumulative_pct": -69.34,
+      "velocity": 69.34
+    },
+    {
+      "time": "2026-03-14 14:42:54",
+      "total_change": -69.62,
+      "cumulative_pct": -69.62,
+      "velocity": 69.62
+    },
+    {
+      "time": "2026-03-14 14:44:06",
+      "total_change": -69.63,
+      "cumulative_pct": -69.63,
+      "velocity": 69.63
+    },
+    {
+      "time": "2026-03-14 14:45:17",
+      "total_change": -68.9,
+      "cumulative_pct": -68.9,
+      "velocity": 68.9
+    },
+    {
+      "time": "2026-03-14 14:46:34",
+      "total_change": -65.07,
+      "cumulative_pct": -65.07,
+      "velocity": 65.07
+    },
+    {
+      "time": "2026-03-14 14:47:57",
+      "total_change": -61.27,
+      "cumulative_pct": -61.27,
+      "velocity": 61.27
+    },
+    {
+      "time": "2026-03-14 14:49:09",
+      "total_change": -61.02,
+      "cumulative_pct": -61.02,
+      "velocity": 61.02
+    },
+    {
+      "time": "2026-03-14 14:50:20",
+      "total_change": -61.69,
+      "cumulative_pct": -61.69,
+      "velocity": 61.69
+    },
+    {
+      "time": "2026-03-14 14:51:32",
+      "total_change": -61.71,
+      "cumulative_pct": -61.71,
+      "velocity": 61.71
+    },
+    {
+      "time": "2026-03-14 14:52:44",
+      "total_change": -60.96,
+      "cumulative_pct": -60.96,
+      "velocity": 60.96
+    },
+    {
+      "time": "2026-03-14 14:54:07",
+      "total_change": -61.07,
+      "cumulative_pct": -61.07,
+      "velocity": 61.07
+    },
+    {
+      "time": "2026-03-14 14:55:18",
+      "total_change": -60.91,
+      "cumulative_pct": -60.91,
+      "velocity": 60.91
+    },
+    {
+      "time": "2026-03-14 14:56:30",
+      "total_change": -60.79,
+      "cumulative_pct": -60.79,
+      "velocity": 60.79
+    },
+    {
+      "time": "2026-03-14 14:57:42",
+      "total_change": -61.52,
+      "cumulative_pct": -61.52,
+      "velocity": 61.52
+    },
+    {
+      "time": "2026-03-14 14:58:53",
+      "total_change": -61.73,
+      "cumulative_pct": -61.73,
+      "velocity": 61.73
+    },
+    {
+      "time": "2026-03-14 15:00:17",
+      "total_change": -61.03,
+      "cumulative_pct": -61.03,
+      "velocity": 61.03
+    },
+    {
+      "time": "2026-03-14 15:01:28",
+      "total_change": -60.38,
+      "cumulative_pct": -60.38,
+      "velocity": 60.38
+    },
+    {
+      "time": "2026-03-14 15:02:40",
+      "total_change": -61.11,
+      "cumulative_pct": -61.11,
+      "velocity": 61.11
+    },
+    {
+      "time": "2026-03-14 15:03:51",
+      "total_change": -61.97,
+      "cumulative_pct": -61.97,
+      "velocity": 61.97
+    },
+    {
+      "time": "2026-03-14 15:05:03",
+      "total_change": -64.65,
+      "cumulative_pct": -64.65,
+      "velocity": 64.65
+    },
+    {
+      "time": "2026-03-14 15:06:26",
+      "total_change": -65.09,
+      "cumulative_pct": -65.09,
+      "velocity": 65.09
+    },
+    {
+      "time": "2026-03-14 15:07:38",
+      "total_change": -63.27,
+      "cumulative_pct": -63.27,
+      "velocity": 63.27
+    },
+    {
+      "time": "2026-03-14 15:08:50",
+      "total_change": -63.67,
+      "cumulative_pct": -63.67,
+      "velocity": 63.67
+    },
+    {
+      "time": "2026-03-14 15:10:02",
+      "total_change": -61.59,
+      "cumulative_pct": -61.59,
+      "velocity": 61.59
+    },
+    {
+      "time": "2026-03-14 15:11:14",
+      "total_change": -60.91,
+      "cumulative_pct": -60.91,
+      "velocity": 60.91
+    },
+    {
+      "time": "2026-03-14 15:12:41",
+      "total_change": -61.34,
+      "cumulative_pct": -61.34,
+      "velocity": 61.34
+    },
+    {
+      "time": "2026-03-14 15:13:52",
+      "total_change": -60.2,
+      "cumulative_pct": -60.2,
+      "velocity": 60.2
+    },
+    {
+      "time": "2026-03-14 15:15:04",
+      "total_change": -60.59,
+      "cumulative_pct": -60.59,
+      "velocity": 60.59
+    },
+    {
+      "time": "2026-03-14 15:16:16",
+      "total_change": -61.99,
+      "cumulative_pct": -61.99,
+      "velocity": 61.99
+    },
+    {
+      "time": "2026-03-14 15:17:43",
+      "total_change": -62.2,
+      "cumulative_pct": -62.2,
+      "velocity": 62.2
+    },
+    {
+      "time": "2026-03-14 15:18:54",
+      "total_change": -60.24,
+      "cumulative_pct": -60.24,
+      "velocity": 60.24
+    },
+    {
+      "time": "2026-03-14 15:20:06",
+      "total_change": -61.34,
+      "cumulative_pct": -61.34,
+      "velocity": 61.34
+    },
+    {
+      "time": "2026-03-14 15:21:18",
+      "total_change": -61.78,
+      "cumulative_pct": -61.78,
+      "velocity": 61.78
+    },
+    {
+      "time": "2026-03-14 15:22:41",
+      "total_change": -62.71,
+      "cumulative_pct": -62.71,
+      "velocity": 62.71
+    },
+    {
+      "time": "2026-03-14 15:23:53",
+      "total_change": -63.62,
+      "cumulative_pct": -63.62,
+      "velocity": 63.62
+    },
+    {
+      "time": "2026-03-14 15:25:05",
+      "total_change": -63.56,
+      "cumulative_pct": -63.56,
+      "velocity": 63.56
+    },
+    {
+      "time": "2026-03-14 15:26:16",
+      "total_change": -63.11,
+      "cumulative_pct": -63.11,
+      "velocity": 63.11
+    },
+    {
+      "time": "2026-03-14 15:27:28",
+      "total_change": -60.8,
+      "cumulative_pct": -60.8,
+      "velocity": 60.8
+    },
+    {
+      "time": "2026-03-14 15:28:51",
+      "total_change": -61.13,
+      "cumulative_pct": -61.13,
+      "velocity": 61.13
+    },
+    {
+      "time": "2026-03-14 15:30:03",
+      "total_change": -61.35,
+      "cumulative_pct": -61.35,
+      "velocity": 61.35
+    },
+    {
+      "time": "2026-03-14 15:31:14",
+      "total_change": -62.37,
+      "cumulative_pct": -62.37,
+      "velocity": 62.37
+    },
+    {
+      "time": "2026-03-14 15:32:26",
+      "total_change": -62.17,
+      "cumulative_pct": -62.17,
+      "velocity": 62.17
+    },
+    {
+      "time": "2026-03-14 15:33:38",
+      "total_change": -64.76,
+      "cumulative_pct": -64.76,
+      "velocity": 64.76
+    },
+    {
+      "time": "2026-03-14 15:35:01",
+      "total_change": -64.58,
+      "cumulative_pct": -64.58,
+      "velocity": 64.58
+    },
+    {
+      "time": "2026-03-14 15:36:13",
+      "total_change": -65.75,
+      "cumulative_pct": -65.75,
+      "velocity": 65.75
+    },
+    {
+      "time": "2026-03-14 15:37:24",
+      "total_change": -67.77,
+      "cumulative_pct": -67.77,
+      "velocity": 67.77
+    },
+    {
+      "time": "2026-03-14 15:38:36",
+      "total_change": -66.48,
+      "cumulative_pct": -66.48,
+      "velocity": 66.48
+    },
+    {
+      "time": "2026-03-14 15:39:47",
+      "total_change": -64.81,
+      "cumulative_pct": -64.81,
+      "velocity": 64.81
+    },
+    {
+      "time": "2026-03-14 15:41:11",
+      "total_change": -66.06,
+      "cumulative_pct": -66.06,
+      "velocity": 66.06
+    },
+    {
+      "time": "2026-03-14 15:42:22",
+      "total_change": -67.88,
+      "cumulative_pct": -67.88,
+      "velocity": 67.88
+    },
+    {
+      "time": "2026-03-14 15:43:34",
+      "total_change": -67.09,
+      "cumulative_pct": -67.09,
+      "velocity": 67.09
+    },
+    {
+      "time": "2026-03-14 15:44:46",
+      "total_change": -67.15,
+      "cumulative_pct": -67.15,
+      "velocity": 67.15
+    },
+    {
+      "time": "2026-03-14 15:45:58",
+      "total_change": -69.97,
+      "cumulative_pct": -69.97,
+      "velocity": 69.97
+    },
+    {
+      "time": "2026-03-14 15:47:21",
+      "total_change": -68.04,
+      "cumulative_pct": -68.04,
+      "velocity": 68.04
+    },
+    {
+      "time": "2026-03-14 15:48:33",
+      "total_change": -68.77,
+      "cumulative_pct": -68.77,
+      "velocity": 68.77
+    },
+    {
+      "time": "2026-03-14 15:49:45",
+      "total_change": -68.25,
+      "cumulative_pct": -68.25,
+      "velocity": 68.25
+    },
+    {
+      "time": "2026-03-14 15:50:57",
+      "total_change": -67.24,
+      "cumulative_pct": -67.24,
+      "velocity": 67.24
+    },
+    {
+      "time": "2026-03-14 15:52:08",
+      "total_change": -67.39,
+      "cumulative_pct": -67.39,
+      "velocity": 67.39
+    },
+    {
+      "time": "2026-03-14 15:53:31",
+      "total_change": -67.1,
+      "cumulative_pct": -67.1,
+      "velocity": 67.1
+    },
+    {
+      "time": "2026-03-14 15:54:43",
+      "total_change": -66.59,
+      "cumulative_pct": -66.59,
+      "velocity": 66.59
+    },
+    {
+      "time": "2026-03-14 15:55:54",
+      "total_change": -66.16,
+      "cumulative_pct": -66.16,
+      "velocity": 66.16
+    },
+    {
+      "time": "2026-03-14 15:57:06",
+      "total_change": -65.98,
+      "cumulative_pct": -65.98,
+      "velocity": 65.98
+    },
+    {
+      "time": "2026-03-14 15:58:18",
+      "total_change": -65.59,
+      "cumulative_pct": -65.59,
+      "velocity": 65.59
+    },
+    {
+      "time": "2026-03-14 15:59:41",
+      "total_change": -66.98,
+      "cumulative_pct": -66.98,
+      "velocity": 66.98
+    },
+    {
+      "time": "2026-03-14 16:00:52",
+      "total_change": -68.19,
+      "cumulative_pct": -68.19,
+      "velocity": 68.19
+    },
+    {
+      "time": "2026-03-14 16:02:04",
+      "total_change": -66.71,
+      "cumulative_pct": -66.71,
+      "velocity": 66.71
+    },
+    {
+      "time": "2026-03-14 16:03:16",
+      "total_change": -66.46,
+      "cumulative_pct": -66.46,
+      "velocity": 66.46
+    },
+    {
+      "time": "2026-03-14 16:04:28",
+      "total_change": -67.13,
+      "cumulative_pct": -67.13,
+      "velocity": 67.13
+    },
+    {
+      "time": "2026-03-14 16:05:52",
+      "total_change": -65.35,
+      "cumulative_pct": -65.35,
+      "velocity": 65.35
+    },
+    {
+      "time": "2026-03-14 16:07:05",
+      "total_change": -66.05,
+      "cumulative_pct": -66.05,
+      "velocity": 66.05
+    },
+    {
+      "time": "2026-03-14 16:08:16",
+      "total_change": -65.11,
+      "cumulative_pct": -65.11,
+      "velocity": 65.11
+    },
+    {
+      "time": "2026-03-14 16:09:28",
+      "total_change": -64.92,
+      "cumulative_pct": -64.92,
+      "velocity": 64.92
+    },
+    {
+      "time": "2026-03-14 16:10:51",
+      "total_change": -65.98,
+      "cumulative_pct": -65.98,
+      "velocity": 65.98
+    },
+    {
+      "time": "2026-03-14 16:12:03",
+      "total_change": -65.76,
+      "cumulative_pct": -65.76,
+      "velocity": 65.76
+    },
+    {
+      "time": "2026-03-14 16:13:15",
+      "total_change": -64.38,
+      "cumulative_pct": -64.38,
+      "velocity": 64.38
+    },
+    {
+      "time": "2026-03-14 16:14:26",
+      "total_change": -63.91,
+      "cumulative_pct": -63.91,
+      "velocity": 63.91
+    },
+    {
+      "time": "2026-03-14 16:15:38",
+      "total_change": -63.27,
+      "cumulative_pct": -63.27,
+      "velocity": 63.27
+    },
+    {
+      "time": "2026-03-14 16:17:01",
+      "total_change": -63.62,
+      "cumulative_pct": -63.62,
+      "velocity": 63.62
+    },
+    {
+      "time": "2026-03-14 16:18:12",
+      "total_change": -65.91,
+      "cumulative_pct": -65.91,
+      "velocity": 65.91
+    },
+    {
+      "time": "2026-03-14 16:19:24",
+      "total_change": -66.89,
+      "cumulative_pct": -66.89,
+      "velocity": 66.89
+    },
+    {
+      "time": "2026-03-14 16:20:36",
+      "total_change": -66.76,
+      "cumulative_pct": -66.76,
+      "velocity": 66.76
+    },
+    {
+      "time": "2026-03-14 16:21:47",
+      "total_change": -66.03,
+      "cumulative_pct": -66.03,
+      "velocity": 66.03
+    },
+    {
+      "time": "2026-03-14 16:23:10",
+      "total_change": -64.08,
+      "cumulative_pct": -64.08,
+      "velocity": 64.08
+    },
+    {
+      "time": "2026-03-14 16:24:22",
+      "total_change": -64.07,
+      "cumulative_pct": -64.07,
+      "velocity": 64.07
+    },
+    {
+      "time": "2026-03-14 16:25:34",
+      "total_change": -66.33,
+      "cumulative_pct": -66.33,
+      "velocity": 66.33
+    },
+    {
+      "time": "2026-03-14 16:26:46",
+      "total_change": -65.39,
+      "cumulative_pct": -65.39,
+      "velocity": 65.39
+    },
+    {
+      "time": "2026-03-14 16:27:57",
+      "total_change": -64.97,
+      "cumulative_pct": -64.97,
+      "velocity": 64.97
+    },
+    {
+      "time": "2026-03-14 16:29:20",
+      "total_change": -64.4,
+      "cumulative_pct": -64.4,
+      "velocity": 64.4
+    },
+    {
+      "time": "2026-03-14 16:30:32",
+      "total_change": -65.13,
+      "cumulative_pct": -65.13,
+      "velocity": 65.13
+    },
+    {
+      "time": "2026-03-14 16:31:44",
+      "total_change": -66.91,
+      "cumulative_pct": -66.91,
+      "velocity": 66.91
+    },
+    {
+      "time": "2026-03-14 16:32:55",
+      "total_change": -66.4,
+      "cumulative_pct": -66.4,
+      "velocity": 66.4
+    },
+    {
+      "time": "2026-03-14 16:34:07",
+      "total_change": -65.06,
+      "cumulative_pct": -65.06,
+      "velocity": 65.06
+    },
+    {
+      "time": "2026-03-14 16:35:30",
+      "total_change": -64.27,
+      "cumulative_pct": -64.27,
+      "velocity": 64.27
+    },
+    {
+      "time": "2026-03-14 16:36:42",
+      "total_change": -65.39,
+      "cumulative_pct": -65.39,
+      "velocity": 65.39
+    },
+    {
+      "time": "2026-03-14 16:37:54",
+      "total_change": -66.59,
+      "cumulative_pct": -66.59,
+      "velocity": 66.59
+    },
+    {
+      "time": "2026-03-14 16:39:05",
+      "total_change": -66.49,
+      "cumulative_pct": -66.49,
+      "velocity": 66.49
+    },
+    {
+      "time": "2026-03-14 16:40:17",
+      "total_change": -66.94,
+      "cumulative_pct": -66.94,
+      "velocity": 66.94
+    },
+    {
+      "time": "2026-03-14 16:41:40",
+      "total_change": -66.22,
+      "cumulative_pct": -66.22,
+      "velocity": 66.22
+    },
+    {
+      "time": "2026-03-14 16:42:52",
+      "total_change": -67.25,
+      "cumulative_pct": -67.25,
+      "velocity": 67.25
+    },
+    {
+      "time": "2026-03-14 16:44:04",
+      "total_change": -67.87,
+      "cumulative_pct": -67.87,
+      "velocity": 67.87
+    },
+    {
+      "time": "2026-03-14 16:45:15",
+      "total_change": -67.67,
+      "cumulative_pct": -67.67,
+      "velocity": 67.67
+    },
+    {
+      "time": "2026-03-14 16:46:27",
+      "total_change": -67.76,
+      "cumulative_pct": -67.76,
+      "velocity": 67.76
+    },
+    {
+      "time": "2026-03-14 16:47:50",
+      "total_change": -67.92,
+      "cumulative_pct": -67.92,
+      "velocity": 67.92
+    },
+    {
+      "time": "2026-03-14 16:49:02",
+      "total_change": -68.45,
+      "cumulative_pct": -68.45,
+      "velocity": 68.45
+    },
+    {
+      "time": "2026-03-14 16:50:13",
+      "total_change": -68.14,
+      "cumulative_pct": -68.14,
+      "velocity": 68.14
+    },
+    {
+      "time": "2026-03-14 16:51:25",
+      "total_change": -67.29,
+      "cumulative_pct": -67.29,
+      "velocity": 67.29
+    },
+    {
+      "time": "2026-03-14 16:52:37",
+      "total_change": -66.67,
+      "cumulative_pct": -66.67,
+      "velocity": 66.67
+    },
+    {
+      "time": "2026-03-14 16:54:00",
+      "total_change": -65.77,
+      "cumulative_pct": -65.77,
+      "velocity": 65.77
+    },
+    {
+      "time": "2026-03-14 16:55:12",
+      "total_change": -65.66,
+      "cumulative_pct": -65.66,
+      "velocity": 65.66
+    },
+    {
+      "time": "2026-03-14 16:56:23",
+      "total_change": -66.37,
+      "cumulative_pct": -66.37,
+      "velocity": 66.37
+    },
+    {
+      "time": "2026-03-14 16:57:35",
+      "total_change": -66.19,
+      "cumulative_pct": -66.19,
+      "velocity": 66.19
+    },
+    {
+      "time": "2026-03-14 16:58:47",
+      "total_change": -66.49,
+      "cumulative_pct": -66.49,
+      "velocity": 66.49
+    },
+    {
+      "time": "2026-03-14 17:00:10",
+      "total_change": -66.68,
+      "cumulative_pct": -66.68,
+      "velocity": 66.68
+    },
+    {
+      "time": "2026-03-14 17:01:21",
+      "total_change": -65.85,
+      "cumulative_pct": -65.85,
+      "velocity": 65.85
+    },
+    {
+      "time": "2026-03-14 17:02:33",
+      "total_change": -65.55,
+      "cumulative_pct": -65.55,
+      "velocity": 65.55
+    },
+    {
+      "time": "2026-03-14 17:03:44",
+      "total_change": -65.89,
+      "cumulative_pct": -65.89,
+      "velocity": 65.89
+    },
+    {
+      "time": "2026-03-14 17:04:56",
+      "total_change": -63.45,
+      "cumulative_pct": -63.45,
+      "velocity": 63.45
+    },
+    {
+      "time": "2026-03-14 17:06:19",
+      "total_change": -63.84,
+      "cumulative_pct": -63.84,
+      "velocity": 63.84
+    },
+    {
+      "time": "2026-03-14 17:07:30",
+      "total_change": -63.79,
+      "cumulative_pct": -63.79,
+      "velocity": 63.79
+    },
+    {
+      "time": "2026-03-14 17:08:42",
+      "total_change": -63.8,
+      "cumulative_pct": -63.8,
+      "velocity": 63.8
+    },
+    {
+      "time": "2026-03-14 17:09:54",
+      "total_change": -62.97,
+      "cumulative_pct": -62.97,
+      "velocity": 62.97
+    },
+    {
+      "time": "2026-03-14 17:11:06",
+      "total_change": -63.7,
+      "cumulative_pct": -63.7,
+      "velocity": 63.7
+    },
+    {
+      "time": "2026-03-14 17:12:29",
+      "total_change": -63.6,
+      "cumulative_pct": -63.6,
+      "velocity": 63.6
+    },
+    {
+      "time": "2026-03-14 17:13:41",
+      "total_change": -63.9,
+      "cumulative_pct": -63.9,
+      "velocity": 63.9
+    },
+    {
+      "time": "2026-03-14 17:14:53",
+      "total_change": -63.33,
+      "cumulative_pct": -63.33,
+      "velocity": 63.33
+    },
+    {
+      "time": "2026-03-14 17:16:04",
+      "total_change": -64.26,
+      "cumulative_pct": -64.26,
+      "velocity": 64.26
+    },
+    {
+      "time": "2026-03-14 17:17:16",
+      "total_change": -65.99,
+      "cumulative_pct": -65.99,
+      "velocity": 65.99
+    },
+    {
+      "time": "2026-03-14 17:18:39",
+      "total_change": -66.65,
+      "cumulative_pct": -66.65,
+      "velocity": 66.65
+    },
+    {
+      "time": "2026-03-14 17:19:51",
+      "total_change": -64.17,
+      "cumulative_pct": -64.17,
+      "velocity": 64.17
+    },
+    {
+      "time": "2026-03-14 17:21:02",
+      "total_change": -65.59,
+      "cumulative_pct": -65.59,
+      "velocity": 65.59
+    },
+    {
+      "time": "2026-03-14 17:22:14",
+      "total_change": -65.46,
+      "cumulative_pct": -65.46,
+      "velocity": 65.46
+    },
+    {
+      "time": "2026-03-14 17:23:26",
+      "total_change": -65.52,
+      "cumulative_pct": -65.52,
+      "velocity": 65.52
+    },
+    {
+      "time": "2026-03-14 17:24:49",
+      "total_change": -65.72,
+      "cumulative_pct": -65.72,
+      "velocity": 65.72
+    },
+    {
+      "time": "2026-03-14 17:26:00",
+      "total_change": -65.32,
+      "cumulative_pct": -65.32,
+      "velocity": 65.32
+    },
+    {
+      "time": "2026-03-14 17:27:12",
+      "total_change": -65.26,
+      "cumulative_pct": -65.26,
+      "velocity": 65.26
+    },
+    {
+      "time": "2026-03-14 17:28:24",
+      "total_change": -65.79,
+      "cumulative_pct": -65.79,
+      "velocity": 65.79
+    },
+    {
+      "time": "2026-03-14 17:29:35",
+      "total_change": -65.32,
+      "cumulative_pct": -65.32,
+      "velocity": 65.32
+    },
+    {
+      "time": "2026-03-14 17:30:58",
+      "total_change": -64.65,
+      "cumulative_pct": -64.65,
+      "velocity": 64.65
+    },
+    {
+      "time": "2026-03-14 17:32:10",
+      "total_change": -64.59,
+      "cumulative_pct": -64.59,
+      "velocity": 64.59
+    },
+    {
+      "time": "2026-03-14 17:33:21",
+      "total_change": -67.49,
+      "cumulative_pct": -67.49,
+      "velocity": 67.49
+    },
+    {
+      "time": "2026-03-14 17:34:33",
+      "total_change": -67.69,
+      "cumulative_pct": -67.69,
+      "velocity": 67.69
+    },
+    {
+      "time": "2026-03-14 17:35:45",
+      "total_change": -69.43,
+      "cumulative_pct": -69.43,
+      "velocity": 69.43
+    },
+    {
+      "time": "2026-03-14 17:37:08",
+      "total_change": -67.86,
+      "cumulative_pct": -67.86,
+      "velocity": 67.86
+    },
+    {
+      "time": "2026-03-14 17:38:19",
+      "total_change": -67.18,
+      "cumulative_pct": -67.18,
+      "velocity": 67.18
+    },
+    {
+      "time": "2026-03-14 17:39:31",
+      "total_change": -67.33,
+      "cumulative_pct": -67.33,
+      "velocity": 67.33
+    },
+    {
+      "time": "2026-03-14 17:40:42",
+      "total_change": -67.57,
+      "cumulative_pct": -67.57,
+      "velocity": 67.57
+    },
+    {
+      "time": "2026-03-14 17:41:53",
+      "total_change": -67.24,
+      "cumulative_pct": -67.24,
+      "velocity": 67.24
+    },
+    {
+      "time": "2026-03-14 17:43:17",
+      "total_change": -66.98,
+      "cumulative_pct": -66.98,
+      "velocity": 66.98
+    },
+    {
+      "time": "2026-03-14 17:44:28",
+      "total_change": -66.81,
+      "cumulative_pct": -66.81,
+      "velocity": 66.81
+    },
+    {
+      "time": "2026-03-14 17:45:40",
+      "total_change": -67.8,
+      "cumulative_pct": -67.8,
+      "velocity": 67.8
+    },
+    {
+      "time": "2026-03-14 17:46:52",
+      "total_change": -68.43,
+      "cumulative_pct": -68.43,
+      "velocity": 68.43
+    },
+    {
+      "time": "2026-03-14 17:48:03",
+      "total_change": -74.63,
+      "cumulative_pct": -74.63,
+      "velocity": 74.63
+    },
+    {
+      "time": "2026-03-14 17:49:27",
+      "total_change": -74.14,
+      "cumulative_pct": -74.14,
+      "velocity": 74.14
+    },
+    {
+      "time": "2026-03-14 17:50:39",
+      "total_change": -73.67,
+      "cumulative_pct": -73.67,
+      "velocity": 73.67
+    },
+    {
+      "time": "2026-03-14 17:51:50",
+      "total_change": -70.39,
+      "cumulative_pct": -70.39,
+      "velocity": 70.39
+    },
+    {
+      "time": "2026-03-14 17:53:02",
+      "total_change": -71.52,
+      "cumulative_pct": -71.52,
+      "velocity": 71.52
+    },
+    {
+      "time": "2026-03-14 17:54:13",
+      "total_change": -71.85,
+      "cumulative_pct": -71.85,
+      "velocity": 71.85
+    },
+    {
+      "time": "2026-03-14 17:55:37",
+      "total_change": -72.12,
+      "cumulative_pct": -72.12,
+      "velocity": 72.12
+    },
+    {
+      "time": "2026-03-14 17:56:48",
+      "total_change": -71.29,
+      "cumulative_pct": -71.29,
+      "velocity": 71.29
+    },
+    {
+      "time": "2026-03-14 17:58:00",
+      "total_change": -70.8,
+      "cumulative_pct": -70.8,
+      "velocity": 70.8
+    },
+    {
+      "time": "2026-03-14 17:59:11",
+      "total_change": -71.31,
+      "cumulative_pct": -71.31,
+      "velocity": 71.31
+    },
+    {
+      "time": "2026-03-14 18:00:23",
+      "total_change": -72.63,
+      "cumulative_pct": -72.63,
+      "velocity": 72.63
+    },
+    {
+      "time": "2026-03-14 18:01:46",
+      "total_change": -71.61,
+      "cumulative_pct": -71.61,
+      "velocity": 71.61
+    },
+    {
+      "time": "2026-03-14 18:02:58",
+      "total_change": -72.38,
+      "cumulative_pct": -72.38,
+      "velocity": 72.38
+    },
+    {
+      "time": "2026-03-14 18:04:09",
+      "total_change": -71.69,
+      "cumulative_pct": -71.69,
+      "velocity": 71.69
+    },
+    {
+      "time": "2026-03-14 18:05:21",
+      "total_change": -71.69,
+      "cumulative_pct": -71.69,
+      "velocity": 71.69
+    },
+    {
+      "time": "2026-03-14 18:06:33",
+      "total_change": -71.73,
+      "cumulative_pct": -71.73,
+      "velocity": 71.73
+    },
+    {
+      "time": "2026-03-14 18:07:56",
+      "total_change": -72.03,
+      "cumulative_pct": -72.03,
+      "velocity": 72.03
+    },
+    {
+      "time": "2026-03-14 18:09:07",
+      "total_change": -73.36,
+      "cumulative_pct": -73.36,
+      "velocity": 73.36
+    },
+    {
+      "time": "2026-03-14 18:10:19",
+      "total_change": -72.93,
+      "cumulative_pct": -72.93,
+      "velocity": 72.93
+    },
+    {
+      "time": "2026-03-14 18:11:30",
+      "total_change": -72.61,
+      "cumulative_pct": -72.61,
+      "velocity": 72.61
+    },
+    {
+      "time": "2026-03-14 18:12:42",
+      "total_change": -74.2,
+      "cumulative_pct": -74.2,
+      "velocity": 74.2
+    },
+    {
+      "time": "2026-03-14 18:14:05",
+      "total_change": -73.61,
+      "cumulative_pct": -73.61,
+      "velocity": 73.61
+    },
+    {
+      "time": "2026-03-14 18:15:17",
+      "total_change": -73.5,
+      "cumulative_pct": -73.5,
+      "velocity": 73.5
+    },
+    {
+      "time": "2026-03-14 18:16:28",
+      "total_change": -75.47,
+      "cumulative_pct": -75.47,
+      "velocity": 75.47
+    },
+    {
+      "time": "2026-03-14 18:17:40",
+      "total_change": -75.48,
+      "cumulative_pct": -75.48,
+      "velocity": 75.48
+    },
+    {
+      "time": "2026-03-14 18:18:52",
+      "total_change": -75.3,
+      "cumulative_pct": -75.3,
+      "velocity": 75.3
+    },
+    {
+      "time": "2026-03-14 18:20:15",
+      "total_change": -74.87,
+      "cumulative_pct": -74.87,
+      "velocity": 74.87
+    },
+    {
+      "time": "2026-03-14 18:21:27",
+      "total_change": -76.36,
+      "cumulative_pct": -76.36,
+      "velocity": 76.36
+    },
+    {
+      "time": "2026-03-14 18:22:39",
+      "total_change": -75.97,
+      "cumulative_pct": -75.97,
+      "velocity": 75.97
+    },
+    {
+      "time": "2026-03-14 18:23:50",
+      "total_change": -76.06,
+      "cumulative_pct": -76.06,
+      "velocity": 76.06
+    },
+    {
+      "time": "2026-03-14 18:25:02",
+      "total_change": -76.13,
+      "cumulative_pct": -76.13,
+      "velocity": 76.13
+    },
+    {
+      "time": "2026-03-14 18:26:25",
+      "total_change": -76.38,
+      "cumulative_pct": -76.38,
+      "velocity": 76.38
+    },
+    {
+      "time": "2026-03-14 18:27:36",
+      "total_change": -76.21,
+      "cumulative_pct": -76.21,
+      "velocity": 76.21
+    },
+    {
+      "time": "2026-03-14 18:28:48",
+      "total_change": -77.11,
+      "cumulative_pct": -77.11,
+      "velocity": 77.11
+    },
+    {
+      "time": "2026-03-14 18:30:05",
+      "total_change": -76.35,
+      "cumulative_pct": -76.35,
+      "velocity": 76.35
+    },
+    {
+      "time": "2026-03-14 18:31:28",
+      "total_change": -76.87,
+      "cumulative_pct": -76.87,
+      "velocity": 76.87
+    },
+    {
+      "time": "2026-03-14 18:32:40",
+      "total_change": -77.88,
+      "cumulative_pct": -77.88,
+      "velocity": 77.88
+    },
+    {
+      "time": "2026-03-14 18:33:52",
+      "total_change": -79.54,
+      "cumulative_pct": -79.54,
+      "velocity": 79.54
+    },
+    {
+      "time": "2026-03-14 18:35:03",
+      "total_change": -77.68,
+      "cumulative_pct": -77.68,
+      "velocity": 77.68
+    },
+    {
+      "time": "2026-03-14 18:36:15",
+      "total_change": -77.8,
+      "cumulative_pct": -77.8,
+      "velocity": 77.8
+    },
+    {
+      "time": "2026-03-14 18:37:38",
+      "total_change": -77.58,
+      "cumulative_pct": -77.58,
+      "velocity": 77.58
+    },
+    {
+      "time": "2026-03-14 18:38:50",
+      "total_change": -78.24,
+      "cumulative_pct": -78.24,
+      "velocity": 78.24
+    },
+    {
+      "time": "2026-03-14 18:40:01",
+      "total_change": -77.56,
+      "cumulative_pct": -77.56,
+      "velocity": 77.56
+    },
+    {
+      "time": "2026-03-14 18:41:13",
+      "total_change": -76.59,
+      "cumulative_pct": -76.59,
+      "velocity": 76.59
+    },
+    {
+      "time": "2026-03-14 18:42:25",
+      "total_change": -76.45,
+      "cumulative_pct": -76.45,
+      "velocity": 76.45
+    },
+    {
+      "time": "2026-03-14 18:43:48",
+      "total_change": -75.54,
+      "cumulative_pct": -75.54,
+      "velocity": 75.54
+    },
+    {
+      "time": "2026-03-14 18:44:59",
+      "total_change": -76.02,
+      "cumulative_pct": -76.02,
+      "velocity": 76.02
+    },
+    {
+      "time": "2026-03-14 18:46:11",
+      "total_change": -76.94,
+      "cumulative_pct": -76.94,
+      "velocity": 76.94
+    },
+    {
+      "time": "2026-03-14 18:47:23",
+      "total_change": -76.92,
+      "cumulative_pct": -76.92,
+      "velocity": 76.92
+    },
+    {
+      "time": "2026-03-14 18:48:35",
+      "total_change": -76.66,
+      "cumulative_pct": -76.66,
+      "velocity": 76.66
+    },
+    {
+      "time": "2026-03-14 18:49:58",
+      "total_change": -76.36,
+      "cumulative_pct": -76.36,
+      "velocity": 76.36
+    },
+    {
+      "time": "2026-03-14 18:51:10",
+      "total_change": -75.61,
+      "cumulative_pct": -75.61,
+      "velocity": 75.61
+    },
+    {
+      "time": "2026-03-14 18:52:21",
+      "total_change": -75.58,
+      "cumulative_pct": -75.58,
+      "velocity": 75.58
+    },
+    {
+      "time": "2026-03-14 18:53:33",
+      "total_change": -75.02,
+      "cumulative_pct": -75.02,
+      "velocity": 75.02
+    },
+    {
+      "time": "2026-03-14 18:54:46",
+      "total_change": -75.03,
+      "cumulative_pct": -75.03,
+      "velocity": 75.03
+    },
+    {
+      "time": "2026-03-14 18:56:10",
+      "total_change": -74.66,
+      "cumulative_pct": -74.66,
+      "velocity": 74.66
+    },
+    {
+      "time": "2026-03-14 18:57:21",
+      "total_change": -75.54,
+      "cumulative_pct": -75.54,
+      "velocity": 75.54
+    },
+    {
+      "time": "2026-03-14 18:58:33",
+      "total_change": -75.02,
+      "cumulative_pct": -75.02,
+      "velocity": 75.02
+    },
+    {
+      "time": "2026-03-14 18:59:45",
+      "total_change": -75.12,
+      "cumulative_pct": -75.12,
+      "velocity": 75.12
+    },
+    {
+      "time": "2026-03-14 19:00:57",
+      "total_change": -75.23,
+      "cumulative_pct": -75.23,
+      "velocity": 75.23
+    },
+    {
+      "time": "2026-03-14 19:02:20",
+      "total_change": -74.82,
+      "cumulative_pct": -74.82,
+      "velocity": 74.82
+    },
+    {
+      "time": "2026-03-14 19:03:32",
+      "total_change": -72.59,
+      "cumulative_pct": -72.59,
+      "velocity": 72.59
+    },
+    {
+      "time": "2026-03-14 19:04:44",
+      "total_change": -69.37,
+      "cumulative_pct": -69.37,
+      "velocity": 69.37
+    },
+    {
+      "time": "2026-03-14 19:05:55",
+      "total_change": -69.24,
+      "cumulative_pct": -69.24,
+      "velocity": 69.24
+    },
+    {
+      "time": "2026-03-14 19:07:07",
+      "total_change": -69.52,
+      "cumulative_pct": -69.52,
+      "velocity": 69.52
+    },
+    {
+      "time": "2026-03-14 19:08:31",
+      "total_change": -68.22,
+      "cumulative_pct": -68.22,
+      "velocity": 68.22
+    },
+    {
+      "time": "2026-03-14 19:09:42",
+      "total_change": -68.8,
+      "cumulative_pct": -68.8,
+      "velocity": 68.8
+    },
+    {
+      "time": "2026-03-14 19:10:54",
+      "total_change": -69.73,
+      "cumulative_pct": -69.73,
+      "velocity": 69.73
+    },
+    {
+      "time": "2026-03-14 19:12:06",
+      "total_change": -69.59,
+      "cumulative_pct": -69.59,
+      "velocity": 69.59
+    },
+    {
+      "time": "2026-03-14 19:13:18",
+      "total_change": -70.15,
+      "cumulative_pct": -70.15,
+      "velocity": 70.15
+    },
+    {
+      "time": "2026-03-14 19:14:41",
+      "total_change": -69.32,
+      "cumulative_pct": -69.32,
+      "velocity": 69.32
+    },
+    {
+      "time": "2026-03-14 19:15:53",
+      "total_change": -69.02,
+      "cumulative_pct": -69.02,
+      "velocity": 69.02
+    },
+    {
+      "time": "2026-03-14 19:18:26",
+      "total_change": -69.67,
+      "cumulative_pct": -69.67,
+      "velocity": 69.67
+    },
+    {
+      "time": "2026-03-14 19:19:49",
+      "total_change": -70.54,
+      "cumulative_pct": -70.54,
+      "velocity": 70.54
+    },
+    {
+      "time": "2026-03-14 19:21:01",
+      "total_change": -70.45,
+      "cumulative_pct": -70.45,
+      "velocity": 70.45
+    },
+    {
+      "time": "2026-03-14 19:22:13",
+      "total_change": -70.99,
+      "cumulative_pct": -70.99,
+      "velocity": 70.99
+    },
+    {
+      "time": "2026-03-14 19:23:24",
+      "total_change": -69.01,
+      "cumulative_pct": -69.01,
+      "velocity": 69.01
+    },
+    {
+      "time": "2026-03-14 19:24:36",
+      "total_change": -68.63,
+      "cumulative_pct": -68.63,
+      "velocity": 68.63
+    },
+    {
+      "time": "2026-03-14 19:25:59",
+      "total_change": -68.38,
+      "cumulative_pct": -68.38,
+      "velocity": 68.38
+    },
+    {
+      "time": "2026-03-14 19:27:11",
+      "total_change": -66.73,
+      "cumulative_pct": -66.73,
+      "velocity": 66.73
+    },
+    {
+      "time": "2026-03-14 19:28:23",
+      "total_change": -66.14,
+      "cumulative_pct": -66.14,
+      "velocity": 66.14
+    },
+    {
+      "time": "2026-03-14 19:29:34",
+      "total_change": -66.44,
+      "cumulative_pct": -66.44,
+      "velocity": 66.44
+    },
+    {
+      "time": "2026-03-14 19:30:46",
+      "total_change": -67.08,
+      "cumulative_pct": -67.08,
+      "velocity": 67.08
+    },
+    {
+      "time": "2026-03-14 19:32:10",
+      "total_change": -66.91,
+      "cumulative_pct": -66.91,
+      "velocity": 66.91
+    },
+    {
+      "time": "2026-03-14 19:33:21",
+      "total_change": -66.12,
+      "cumulative_pct": -66.12,
+      "velocity": 66.12
+    },
+    {
+      "time": "2026-03-14 19:34:33",
+      "total_change": -65.72,
+      "cumulative_pct": -65.72,
+      "velocity": 65.72
+    },
+    {
+      "time": "2026-03-14 19:35:45",
+      "total_change": -65.37,
+      "cumulative_pct": -65.37,
+      "velocity": 65.37
+    },
+    {
+      "time": "2026-03-14 19:36:56",
+      "total_change": -64.84,
+      "cumulative_pct": -64.84,
+      "velocity": 64.84
+    },
+    {
+      "time": "2026-03-14 19:38:20",
+      "total_change": -64.89,
+      "cumulative_pct": -64.89,
+      "velocity": 64.89
+    },
+    {
+      "time": "2026-03-14 19:39:31",
+      "total_change": -64.05,
+      "cumulative_pct": -64.05,
+      "velocity": 64.05
+    },
+    {
+      "time": "2026-03-14 19:40:43",
+      "total_change": -64.18,
+      "cumulative_pct": -64.18,
+      "velocity": 64.18
+    },
+    {
+      "time": "2026-03-14 19:41:54",
+      "total_change": -64.16,
+      "cumulative_pct": -64.16,
+      "velocity": 64.16
+    },
+    {
+      "time": "2026-03-14 19:43:06",
+      "total_change": -63.57,
+      "cumulative_pct": -63.57,
+      "velocity": 63.57
+    },
+    {
+      "time": "2026-03-14 19:44:29",
+      "total_change": -62.51,
+      "cumulative_pct": -62.51,
+      "velocity": 62.51
+    },
+    {
+      "time": "2026-03-14 19:45:41",
+      "total_change": -62.84,
+      "cumulative_pct": -62.84,
+      "velocity": 62.84
+    },
+    {
+      "time": "2026-03-14 19:46:53",
+      "total_change": -62.27,
+      "cumulative_pct": -62.27,
+      "velocity": 62.27
+    },
+    {
+      "time": "2026-03-14 19:48:05",
+      "total_change": -61.21,
+      "cumulative_pct": -61.21,
+      "velocity": 61.21
+    },
+    {
+      "time": "2026-03-14 19:49:16",
+      "total_change": -62.76,
+      "cumulative_pct": -62.76,
+      "velocity": 62.76
+    },
+    {
+      "time": "2026-03-14 19:50:40",
+      "total_change": -62.7,
+      "cumulative_pct": -62.7,
+      "velocity": 62.7
+    },
+    {
+      "time": "2026-03-14 19:51:51",
+      "total_change": -62.13,
+      "cumulative_pct": -62.13,
+      "velocity": 62.13
+    },
+    {
+      "time": "2026-03-14 19:53:03",
+      "total_change": -62.39,
+      "cumulative_pct": -62.39,
+      "velocity": 62.39
+    },
+    {
+      "time": "2026-03-14 19:54:15",
+      "total_change": -62.05,
+      "cumulative_pct": -62.05,
+      "velocity": 62.05
+    },
+    {
+      "time": "2026-03-14 19:55:26",
+      "total_change": -63.31,
+      "cumulative_pct": -63.31,
+      "velocity": 63.31
+    },
+    {
+      "time": "2026-03-14 19:56:50",
+      "total_change": -63.52,
+      "cumulative_pct": -63.52,
+      "velocity": 63.52
+    },
+    {
+      "time": "2026-03-14 19:58:01",
+      "total_change": -63.3,
+      "cumulative_pct": -63.3,
+      "velocity": 63.3
+    },
+    {
+      "time": "2026-03-14 19:59:13",
+      "total_change": -63.09,
+      "cumulative_pct": -63.09,
+      "velocity": 63.09
+    },
+    {
+      "time": "2026-03-14 20:00:25",
+      "total_change": -63.9,
+      "cumulative_pct": -63.9,
+      "velocity": 63.9
+    },
+    {
+      "time": "2026-03-14 20:01:36",
+      "total_change": -63.42,
+      "cumulative_pct": -63.42,
+      "velocity": 63.42
+    },
+    {
+      "time": "2026-03-14 20:03:00",
+      "total_change": -60.85,
+      "cumulative_pct": -60.85,
+      "velocity": 60.85
+    },
+    {
+      "time": "2026-03-14 20:04:11",
+      "total_change": -62.08,
+      "cumulative_pct": -62.08,
+      "velocity": 62.08
+    },
+    {
+      "time": "2026-03-14 20:05:23",
+      "total_change": -61.46,
+      "cumulative_pct": -61.46,
+      "velocity": 61.46
+    },
+    {
+      "time": "2026-03-14 20:06:35",
+      "total_change": -61.92,
+      "cumulative_pct": -61.92,
+      "velocity": 61.92
+    },
+    {
+      "time": "2026-03-14 20:07:46",
+      "total_change": -61.65,
+      "cumulative_pct": -61.65,
+      "velocity": 61.65
+    },
+    {
+      "time": "2026-03-14 20:09:10",
+      "total_change": -63.4,
+      "cumulative_pct": -63.4,
+      "velocity": 63.4
+    },
+    {
+      "time": "2026-03-14 20:10:22",
+      "total_change": -65.28,
+      "cumulative_pct": -65.28,
+      "velocity": 65.28
+    },
+    {
+      "time": "2026-03-14 20:11:33",
+      "total_change": -64.73,
+      "cumulative_pct": -64.73,
+      "velocity": 64.73
+    },
+    {
+      "time": "2026-03-14 20:12:45",
+      "total_change": -64.05,
+      "cumulative_pct": -64.05,
+      "velocity": 64.05
+    },
+    {
+      "time": "2026-03-14 20:13:57",
+      "total_change": -65.05,
+      "cumulative_pct": -65.05,
+      "velocity": 65.05
+    },
+    {
+      "time": "2026-03-14 20:15:20",
+      "total_change": -64.26,
+      "cumulative_pct": -64.26,
+      "velocity": 64.26
+    },
+    {
+      "time": "2026-03-14 20:16:32",
+      "total_change": -63.16,
+      "cumulative_pct": -63.16,
+      "velocity": 63.16
+    },
+    {
+      "time": "2026-03-14 20:17:44",
+      "total_change": -63.81,
+      "cumulative_pct": -63.81,
+      "velocity": 63.81
+    },
+    {
+      "time": "2026-03-14 20:18:56",
+      "total_change": -63.22,
+      "cumulative_pct": -63.22,
+      "velocity": 63.22
+    },
+    {
+      "time": "2026-03-14 20:20:07",
+      "total_change": -63.23,
+      "cumulative_pct": -63.23,
+      "velocity": 63.23
+    },
+    {
+      "time": "2026-03-14 20:21:31",
+      "total_change": -63.25,
+      "cumulative_pct": -63.25,
+      "velocity": 63.25
+    },
+    {
+      "time": "2026-03-14 20:22:42",
+      "total_change": -62.6,
+      "cumulative_pct": -62.6,
+      "velocity": 62.6
+    },
+    {
+      "time": "2026-03-14 20:23:54",
+      "total_change": -62.34,
+      "cumulative_pct": -62.34,
+      "velocity": 62.34
+    },
+    {
+      "time": "2026-03-14 20:25:05",
+      "total_change": -62.07,
+      "cumulative_pct": -62.07,
+      "velocity": 62.07
+    },
+    {
+      "time": "2026-03-14 20:26:17",
+      "total_change": -63.93,
+      "cumulative_pct": -63.93,
+      "velocity": 63.93
+    },
+    {
+      "time": "2026-03-14 20:27:40",
+      "total_change": -64.62,
+      "cumulative_pct": -64.62,
+      "velocity": 64.62
+    },
+    {
+      "time": "2026-03-14 20:28:52",
+      "total_change": -65.34,
+      "cumulative_pct": -65.34,
+      "velocity": 65.34
+    },
+    {
+      "time": "2026-03-14 20:30:04",
+      "total_change": -64.86,
+      "cumulative_pct": -64.86,
+      "velocity": 64.86
+    },
+    {
+      "time": "2026-03-14 20:31:15",
+      "total_change": -63.86,
+      "cumulative_pct": -63.86,
+      "velocity": 63.86
+    },
+    {
+      "time": "2026-03-14 20:32:27",
+      "total_change": -65.44,
+      "cumulative_pct": -65.44,
+      "velocity": 65.44
+    },
+    {
+      "time": "2026-03-14 20:33:51",
+      "total_change": -66.89,
+      "cumulative_pct": -66.89,
+      "velocity": 66.89
+    },
+    {
+      "time": "2026-03-14 20:35:02",
+      "total_change": -66.78,
+      "cumulative_pct": -66.78,
+      "velocity": 66.78
+    },
+    {
+      "time": "2026-03-14 20:36:14",
+      "total_change": -69.04,
+      "cumulative_pct": -69.04,
+      "velocity": 69.04
+    },
+    {
+      "time": "2026-03-14 20:37:26",
+      "total_change": -70.41,
+      "cumulative_pct": -70.41,
+      "velocity": 70.41
+    },
+    {
+      "time": "2026-03-14 20:38:37",
+      "total_change": -70.11,
+      "cumulative_pct": -70.11,
+      "velocity": 70.11
+    },
+    {
+      "time": "2026-03-14 20:40:01",
+      "total_change": -69.88,
+      "cumulative_pct": -69.88,
+      "velocity": 69.88
+    },
+    {
+      "time": "2026-03-14 20:41:13",
+      "total_change": -70.79,
+      "cumulative_pct": -70.79,
+      "velocity": 70.79
+    },
+    {
+      "time": "2026-03-14 20:42:29",
+      "total_change": -70.69,
+      "cumulative_pct": -70.69,
+      "velocity": 70.69
+    },
+    {
+      "time": "2026-03-14 20:43:41",
+      "total_change": -69.94,
+      "cumulative_pct": -69.94,
+      "velocity": 69.94
+    },
+    {
+      "time": "2026-03-14 20:45:04",
+      "total_change": -69.98,
+      "cumulative_pct": -69.98,
+      "velocity": 69.98
+    },
+    {
+      "time": "2026-03-14 20:46:16",
+      "total_change": -68.65,
+      "cumulative_pct": -68.65,
+      "velocity": 68.65
+    },
+    {
+      "time": "2026-03-14 20:47:28",
+      "total_change": -68.6,
+      "cumulative_pct": -68.6,
+      "velocity": 68.6
+    },
+    {
+      "time": "2026-03-14 20:48:40",
+      "total_change": -67.1,
+      "cumulative_pct": -67.1,
+      "velocity": 67.1
+    },
+    {
+      "time": "2026-03-14 20:49:51",
+      "total_change": -67.05,
+      "cumulative_pct": -67.05,
+      "velocity": 67.05
+    },
+    {
+      "time": "2026-03-14 20:51:14",
+      "total_change": -66.54,
+      "cumulative_pct": -66.54,
+      "velocity": 66.54
+    },
+    {
+      "time": "2026-03-14 20:52:26",
+      "total_change": -68.39,
+      "cumulative_pct": -68.39,
+      "velocity": 68.39
+    },
+    {
+      "time": "2026-03-14 20:53:38",
+      "total_change": -67.15,
+      "cumulative_pct": -67.15,
+      "velocity": 67.15
+    },
+    {
+      "time": "2026-03-14 20:54:50",
+      "total_change": -66.38,
+      "cumulative_pct": -66.38,
+      "velocity": 66.38
+    },
+    {
+      "time": "2026-03-14 20:56:02",
+      "total_change": -66.04,
+      "cumulative_pct": -66.04,
+      "velocity": 66.04
+    },
+    {
+      "time": "2026-03-14 20:57:25",
+      "total_change": -66.62,
+      "cumulative_pct": -66.62,
+      "velocity": 66.62
+    },
+    {
+      "time": "2026-03-14 20:58:37",
+      "total_change": -66.93,
+      "cumulative_pct": -66.93,
+      "velocity": 66.93
+    },
+    {
+      "time": "2026-03-14 20:59:48",
+      "total_change": -65.6,
+      "cumulative_pct": -65.6,
+      "velocity": 65.6
+    },
+    {
+      "time": "2026-03-14 21:01:00",
+      "total_change": -67.4,
+      "cumulative_pct": -67.4,
+      "velocity": 67.4
+    },
+    {
+      "time": "2026-03-14 21:02:12",
+      "total_change": -67.15,
+      "cumulative_pct": -67.15,
+      "velocity": 67.15
+    },
+    {
+      "time": "2026-03-14 21:03:36",
+      "total_change": -66.31,
+      "cumulative_pct": -66.31,
+      "velocity": 66.31
+    },
+    {
+      "time": "2026-03-14 21:04:47",
+      "total_change": -66.47,
+      "cumulative_pct": -66.47,
+      "velocity": 66.47
+    },
+    {
+      "time": "2026-03-14 21:05:59",
+      "total_change": -66.38,
+      "cumulative_pct": -66.38,
+      "velocity": 66.38
+    },
+    {
+      "time": "2026-03-14 21:07:11",
+      "total_change": -65.88,
+      "cumulative_pct": -65.88,
+      "velocity": 65.88
+    },
+    {
+      "time": "2026-03-14 21:08:22",
+      "total_change": -65.49,
+      "cumulative_pct": -65.49,
+      "velocity": 65.49
+    },
+    {
+      "time": "2026-03-14 21:09:46",
+      "total_change": -66.08,
+      "cumulative_pct": -66.08,
+      "velocity": 66.08
+    },
+    {
+      "time": "2026-03-14 21:10:58",
+      "total_change": -65.02,
+      "cumulative_pct": -65.02,
+      "velocity": 65.02
+    },
+    {
+      "time": "2026-03-14 21:12:09",
+      "total_change": -64.42,
+      "cumulative_pct": -64.42,
+      "velocity": 64.42
+    },
+    {
+      "time": "2026-03-14 21:13:21",
+      "total_change": -65.11,
+      "cumulative_pct": -65.11,
+      "velocity": 65.11
+    },
+    {
+      "time": "2026-03-14 21:14:32",
+      "total_change": -65.46,
+      "cumulative_pct": -65.46,
+      "velocity": 65.46
+    },
+    {
+      "time": "2026-03-14 21:15:56",
+      "total_change": -63.17,
+      "cumulative_pct": -63.17,
+      "velocity": 63.17
+    },
+    {
+      "time": "2026-03-14 21:17:07",
+      "total_change": -62.94,
+      "cumulative_pct": -62.94,
+      "velocity": 62.94
+    },
+    {
+      "time": "2026-03-14 21:18:19",
+      "total_change": -62.95,
+      "cumulative_pct": -62.95,
+      "velocity": 62.95
+    },
+    {
+      "time": "2026-03-14 21:20:43",
+      "total_change": -61.58,
+      "cumulative_pct": -61.58,
+      "velocity": 61.58
+    },
+    {
+      "time": "2026-03-14 21:22:06",
+      "total_change": -61.04,
+      "cumulative_pct": -61.04,
+      "velocity": 61.04
+    },
+    {
+      "time": "2026-03-14 21:23:18",
+      "total_change": -60.32,
+      "cumulative_pct": -60.32,
+      "velocity": 60.32
+    },
+    {
+      "time": "2026-03-14 21:24:30",
+      "total_change": -58.99,
+      "cumulative_pct": -58.99,
+      "velocity": 58.99
+    },
+    {
+      "time": "2026-03-14 21:25:42",
+      "total_change": -58.61,
+      "cumulative_pct": -58.61,
+      "velocity": 58.61
+    },
+    {
+      "time": "2026-03-14 21:26:53",
+      "total_change": -58.92,
+      "cumulative_pct": -58.92,
+      "velocity": 58.92
+    },
+    {
+      "time": "2026-03-14 21:28:17",
+      "total_change": -57.47,
+      "cumulative_pct": -57.47,
+      "velocity": 57.47
+    },
+    {
+      "time": "2026-03-14 21:29:28",
+      "total_change": -58.0,
+      "cumulative_pct": -58.0,
+      "velocity": 58.0
+    },
+    {
+      "time": "2026-03-14 21:30:40",
+      "total_change": -57.81,
+      "cumulative_pct": -57.81,
+      "velocity": 57.81
+    },
+    {
+      "time": "2026-03-14 21:31:52",
+      "total_change": -57.38,
+      "cumulative_pct": -57.38,
+      "velocity": 57.38
+    },
+    {
+      "time": "2026-03-14 21:33:04",
+      "total_change": -57.45,
+      "cumulative_pct": -57.45,
+      "velocity": 57.45
+    },
+    {
+      "time": "2026-03-14 21:34:27",
+      "total_change": -57.45,
+      "cumulative_pct": -57.45,
+      "velocity": 57.45
+    },
+    {
+      "time": "2026-03-14 21:35:39",
+      "total_change": -58.19,
+      "cumulative_pct": -58.19,
+      "velocity": 58.19
+    },
+    {
+      "time": "2026-03-14 21:36:50",
+      "total_change": -58.79,
+      "cumulative_pct": -58.79,
+      "velocity": 58.79
+    },
+    {
+      "time": "2026-03-14 21:38:02",
+      "total_change": -59.32,
+      "cumulative_pct": -59.32,
+      "velocity": 59.32
+    },
+    {
+      "time": "2026-03-14 21:39:13",
+      "total_change": -59.88,
+      "cumulative_pct": -59.88,
+      "velocity": 59.88
+    },
+    {
+      "time": "2026-03-14 21:40:37",
+      "total_change": -60.16,
+      "cumulative_pct": -60.16,
+      "velocity": 60.16
+    },
+    {
+      "time": "2026-03-14 21:41:49",
+      "total_change": -59.46,
+      "cumulative_pct": -59.46,
+      "velocity": 59.46
+    },
+    {
+      "time": "2026-03-14 21:43:05",
+      "total_change": -59.41,
+      "cumulative_pct": -59.41,
+      "velocity": 59.41
+    },
+    {
+      "time": "2026-03-14 21:44:17",
+      "total_change": -59.67,
+      "cumulative_pct": -59.67,
+      "velocity": 59.67
+    },
+    {
+      "time": "2026-03-14 21:45:41",
+      "total_change": -60.78,
+      "cumulative_pct": -60.78,
+      "velocity": 60.78
+    },
+    {
+      "time": "2026-03-14 21:46:52",
+      "total_change": -62.6,
+      "cumulative_pct": -62.6,
+      "velocity": 62.6
+    },
+    {
+      "time": "2026-03-14 21:48:04",
+      "total_change": -62.73,
+      "cumulative_pct": -62.73,
+      "velocity": 62.73
+    },
+    {
+      "time": "2026-03-14 21:49:16",
+      "total_change": -62.74,
+      "cumulative_pct": -62.74,
+      "velocity": 62.74
+    },
+    {
+      "time": "2026-03-14 21:50:27",
+      "total_change": -62.57,
+      "cumulative_pct": -62.57,
+      "velocity": 62.57
+    },
+    {
+      "time": "2026-03-14 21:51:51",
+      "total_change": -62.73,
+      "cumulative_pct": -62.73,
+      "velocity": 62.73
+    },
+    {
+      "time": "2026-03-14 21:53:02",
+      "total_change": -63.4,
+      "cumulative_pct": -63.4,
+      "velocity": 63.4
+    },
+    {
+      "time": "2026-03-14 21:54:14",
+      "total_change": -61.88,
+      "cumulative_pct": -61.88,
+      "velocity": 61.88
+    },
+    {
+      "time": "2026-03-14 21:55:26",
+      "total_change": -60.57,
+      "cumulative_pct": -60.57,
+      "velocity": 60.57
+    },
+    {
+      "time": "2026-03-14 21:56:38",
+      "total_change": -61.26,
+      "cumulative_pct": -61.26,
+      "velocity": 61.26
+    },
+    {
+      "time": "2026-03-14 21:58:02",
+      "total_change": -60.67,
+      "cumulative_pct": -60.67,
+      "velocity": 60.67
+    },
+    {
+      "time": "2026-03-14 21:59:14",
+      "total_change": -60.45,
+      "cumulative_pct": -60.45,
+      "velocity": 60.45
+    },
+    {
+      "time": "2026-03-14 22:00:26",
+      "total_change": -60.48,
+      "cumulative_pct": -60.48,
+      "velocity": 60.48
+    },
+    {
+      "time": "2026-03-14 22:01:38",
+      "total_change": -60.97,
+      "cumulative_pct": -60.97,
+      "velocity": 60.97
+    },
+    {
+      "time": "2026-03-14 22:03:02",
+      "total_change": -59.27,
+      "cumulative_pct": -59.27,
+      "velocity": 59.27
+    },
+    {
+      "time": "2026-03-14 22:04:14",
+      "total_change": -57.35,
+      "cumulative_pct": -57.35,
+      "velocity": 57.35
+    },
+    {
+      "time": "2026-03-14 22:05:26",
+      "total_change": -58.25,
+      "cumulative_pct": -58.25,
+      "velocity": 58.25
+    },
+    {
+      "time": "2026-03-14 22:06:38",
+      "total_change": -56.54,
+      "cumulative_pct": -56.54,
+      "velocity": 56.54
+    },
+    {
+      "time": "2026-03-14 22:08:02",
+      "total_change": -56.32,
+      "cumulative_pct": -56.32,
+      "velocity": 56.32
+    },
+    {
+      "time": "2026-03-14 22:09:14",
+      "total_change": -57.53,
+      "cumulative_pct": -57.53,
+      "velocity": 57.53
+    },
+    {
+      "time": "2026-03-14 22:10:27",
+      "total_change": -60.73,
+      "cumulative_pct": -60.73,
+      "velocity": 60.73
+    },
+    {
+      "time": "2026-03-14 22:11:38",
+      "total_change": -60.13,
+      "cumulative_pct": -60.13,
+      "velocity": 60.13
+    },
+    {
+      "time": "2026-03-14 22:12:50",
+      "total_change": -60.34,
+      "cumulative_pct": -60.34,
+      "velocity": 60.34
+    },
+    {
+      "time": "2026-03-14 22:14:14",
+      "total_change": -61.69,
+      "cumulative_pct": -61.69,
+      "velocity": 61.69
+    },
+    {
+      "time": "2026-03-14 22:15:26",
+      "total_change": -60.49,
+      "cumulative_pct": -60.49,
+      "velocity": 60.49
+    },
+    {
+      "time": "2026-03-14 22:16:39",
+      "total_change": -61.74,
+      "cumulative_pct": -61.74,
+      "velocity": 61.74
+    },
+    {
+      "time": "2026-03-14 22:17:50",
+      "total_change": -59.32,
+      "cumulative_pct": -59.32,
+      "velocity": 59.32
+    },
+    {
+      "time": "2026-03-14 22:19:16",
+      "total_change": -59.65,
+      "cumulative_pct": -59.65,
+      "velocity": 59.65
+    },
+    {
+      "time": "2026-03-14 22:20:27",
+      "total_change": -59.59,
+      "cumulative_pct": -59.59,
+      "velocity": 59.59
+    },
+    {
+      "time": "2026-03-14 22:21:39",
+      "total_change": -61.33,
+      "cumulative_pct": -61.33,
+      "velocity": 61.33
+    },
+    {
+      "time": "2026-03-14 22:22:51",
+      "total_change": -60.68,
+      "cumulative_pct": -60.68,
+      "velocity": 60.68
+    },
+    {
+      "time": "2026-03-14 22:24:15",
+      "total_change": -60.71,
+      "cumulative_pct": -60.71,
+      "velocity": 60.71
+    },
+    {
+      "time": "2026-03-14 22:25:27",
+      "total_change": -60.99,
+      "cumulative_pct": -60.99,
+      "velocity": 60.99
+    },
+    {
+      "time": "2026-03-14 22:26:39",
+      "total_change": -59.56,
+      "cumulative_pct": -59.56,
+      "velocity": 59.56
+    },
+    {
+      "time": "2026-03-14 22:27:51",
+      "total_change": -60.19,
+      "cumulative_pct": -60.19,
+      "velocity": 60.19
+    },
+    {
+      "time": "2026-03-14 22:29:03",
+      "total_change": -58.33,
+      "cumulative_pct": -58.33,
+      "velocity": 58.33
+    },
+    {
+      "time": "2026-03-14 22:30:27",
+      "total_change": -57.54,
+      "cumulative_pct": -57.54,
+      "velocity": 57.54
+    },
+    {
+      "time": "2026-03-14 22:31:38",
+      "total_change": -58.62,
+      "cumulative_pct": -58.62,
+      "velocity": 58.62
+    },
+    {
+      "time": "2026-03-14 22:32:50",
+      "total_change": -64.9,
+      "cumulative_pct": -64.9,
+      "velocity": 64.9
+    },
+    {
+      "time": "2026-03-14 22:34:02",
+      "total_change": -63.26,
+      "cumulative_pct": -63.26,
+      "velocity": 63.26
+    },
+    {
+      "time": "2026-03-14 22:35:14",
+      "total_change": -62.55,
+      "cumulative_pct": -62.55,
+      "velocity": 62.55
+    },
+    {
+      "time": "2026-03-14 22:36:38",
+      "total_change": -61.89,
+      "cumulative_pct": -61.89,
+      "velocity": 61.89
+    },
+    {
+      "time": "2026-03-14 22:37:50",
+      "total_change": -61.88,
+      "cumulative_pct": -61.88,
+      "velocity": 61.88
+    },
+    {
+      "time": "2026-03-14 22:39:02",
+      "total_change": -62.54,
+      "cumulative_pct": -62.54,
+      "velocity": 62.54
+    },
+    {
+      "time": "2026-03-14 22:40:14",
+      "total_change": -63.22,
+      "cumulative_pct": -63.22,
+      "velocity": 63.22
+    },
+    {
+      "time": "2026-03-14 22:41:26",
+      "total_change": -64.51,
+      "cumulative_pct": -64.51,
+      "velocity": 64.51
+    },
+    {
+      "time": "2026-03-14 22:42:50",
+      "total_change": -65.22,
+      "cumulative_pct": -65.22,
+      "velocity": 65.22
+    },
+    {
+      "time": "2026-03-14 22:44:02",
+      "total_change": -68.7,
+      "cumulative_pct": -68.7,
+      "velocity": 68.7
+    },
+    {
+      "time": "2026-03-14 22:45:14",
+      "total_change": -69.97,
+      "cumulative_pct": -69.97,
+      "velocity": 69.97
+    },
+    {
+      "time": "2026-03-14 22:46:26",
+      "total_change": -69.18,
+      "cumulative_pct": -69.18,
+      "velocity": 69.18
+    },
+    {
+      "time": "2026-03-14 22:47:50",
+      "total_change": -69.19,
+      "cumulative_pct": -69.19,
+      "velocity": 69.19
+    },
+    {
+      "time": "2026-03-14 22:49:02",
+      "total_change": -68.77,
+      "cumulative_pct": -68.77,
+      "velocity": 68.77
+    },
+    {
+      "time": "2026-03-14 22:50:14",
+      "total_change": -69.08,
+      "cumulative_pct": -69.08,
+      "velocity": 69.08
+    },
+    {
+      "time": "2026-03-14 22:51:26",
+      "total_change": -68.03,
+      "cumulative_pct": -68.03,
+      "velocity": 68.03
+    },
+    {
+      "time": "2026-03-14 22:52:38",
+      "total_change": -68.5,
+      "cumulative_pct": -68.5,
+      "velocity": 68.5
+    },
+    {
+      "time": "2026-03-14 22:54:01",
+      "total_change": -68.03,
+      "cumulative_pct": -68.03,
+      "velocity": 68.03
+    },
+    {
+      "time": "2026-03-14 22:55:13",
+      "total_change": -68.52,
+      "cumulative_pct": -68.52,
+      "velocity": 68.52
+    },
+    {
+      "time": "2026-03-14 22:56:25",
+      "total_change": -67.7,
+      "cumulative_pct": -67.7,
+      "velocity": 67.7
+    },
+    {
+      "time": "2026-03-14 22:57:37",
+      "total_change": -68.07,
+      "cumulative_pct": -68.07,
+      "velocity": 68.07
+    },
+    {
+      "time": "2026-03-14 22:58:49",
+      "total_change": -68.85,
+      "cumulative_pct": -68.85,
+      "velocity": 68.85
+    },
+    {
+      "time": "2026-03-14 23:00:12",
+      "total_change": -69.38,
+      "cumulative_pct": -69.38,
+      "velocity": 69.38
+    },
+    {
+      "time": "2026-03-14 23:01:24",
+      "total_change": -71.93,
+      "cumulative_pct": -71.93,
+      "velocity": 71.93
+    },
+    {
+      "time": "2026-03-14 23:02:36",
+      "total_change": -68.61,
+      "cumulative_pct": -68.61,
+      "velocity": 68.61
+    },
+    {
+      "time": "2026-03-14 23:03:48",
+      "total_change": -66.3,
+      "cumulative_pct": -66.3,
+      "velocity": 66.3
+    },
+    {
+      "time": "2026-03-14 23:05:00",
+      "total_change": -68.73,
+      "cumulative_pct": -68.73,
+      "velocity": 68.73
+    },
+    {
+      "time": "2026-03-14 23:06:24",
+      "total_change": -68.89,
+      "cumulative_pct": -68.89,
+      "velocity": 68.89
+    },
+    {
+      "time": "2026-03-14 23:07:36",
+      "total_change": -68.45,
+      "cumulative_pct": -68.45,
+      "velocity": 68.45
+    },
+    {
+      "time": "2026-03-14 23:08:48",
+      "total_change": -68.43,
+      "cumulative_pct": -68.43,
+      "velocity": 68.43
+    },
+    {
+      "time": "2026-03-14 23:10:00",
+      "total_change": -69.43,
+      "cumulative_pct": -69.43,
+      "velocity": 69.43
+    },
+    {
+      "time": "2026-03-14 23:11:12",
+      "total_change": -68.85,
+      "cumulative_pct": -68.85,
+      "velocity": 68.85
+    },
+    {
+      "time": "2026-03-14 23:12:36",
+      "total_change": -69.16,
+      "cumulative_pct": -69.16,
+      "velocity": 69.16
+    },
+    {
+      "time": "2026-03-14 23:13:48",
+      "total_change": -68.75,
+      "cumulative_pct": -68.75,
+      "velocity": 68.75
+    },
+    {
+      "time": "2026-03-14 23:15:00",
+      "total_change": -69.02,
+      "cumulative_pct": -69.02,
+      "velocity": 69.02
+    },
+    {
+      "time": "2026-03-14 23:16:12",
+      "total_change": -68.29,
+      "cumulative_pct": -68.29,
+      "velocity": 68.29
+    },
+    {
+      "time": "2026-03-14 23:18:59",
+      "total_change": -69.11,
+      "cumulative_pct": -69.11,
+      "velocity": 69.11
+    },
+    {
+      "time": "2026-03-14 23:20:11",
+      "total_change": -68.85,
+      "cumulative_pct": -68.85,
+      "velocity": 68.85
+    },
+    {
+      "time": "2026-03-14 23:21:22",
+      "total_change": -68.76,
+      "cumulative_pct": -68.76,
+      "velocity": 68.76
+    },
+    {
+      "time": "2026-03-14 23:22:34",
+      "total_change": -68.73,
+      "cumulative_pct": -68.73,
+      "velocity": 68.73
+    },
+    {
+      "time": "2026-03-14 23:23:58",
+      "total_change": -69.18,
+      "cumulative_pct": -69.18,
+      "velocity": 69.18
+    },
+    {
+      "time": "2026-03-14 23:25:10",
+      "total_change": -69.42,
+      "cumulative_pct": -69.42,
+      "velocity": 69.42
+    },
+    {
+      "time": "2026-03-14 23:26:22",
+      "total_change": -69.59,
+      "cumulative_pct": -69.59,
+      "velocity": 69.59
+    },
+    {
+      "time": "2026-03-14 23:27:33",
+      "total_change": -67.97,
+      "cumulative_pct": -67.97,
+      "velocity": 67.97
+    },
+    {
+      "time": "2026-03-14 23:28:45",
+      "total_change": -68.09,
+      "cumulative_pct": -68.09,
+      "velocity": 68.09
+    },
+    {
+      "time": "2026-03-14 23:30:09",
+      "total_change": -69.37,
+      "cumulative_pct": -69.37,
+      "velocity": 69.37
+    },
+    {
+      "time": "2026-03-14 23:31:21",
+      "total_change": -70.85,
+      "cumulative_pct": -70.85,
+      "velocity": 70.85
+    },
+    {
+      "time": "2026-03-14 23:32:33",
+      "total_change": -73.83,
+      "cumulative_pct": -73.83,
+      "velocity": 73.83
+    },
+    {
+      "time": "2026-03-14 23:33:44",
+      "total_change": -72.08,
+      "cumulative_pct": -72.08,
+      "velocity": 72.08
+    },
+    {
+      "time": "2026-03-14 23:34:56",
+      "total_change": -71.46,
+      "cumulative_pct": -71.46,
+      "velocity": 71.46
+    },
+    {
+      "time": "2026-03-14 23:36:20",
+      "total_change": -73.96,
+      "cumulative_pct": -73.96,
+      "velocity": 73.96
+    },
+    {
+      "time": "2026-03-14 23:37:32",
+      "total_change": -71.73,
+      "cumulative_pct": -71.73,
+      "velocity": 71.73
+    },
+    {
+      "time": "2026-03-14 23:38:44",
+      "total_change": -70.72,
+      "cumulative_pct": -70.72,
+      "velocity": 70.72
+    },
+    {
+      "time": "2026-03-14 23:39:55",
+      "total_change": -71.41,
+      "cumulative_pct": -71.41,
+      "velocity": 71.41
+    },
+    {
+      "time": "2026-03-14 23:41:07",
+      "total_change": -71.36,
+      "cumulative_pct": -71.36,
+      "velocity": 71.36
+    },
+    {
+      "time": "2026-03-14 23:42:31",
+      "total_change": -71.79,
+      "cumulative_pct": -71.79,
+      "velocity": 71.79
+    },
+    {
+      "time": "2026-03-14 23:43:43",
+      "total_change": -71.57,
+      "cumulative_pct": -71.57,
+      "velocity": 71.57
+    },
+    {
+      "time": "2026-03-14 23:44:54",
+      "total_change": -70.8,
+      "cumulative_pct": -70.8,
+      "velocity": 70.8
+    },
+    {
+      "time": "2026-03-14 23:46:06",
+      "total_change": -69.68,
+      "cumulative_pct": -69.68,
+      "velocity": 69.68
+    },
+    {
+      "time": "2026-03-14 23:47:18",
+      "total_change": -69.67,
+      "cumulative_pct": -69.67,
+      "velocity": 69.67
+    },
+    {
+      "time": "2026-03-14 23:48:42",
+      "total_change": -69.85,
+      "cumulative_pct": -69.85,
+      "velocity": 69.85
+    },
+    {
+      "time": "2026-03-14 23:49:54",
+      "total_change": -68.97,
+      "cumulative_pct": -68.97,
+      "velocity": 68.97
+    },
+    {
+      "time": "2026-03-14 23:51:05",
+      "total_change": -67.99,
+      "cumulative_pct": -67.99,
+      "velocity": 67.99
+    },
+    {
+      "time": "2026-03-14 23:52:17",
+      "total_change": -65.08,
+      "cumulative_pct": -65.08,
+      "velocity": 65.08
+    },
+    {
+      "time": "2026-03-14 23:53:29",
+      "total_change": -65.26,
+      "cumulative_pct": -65.26,
+      "velocity": 65.26
+    },
+    {
+      "time": "2026-03-14 23:54:53",
+      "total_change": -65.63,
+      "cumulative_pct": -65.63,
+      "velocity": 65.63
+    },
+    {
+      "time": "2026-03-14 23:56:05",
+      "total_change": -65.89,
+      "cumulative_pct": -65.89,
+      "velocity": 65.89
+    },
+    {
+      "time": "2026-03-14 23:57:17",
+      "total_change": -66.0,
+      "cumulative_pct": -66.0,
+      "velocity": 66.0
+    },
+    {
+      "time": "2026-03-14 23:58:29",
+      "total_change": -65.73,
+      "cumulative_pct": -65.73,
+      "velocity": 65.73
+    }
+  ]
+}

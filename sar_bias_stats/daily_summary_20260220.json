@@ -1,0 +1,17 @@
+{
+  "date": "2026-02-20",
+  "total_bullish": 3,
+  "total_bearish": 15,
+  "total_points": 291,
+  "unique_bullish_symbols": [
+    "LINK",
+    "STX"
+  ],
+  "unique_bearish_symbols": [
+    "BCH",
+    "TON"
+  ],
+  "unique_bullish_count": 2,
+  "unique_bearish_count": 2,
+  "generated_at": "2026-02-28 22:15:29"
+}

@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>Tooltip调试 - 逐步可视化</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        body { 
+            background: #1a1a2e; 
+            color: #fff; 
+            font-family: 'Consolas', monospace; 
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { color: #52c41a; border-bottom: 3px solid #52c41a; padding-bottom: 10px; }
+        h2 { color: #faad14; margin-top: 30px; border-left: 5px solid #faad14; padding-left: 15px; }
+        .step { 
+            background: #16213e; 
+            border: 2px solid #0f3460; 
+            border-radius: 8px; 
+            padding: 20px; 
+            margin: 20px 0;
+        }
+        .step.active { border-color: #52c41a; }
+        .step.error { border-color: #ff4d4f; }
+        .code { 
+            background: #0f3460; 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin: 10px 0;
+            overflow-x: auto;
+            font-size: 13px;
+        }
+        .highlight { background: #faad14; color: #000; padding: 2px 6px; border-radius: 3px; font-weight: bold; }
+        .success { color: #52c41a; font-weight: bold; }
+        .error { color: #ff4d4f; font-weight: bold; }
+        .warning { color: #faad14; font-weight: bold; }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 15px 0;
+            background: #0f3460;
+        }
+        th, td { 
+            padding: 12px; 
+            text-align: left; 
+            border-bottom: 1px solid #444; 
+        }
+        th { background: #16213e; color: #faad14; }
+        #chart { width: 100%; height: 400px; margin: 20px 0; }
+        .button {
+            background: #52c41a;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 5px;
+        }
+        .button:hover { background: #73d13d; }
+        .button.danger { background: #ff4d4f; color: #fff; }
+        .button.danger:hover { background: #ff7875; }
+        .info-box {
+            background: #0f3460;
+            border-left: 5px solid #1890ff;
+            padding: 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Tooltip数据流程可视化调试</h1>
+        
+        <div class="info-box">
+            <strong>目标：</strong>逐步验证tooltip显示值从数据源到最终显示的每一步<br>
+            <strong>期望：</strong>tooltip应该显示 <span class="highlight">184次</span> 而不是 <span class="highlight">79次</span>
+        </div>
+
+        <!-- 步骤1 -->
+        <div class="step active" id="step1">
+            <h2>步骤1: 获取API数据</h2>
+            <button class="button" onclick="loadAPIData()">📡 加载API数据</button>
+            <div id="step1-result"></div>
+        </div>
+
+        <!-- 步骤2 -->
+        <div class="step" id="step2">
+            <h2>步骤2: 计算24h统计</h2>
+            <button class="button" onclick="calculateStats()">🔢 计算统计数据</button>
+            <div id="step2-result"></div>
+        </div>
+
+        <!-- 步骤3 -->
+        <div class="step" id="step3">
+            <h2>步骤3: 创建图表数据</h2>
+            <button class="button" onclick="createChartData()">📊 生成图表数据</button>
+            <div id="step3-result"></div>
+        </div>
+
+        <!-- 步骤4 -->
+        <div class="step" id="step4">
+            <h2>步骤4: 渲染图表</h2>
+            <button class="button" onclick="renderChart()">🎨 渲染图表</button>
+            <div id="chart"></div>
+            <div id="step4-result"></div>
+        </div>
+
+        <!-- 步骤5 -->
+        <div class="step" id="step5">
+            <h2>步骤5: Tooltip取值验证</h2>
+            <p class="warning">⚠️ 请鼠标悬停在图表最右侧，查看tooltip显示的值</p>
+            <div id="step5-result"></div>
+        </div>
+
+        <!-- 结果汇总 -->
+        <div class="step" id="summary" style="display: none;">
+            <h2>📝 诊断结果</h2>
+            <div id="summary-result"></div>
+        </div>
+    </div>
+
+    <script>
+        let apiData = null;
+        let statsData = null;
+        let chartDataArrays = null;
+        let myChart = null;
+
+        console.log('%c🔥 调试页面已加载 - v1.0.0-DEBUG', 'color: #52c41a; font-size: 16px; font-weight: bold;');
+
+        // 步骤1: 加载API数据
+        async function loadAPIData() {
+            const result = document.getElementById('step1-result');
+            result.innerHTML = '<p class="warning">⏳ 正在加载API数据...</p>';
+            
+            try {
+                const response = await fetch('/api/price-position/chart-data/2026-02-15');
+                const data = await response.json();
+                apiData = data.data;
+                
+                const sellCount = apiData.filter(d => d.signal_type === 'sell' && d.signal_triggered === 1).length;
+                
+                result.innerHTML = `
+                    <div class="code">
+                    <strong class="success">✅ API数据加载成功</strong><br>
+                    - 数据条数: ${apiData.length} 条<br>
+                    - Sell信号数: ${sellCount} 次<br>
+                    - 时间范围: ${apiData[0].time} 到 ${apiData[apiData.length-1].time}<br>
+                    - 最后一个点: ${apiData[apiData.length-1].time}
+                    </div>
+                    <table>
+                        <tr><th>字段</th><th>值</th></tr>
+                        <tr><td>总数据点</td><td class="success">${apiData.length}</td></tr>
+                        <tr><td>Sell信号总数</td><td class="success">${sellCount}</td></tr>
+                        <tr><td>最后时间</td><td class="success">${apiData[apiData.length-1].time}</td></tr>
+                    </table>
+                `;
+                
+                document.getElementById('step1').classList.add('active');
+                document.getElementById('step2').classList.add('active');
+                
+                console.log('✅ 步骤1完成: API数据', apiData);
+            } catch (error) {
+                result.innerHTML = `<p class="error">❌ 加载失败: ${error.message}</p>`;
+                console.error('步骤1失败:', error);
+            }
+        }
+
+        // 步骤2: 计算统计
+        function calculateStats() {
+            if (!apiData) {
+                alert('请先加载API数据！');
+                return;
+            }
+
+            const result = document.getElementById('step2-result');
+            result.innerHTML = '<p class="warning">⏳ 正在计算统计数据...</p>';
+
+            // 模拟前端的统计计算逻辑
+            const sell24hData = [];
+            const sell2hData = [];
+            const fullTimes = [];
+
+            apiData.forEach((point, index) => {
+                const currentTime = new Date(point.time);
+                fullTimes.push(point.time);
+
+                // 计算24h窗口
+                const time24hAgo = new Date(currentTime.getTime() - 24 * 60 * 60 * 1000);
+                let count24h = 0;
+                for (let j = 0; j <= index; j++) {
+                    const checkTime = new Date(apiData[j].time);
+                    if (checkTime >= time24hAgo && checkTime <= currentTime) {
+                        if (apiData[j].signal_type === 'sell' && apiData[j].signal_triggered === 1) {
+                            count24h++;
+                        }
+                    }
+                }
+                sell24hData.push(count24h);
+
+                // 计算2h窗口
+                const time2hAgo = new Date(currentTime.getTime() - 2 * 60 * 60 * 1000);
+                let count2h = 0;
+                for (let j = 0; j <= index; j++) {
+                    const checkTime = new Date(apiData[j].time);
+                    if (checkTime >= time2hAgo && checkTime <= currentTime) {
+                        if (apiData[j].signal_type === 'sell' && apiData[j].signal_triggered === 1) {
+                            count2h++;
+                        }
+                    }
+                }
+                sell2hData.push(count2h);
+            });
+
+            statsData = { sell24hData, sell2hData, fullTimes };
+
+            const lastIndex = sell24hData.length - 1;
+            result.innerHTML = `
+                <div class="code">
+                <strong class="success">✅ 统计计算完成</strong><br>
+                - 数据点数: ${sell24hData.length}<br>
+                - 最后一个点的24h统计: ${sell24hData[lastIndex]} 次<br>
+                - 最后一个点的2h统计: ${sell2hData[lastIndex]} 次<br>
+                - 最后一个点的时间: ${fullTimes[lastIndex]}
+                </div>
+                <table>
+                    <tr><th>项目</th><th>值</th><th>验证</th></tr>
+                    <tr>
+                        <td>最后点24h统计</td>
+                        <td class="success">${sell24hData[lastIndex]} 次</td>
+                        <td>${sell24hData[lastIndex] >= 180 ? '<span class="success">✅ 接近184</span>' : '<span class="error">❌ 不符合预期</span>'}</td>
+                    </tr>
+                    <tr>
+                        <td>最后5个24h值</td>
+                        <td class="success">${sell24hData.slice(-5).join(', ')}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>最后5个2h值</td>
+                        <td class="success">${sell2hData.slice(-5).join(', ')}</td>
+                        <td></td>
+                    </tr>
+                </table>
+            `;
+
+            document.getElementById('step2').classList.add('active');
+            document.getElementById('step3').classList.add('active');
+
+            console.log('✅ 步骤2完成: 统计数据', statsData);
+            console.log('  sell24hData最后5个值:', sell24hData.slice(-5));
+            console.log('  sell2hData最后5个值:', sell2hData.slice(-5));
+        }
+
+        // 步骤3: 创建图表数据
+        function createChartData() {
+            if (!statsData) {
+                alert('请先计算统计数据！');
+                return;
+            }
+
+            const result = document.getElementById('step3-result');
+            result.innerHTML = '<p class="warning">⏳ 正在创建图表数据...</p>';
+
+            // 🔧 这里是关键：模拟tooltip的数据复制逻辑
+            const chartData24h = statsData.sell24hData.slice();
+            const chartData2h = statsData.sell2hData.slice();
+            const chartFullTimes = statsData.fullTimes.slice();
+
+            chartDataArrays = { chartData24h, chartData2h, chartFullTimes };
+
+            const lastIndex = chartData24h.length - 1;
+            const matches = (chartData24h[lastIndex] === statsData.sell24hData[lastIndex]);
+
+            result.innerHTML = `
+                <div class="code">
+                <strong class="success">✅ 图表数据创建完成</strong><br>
+                - chartData24h = sell24hData.slice()<br>
+                - chartData2h = sell2hData.slice()<br>
+                - chartFullTimes = fullTimes.slice()
+                </div>
+                <table>
+                    <tr><th>数组</th><th>长度</th><th>最后一个值</th><th>验证</th></tr>
+                    <tr>
+                        <td>sell24hData (原始)</td>
+                        <td>${statsData.sell24hData.length}</td>
+                        <td>${statsData.sell24hData[lastIndex]}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>chartData24h (复制)</td>
+                        <td>${chartData24h.length}</td>
+                        <td class="success">${chartData24h[lastIndex]}</td>
+                        <td>${matches ? '<span class="success">✅ 一致</span>' : '<span class="error">❌ 不一致</span>'}</td>
+                    </tr>
+                    <tr>
+                        <td>sell2hData (原始)</td>
+                        <td>${statsData.sell2hData.length}</td>
+                        <td>${statsData.sell2hData[lastIndex]}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>chartData2h (复制)</td>
+                        <td>${chartData2h.length}</td>
+                        <td class="success">${chartData2h[lastIndex]}</td>
+                        <td>${statsData.sell2hData[lastIndex] === chartData2h[lastIndex] ? '<span class="success">✅ 一致</span>' : '<span class="error">❌ 不一致</span>'}</td>
+                    </tr>
+                </table>
+            `;
+
+            document.getElementById('step3').classList.add('active');
+            document.getElementById('step4').classList.add('active');
+
+            console.log('✅ 步骤3完成: 图表数据', chartDataArrays);
+        }
+
+        // 步骤4: 渲染图表
+        function renderChart() {
+            if (!chartDataArrays) {
+                alert('请先创建图表数据！');
+                return;
+            }
+
+            const result = document.getElementById('step4-result');
+            result.innerHTML = '<p class="warning">⏳ 正在渲染图表...</p>';
+
+            const chartDom = document.getElementById('chart');
+            myChart = echarts.init(chartDom);
+
+            // 生成X轴标签（只显示时间）
+            const xAxisData = chartDataArrays.chartFullTimes.map(t => t.split(' ')[1]);
+
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'cross' },
+                    formatter: function(params) {
+                        if (!params || params.length === 0) return '';
+                        const dataIndex = params[0].dataIndex;
+                        const fullTime = chartDataArrays.chartFullTimes[dataIndex];
+                        const actual24h = chartDataArrays.chartData24h[dataIndex];
+                        const actual2h = chartDataArrays.chartData2h[dataIndex];
+
+                        console.log(`🎯 Tooltip触发:`);
+                        console.log(`  - dataIndex: ${dataIndex}`);
+                        console.log(`  - fullTime: ${fullTime}`);
+                        console.log(`  - actual24h: ${actual24h}`);
+                        console.log(`  - actual2h: ${actual2h}`);
+                        console.log(`  - chartData24h.length: ${chartDataArrays.chartData24h.length}`);
+                        console.log(`  - chartData24h[${dataIndex}]: ${chartDataArrays.chartData24h[dataIndex]}`);
+                        console.log(`  - series data长度: ${params[0].data.length || 'N/A'}`);
+
+                        document.getElementById('step5-result').innerHTML = `
+                            <div class="code">
+                            <strong class="warning">🎯 Tooltip数据检查</strong><br>
+                            - dataIndex: ${dataIndex}<br>
+                            - 数组总长度: ${chartDataArrays.chartData24h.length}<br>
+                            - fullTime: ${fullTime}<br>
+                            - actual24h = chartData24h[${dataIndex}] = <span class="highlight">${actual24h}</span> 次<br>
+                            - actual2h = chartData2h[${dataIndex}] = <span class="highlight">${actual2h}</span> 次
+                            </div>
+                            <table>
+                                <tr><th>项目</th><th>值</th><th>状态</th></tr>
+                                <tr>
+                                    <td>Tooltip显示24h值</td>
+                                    <td class="highlight">${actual24h} 次</td>
+                                    <td>${actual24h >= 180 ? '<span class="success">✅ 正确</span>' : '<span class="error">❌ 错误（应该接近184）</span>'}</td>
+                                </tr>
+                                <tr>
+                                    <td>Tooltip显示2h值</td>
+                                    <td class="highlight">${actual2h} 次</td>
+                                    <td><span class="success">✅</span></td>
+                                </tr>
+                                <tr>
+                                    <td>悬停位置</td>
+                                    <td>索引 ${dataIndex} / ${chartDataArrays.chartData24h.length - 1}</td>
+                                    <td>${dataIndex === chartDataArrays.chartData24h.length - 1 ? '<span class="success">✅ 最右侧</span>' : '<span class="warning">⚠️ 不是最右侧</span>'}</td>
+                                </tr>
+                            </table>
+                        `;
+
+                        document.getElementById('step5').classList.add('active');
+                        showSummary(dataIndex, actual24h, actual2h);
+
+                        let result = `<div style="font-weight: bold; margin-bottom: 8px;">📅 ${fullTime}</div>`;
+                        result += `<div style="margin: 4px 0; color: #faad14;">🐛 索引${dataIndex}/${chartDataArrays.chartData24h.length - 1}</div>`;
+                        result += `<div style="margin: 4px 0;">
+                            <span style="display:inline-block;width:10px;height:10px;background:#ff4d4f;border-radius:50%;margin-right:5px;"></span>
+                            24h逃顶: <strong>${actual24h}</strong> 次
+                        </div>`;
+                        result += `<div style="margin: 4px 0;">
+                            <span style="display:inline-block;width:10px;height:10px;background:#faad14;border-radius:50%;margin-right:5px;"></span>
+                            2h逃顶: <strong>${actual2h}</strong> 次
+                        </div>`;
+                        return result;
+                    }
+                },
+                legend: {
+                    data: ['24h逃顶', '2h逃顶'],
+                    textStyle: { color: '#fff' },
+                    top: 10
+                },
+                grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: xAxisData,
+                    axisLabel: { color: '#a0a0a0', fontSize: 11 },
+                    axisLine: { lineStyle: { color: '#444' } }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '触发次数',
+                    nameTextStyle: { color: '#a0a0a0' },
+                    axisLabel: { color: '#a0a0a0' },
+                    axisLine: { lineStyle: { color: '#444' } },
+                    splitLine: { lineStyle: { color: '#2d2d44' } }
+                },
+                series: [
+                    {
+                        name: '24h逃顶',
+                        type: 'line',
+                        data: chartDataArrays.chartData24h,
+                        itemStyle: { color: '#ff4d4f' },
+                        areaStyle: { color: 'rgba(255, 77, 79, 0.2)' },
+                        smooth: true
+                    },
+                    {
+                        name: '2h逃顶',
+                        type: 'line',
+                        data: chartDataArrays.chartData2h,
+                        itemStyle: { color: '#faad14' },
+                        areaStyle: { color: 'rgba(250, 173, 20, 0.2)' },
+                        smooth: true
+                    }
+                ]
+            };
+
+            myChart.setOption(option);
+
+            result.innerHTML = `
+                <div class="code">
+                <strong class="success">✅ 图表渲染完成</strong><br>
+                - Series data 使用: chartData24h, chartData2h<br>
+                - Tooltip 访问: chartData24h[dataIndex], chartData2h[dataIndex]<br>
+                - 数据对齐: 索引一致 ✅
+                </div>
+                <p class="warning">⚠️ 请鼠标悬停在图表<strong>最右侧</strong>，查看tooltip显示的值！</p>
+            `;
+
+            document.getElementById('step4').classList.add('active');
+            document.getElementById('step5').classList.add('active');
+
+            console.log('✅ 步骤4完成: 图表渲染');
+        }
+
+        function showSummary(dataIndex, actual24h, actual2h) {
+            const summaryDiv = document.getElementById('summary');
+            const summaryResult = document.getElementById('summary-result');
+            
+            const isLastPoint = dataIndex === chartDataArrays.chartData24h.length - 1;
+            const is24hCorrect = actual24h >= 180 && actual24h <= 190;
+            
+            let diagnosis = '';
+            if (!isLastPoint) {
+                diagnosis = `<p class="warning">⚠️ <strong>您悬停的不是最右侧的点！</strong></p>
+                            <p>您悬停在索引 <span class="highlight">${dataIndex}</span>，而最后一个点是索引 <span class="highlight">${chartDataArrays.chartData24h.length - 1}</span>。</p>
+                            <p>索引${dataIndex}的24h统计值是 <span class="highlight">${actual24h}次</span>，这可能是正确的历史值。</p>
+                            <p><strong>请悬停在图表最右侧边缘！</strong></p>`;
+            } else if (is24hCorrect) {
+                diagnosis = `<p class="success">✅ <strong>完全正确！</strong></p>
+                            <p>Tooltip显示的24h统计值 <span class="highlight">${actual24h}次</span> 符合预期（接近184次）。</p>
+                            <p><strong>问题已解决！</strong></p>`;
+            } else {
+                diagnosis = `<p class="error">❌ <strong>发现问题！</strong></p>
+                            <p>您悬停在最后一个点（索引${dataIndex}），但tooltip显示 <span class="highlight">${actual24h}次</span>，不符合预期的184次。</p>
+                            <p><strong>这确实是一个bug！</strong></p>
+                            <p>可能的原因：</p>
+                            <ul>
+                                <li>chartData24h数组的值不正确</li>
+                                <li>数据计算逻辑有误</li>
+                                <li>浏览器缓存了旧的JavaScript</li>
+                            </ul>`;
+            }
+
+            summaryResult.innerHTML = `
+                <div class="code">
+                ${diagnosis}
+                </div>
+                <table>
+                    <tr><th>检查项</th><th>结果</th></tr>
+                    <tr><td>悬停位置</td><td>${isLastPoint ? '<span class="success">✅ 最右侧</span>' : '<span class="error">❌ 不是最右侧</span>'}</td></tr>
+                    <tr><td>Tooltip 24h值</td><td><span class="highlight">${actual24h}次</span></td></tr>
+                    <tr><td>预期值</td><td>约184次</td></tr>
+                    <tr><td>是否正确</td><td>${is24hCorrect ? '<span class="success">✅ 正确</span>' : '<span class="error">❌ 错误</span>'}</td></tr>
+                </table>
+            `;
+
+            summaryDiv.style.display = 'block';
+        }
+
+        // 自动加载
+        setTimeout(() => {
+            console.log('%c点击按钮开始逐步调试', 'color: #faad14; font-size: 14px;');
+        }, 1000);
+    </script>
+</body>
+</html>

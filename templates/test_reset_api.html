@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>测试清零API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a1f3a;
+            color: #fff;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #252b4a;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button {
+            background: #00ff88;
+            border: none;
+            color: #1a1f3a;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #00dd77;
+        }
+        pre {
+            background: #1a1f3a;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .success {
+            color: #00ff88;
+        }
+        .error {
+            color: #ff4d4f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>测试维护次数清零API</h1>
+        
+        <div>
+            <label>币种ID:</label>
+            <input type="text" id="instId" value="FIL-USDT-SWAP" style="width: 200px;">
+        </div>
+        
+        <div>
+            <label>方向:</label>
+            <select id="posSide">
+                <option value="long">long</option>
+                <option value="short">short</option>
+            </select>
+        </div>
+        
+        <button onclick="testReset()">测试清零</button>
+        <button onclick="testCurrent()">查看当前记录</button>
+        
+        <h2>API响应:</h2>
+        <pre id="response">等待测试...</pre>
+        
+        <h2>请求详情:</h2>
+        <pre id="details">等待测试...</pre>
+    </div>
+
+    <script>
+        async function testReset() {
+            const instId = document.getElementById('instId').value;
+            const posSide = document.getElementById('posSide').value;
+            
+            const responseDiv = document.getElementById('response');
+            const detailsDiv = document.getElementById('details');
+            
+            responseDiv.textContent = '发送请求中...';
+            detailsDiv.textContent = '';
+            
+            try {
+                const url = '/api/main-account/reset-maintenance-count';
+                const body = JSON.stringify({ inst_id: instId, pos_side: posSide });
+                
+                detailsDiv.textContent = `请求URL: ${url}\n请求Body: ${body}`;
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: body
+                });
+                
+                // 先获取原始文本
+                const rawText = await response.text();
+                
+                detailsDiv.textContent += `\n\nHTTP状态: ${response.status} ${response.statusText}`;
+                detailsDiv.textContent += `\nContent-Type: ${response.headers.get('content-type')}`;
+                detailsDiv.textContent += `\n原始响应:\n${rawText}`;
+                
+                // 尝试解析JSON
+                try {
+                    const data = JSON.parse(rawText);
+                    responseDiv.className = data.success ? 'success' : 'error';
+                    responseDiv.textContent = JSON.stringify(data, null, 2);
+                } catch (e) {
+                    responseDiv.className = 'error';
+                    responseDiv.textContent = `JSON解析失败: ${e.message}\n原始响应:\n${rawText}`;
+                }
+                
+            } catch (error) {
+                responseDiv.className = 'error';
+                responseDiv.textContent = `请求失败: ${error.message}`;
+            }
+        }
+        
+        async function testCurrent() {
+            const responseDiv = document.getElementById('response');
+            const detailsDiv = document.getElementById('details');
+            
+            responseDiv.textContent = '获取记录中...';
+            detailsDiv.textContent = '';
+            
+            try {
+                const response = await fetch('/anchor_maintenance_records.json');
+                const data = await response.json();
+                
+                responseDiv.className = 'success';
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+                
+                detailsDiv.textContent = '当前维护记录文件内容';
+                
+            } catch (error) {
+                responseDiv.className = 'error';
+                responseDiv.textContent = `获取失败: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

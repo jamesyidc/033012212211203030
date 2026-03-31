@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日00:10任务执行状态</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: rgba(255,255,255,0.7);
+            font-size: 1.1rem;
+        }
+        
+        .tasks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .task-card {
+            background: rgba(42, 45, 71, 0.95);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+        
+        .task-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
+        }
+        
+        .task-card.success {
+            border-color: rgba(16, 185, 129, 0.5);
+        }
+        
+        .task-card.pending {
+            border-color: rgba(251, 191, 36, 0.5);
+        }
+        
+        .task-card.failed {
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+        
+        .task-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .task-icon {
+            font-size: 2.5rem;
+            margin-right: 15px;
+        }
+        
+        .task-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .task-status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+        
+        .status-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .status-label {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .status-value {
+            font-weight: 600;
+            color: #00d4ff;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status-badge.success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+        
+        .status-badge.pending {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+        
+        .status-badge.failed {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        
+        .next-execution {
+            text-align: center;
+            padding: 30px;
+            background: rgba(42, 45, 71, 0.95);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .next-execution h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #00d4ff;
+        }
+        
+        .countdown {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #00d4ff;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .execution-time {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .log-container {
+            background: rgba(42, 45, 71, 0.95);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+        }
+        
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .log-content {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        .log-line {
+            margin-bottom: 5px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .refresh-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        
+        .refresh-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .loading {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⏰ 每日00:10任务执行状态</h1>
+            <p>自动更新父文件夹ID & 清理未使用的配置</p>
+        </div>
+        
+        <div class="next-execution">
+            <h2>⏳ 距离下次执行</h2>
+            <div class="countdown" id="countdown">--:--:--</div>
+            <div class="execution-time">下次执行时间: <span id="next-time">--</span></div>
+        </div>
+        
+        <div class="tasks-grid">
+            <!-- 任务1: 更新父文件夹ID -->
+            <div class="task-card" id="task-parent-folder">
+                <div class="task-header">
+                    <div class="task-icon">📂</div>
+                    <div>
+                        <div class="task-title">更新父文件夹ID</div>
+                        <div style="font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-top: 5px;">
+                            从Google Drive获取最新结构
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="task-status">
+                    <div class="status-row">
+                        <span class="status-label">执行状态</span>
+                        <span class="status-badge" id="parent-status">pending</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">最后执行</span>
+                        <span class="status-value" id="parent-last-time">--</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">父文件夹ID</span>
+                        <span class="status-value" id="parent-folder-id" style="font-size: 0.75rem; word-break: break-all;">--</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">子文件夹ID</span>
+                        <span class="status-value" id="child-folder-id" style="font-size: 0.75rem; word-break: break-all;">--</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 任务2: 清理未使用ID -->
+            <div class="task-card" id="task-cleanup">
+                <div class="task-header">
+                    <div class="task-icon">🧹</div>
+                    <div>
+                        <div class="task-title">清理未使用ID</div>
+                        <div style="font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-top: 5px;">
+                            删除今天不需要的父文件夹ID
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="task-status">
+                    <div class="status-row">
+                        <span class="status-label">执行状态</span>
+                        <span class="status-badge" id="cleanup-status">pending</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">最后清理</span>
+                        <span class="status-value" id="cleanup-last-time">--</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">清理原因</span>
+                        <span class="status-value" id="cleanup-reason" style="font-size: 0.85rem;">--</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">今天日期</span>
+                        <span class="status-value" id="today-date">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="log-container">
+            <div class="log-header">
+                <h2>📋 执行日志</h2>
+                <button class="refresh-btn" onclick="loadLogs()">🔄 刷新日志</button>
+            </div>
+            <div class="log-content" id="log-content">
+                <div class="log-line loading">加载中...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 更新倒计时
+        function updateCountdown() {
+            const now = new Date();
+            const beijing = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Shanghai' }));
+            
+            // 计算下一个00:10
+            let nextExecution = new Date(beijing);
+            nextExecution.setHours(0, 10, 0, 0);
+            
+            // 如果已经过了今天的00:10，设置为明天的00:10
+            if (beijing > nextExecution) {
+                nextExecution.setDate(nextExecution.getDate() + 1);
+            }
+            
+            // 计算时间差
+            const diff = nextExecution - beijing;
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            // 更新显示
+            document.getElementById('countdown').textContent = 
+                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            document.getElementById('next-time').textContent = 
+                nextExecution.toLocaleString('zh-CN', { 
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+        }
+        
+        // 加载任务状态
+        function loadStatus() {
+            fetch('/api/daily-tasks/status')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // 更新父文件夹任务状态
+                        const parentCard = document.getElementById('task-parent-folder');
+                        const parentStatus = data.parent_folder_update || {};
+                        
+                        if (parentStatus.status === 'success') {
+                            parentCard.className = 'task-card success';
+                            document.getElementById('parent-status').textContent = '✅ 已完成';
+                            document.getElementById('parent-status').className = 'status-badge success';
+                        } else if (parentStatus.status === 'failed') {
+                            parentCard.className = 'task-card failed';
+                            document.getElementById('parent-status').textContent = '❌ 失败';
+                            document.getElementById('parent-status').className = 'status-badge failed';
+                        } else {
+                            parentCard.className = 'task-card pending';
+                            document.getElementById('parent-status').textContent = '⏳ 待执行';
+                            document.getElementById('parent-status').className = 'status-badge pending';
+                        }
+                        
+                        document.getElementById('parent-last-time').textContent = parentStatus.last_update || '--';
+                        document.getElementById('parent-folder-id').textContent = parentStatus.parent_folder_id || '--';
+                        document.getElementById('child-folder-id').textContent = parentStatus.child_folder_id || '--';
+                        
+                        // 更新清理任务状态
+                        const cleanupCard = document.getElementById('task-cleanup');
+                        const cleanupStatus = data.cleanup || {};
+                        
+                        if (cleanupStatus.last_cleanup) {
+                            cleanupCard.className = 'task-card success';
+                            document.getElementById('cleanup-status').textContent = '✅ 已完成';
+                            document.getElementById('cleanup-status').className = 'status-badge success';
+                        } else {
+                            cleanupCard.className = 'task-card pending';
+                            document.getElementById('cleanup-status').textContent = '⏳ 待执行';
+                            document.getElementById('cleanup-status').className = 'status-badge pending';
+                        }
+                        
+                        document.getElementById('cleanup-last-time').textContent = cleanupStatus.last_cleanup || '--';
+                        document.getElementById('cleanup-reason').textContent = cleanupStatus.cleanup_reason || '--';
+                        document.getElementById('today-date').textContent = data.today_date || '--';
+                    }
+                })
+                .catch(err => {
+                    console.error('获取状态失败:', err);
+                });
+        }
+        
+        // 加载日志
+        function loadLogs() {
+            fetch('/api/daily-tasks/logs')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const logContent = document.getElementById('log-content');
+                        if (data.logs && data.logs.length > 0) {
+                            logContent.innerHTML = data.logs.map(log => 
+                                `<div class="log-line">${log}</div>`
+                            ).join('');
+                        } else {
+                            logContent.innerHTML = '<div class="log-line">暂无日志</div>';
+                        }
+                        
+                        // 自动滚动到底部
+                        logContent.scrollTop = logContent.scrollHeight;
+                    }
+                })
+                .catch(err => {
+                    console.error('获取日志失败:', err);
+                    document.getElementById('log-content').innerHTML = 
+                        '<div class="log-line">❌ 加载日志失败</div>';
+                });
+        }
+        
+        // 初始加载
+        updateCountdown();
+        loadStatus();
+        loadLogs();
+        
+        // 每秒更新倒计时
+        setInterval(updateCountdown, 1000);
+        
+        // 每30秒刷新状态
+        setInterval(() => {
+            loadStatus();
+            loadLogs();
+        }, 30000);
+    </script>
+</body>
+</html>

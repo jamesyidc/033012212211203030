@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚠️ 锚点单预警监控</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            color: #667eea;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-card .value {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .stat-card.critical .value {
+            color: #ef4444;
+        }
+
+        .stat-card.warning .value {
+            color: #f59e0b;
+        }
+
+        .stat-card.normal .value {
+            color: #10b981;
+        }
+
+        .stat-card.total .value {
+            color: #667eea;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .warnings-section, .logs-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .warning-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+        .warning-card:hover {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .warning-card.critical {
+            border-color: #ef4444;
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        }
+
+        .warning-card.warning {
+            border-color: #f59e0b;
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+        }
+
+        .warning-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .warning-title {
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .warning-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge-critical {
+            background: #ef4444;
+            color: white;
+        }
+
+        .badge-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .warning-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .detail-label {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .warning-message {
+            background: rgba(255,255,255,0.5);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid;
+        }
+
+        .warning-card.critical .warning-message {
+            border-left-color: #ef4444;
+        }
+
+        .warning-card.warning .warning-message {
+            border-left-color: #f59e0b;
+        }
+
+        .warning-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .log-table th,
+        .log-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .log-table th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .log-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .action-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .action-create {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .action-update {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .action-close {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state-text {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .auto-refresh {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+        }
+
+        .auto-refresh label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #667eea;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        .back-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            background: white;
+            border-radius: 50px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <span>⚠️</span>
+                <span>锚点单预警监控系统</span>
+            </h1>
+            <p>实时监控锚点单风险，提供-8%预警和-10%维护信号</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-card total">
+                <div class="value" id="total-anchors">-</div>
+                <div class="label">监控锚点单</div>
+            </div>
+            <div class="stat-card critical">
+                <div class="value" id="critical-warnings">-</div>
+                <div class="label">临界预警 (≤-10%)</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="value" id="normal-warnings">-</div>
+                <div class="label">普通预警 (-8%~-10%)</div>
+            </div>
+            <div class="stat-card normal">
+                <div class="value" id="safe-count">-</div>
+                <div class="label">正常状态</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="scanWarnings()">
+                <span>🔍</span>
+                <span>立即扫描</span>
+            </button>
+            <button class="btn btn-success" onclick="loadActiveWarnings()">
+                <span>🔄</span>
+                <span>刷新预警</span>
+            </button>
+            <button class="btn btn-warning" onclick="loadWarningLogs()">
+                <span>📋</span>
+                <span>查看日志</span>
+            </button>
+            
+            <div class="auto-refresh">
+                <label>自动刷新</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="auto-refresh-toggle" onchange="toggleAutoRefresh()">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="warnings-section">
+            <div class="section-title">
+                <span>⚠️</span>
+                <span>活跃预警</span>
+                <span style="margin-left: auto; font-size: 14px; color: #666;" id="last-update">-</span>
+            </div>
+            <div id="warnings-container">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>加载中...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="logs-section">
+            <div class="section-title">
+                <span>📋</span>
+                <span>操作日志</span>
+            </div>
+            <div id="logs-container">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>加载中...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="/trading-manager" class="back-btn">
+        <span>←</span>
+        <span>返回交易管理</span>
+    </a>
+
+    <script>
+        let autoRefreshInterval = null;
+
+        // 页面加载时执行
+        window.onload = function() {
+            loadActiveWarnings();
+            loadWarningLogs();
+        };
+
+        // 扫描预警
+        function scanWarnings() {
+            const btn = event.target.closest('.btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span>🔄</span><span>扫描中...</span>';
+            btn.disabled = true;
+
+            fetch('/api/trading/anchor-warning/scan', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`✅ 扫描完成\n\n扫描锚点单: ${data.total_scanned}个\n活跃预警: ${data.warnings_count}个`);
+                    loadActiveWarnings();
+                    loadWarningLogs();
+                } else {
+                    alert(`❌ 扫描失败: ${data.error || '未知错误'}`);
+                }
+            })
+            .catch(err => {
+                alert(`❌ 请求失败: ${err.message}`);
+            })
+            .finally(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        }
+
+        // 加载活跃预警
+        function loadActiveWarnings() {
+            document.getElementById('warnings-container').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>加载中...</p>
+                </div>
+            `;
+
+            fetch('/api/trading/anchor-warning/active')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateStats(data);
+                    renderWarnings(data.warnings);
+                    document.getElementById('last-update').textContent = `最后更新: ${new Date().toLocaleTimeString()}`;
+                } else {
+                    document.getElementById('warnings-container').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">❌</div>
+                            <div class="empty-state-text">加载失败</div>
+                            <p>${data.error || '未知错误'}</p>
+                        </div>
+                    `;
+                }
+            })
+            .catch(err => {
+                document.getElementById('warnings-container').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">❌</div>
+                        <div class="empty-state-text">网络错误</div>
+                        <p>${err.message}</p>
+                    </div>
+                `;
+            });
+        }
+
+        // 更新统计数据
+        function updateStats(data) {
+            const warnings = data.warnings || [];
+            const criticalCount = warnings.filter(w => w.warning_level === 'critical').length;
+            const warningCount = warnings.filter(w => w.warning_level === 'warning').length;
+            
+            document.getElementById('total-anchors').textContent = data.total || 0;
+            document.getElementById('critical-warnings').textContent = criticalCount;
+            document.getElementById('normal-warnings').textContent = warningCount;
+            document.getElementById('safe-count').textContent = (data.total || 0) - warnings.length;
+        }
+
+        // 渲染预警列表
+        function renderWarnings(warnings) {
+            const container = document.getElementById('warnings-container');
+            
+            if (!warnings || warnings.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">✅</div>
+                        <div class="empty-state-text">暂无预警</div>
+                        <p>所有锚点单状态正常</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = warnings.map(warning => `
+                <div class="warning-card ${warning.warning_level}">
+                    <div class="warning-header">
+                        <div class="warning-title">
+                            <span>${warning.warning_level === 'critical' ? '❗' : '⚠️'}</span>
+                            <span>${warning.inst_id}</span>
+                        </div>
+                        <span class="warning-badge badge-${warning.warning_level}">
+                            ${warning.warning_level === 'critical' ? '临界预警' : '普通预警'}
+                        </span>
+                    </div>
+
+                    <div class="warning-details">
+                        <div class="detail-item">
+                            <div class="detail-label">方向</div>
+                            <div class="detail-value">${warning.pos_side === 'long' ? '做多' : '做空'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">开仓价</div>
+                            <div class="detail-value">${parseFloat(warning.open_price).toFixed(4)} USDT</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">当前价</div>
+                            <div class="detail-value">${parseFloat(warning.current_price).toFixed(4)} USDT</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">收益率 (10x)</div>
+                            <div class="detail-value" style="color: ${warning.profit_rate < 0 ? '#ef4444' : '#10b981'}">
+                                ${parseFloat(warning.profit_rate).toFixed(2)}%
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">持仓量</div>
+                            <div class="detail-value">${parseFloat(warning.open_size).toFixed(4)}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">创建时间</div>
+                            <div class="detail-value">${warning.created_at}</div>
+                        </div>
+                    </div>
+
+                    <div class="warning-message">
+                        ${warning.alert_message}
+                    </div>
+
+                    <div class="warning-actions">
+                        <button class="btn btn-danger" onclick="closeWarning(${warning.id}, '${warning.inst_id}')">
+                            <span>✓</span>
+                            <span>手动关闭</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 加载操作日志
+        function loadWarningLogs() {
+            document.getElementById('logs-container').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>加载中...</p>
+                </div>
+            `;
+
+            fetch('/api/trading/anchor-warning/logs?limit=50')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    renderLogs(data.logs);
+                } else {
+                    document.getElementById('logs-container').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">❌</div>
+                            <div class="empty-state-text">加载失败</div>
+                        </div>
+                    `;
+                }
+            })
+            .catch(err => {
+                document.getElementById('logs-container').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">❌</div>
+                        <div class="empty-state-text">网络错误</div>
+                    </div>
+                `;
+            });
+        }
+
+        // 渲染日志列表
+        function renderLogs(logs) {
+            const container = document.getElementById('logs-container');
+            
+            if (!logs || logs.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <div class="empty-state-text">暂无日志</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const actionMap = {
+                'create_warning': '创建预警',
+                'update_warning': '更新预警',
+                'close_warning': '关闭预警'
+            };
+
+            const actionClassMap = {
+                'create_warning': 'action-create',
+                'update_warning': 'action-update',
+                'close_warning': 'action-close'
+            };
+
+            container.innerHTML = `
+                <table class="log-table">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>币种</th>
+                            <th>方向</th>
+                            <th>操作</th>
+                            <th>收益率</th>
+                            <th>当前价</th>
+                            <th>操作员</th>
+                            <th>备注</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${logs.map(log => `
+                            <tr>
+                                <td>${log.created_at}</td>
+                                <td><strong>${log.inst_id}</strong></td>
+                                <td>${log.pos_side === 'long' ? '做多' : '做空'}</td>
+                                <td>
+                                    <span class="action-badge ${actionClassMap[log.action] || ''}">
+                                        ${actionMap[log.action] || log.action}
+                                    </span>
+                                </td>
+                                <td style="color: ${log.profit_rate < 0 ? '#ef4444' : '#10b981'}">
+                                    ${parseFloat(log.profit_rate).toFixed(2)}%
+                                </td>
+                                <td>${parseFloat(log.current_price).toFixed(4)}</td>
+                                <td>${log.operator}</td>
+                                <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    ${log.remark || '-'}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // 关闭预警
+        function closeWarning(warningId, instId) {
+            if (!confirm(`确定要关闭 ${instId} 的预警吗？`)) {
+                return;
+            }
+
+            const reason = prompt('请输入关闭原因（可选）:', '手动关闭') || '手动关闭';
+
+            fetch(`/api/trading/anchor-warning/close/${warningId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ reason })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ 预警已关闭');
+                    loadActiveWarnings();
+                    loadWarningLogs();
+                } else {
+                    alert(`❌ 关闭失败: ${data.error || '未知错误'}`);
+                }
+            })
+            .catch(err => {
+                alert(`❌ 请求失败: ${err.message}`);
+            });
+        }
+
+        // 切换自动刷新
+        function toggleAutoRefresh() {
+            const toggle = document.getElementById('auto-refresh-toggle');
+            
+            if (toggle.checked) {
+                // 启动自动刷新（每30秒）
+                autoRefreshInterval = setInterval(() => {
+                    loadActiveWarnings();
+                }, 30000);
+                console.log('✅ 自动刷新已启动（30秒）');
+            } else {
+                // 停止自动刷新
+                if (autoRefreshInterval) {
+                    clearInterval(autoRefreshInterval);
+                    autoRefreshInterval = null;
+                }
+                console.log('⏸️ 自动刷新已停止');
+            }
+        }
+    </script>
+</body>
+</html>

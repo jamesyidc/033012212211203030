@@ -1,0 +1,222 @@
+{
+  "date": "20260207",
+  "data_points": 1389,
+  "peaks_count": 6,
+  "false_breakout": {
+    "consecutive_peaks": 3,
+    "reference_high": 74.62,
+    "peaks": [
+      {
+        "b_point": {
+          "index": 517,
+          "timestamp": "2026-02-07T08:37:00.315182+08:00",
+          "beijing_time": "2026-02-07 08:37:00",
+          "value": 33.29
+        },
+        "a_point": {
+          "index": 641,
+          "timestamp": "2026-02-07T11:28:00.335179+08:00",
+          "beijing_time": "2026-02-07 11:28:00",
+          "value": 74.62
+        },
+        "c_point": {
+          "index": 722,
+          "timestamp": "2026-02-07T12:49:00.328967+08:00",
+          "beijing_time": "2026-02-07 12:49:00",
+          "value": 52.62
+        },
+        "amplitude": 41.330000000000005,
+        "decline": 22.000000000000007,
+        "decline_ratio": 53.23009920154852
+      },
+      {
+        "b_point": {
+          "index": 870,
+          "timestamp": "2026-02-07T15:18:00.586633+08:00",
+          "beijing_time": "2026-02-07 15:18:00",
+          "value": -42.66
+        },
+        "a_point": {
+          "index": 895,
+          "timestamp": "2026-02-07T15:43:00.334107+08:00",
+          "beijing_time": "2026-02-07 15:43:00",
+          "value": 6.59
+        },
+        "c_point": {
+          "index": 915,
+          "timestamp": "2026-02-07T16:03:00.345545+08:00",
+          "beijing_time": "2026-02-07 16:03:00",
+          "value": -26.06
+        },
+        "amplitude": 49.25,
+        "decline": 32.65,
+        "decline_ratio": 66.29441624365482
+      },
+      {
+        "b_point": {
+          "index": 1071,
+          "timestamp": "2026-02-07T18:40:00.370853+08:00",
+          "beijing_time": "2026-02-07 18:40:00",
+          "value": -40.88
+        },
+        "a_point": {
+          "index": 1182,
+          "timestamp": "2026-02-07T20:32:00.386444+08:00",
+          "beijing_time": "2026-02-07 20:32:00",
+          "value": 49.21
+        },
+        "c_point": {
+          "index": 1249,
+          "timestamp": "2026-02-07T21:40:00.396890+08:00",
+          "beijing_time": "2026-02-07 21:40:00",
+          "value": 3.4
+        },
+        "amplitude": 90.09,
+        "decline": 45.81,
+        "decline_ratio": 50.849150849150845
+      }
+    ],
+    "warning": "市场可能转跌，建议谨慎操作"
+  },
+  "peaks": [
+    {
+      "b_point": {
+        "index": 1,
+        "timestamp": "2026-02-07T00:01:00.263811+08:00",
+        "beijing_time": "2026-02-07 00:01:00",
+        "value": -4.09
+      },
+      "a_point": {
+        "index": 55,
+        "timestamp": "2026-02-07T00:55:00.267412+08:00",
+        "beijing_time": "2026-02-07 00:55:00",
+        "value": 69.84
+      },
+      "c_point": {
+        "index": 144,
+        "timestamp": "2026-02-07T02:24:00.290442+08:00",
+        "beijing_time": "2026-02-07 02:24:00",
+        "value": 28.58
+      },
+      "amplitude": 73.93,
+      "decline": 41.260000000000005,
+      "decline_ratio": 55.80954957392128
+    },
+    {
+      "b_point": {
+        "index": 148,
+        "timestamp": "2026-02-07T02:28:00.291036+08:00",
+        "beijing_time": "2026-02-07 02:28:00",
+        "value": 28.23
+      },
+      "a_point": {
+        "index": 276,
+        "timestamp": "2026-02-07T04:36:00.303340+08:00",
+        "beijing_time": "2026-02-07 04:36:00",
+        "value": 74.6
+      },
+      "c_point": {
+        "index": 298,
+        "timestamp": "2026-02-07T04:58:00.293159+08:00",
+        "beijing_time": "2026-02-07 04:58:00",
+        "value": 41.21
+      },
+      "amplitude": 46.36999999999999,
+      "decline": 33.38999999999999,
+      "decline_ratio": 72.00776364028468
+    },
+    {
+      "b_point": {
+        "index": 308,
+        "timestamp": "2026-02-07T05:08:00.319692+08:00",
+        "beijing_time": "2026-02-07 05:08:00",
+        "value": 33.63
+      },
+      "a_point": {
+        "index": 399,
+        "timestamp": "2026-02-07T06:39:00.300300+08:00",
+        "beijing_time": "2026-02-07 06:39:00",
+        "value": 95.2
+      },
+      "c_point": {
+        "index": 439,
+        "timestamp": "2026-02-07T07:19:00.317901+08:00",
+        "beijing_time": "2026-02-07 07:19:00",
+        "value": 62.44
+      },
+      "amplitude": 61.57,
+      "decline": 32.760000000000005,
+      "decline_ratio": 53.20773103784311
+    },
+    {
+      "b_point": {
+        "index": 517,
+        "timestamp": "2026-02-07T08:37:00.315182+08:00",
+        "beijing_time": "2026-02-07 08:37:00",
+        "value": 33.29
+      },
+      "a_point": {
+        "index": 641,
+        "timestamp": "2026-02-07T11:28:00.335179+08:00",
+        "beijing_time": "2026-02-07 11:28:00",
+        "value": 74.62
+      },
+      "c_point": {
+        "index": 722,
+        "timestamp": "2026-02-07T12:49:00.328967+08:00",
+        "beijing_time": "2026-02-07 12:49:00",
+        "value": 52.62
+      },
+      "amplitude": 41.330000000000005,
+      "decline": 22.000000000000007,
+      "decline_ratio": 53.23009920154852
+    },
+    {
+      "b_point": {
+        "index": 870,
+        "timestamp": "2026-02-07T15:18:00.586633+08:00",
+        "beijing_time": "2026-02-07 15:18:00",
+        "value": -42.66
+      },
+      "a_point": {
+        "index": 895,
+        "timestamp": "2026-02-07T15:43:00.334107+08:00",
+        "beijing_time": "2026-02-07 15:43:00",
+        "value": 6.59
+      },
+      "c_point": {
+        "index": 915,
+        "timestamp": "2026-02-07T16:03:00.345545+08:00",
+        "beijing_time": "2026-02-07 16:03:00",
+        "value": -26.06
+      },
+      "amplitude": 49.25,
+      "decline": 32.65,
+      "decline_ratio": 66.29441624365482
+    },
+    {
+      "b_point": {
+        "index": 1071,
+        "timestamp": "2026-02-07T18:40:00.370853+08:00",
+        "beijing_time": "2026-02-07 18:40:00",
+        "value": -40.88
+      },
+      "a_point": {
+        "index": 1182,
+        "timestamp": "2026-02-07T20:32:00.386444+08:00",
+        "beijing_time": "2026-02-07 20:32:00",
+        "value": 49.21
+      },
+      "c_point": {
+        "index": 1249,
+        "timestamp": "2026-02-07T21:40:00.396890+08:00",
+        "beijing_time": "2026-02-07 21:40:00",
+        "value": 3.4
+      },
+      "amplitude": 90.09,
+      "decline": 45.81,
+      "decline_ratio": 50.849150849150845
+    }
+  ],
+  "processed_at": "2026-02-18T09:45:44.359996"
+}

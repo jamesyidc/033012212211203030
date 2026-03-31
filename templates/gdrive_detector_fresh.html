@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Google Drive TXT监控 (无缓存)</title>
+    <link rel="stylesheet" href="/static/css/style.css?v={{ timestamp }}">
+</head>
+<body>
+    <div style="padding: 20px; font-family: Arial, sans-serif;">
+        <h1>🔍 Google Drive TXT 文件监控</h1>
+        <div style="background: #f0f0f0; padding: 15px; margin: 20px 0; border-radius: 8px;">
+            <h2>检测器状态</h2>
+            <div style="font-size: 18px; margin: 10px 0;">
+                运行状态: <span id="status-text" style="font-weight: bold; color: #666;">加载中...</span>
+                <span id="indicator" style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #ccc; margin-left: 10px;"></span>
+            </div>
+            <div style="font-size: 14px; color: #666; margin: 5px 0;">
+                最后检查: <span id="last-check">--</span>
+            </div>
+            <div style="font-size: 14px; color: #666; margin: 5px 0;">
+                文件时间: <span id="file-time">--</span>
+            </div>
+            <div style="font-size: 14px; color: #666; margin: 5px 0;">
+                数据延迟: <span id="delay">--</span>
+            </div>
+        </div>
+        
+        <div style="background: #f0f0f0; padding: 15px; margin: 20px 0; border-radius: 8px;">
+            <h2>TXT 文件列表 (<span id="file-count">0</span> 个文件)</h2>
+            <div id="file-list" style="max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 13px;">
+                加载中...
+            </div>
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <button onclick="loadAll()" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">🔄 刷新数据</button>
+            <a href="/gdrive-detector" style="margin-left: 15px; text-decoration: none; color: #007bff;">返回原页面</a>
+        </div>
+    </div>
+    
+    <script>
+        async function loadStatus() {
+            try {
+                const response = await fetch('/api/gdrive-detector/status?' + Date.now());
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    const data = result.data;
+                    const statusEl = document.getElementById('status-text');
+                    const indicator = document.getElementById('indicator');
+                    
+                    if (data.detector_running) {
+                        statusEl.textContent = '✅ 运行中';
+                        statusEl.style.color = '#28a745';
+                        indicator.style.background = '#28a745';
+                    } else {
+                        statusEl.textContent = '❌ 已停止';
+                        statusEl.style.color = '#dc3545';
+                        indicator.style.background = '#dc3545';
+                    }
+                    
+                    document.getElementById('last-check').textContent = data.last_check_time || '--';
+                    document.getElementById('file-time').textContent = data.file_timestamp || '--';
+                    document.getElementById('delay').textContent = data.delay_minutes ? data.delay_minutes.toFixed(1) + ' 分钟' : '--';
+                }
+            } catch (error) {
+                console.error('加载状态失败:', error);
+                document.getElementById('status-text').textContent = '❌ 加载失败';
+                document.getElementById('status-text').style.color = '#dc3545';
+            }
+        }
+        
+        async function loadFiles() {
+            try {
+                const response = await fetch('/api/gdrive-detector/txt-files?' + Date.now());
+                const result = await response.json();
+                
+                if (result.files && result.files.length > 0) {
+                    document.getElementById('file-count').textContent = result.files.length;
+                    const fileList = result.files.slice(0, 50).map((file, index) => 
+                        `<div style="padding: 5px; ${index % 2 === 0 ? 'background: #fff;' : ''}">${index + 1}. ${file}</div>`
+                    ).join('');
+                    document.getElementById('file-list').innerHTML = fileList;
+                } else {
+                    document.getElementById('file-list').innerHTML = '<div style="color: #999;">暂无文件</div>';
+                }
+            } catch (error) {
+                console.error('加载文件失败:', error);
+                document.getElementById('file-list').innerHTML = '<div style="color: #dc3545;">加载失败</div>';
+            }
+        }
+        
+        function loadAll() {
+            loadStatus();
+            loadFiles();
+        }
+        
+        // 初始加载
+        loadAll();
+        
+        // 每10秒自动刷新
+        setInterval(loadAll, 10000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{"timestamp": "2026-03-19 10:59:36", "account": "A", "direction": "long", "strategy": ["前8"], "mode": "multi"}
+{"timestamp": "2026-03-19 12:02:02", "account": "A", "direction": "long", "strategy": ["前8", "BTC50"], "mode": "multi"}
+{"timestamp": "2026-03-19 13:33:52", "account": "A", "direction": "long", "strategy": ["前8", "BTC50", "ETH50"], "mode": "multi"}
+{"timestamp": "2026-03-19 15:40:00", "account": "A", "direction": "long", "strategy": ["前8", "ETH50"], "mode": "multi"}
+{"timestamp": "2026-03-19 15:40:00", "account": "A", "direction": "long", "strategy": ["ETH50"], "mode": "multi"}
+{"timestamp": "2026-03-19 15:44:40", "account": "A", "direction": "long", "strategy": ["ETH50"], "mode": "multi"}
+{"timestamp": "2026-03-19 15:48:45", "account": "A", "direction": "long", "strategy": ["ETH50"], "mode": "multi"}
+{"timestamp": "2026-03-19 16:02:10", "account": "A", "direction": "long", "strategy": ["ETH50"], "mode": "multi"}

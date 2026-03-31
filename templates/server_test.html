@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>服务器测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .status {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .success {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .info {
+            margin-top: 20px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .link-box {
+            background: rgba(255,255,255,0.2);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        .link-box a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        .link-box a:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateX(5px);
+        }
+    </style>
+</head>
+<body>
+    <div class="status">
+        <div class="success">✅</div>
+        <h1>Flask 服务器运行正常！</h1>
+        <p>如果您能看到这个页面，说明服务器完全正常工作。</p>
+        
+        <div class="info">
+            <p>📅 当前时间: <span id="time"></span></p>
+            <p>🔧 服务器: Flask (Python)</p>
+            <p>✨ 状态: 运行中</p>
+        </div>
+        
+        <div class="link-box">
+            <h2>📊 可用页面列表：</h2>
+            <a href="/okx-trading-marks">1. OKX交易标记系统 (原始URL)</a>
+            <a href="/okx-trading-marks-v2">2. OKX交易标记系统 V2</a>
+            <a href="/okx-trading-marks-v3">3. OKX交易标记系统 V3 (最新)</a>
+            <a href="/coin-change-tracker">4. 币价追踪系统</a>
+            <a href="/">5. 返回首页</a>
+        </div>
+    </div>
+    
+    <script>
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('time').textContent = now.toLocaleString('zh-CN');
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+        
+        console.log('✅ 服务器测试页面加载成功');
+        console.log('📊 Flask服务器正常运行');
+        console.log('🔗 URL:', window.location.href);
+    </script>
+</body>
+</html>

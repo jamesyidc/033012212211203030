@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>恐慌清洗指数 - 独立系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: #16213e;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        .title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #00d4ff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #00d4ff33;
+        }
+        
+        .stat-card.green {
+            background: linear-gradient(135deg, #0a3d2e 0%, #134e3a 100%);
+            border-color: #38ef7d33;
+        }
+        
+        .stat-card.yellow {
+            background: linear-gradient(135deg, #3d2a0a 0%, #4e3a13 100%);
+            border-color: #f5576c33;
+        }
+        
+        .stat-card.red {
+            background: linear-gradient(135deg, #3d0a0a 0%, #4e1313 100%);
+            border-color: #ff4757aa;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+        
+        .stat-unit {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+        
+        .chart-container {
+            background: #16213e;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid #00d4ff33;
+        }
+        
+        .chart-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00d4ff;
+            margin-bottom: 20px;
+        }
+        
+        .chart {
+            width: 100%;
+            height: 500px;
+        }
+        
+        .update-time {
+            text-align: center;
+            color: #888;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #00d4ff;
+            font-size: 18px;
+        }
+        
+        .system-info {
+            background: #16213e;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #00d4ff33;
+        }
+        
+        .system-info h3 {
+            color: #00d4ff;
+            margin-bottom: 15px;
+        }
+        
+        .system-info pre {
+            background: #0f1419;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            color: #0f0;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            opacity: 0.8;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">📊 恐慌清洗指数 - 独立系统</div>
+            <div class="stats-grid" id="statsGrid">
+                <div class="loading">正在加载数据...</div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">📈 24小时爆仓 + 全网持仓 + 恐慌指数</div>
+            <div id="chart24h" class="chart"></div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">⚡ 1小时爆仓金额</div>
+            <div id="chart1h" class="chart"></div>
+        </div>
+        
+        <div class="update-time" id="updateTime"></div>
+        
+        <div class="system-info">
+            <h3>🔧 系统说明</h3>
+            <pre id="systemInfo">正在初始化...</pre>
+            <div style="text-align: center; margin-top: 15px;">
+                <button class="btn" onclick="collectData()">手动采集一次</button>
+                <button class="btn" onclick="exportData()">导出今日数据</button>
+                <button class="btn" onclick="clearOldData()">清理旧数据</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================================
+        // 数据采集与存储系统
+        // ============================================================================
+        
+        const STORAGE_KEY_PREFIX = 'panic_data_';
+        const BTC126_API = 'https://api.btc126.com/bicoin.php';
+        const COLLECT_INTERVAL = 60000; // 60秒采集一次
+        
+        // 获取北京时间
+        function getBeijingTime() {
+            const date = new Date();
+            const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
+            const beijing = new Date(utc + (8 * 3600000));
+            return beijing;
+        }
+        
+        // 格式化时间
+        function formatTime(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            const h = String(date.getHours()).padStart(2, '0');
+            const min = String(date.getMinutes()).padStart(2, '0');
+            const s = String(date.getSeconds()).padStart(2, '0');
+            return `${y}-${m}-${d} ${h}:${min}:${s}`;
+        }
+        
+        // 获取日期字符串 YYYYMMDD
+        function getDateString(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}${m}${d}`;
+        }
+        
+        // 从BTC126采集数据
+        async function collectFromBTC126() {
+            try {
+                const ts = Date.now();
+                
+                // 1. 获取爆仓数据
+                const resp1 = await fetch(`${BTC126_API}?from=24hbaocang&t=${ts}`);
+                const liquidationData = await resp1.json();
+                
+                if (liquidationData.code !== 0) {
+                    throw new Error('爆仓数据API错误');
+                }
+                
+                // 2. 获取全网持仓
+                const resp2 = await fetch(`${BTC126_API}?from=realhold&t=${ts}`);
+                const openInterestData = await resp2.json();
+                
+                if (openInterestData.code !== 0) {
+                    throw new Error('持仓数据API错误');
+                }
+                
+                // 3. 提取数据
+                const liqData = liquidationData.data;
+                const liquidation_1h = Math.round(liqData.totalBlastUsd1h / 10000 * 100) / 100;
+                const liquidation_24h = Math.round(liqData.totalBlastUsd24h / 10000 * 100) / 100;
+                const liquidation_count_24h = Math.round(liqData.totalBlastNum24h / 10000 * 100) / 100;
+                
+                // 4. 找到全网持仓
+                let open_interest = 0;
+                for (const item of openInterestData.data) {
+                    const exchange = item.exchange || '';
+                    const exchangeOther = item.exchangeOtherName || '';
+                    if (exchange.includes('全网总计') || exchangeOther.includes('Net total')) {
+                        open_interest = Math.round(item.amount / 100000000 * 100) / 100;
+                        break;
+                    }
+                }
+                
+                // 5. 数据验证
+                if (liquidation_count_24h > 100 || open_interest <= 0 || open_interest > 200) {
+                    throw new Error('数据异常');
+                }
+                
+                // 6. 计算恐慌指数
+                const panic_index = Math.round(liquidation_count_24h / open_interest * 10000) / 10000;
+                
+                // 7. 确定恐慌级别
+                let panic_level = '低恐慌';
+                if (panic_index > 0.15) panic_level = '高恐慌';
+                else if (panic_index > 0.08) panic_level = '中等恐慌';
+                
+                // 8. 构建记录
+                const now = getBeijingTime();
+                const record = {
+                    liquidation_1h,
+                    liquidation_24h,
+                    liquidation_count_24h,
+                    open_interest,
+                    panic_index,
+                    panic_level,
+                    timestamp: now.getTime(),
+                    beijing_time: formatTime(now)
+                };
+                
+                return record;
+                
+            } catch (error) {
+                console.error('采集失败:', error);
+                return null;
+            }
+        }
+        
+        // 保存数据到LocalStorage（按日期）
+        function saveData(record) {
+            if (!record) return false;
+            
+            try {
+                const dateStr = getDateString(new Date(record.timestamp));
+                const key = STORAGE_KEY_PREFIX + dateStr;
+                
+                // 读取当天数据
+                let dayData = [];
+                const stored = localStorage.getItem(key);
+                if (stored) {
+                    dayData = JSON.parse(stored);
+                }
+                
+                // 追加新记录
+                dayData.push(record);
+                
+                // 保存
+                localStorage.setItem(key, JSON.stringify(dayData));
+                
+                console.log(`[保存成功] ${record.beijing_time} | 恐慌指数: ${record.panic_index}`);
+                return true;
+                
+            } catch (error) {
+                console.error('[保存失败]', error);
+                return false;
+            }
+        }
+        
+        // 加载指定日期的数据
+        function loadDayData(dateStr) {
+            try {
+                const key = STORAGE_KEY_PREFIX + dateStr;
+                const stored = localStorage.getItem(key);
+                return stored ? JSON.parse(stored) : [];
+            } catch {
+                return [];
+            }
+        }
+        
+        // 加载最近N天数据
+        function loadRecentData(days = 7) {
+            const allData = [];
+            const now = getBeijingTime();
+            
+            for (let i = 0; i < days; i++) {
+                const date = new Date(now.getTime() - i * 86400000);
+                const dateStr = getDateString(date);
+                const dayData = loadDayData(dateStr);
+                allData.push(...dayData);
+            }
+            
+            // 按时间戳排序
+            allData.sort((a, b) => a.timestamp - b.timestamp);
+            
+            return allData;
+        }
+        
+        // 加载最近24小时数据
+        function load24hData() {
+            const allData = loadRecentData(2);
+            const now = Date.now();
+            const cutoff = now - 24 * 60 * 60 * 1000;
+            
+            return allData.filter(d => d.timestamp >= cutoff);
+        }
+        
+        // 手动采集一次
+        async function collectData() {
+            updateSystemInfo('正在采集数据...');
+            const record = await collectFromBTC126();
+            if (record) {
+                saveData(record);
+                await loadAndDisplay();
+                updateSystemInfo(`采集成功！时间: ${record.beijing_time}`);
+            } else {
+                updateSystemInfo('采集失败，请稍后重试');
+            }
+        }
+        
+        // 导出今日数据
+        function exportData() {
+            const today = getDateString(getBeijingTime());
+            const data = loadDayData(today);
+            
+            if (data.length === 0) {
+                alert('今日暂无数据');
+                return;
+            }
+            
+            // 生成JSONL格式
+            const jsonl = data.map(d => JSON.stringify(d)).join('\n');
+            
+            // 下载
+            const blob = new Blob([jsonl], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `panic_${today}.jsonl`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            updateSystemInfo(`导出成功：${data.length} 条记录`);
+        }
+        
+        // 清理30天前的旧数据
+        function clearOldData() {
+            const cutoff = Date.now() - 30 * 86400000;
+            let cleared = 0;
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith(STORAGE_KEY_PREFIX)) {
+                    const dateStr = key.replace(STORAGE_KEY_PREFIX, '');
+                    const y = parseInt(dateStr.substr(0, 4));
+                    const m = parseInt(dateStr.substr(4, 2)) - 1;
+                    const d = parseInt(dateStr.substr(6, 2));
+                    const date = new Date(y, m, d);
+                    
+                    if (date.getTime() < cutoff) {
+                        localStorage.removeItem(key);
+                        cleared++;
+                        i--;
+                    }
+                }
+            }
+            
+            updateSystemInfo(`清理完成：删除 ${cleared} 天的旧数据`);
+        }
+        
+        // 自动采集循环
+        async function autoCollect() {
+            await collectData();
+            setTimeout(autoCollect, COLLECT_INTERVAL);
+        }
+        
+        // ============================================================================
+        // 图表显示
+        // ============================================================================
+        
+        let chart24h = null;
+        let chart1h = null;
+        
+        function initCharts() {
+            chart24h = echarts.init(document.getElementById('chart24h'), 'dark');
+            chart1h = echarts.init(document.getElementById('chart1h'), 'dark');
+            
+            window.addEventListener('resize', () => {
+                chart24h.resize();
+                chart1h.resize();
+            });
+        }
+        
+        function updateStats(data) {
+            const panicIndex = data.panic_index || 0;
+            let cardClass = 'green';
+            if (panicIndex > 0.15) cardClass = 'red';
+            else if (panicIndex > 0.08) cardClass = 'yellow';
+            
+            const html = `
+                <div class="stat-card ${cardClass}">
+                    <div class="stat-label">恐慌清洗指数</div>
+                    <div class="stat-value">${(panicIndex * 100).toFixed(2)}%</div>
+                    <div class="stat-unit">${data.panic_level || '低恐慌'}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">1小时爆仓金额</div>
+                    <div class="stat-value">$${data.liquidation_1h || 0}</div>
+                    <div class="stat-unit">万美元</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">24小时爆仓金额</div>
+                    <div class="stat-value">$${data.liquidation_24h || 0}</div>
+                    <div class="stat-unit">万美元</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">24小时爆仓人数</div>
+                    <div class="stat-value">${data.liquidation_count_24h || 0}</div>
+                    <div class="stat-unit">万人</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">全网持仓量</div>
+                    <div class="stat-value">$${data.open_interest || 0}</div>
+                    <div class="stat-unit">亿美元</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">最后更新</div>
+                    <div class="stat-value">${data.beijing_time ? data.beijing_time.split(' ')[1] : '--:--:--'}</div>
+                    <div class="stat-unit">每1分钟更新</div>
+                </div>
+            `;
+            
+            document.getElementById('statsGrid').innerHTML = html;
+        }
+        
+        function update24hChart(data) {
+            if (!data || data.length === 0) return;
+            
+            const times = data.map(d => d.beijing_time.split(' ')[1]);
+            const liquidation24h = data.map(d => d.liquidation_24h || 0);
+            const openInterest = data.map(d => d.open_interest || 0);
+            const panicIndex = data.map(d => (d.panic_index || 0) * 100);
+            
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'cross' },
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    borderColor: '#00d4ff',
+                    textStyle: { color: '#fff' }
+                },
+                legend: {
+                    data: ['24小时爆仓', '全网持仓', '恐慌指数'],
+                    top: 0,
+                    textStyle: { color: '#00d4ff' }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: times,
+                    axisLabel: { 
+                        rotate: 45,
+                        color: '#888'
+                    },
+                    axisLine: { lineStyle: { color: '#00d4ff44' } }
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '爆仓(万$)',
+                        position: 'left',
+                        axisLabel: { color: '#888' },
+                        axisLine: { lineStyle: { color: '#00d4ff44' } },
+                        splitLine: { lineStyle: { color: '#00d4ff22' } }
+                    },
+                    {
+                        type: 'value',
+                        name: '持仓(亿$)',
+                        position: 'right',
+                        axisLabel: { color: '#888' },
+                        axisLine: { lineStyle: { color: '#00d4ff44' } },
+                        splitLine: { show: false }
+                    },
+                    {
+                        type: 'value',
+                        name: '恐慌(%)',
+                        position: 'right',
+                        offset: 80,
+                        axisLabel: { color: '#888' },
+                        axisLine: { lineStyle: { color: '#00d4ff44' } },
+                        splitLine: { show: false }
+                    }
+                ],
+                series: [
+                    {
+                        name: '24小时爆仓',
+                        type: 'line',
+                        data: liquidation24h,
+                        yAxisIndex: 0,
+                        smooth: true,
+                        lineStyle: { width: 3, color: '#667eea' },
+                        itemStyle: { color: '#667eea' }
+                    },
+                    {
+                        name: '全网持仓',
+                        type: 'line',
+                        data: openInterest,
+                        yAxisIndex: 1,
+                        smooth: true,
+                        lineStyle: { width: 2, color: '#38ef7d' },
+                        itemStyle: { color: '#38ef7d' }
+                    },
+                    {
+                        name: '恐慌指数',
+                        type: 'line',
+                        data: panicIndex,
+                        yAxisIndex: 2,
+                        smooth: true,
+                        lineStyle: { width: 2, color: '#f5576c', type: 'dashed' },
+                        itemStyle: { color: '#f5576c' }
+                    }
+                ]
+            };
+            
+            chart24h.setOption(option);
+        }
+        
+        function update1hChart(data) {
+            if (!data || data.length === 0) return;
+            
+            const times = data.map(d => d.beijing_time.split(' ')[1]);
+            const liquidation1h = data.map(d => d.liquidation_1h || 0);
+            
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    borderColor: '#00d4ff',
+                    textStyle: { color: '#fff' }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: times,
+                    axisLabel: { 
+                        rotate: 45,
+                        color: '#888'
+                    },
+                    axisLine: { lineStyle: { color: '#00d4ff44' } }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '1小时爆仓(万$)',
+                    axisLabel: { color: '#888' },
+                    axisLine: { lineStyle: { color: '#00d4ff44' } },
+                    splitLine: { lineStyle: { color: '#00d4ff22' } }
+                },
+                series: [{
+                    name: '1小时爆仓',
+                    type: 'line',
+                    data: liquidation1h,
+                    smooth: true,
+                    lineStyle: { 
+                        width: 3, 
+                        color: '#667eea'
+                    },
+                    itemStyle: { 
+                        color: '#667eea'
+                    },
+                    areaStyle: {
+                        color: {
+                            type: 'linear',
+                            x: 0, y: 0, x2: 0, y2: 1,
+                            colorStops: [
+                                { offset: 0, color: 'rgba(102, 126, 234, 0.5)' },
+                                { offset: 1, color: 'rgba(118, 75, 162, 0.1)' }
+                            ]
+                        }
+                    }
+                }]
+            };
+            
+            chart1h.setOption(option);
+        }
+        
+        async function loadAndDisplay() {
+            const data24h = load24hData();
+            
+            if (data24h.length > 0) {
+                updateStats(data24h[data24h.length - 1]);
+                document.getElementById('updateTime').textContent = 
+                    `最后更新: ${data24h[data24h.length - 1].beijing_time}`;
+                
+                update24hChart(data24h);
+                update1hChart(data24h);
+            } else {
+                document.getElementById('statsGrid').innerHTML = 
+                    '<div class="loading">暂无数据，正在采集...</div>';
+            }
+            
+            updateSystemInfo('数据加载完成');
+        }
+        
+        function updateSystemInfo(message) {
+            const today = getDateString(getBeijingTime());
+            const todayData = loadDayData(today);
+            const totalDays = Object.keys(localStorage).filter(k => k.startsWith(STORAGE_KEY_PREFIX)).length;
+            
+            const info = `
+═══════════════════════════════════════════════════════════════
+  恐慌清洗指数 - 独立系统
+═══════════════════════════════════════════════════════════════
+
+📊 数据统计
+  • 今日记录数: ${todayData.length} 条
+  • 总天数: ${totalDays} 天
+  • 存储位置: LocalStorage (浏览器本地)
+  • 数据格式: JSONL (每天一个文件)
+
+⚙️ 系统配置
+  • 采集频率: 每 60 秒
+  • 数据源: https://history.btc126.com/baocang/
+  • 自动清理: 保留最近 30 天
+
+📐 核心公式
+  恐慌指数 = 24H爆仓人数(万人) / 全网持仓(亿$)
+
+🎨 显示功能
+  • 24小时三线图: 爆仓 + 持仓 + 恐慌指数
+  • 1小时线图: 爆仓金额趋势
+
+💾 数据存储格式
+  Key: panic_data_YYYYMMDD
+  Value: [
+    {
+      "liquidation_1h": 3832.76,
+      "liquidation_24h": 17653.97,
+      "liquidation_count_24h": 7.35,
+      "open_interest": 56.41,
+      "panic_index": 0.1304,
+      "panic_level": "中等恐慌",
+      "timestamp": 1770791852482,
+      "beijing_time": "2026-02-11 14:37:32"
+    }
+  ]
+
+🔄 状态: ${message}
+═══════════════════════════════════════════════════════════════
+            `;
+            
+            document.getElementById('systemInfo').textContent = info;
+        }
+        
+        // ============================================================================
+        // 初始化
+        // ============================================================================
+        
+        window.addEventListener('load', async () => {
+            initCharts();
+            await loadAndDisplay();
+            
+            // 立即采集一次
+            await collectData();
+            
+            // 定时刷新显示
+            setInterval(loadAndDisplay, 60000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,3489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OKX交易标记系统 V3.1 - 角度标记优化 ⚡ 性能优化V2.0</title>
+    
+    <!-- 强制刷新缓存 -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js?v={{ cache_bust }}"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+                'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #2d3748;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .home-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+        }
+
+        .date-navigation {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .nav-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .date-display {
+            padding: 8px 20px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #667eea;
+            font-size: 16px;
+        }
+
+        .date-input {
+            padding: 8px 12px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        /* 说明文档框样式 */
+        .info-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            margin-top: 15px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .info-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+            transition: all 0.3s;
+        }
+
+        .info-header:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #654a8c 100%);
+        }
+
+        .info-header-title {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-toggle {
+            font-size: 20px;
+            transition: transform 0.3s;
+        }
+
+        .info-toggle.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .info-content {
+            max-height: 600px;
+            overflow-y: auto;
+            padding: 20px;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .info-content.collapsed {
+            max-height: 0;
+            padding: 0 20px;
+            overflow: hidden;
+        }
+
+        .info-section {
+            margin-bottom: 20px;
+        }
+
+        .info-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .info-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-list li {
+            padding: 8px 0;
+            color: #4a5568;
+            line-height: 1.6;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .info-list li::before {
+            content: "▸";
+            color: #667eea;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .info-card {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-card-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .info-card-content {
+            color: #718096;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+
+        #mainChart {
+            width: 100%;
+            height: 600px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #718096;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .trade-list-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .trade-list-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .trade-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .trade-table th {
+            background: #f7fafc;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #4a5568;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .trade-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .trade-table tr:hover {
+            background: #f7fafc;
+        }
+
+        .trade-type {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 12px;
+            display: inline-block;
+        }
+
+        .long-buy {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .long-sell {
+            background: #c6f6d5;
+            color: #2f855a;
+        }
+
+        .short-buy {
+            background: #feebc8;
+            color: #c05621;
+        }
+
+        .short-sell {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+
+        .merged-badge {
+            background: #edf2f7;
+            color: #4a5568;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            margin-left: 8px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>
+                <span>📊 OKX交易标记系统 V3.0 ⚡ <span style="color: #16a34a;">性能优化V2.0：加载提升91.6% (10s→0.8s)</span></span>
+                <a href="/" class="home-btn">
+                    🏠 返回首页
+                </a>
+            </h1>
+            <p style="color: #718096; margin-top: 5px;">主账户交易历史 · 2分钟内自动合并</p>
+            
+            <!-- 日期导航 -->
+            <div class="date-navigation">
+                <button class="nav-btn" onclick="previousDay()">◀ 前一天</button>
+                <div class="date-display" id="currentDateDisplay">2026-02-10</div>
+                <button class="nav-btn" onclick="nextDay()">后一天 ▶</button>
+                <input type="date" id="dateSelector" class="date-input" onchange="selectDate()">
+                <button class="nav-btn" onclick="loadTodayData()">今天</button>
+            </div>
+            
+            <!-- 日期提示 -->
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 20px; border-radius: 10px; margin-top: 15px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);">
+                <span style="font-size: 24px;">💡</span>
+                <div style="flex: 1;">
+                    <div style="font-weight: bold; margin-bottom: 4px;">📅 日期导航提示</div>
+                    <div style="font-size: 14px; opacity: 0.95;">
+                        当前显示 <strong id="currentDateHint">今天</strong> 的数据。如需查看历史交易记录，请点击 <strong>◀ 前一天</strong> 按钮，或使用日期选择器。
+                        <span style="opacity: 0.8; margin-left: 10px;">（系统已导入2月1日-25日的数据）</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 说明文档面板 -->
+            <div class="info-panel">
+                <div class="info-header" onclick="toggleInfoPanel()">
+                    <div class="info-header-title">
+                        <span>📖</span>
+                        <span>系统说明文档</span>
+                    </div>
+                    <span class="info-toggle" id="infoToggle">▼</span>
+                </div>
+                <div class="info-content collapsed" id="infoContent">
+                    <!-- 图表标记说明 -->
+                    <div class="info-section">
+                        <div class="info-section-title">📊 图表标记说明</div>
+                        <div class="info-grid">
+                            <div class="info-card">
+                                <div class="info-card-title">🔺 角度标记（峰值/谷底）</div>
+                                <div class="info-card-content">
+                                    <strong>上升角度：</strong><br>
+                                    🔺 红色三角形 = 上升锐角（< 45°）<br>
+                                    🟧 橙色方块 = 上升钝角（≥ 45°）<br><br>
+                                    <strong>下降角度：</strong><br>
+                                    🔻 蓝色倒三角 = 下降锐角（< 45°）<br>
+                                    💎 紫色菱形 = 下降钝角（≥ 45°）
+                                </div>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-card-title">🎯 交易标记</div>
+                                <div class="info-card-content">
+                                    🔴 红色圆圈 = 多单开仓<br>
+                                    🟢 绿色圆圈 = 多单平仓<br>
+                                    🟠 橙色菱形 = 空单开仓<br>
+                                    🔵 蓝色菱形 = 空单平仓<br><br>
+                                    <em>* 2分钟内的交易自动合并显示</em>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 数据来源 -->
+                    <div class="info-section">
+                        <div class="info-section-title">📁 数据来源与存储</div>
+                        <ul class="info-list">
+                            <li><strong>趋势数据：</strong>data/coin_change_tracker/coin_change_YYYYMMDD.jsonl - 27币种累计涨跌幅，每5分钟更新</li>
+                            <li><strong>角度数据：</strong>data/okx_angle_analysis/okx_angles_YYYYMMDD.jsonl - 峰值/谷底角度分析</li>
+                            <li><strong>交易历史：</strong>data/okx_trading_history/okx_trades_YYYYMMDD.jsonl - OKX主账户成交记录（SWAP+SPOT），每5分钟自动采集 <span style="color: #48bb78; font-weight: bold;">⭐ 实时采集</span></li>
+                            <li><strong>交易评价：</strong>data/trade_ratings/ - 人工标记的交易评级数据</li>
+                        </ul>
+                        <div style="margin-top: 10px; padding: 10px; background: #f0fff4; border-left: 4px solid #48bb78; border-radius: 4px;">
+                            <strong style="color: #2f855a;">💡 交易数据采集说明：</strong>
+                            <ul style="margin: 5px 0 0 20px; color: #2d3748;">
+                                <li>采集器进程：<code>okx-trade-history</code> (PM2托管)</li>
+                                <li>采集间隔：每5分钟自动从OKX API获取最新100笔成交</li>
+                                <li>数据格式：JSONL（每行一个JSON对象），按日期分文件</li>
+                                <li>去重机制：基于tradeId自动去重，避免重复保存</li>
+                                <li>数据类型：永续合约(SWAP) + 现货(SPOT)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- API接口 -->
+                    <div class="info-section">
+                        <div class="info-section-title">🔌 API接口说明</div>
+                        <ul class="info-list">
+                            <li><code>/api/coin-change-tracker/history?date=YYYYMMDD&limit=1440</code> - 获取趋势历史数据</li>
+                            <li><code>/api/okx-trading/angles?date=YYYYMMDD</code> - 获取角度分析数据</li>
+                            <li><code>/api/okx-trading/trade-history</code> - 获取交易历史（POST，需要日期范围）</li>
+                            <li><code>/api/okx-trading/trade-ratings?date=YYYY-MM-DD</code> - 获取交易评价数据</li>
+                        </ul>
+                    </div>
+
+                    <!-- 功能特性 -->
+                    <div class="info-section">
+                        <div class="info-section-title">✨ 核心功能</div>
+                        <div class="info-grid">
+                            <div class="info-card">
+                                <div class="info-card-title">📅 日期导航</div>
+                                <div class="info-card-content">
+                                    支持前后翻页、日期选择器、快速返回今天，可查看历史数据
+                                </div>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-card-title">🔄 自动合并</div>
+                                <div class="info-card-content">
+                                    2分钟内的交易自动合并，避免标记重叠，保持图表清晰
+                                </div>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-card-title">📍 角度标记</div>
+                                <div class="info-card-content">
+                                    自动识别峰值/谷底，区分锐角/钝角，提供角度值和时段信息
+                                </div>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-card-title">📊 交易评级</div>
+                                <div class="info-card-content">
+                                    支持A+/A/B/C等级标记，点击标记可查看详情，帮助分析交易质量
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 操作提示 -->
+                    <div class="info-section">
+                        <div class="info-section-title">💡 操作提示</div>
+                        <ul class="info-list">
+                            <li><strong>鼠标悬停：</strong>在图表上移动鼠标，可查看详细时间点和数值信息</li>
+                            <li><strong>左键点击标记：</strong>点击交易标记可查看该笔交易的详细信息和评级</li>
+                            <li><strong>🖱️ 右键删除角度：</strong>在角度标记上点击鼠标<span style="color: #e53e3e; font-weight: bold;">右键</span>可删除该角度（支持删除系统和手动添加的角度，用于纠正识别错误）</li>
+                            <li><strong>角度详情：</strong>鼠标悬停在角度标记上可查看角度值、峰值时间、价格变化等详细信息</li>
+                            <li><strong>日期切换：</strong>切换日期后会自动重新加载对应日期的所有数据</li>
+                            <li><strong>强制刷新：</strong>如果数据未更新，请使用 Ctrl+F5 (Windows) 或 Cmd+Shift+R (Mac) 强制刷新</li>
+                        </ul>
+                    </div>
+
+                    <!-- 技术架构 -->
+                    <div class="info-section">
+                        <div class="info-section-title">⚙️ 技术架构</div>
+                        <div class="info-grid">
+                            <div class="info-card">
+                                <div class="info-card-title">后端服务</div>
+                                <div class="info-card-content">
+                                    Flask (Python) - 提供RESTful API<br>
+                                    PM2进程管理 - 保证服务稳定运行
+                                </div>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-card-title">数据采集</div>
+                                <div class="info-card-content">
+                                    币价追踪器 - 每5分钟采集27币种数据<br>
+                                    交易历史采集器 - 每5分钟采集主账户成交记录 ⭐ NEW<br>
+                                    角度分析器 - 自动分析峰值/谷底
+                                </div>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-card-title">前端展示</div>
+                                <div class="info-card-content">
+                                    ECharts 5.4.3 - 专业图表库<br>
+                                    响应式设计 - 支持多种屏幕尺寸
+                                </div>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-card-title">数据存储</div>
+                                <div class="info-card-content">
+                                    JSONL格式 - 便于追加和读取<br>
+                                    按日期分文件 - 方便管理和备份
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 系统依赖 -->
+                    <div class="info-section">
+                        <div class="info-section-title">📦 系统完整依赖清单（重新部署必备）</div>
+                        
+                        <div style="padding: 12px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px; margin-bottom: 20px; color: #856404;">
+                            <strong>⚠️ 重要提示：</strong>以下所有依赖都是系统正常运行的必需组件，缺少任何一项都可能导致功能异常。重新部署时请逐项检查确认。
+                        </div>
+                        
+                        <!-- Python依赖 -->
+                        <div class="info-card" style="margin-bottom: 15px;">
+                            <div class="info-card-title">🐍 Python 环境依赖（必需 Python 3.8+）</div>
+                            <div class="info-card-content">
+                                <strong style="color: #2563eb;">1. 核心Web框架：</strong><br>
+                                • <code>Flask==3.1.2</code> - Python Web框架，提供HTTP服务<br>
+                                • <code>Flask-CORS==4.0.0</code> - 跨域资源共享支持<br>
+                                • <code>Flask-Compress==1.23</code> - HTTP响应压缩<br><br>
+                                
+                                <strong style="color: #2563eb;">2. 数据处理库：</strong><br>
+                                • <code>pandas==2.2.3</code> - 数据分析和处理<br>
+                                • <code>numpy==1.26.4</code> - 数值计算库<br>
+                                • <code>pytz</code> - 时区处理（北京时间转换）<br><br>
+                                
+                                <strong style="color: #2563eb;">3. HTTP请求库：</strong><br>
+                                • <code>requests==2.32.4</code> - HTTP请求库<br>
+                                • <code>requests-oauthlib==2.0.0</code> - OAuth认证支持<br><br>
+                                
+                                <strong style="color: #2563eb;">4. 加密货币交易所API：</strong><br>
+                                • <code>ccxt==4.0.0</code> - 统一的加密货币交易所API（可选，但推荐）<br><br>
+                                
+                                <strong style="color: #2563eb;">5. OKX API签名（内置）：</strong><br>
+                                • <code>hmac</code> - HMAC签名（Python标准库）<br>
+                                • <code>hashlib</code> - SHA256哈希（Python标准库）<br>
+                                • <code>base64</code> - Base64编码（Python标准库）<br><br>
+                                
+                                <strong style="color: #16a34a;">📥 一键安装命令：</strong><br>
+                                <code style="display: block; background: #f3f4f6; padding: 8px; border-radius: 4px; margin-top: 8px;">
+                                pip3 install Flask==3.1.2 Flask-CORS==4.0.0 Flask-Compress==1.23 pandas==2.2.3 numpy==1.26.4 requests==2.32.4 requests-oauthlib==2.0.0 pytz ccxt==4.0.0
+                                </code>
+                                
+                                <strong style="color: #16a34a;">✅ 验证安装：</strong><br>
+                                <code style="display: block; background: #f3f4f6; padding: 8px; border-radius: 4px; margin-top: 8px;">
+                                python3 -c "import flask, pandas, numpy, requests, pytz; print('✅ All Python dependencies OK')"
+                                </code>
+                            </div>
+                        </div>
+
+                        <!-- Node.js和PM2依赖 -->
+                        <div class="info-card" style="margin-bottom: 15px;">
+                            <div class="info-card-title">🟢 Node.js 环境和PM2进程管理（必需 Node 14+）</div>
+                            <div class="info-card-content">
+                                <strong style="color: #2563eb;">1. Node.js 版本要求：</strong><br>
+                                • 推荐版本: Node.js 16.x 或更高<br>
+                                • 最低版本: Node.js 14.x<br>
+                                • 验证命令: <code>node --version</code><br><br>
+                                
+                                <strong style="color: #2563eb;">2. PM2 进程管理器：</strong><br>
+                                • 包名: <code>pm2@latest</code><br>
+                                • 用途: 守护进程管理、自动重启、日志管理<br>
+                                • 全局安装: 必须使用 <code>-g</code> 参数<br><br>
+                                
+                                <strong style="color: #16a34a;">📥 安装命令：</strong><br>
+                                <code style="display: block; background: #f3f4f6; padding: 8px; border-radius: 4px; margin-top: 8px;">
+                                npm install -g pm2
+                                </code>
+                                
+                                <strong style="color: #16a34a;">✅ 验证安装：</strong><br>
+                                <code style="display: block; background: #f3f4f6; padding: 8px; border-radius: 4px; margin-top: 8px;">
+                                pm2 --version && echo "✅ PM2 installed"
+                                </code>
+                                
+                                <strong style="color: #2563eb;">3. PM2配置文件：</strong><br>
+                                • 文件名: <code>ecosystem.config.js</code><br>
+                                • 位置: <code>/home/user/webapp/ecosystem.config.js</code><br>
+                                • 格式: JavaScript CommonJS模块<br>
+                                • 包含: 6个应用进程配置<br><br>
+                                
+                                <strong style="color: #dc2626;">⚠️ 重要命令：</strong><br>
+                                • 启动所有进程: <code>pm2 start ecosystem.config.js</code><br>
+                                • 查看状态: <code>pm2 status</code> 或 <code>pm2 list</code><br>
+                                • 查看日志: <code>pm2 logs [进程名] --lines 50</code><br>
+                                • 重启进程: <code>pm2 restart [进程名]</code><br>
+                                • 停止进程: <code>pm2 stop [进程名]</code><br>
+                                • 保存配置: <code>pm2 save</code><br>
+                                • 开机自启: <code>pm2 startup</code><br>
+                                • 删除进程: <code>pm2 delete [进程名]</code>
+                            </div>
+                        </div>
+
+                        <!-- 前端依赖 -->
+                        <div class="info-card" style="margin-bottom: 15px;">
+                            <div class="info-card-title">🎨 前端依赖（CDN自动加载，无需安装）</div>
+                            <div class="info-card-content">
+                                <strong style="color: #2563eb;">1. ECharts 图表库：</strong><br>
+                                • 版本: <code>ECharts 5.4.3</code><br>
+                                • CDN: <code>https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js</code><br>
+                                • 功能: 专业的数据可视化图表库<br>
+                                • 大小: ~1.2MB (gzip后约400KB)<br>
+                                • 使用: HTML中通过&lt;script&gt;标签自动加载<br><br>
+                                
+                                <strong style="color: #2563eb;">2. 原生技术栈（无需安装）：</strong><br>
+                                • JavaScript: ES6+ 原生语法<br>
+                                • CSS3: 响应式布局、Grid、Flexbox<br>
+                                • HTML5: 标准语义化标签<br><br>
+                                
+                                <strong style="color: #16a34a;">✅ 优势：</strong><br>
+                                • 无需Node.js打包工具（Webpack、Vite等）<br>
+                                • 无需前端框架（React、Vue等）<br>
+                                • 页面加载快速，维护简单<br>
+                                • 浏览器兼容性好（支持Chrome、Firefox、Safari、Edge）
+                            </div>
+                        </div>
+
+                        <!-- 系统服务 -->
+                        <div class="info-card" style="margin-bottom: 15px;">
+                            <div class="info-card-title">🔧 系统服务配置（PM2进程）</div>
+                            <div class="info-card-content">
+                                <strong>PM2进程列表：</strong><br>
+                                1. <strong>flask-app</strong><br>
+                                   └─ 脚本: code/python/app.py<br>
+                                   └─ 端口: 5000<br>
+                                   └─ 内存限制: 1G<br>
+                                   └─ 功能: Flask API服务<br><br>
+                                
+                                2. <strong>coin-change-tracker</strong><br>
+                                   └─ 脚本: source_code/coin_change_tracker_collector.py<br>
+                                   └─ 内存限制: 200M<br>
+                                   └─ 功能: 27币种趋势采集（每5分钟）<br><br>
+                                
+                                3. <strong>okx-trading-marks</strong><br>
+                                   └─ 脚本: source_code/okx_trading_marks_collector.py<br>
+                                   └─ 内存限制: 200M<br>
+                                   └─ 功能: OKX日涨跌幅采集（每5分钟）<br><br>
+                                
+                                4. <strong>okx-trade-history</strong> ⭐ <span style="color: #16a34a; font-weight: bold;">NEW!</span><br>
+                                   └─ 脚本: source_code/okx_trade_history_collector.py<br>
+                                   └─ 内存限制: 200M<br>
+                                   └─ 功能: OKX交易历史采集（每5分钟）<br>
+                                   └─ 说明: 实时采集主账户成交记录，保存到按日期分文件的JSONL<br>
+                                   └─ 数据源: OKX API /api/v5/trade/fills<br><br>
+                                
+                                5. <strong>panic-collector</strong><br>
+                                   └─ 脚本: source_code/panic_wash_collector.py<br>
+                                   └─ 内存限制: 200M<br>
+                                   └─ 功能: 恐慌指数采集（每2分钟）<br><br>
+                                
+                                6. <strong>sar-jsonl-collector</strong><br>
+                                   └─ 脚本: source_code/sar_jsonl_collector.py<br>
+                                   └─ 内存限制: 200M<br>
+                                   └─ 功能: SAR序号数据采集（每5分钟）<br><br>
+                                
+                                <strong>启动命令：</strong><br>
+                                <code>cd /home/user/webapp && pm2 start ecosystem.config.js</code><br><br>
+                                
+                                <strong>管理命令：</strong><br>
+                                • 查看状态: <code>pm2 status</code><br>
+                                • 查看日志: <code>pm2 logs [app-name]</code><br>
+                                • 重启服务: <code>pm2 restart [app-name]</code><br>
+                                • 停止服务: <code>pm2 stop [app-name]</code><br>
+                                • 保存配置: <code>pm2 save</code>
+                            </div>
+                        </div>
+
+                        <!-- 数据目录结构 -->
+                        <div class="info-card" style="margin-bottom: 15px;">
+                            <div class="info-card-title">📂 数据目录结构（必须存在）</div>
+                            <div class="info-card-content">
+                                <pre style="background: #f7fafc; padding: 10px; border-radius: 4px; font-size: 12px; overflow-x: auto;">
+/home/user/webapp/
+├── data/
+│   ├── coin_change_tracker/      # 趋势数据
+│   │   └── coin_change_YYYYMMDD.jsonl
+│   ├── okx_angle_analysis/       # 角度数据
+│   │   └── okx_angles_YYYYMMDD.jsonl
+│   ├── okx_trading_history/      # 交易历史
+│   ├── trade_ratings/            # 交易评级
+│   ├── sar_jsonl/                # SAR数据
+│   │   └── [SYMBOL].jsonl (29个币种)
+│   ├── panic_jsonl/              # 恐慌指数
+│   └── okx_trading_logs/         # 交易日志
+├── code/python/
+│   ├── app.py                    # Flask主程序
+│   ├── collectors/               # 数据采集器
+│   │   ├── coin_change_tracker.py
+│   │   ├── okx_panic_collector.py
+│   │   ├── sar_jsonl_collector.py
+│   │   └── okx_angle_analyzer_v3.py
+│   ├── okx_accounts.json         # OKX API配置
+│   └── data/ -> /home/user/webapp/data/
+├── templates/
+│   └── okx_trading_marks.html    # 本页面
+├── ecosystem.config.js           # PM2配置
+└── backup.sh                     # 备份脚本
+                                </pre>
+                            </div>
+                        </div>
+
+                        <!-- API配置 -->
+                        <div class="info-card" style="margin-bottom: 15px;">
+                            <div class="info-card-title">🔑 OKX API 配置（重要）</div>
+                            <div class="info-card-content">
+                                <strong>配置文件：</strong><br>
+                                • 路径: code/python/okx_accounts.json<br><br>
+                                
+                                <strong>主账户配置（account_main）：</strong><br>
+                                • API Key: b0c18f2d-e014-4ae8-9c3c-cb02161de4db<br>
+                                • API Secret: 92F864C599B2CE2EC5186AD14C8B4110<br>
+                                • Passphrase: Tencent@123<br><br>
+                                
+                                <strong>⚠️ 安全提示：</strong><br>
+                                • 配置文件已固化在系统中<br>
+                                • 重新部署时会自动使用<br>
+                                • 请妥善保管备份文件<br>
+                                • 建议定期更换API密钥
+                            </div>
+                        </div>
+
+                        <!-- 符号链接 -->
+                        <div class="info-card" style="margin-bottom: 15px;">
+                            <div class="info-card-title">🔗 符号链接（必须创建）</div>
+                            <div class="info-card-content">
+                                <strong>数据目录链接：</strong><br>
+                                <code>ln -s /home/user/webapp/data /home/user/webapp/code/python/data</code><br><br>
+                                
+                                <strong>已创建的链接：</strong><br>
+                                • code/python/data/coin_change_tracker<br>
+                                • code/python/data/okx_angle_analysis<br>
+                                • code/python/data/okx_trading_history<br>
+                                • code/python/data/trade_ratings<br>
+                                • code/python/data/sar_jsonl<br><br>
+                                
+                                <strong>验证命令：</strong><br>
+                                <code>ls -la code/python/data</code>
+                            </div>
+                        </div>
+
+                        <!-- 备份与恢复 -->
+                        <div class="info-card" style="margin-bottom: 15px;">
+                            <div class="info-card-title">💾 备份与恢复</div>
+                            <div class="info-card-content">
+                                <strong>备份脚本：</strong><br>
+                                • 路径: /home/user/webapp/backup.sh<br>
+                                • 执行: <code>cd /home/user/webapp && ./backup.sh</code><br><br>
+                                
+                                <strong>备份内容：</strong><br>
+                                • 所有数据文件（data/）<br>
+                                • OKX API配置（okx_accounts.json）<br>
+                                • PM2配置（ecosystem.config.js）<br>
+                                • 核心Python代码<br>
+                                • 系统文档<br><br>
+                                
+                                <strong>备份位置：</strong><br>
+                                • /mnt/aidrive/panic_history_backup/<br>
+                                • 保留最近7天的备份<br><br>
+                                
+                                <strong>恢复命令：</strong><br>
+                                <code>tar -xzf backup_file.tar.gz -C /home/user/webapp</code>
+                            </div>
+                        </div>
+
+                        <!-- 端口配置 -->
+                        <div class="info-card" style="margin-bottom: 15px;">
+                            <div class="info-card-title">🌐 端口配置</div>
+                            <div class="info-card-content">
+                                <strong>Flask API服务：</strong><br>
+                                • 端口: 5000<br>
+                                • 访问: http://localhost:5000<br>
+                                • 公网: https://5000-xxx.sandbox.novita.ai<br><br>
+                                
+                                <strong>防火墙规则：</strong><br>
+                                • 确保5000端口开放<br>
+                                • 允许内网访问<br>
+                                • 外网通过代理访问
+                            </div>
+                        </div>
+
+                        <!-- 环境变量 -->
+                        <div class="info-card" style="margin-bottom: 15px;">
+                            <div class="info-card-title">🌍 环境变量（可选）</div>
+                            <div class="info-card-content">
+                                <strong>Python环境：</strong><br>
+                                • FLASK_APP=code/python/app.py<br>
+                                • FLASK_ENV=production<br>
+                                • PYTHONPATH=/home/user/webapp<br><br>
+                                
+                                <strong>PM2环境：</strong><br>
+                                • NODE_ENV=production<br>
+                                • PM2_HOME=/home/user/.pm2
+                            </div>
+                        </div>
+
+                        <!-- 完整部署流程 -->
+                        <div class="info-card">
+                            <div class="info-card-title">🚀 完整部署流程（首次/重新部署）</div>
+                            <div class="info-card-content">
+                                <strong>1. 安装系统依赖：</strong><br>
+                                <code>
+                                # Python依赖<br>
+                                pip install Flask Flask-CORS pandas numpy requests ccxt<br><br>
+                                # Node.js依赖<br>
+                                npm install -g pm2
+                                </code><br><br>
+                                
+                                <strong>2. 创建目录结构：</strong><br>
+                                <code>
+                                mkdir -p data/coin_change_tracker<br>
+                                mkdir -p data/okx_angle_analysis<br>
+                                mkdir -p data/okx_trading_history<br>
+                                mkdir -p data/trade_ratings<br>
+                                mkdir -p data/sar_jsonl<br>
+                                mkdir -p data/panic_jsonl<br>
+                                mkdir -p data/okx_trading_logs
+                                </code><br><br>
+                                
+                                <strong>3. 创建符号链接：</strong><br>
+                                <code>
+                                cd /home/user/webapp<br>
+                                ln -sf /home/user/webapp/data /home/user/webapp/code/python/data
+                                </code><br><br>
+                                
+                                <strong>4. 恢复OKX API配置：</strong><br>
+                                <code>
+                                # 从备份恢复或手动创建<br>
+                                # 文件: code/python/okx_accounts.json
+                                </code><br><br>
+                                
+                                <strong>5. 启动服务：</strong><br>
+                                <code>
+                                cd /home/user/webapp<br>
+                                pm2 start ecosystem.config.js<br>
+                                pm2 save
+                                </code><br><br>
+                                
+                                <strong>6. 验证服务：</strong><br>
+                                <code>
+                                pm2 status<br>
+                                curl http://localhost:5000/api/coin-change-tracker/history?date=20260211
+                                </code><br><br>
+                                
+                                <strong>7. 设置自动备份（可选）：</strong><br>
+                                <code>
+                                # 添加到crontab<br>
+                                0 2 * * * cd /home/user/webapp && ./backup.sh
+                                </code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">📊 当日交易总数</div>
+                <div class="stat-value" id="totalTrades">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">🔴 多单开仓</div>
+                <div class="stat-value" style="color: #e53e3e;" id="longBuy">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">🟢 多单平仓</div>
+                <div class="stat-value" style="color: #38a169;" id="longSell">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">🟠 空单开仓</div>
+                <div class="stat-value" style="color: #dd6b20;" id="shortBuy">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">🔵 空单平仓</div>
+                <div class="stat-value" style="color: #3182ce;" id="shortSell">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">🔗 合并后总数</div>
+                <div class="stat-value" style="color: #805ad5;" id="mergedTotal">--</div>
+            </div>
+        </div>
+
+        <!-- 图表 -->
+        <div class="chart-container">
+            <div class="chart-title">📈 27币当日涨跌幅趋势 + 交易标记点</div>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #e53e3e;"></div>
+                    <span>多单开仓</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #38a169;"></div>
+                    <span>多单平仓</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #dd6b20;"></div>
+                    <span>空单开仓</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #3182ce;"></div>
+                    <span>空单平仓</span>
+                </div>
+            </div>
+            
+            <!-- 角度标记工具栏 -->
+            <div style="display: flex; gap: 10px; align-items: center; margin: 10px 0; padding: 10px; background: #f7fafc; border-radius: 8px; flex-wrap: wrap;">
+                <button id="toggleAngleModeBtn" onclick="toggleAngleMode()" style="padding: 8px 16px; background: #4299e1; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; white-space: nowrap;">
+                    📐 进入角度标记模式
+                </button>
+                
+                <!-- 方向选择按钮 -->
+                <div id="directionButtons" style="display: none; gap: 10px;">
+                    <button id="upAngleBtn" onclick="selectDirection('up')" style="padding: 6px 12px; background: #e8f5e9; color: #2e7d32; border: 2px solid #4caf50; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500;">
+                        ↗️ 正角（上升）
+                    </button>
+                    <button id="downAngleBtn" onclick="selectDirection('down')" style="padding: 6px 12px; background: #e3f2fd; color: #1565c0; border: 2px solid #2196f3; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500;">
+                        ↘️ 负角（下降）
+                    </button>
+                </div>
+                
+                <div id="angleModeHint" style="display: none; color: #2d3748; font-size: 13px; flex: 1; min-width: 300px;">
+                    <strong>📍 请先选择角度方向</strong> - ↗️正角（上升）或 ↘️负角（下降）
+                </div>
+                <div id="angleStepInfo" style="display: none; color: #805ad5; font-size: 13px; font-weight: 500;"></div>
+                <button id="cancelAngleBtn" onclick="cancelAngleMarking()" style="display: none; padding: 6px 12px; background: #e53e3e; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">
+                    ❌ 取消标记
+                </button>
+                <button id="clearAllAnglesBtn" onclick="clearAllManualAngles()" style="display: none; padding: 6px 12px; background: #dd6b20; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">
+                    🗑️ 清除所有手动角度
+                </button>
+            </div>
+            
+            <!-- 操作提示横幅 -->
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 20px; border-radius: 10px; margin-bottom: 15px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);">
+                <span style="font-size: 24px; flex-shrink: 0;">💡</span>
+                <div style="flex: 1; line-height: 1.7; font-size: 13px;">
+                    <strong style="font-size: 15px; display: block; margin-bottom: 6px;">快速操作指南</strong>
+                    <div style="opacity: 0.95; display: flex; flex-wrap: wrap; gap: 15px;">
+                        <span>🖱️ <strong>删除角度：</strong>在角度标记上<span style="background: rgba(255,255,255,0.25); padding: 2px 8px; border-radius: 4px; font-weight: bold; margin: 0 3px;">鼠标右键</span></span>
+                        <span>👆 <strong>查看详情：</strong>鼠标悬停角度/交易标记</span>
+                        <span>📊 <strong>交易详情：</strong>左键点击交易标记</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="mainChart"></div>
+        </div>
+
+        <!-- 交易列表 -->
+        <div class="trade-list-container">
+            <div class="trade-list-title">
+                📋 详细交易列表
+                <span style="font-size: 14px; color: #718096; font-weight: normal;">
+                    （2分钟内的交易已自动合并）
+                </span>
+            </div>
+            <div id="tradeListContent">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 交易评价模态框 -->
+    <div id="tradeRatingModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; justify-content: center; align-items: center;">
+        <div style="background: white; border-radius: 12px; padding: 30px; width: 500px; max-width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; font-size: 20px; color: #2d3748;">📊 交易评价</h3>
+                <button onclick="closeRatingModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #a0aec0;">&times;</button>
+            </div>
+            
+            <div id="tradeInfoDisplay" style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 14px;">
+                <!-- 交易信息将动态填充 -->
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #2d3748;">评价结果</label>
+                <div style="display: flex; gap: 15px;">
+                    <button id="ratingCorrect" onclick="selectRating('correct')" style="flex: 1; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; background: white; cursor: pointer; font-size: 16px; transition: all 0.2s;">
+                        ✅ 正确
+                    </button>
+                    <button id="ratingIncorrect" onclick="selectRating('incorrect')" style="flex: 1; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; background: white; cursor: pointer; font-size: 16px; transition: all 0.2s;">
+                        ❌ 错误
+                    </button>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #2d3748;">备注说明（最多50字）</label>
+                <textarea id="ratingNote" maxlength="50" rows="3" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; resize: vertical; font-family: inherit;" placeholder="输入备注..."></textarea>
+                <div style="text-align: right; font-size: 12px; color: #a0aec0; margin-top: 5px;">
+                    <span id="noteCharCount">0</span>/50
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; justify-content: space-between; align-items: center;">
+                <button id="deleteRatingBtn" onclick="deleteTradeRating()" style="padding: 10px 20px; border: 1px solid #f56565; border-radius: 8px; background: white; color: #f56565; cursor: pointer; font-size: 14px; display: none;">
+                    🗑️ 删除评价
+                </button>
+                <div style="display: flex; gap: 10px; margin-left: auto;">
+                    <button onclick="closeRatingModal()" style="padding: 10px 20px; border: 1px solid #e2e8f0; border-radius: 8px; background: white; cursor: pointer; font-size: 14px;">
+                        取消
+                    </button>
+                    <button onclick="saveTradeRating()" style="padding: 10px 20px; border: none; border-radius: 8px; background: #3182ce; color: white; cursor: pointer; font-size: 14px; font-weight: 600;">
+                        保存评价
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let chart = null;
+        let currentDate = new Date();
+        let allTrades = []; // 存储所有交易数据
+        
+        // 主账户API配置
+        const MAIN_ACCOUNT = {
+            id: 'account_main',
+            name: '主账户',
+            apiKey: 'b0c18f2d-e014-4ae8-9c3c-cb02161de4db',
+            apiSecret: '92F864C599B2CE2EC5186AD14C8B4110',
+            passphrase: 'Tencent@123'
+        };
+
+        // 数据缓存机制
+        const tradingDataCache = {
+            trendData: { data: null, date: null, timestamp: 0, ttl: 60000 }, // 60秒缓存
+            tradesData: { data: null, date: null, timestamp: 0, ttl: 30000 }, // 30秒缓存
+            angleData: { data: null, date: null, timestamp: 0, ttl: 120000 }, // 120秒缓存
+            ratings: { data: null, timestamp: 0, ttl: 300000 } // 5分钟缓存
+        };
+        
+        // 缓存获取函数
+        function getTradingCachedData(key, currentDateStr) {
+            const cache = tradingDataCache[key];
+            if (!cache) return null;
+            
+            const now = Date.now();
+            const isExpired = now - cache.timestamp > cache.ttl;
+            const isWrongDate = currentDateStr && cache.date !== currentDateStr;
+            
+            if (cache.data && !isExpired && !isWrongDate) {
+                console.log(`📦 使用缓存数据: ${key}`);
+                return cache.data;
+            }
+            return null;
+        }
+        
+        // 缓存设置函数
+        function setTradingCachedData(key, data, currentDateStr) {
+            const cache = tradingDataCache[key];
+            if (cache) {
+                cache.data = data;
+                cache.timestamp = Date.now();
+                if (currentDateStr !== undefined) {
+                    cache.date = currentDateStr;
+                }
+                console.log(`💾 已缓存数据: ${key}`);
+            }
+        }
+        
+        // 初始化 - 高性能版本（并行加载 + 缓存机制）
+        window.onload = async function() {
+            console.log('🚀 OKX Trading Marks 页面初始化开始...');
+            const startTime = performance.now();
+            
+            try {
+                // 第1步：初始化图表骨架
+                initChart();
+                console.log('✅ 图表初始化完成');
+                
+                // 第2步：加载今天的数据
+                await loadTodayData();
+                
+                // 第3步：等待chart初始化后添加点击事件
+                setTimeout(() => {
+                    if (chart) {
+                        setupChartEventListeners();
+                    }
+                }, 1000);
+                
+                const endTime = performance.now();
+                console.log(`✅ 页面初始化完成，总耗时: ${((endTime - startTime) / 1000).toFixed(2)}秒`);
+                console.log(`⚡ 性能提升: 采用并行加载 + 缓存机制，预计减少50%以上加载时间`);
+                
+                // 额外的安全措施：确保加载界面一定被移除
+                setTimeout(() => {
+                    const overlay = document.getElementById('loadingOverlay');
+                    if (overlay) {
+                        console.warn('⚠️ 检测到加载界面仍然存在，强制移除');
+                        overlay.remove();
+                    }
+                }, 2000);
+            } catch (error) {
+                console.error('❌ 页面初始化失败:', error);
+                showError('页面初始化失败: ' + error.message);
+                // 确保出错时也移除加载界面
+                setTimeout(() => {
+                    const overlay = document.getElementById('loadingOverlay');
+                    if (overlay) overlay.remove();
+                }, 500);
+            }
+        };
+
+        // 初始化图表
+        function initChart() {
+            const chartContainer = document.getElementById('mainChart');
+            if (!chartContainer) {
+                console.error('❌ 找不到图表容器元素 #mainChart');
+                return;
+            }
+            
+            chart = echarts.init(chartContainer);
+            
+            if (chart) {
+                chart.setOption({
+                    title: {
+                        text: '加载中...',
+                        left: 'center',
+                        top: 'middle',
+                        textStyle: { color: '#999', fontSize: 16 }
+                    }
+                });
+            } else {
+                console.error('❌ 图表初始化失败');
+            }
+        }
+
+        // 加载今天的数据 - 优化版本
+        async function loadTodayData() {
+            currentDate = new Date();
+            updateDateDisplay();
+            await loadData();
+        }
+
+        // 前一天 - 优化版本
+        async function previousDay() {
+            currentDate.setDate(currentDate.getDate() - 1);
+            updateDateDisplay();
+            await loadData();
+        }
+
+        // 后一天 - 优化版本
+        async function nextDay() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const nextDate = new Date(currentDate);
+            nextDate.setDate(nextDate.getDate() + 1);
+            
+            if (nextDate <= today) {
+                currentDate = nextDate;
+                updateDateDisplay();
+                await loadData();
+            }
+        }
+
+        // 选择日期
+        function selectDate() {
+            const dateInput = document.getElementById('dateSelector');
+            if (dateInput.value) {
+                currentDate = new Date(dateInput.value + 'T00:00:00');
+                updateDateDisplay();
+                loadData();
+            }
+        }
+
+        // 更新日期显示
+        function updateDateDisplay() {
+            const dateStr = formatDate(currentDate);
+            document.getElementById('currentDateDisplay').textContent = dateStr;
+            document.getElementById('dateSelector').value = dateStr;
+            
+            // 更新提示文本
+            const today = formatDate(new Date());
+            const hintElement = document.getElementById('currentDateHint');
+            if (hintElement) {
+                if (dateStr === today) {
+                    hintElement.textContent = '今天';
+                } else {
+                    hintElement.textContent = dateStr;
+                }
+            }
+        }
+
+        // 格式化日期
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // 加载数据 - 高性能版本（并行加载 + 缓存 + 详细进度提示）
+        async function loadData() {
+            // 确保即使出错也会隐藏加载界面
+            let loadingHidden = false;
+            const safeHideLoading = () => {
+                if (!loadingHidden) {
+                    hideLoading();
+                    loadingHidden = true;
+                }
+            };
+            
+            try {
+                showLoading();
+                console.log('🔄 加载日期:', formatDate(currentDate));
+                const loadStart = performance.now();
+                const currentDateStr = formatDate(currentDate);
+                
+                // 步骤1: 初始化（0-10%）
+                updateLoadingProgress(1, 5, '正在初始化图表环境...');
+                await new Promise(resolve => setTimeout(resolve, 100));
+                updateLoadingProgress(1, 10, '图表环境初始化完成');
+                
+                // 高性能策略：并行加载所有数据，并使用缓存
+                console.log('📦 检查缓存中...');
+                updateLoadingProgress(2, 15, '正在检查本地缓存...');
+                
+                // 检查缓存
+                const cachedTrend = getTradingCachedData('trendData', currentDateStr);
+                const cachedTrades = getTradingCachedData('tradesData', currentDateStr);
+                const cachedAngles = getTradingCachedData('angleData', currentDateStr);
+                
+                // 步骤2-4: 并行加载所有需要的数据（15-70%）
+                console.log('📡 并行加载三类数据...');
+                updateLoadingProgress(2, 20, '正在加载趋势数据（27币种）...');
+                
+                const [trendResult, tradesResult, angleResult] = await Promise.allSettled([
+                    cachedTrend ? Promise.resolve(cachedTrend) : fetchTrendData(),
+                    cachedTrades ? Promise.resolve(cachedTrades) : fetchTradesData(),
+                    cachedAngles ? Promise.resolve(cachedAngles) : fetchAngleData()
+                ]);
+                
+                updateLoadingProgress(3, 50, '趋势数据加载完成，正在加载交易记录...');
+                
+                // 处理趋势数据
+                let trendData = [];
+                if (trendResult.status === 'fulfilled') {
+                    trendData = trendResult.value;
+                    if (!cachedTrend) setTradingCachedData('trendData', trendData, currentDateStr);
+                    console.log('✅ 趋势数据:', trendData.length, '个点');
+                    updateLoadingProgress(2, 35, `趋势数据加载成功（${trendData.length}个数据点）`);
+                } else {
+                    console.error('❌ 趋势数据加载失败:', trendResult.reason);
+                    updateLoadingProgress(2, 35, '⚠️ 趋势数据加载失败，继续加载其他数据...');
+                }
+                
+                // 处理交易数据
+                let tradesData = { trades: [], stats: {} };
+                if (tradesResult.status === 'fulfilled') {
+                    tradesData = tradesResult.value;
+                    if (!cachedTrades) setTradingCachedData('tradesData', tradesData, currentDateStr);
+                    console.log('✅ 交易数据:', tradesData.trades.length, '笔');
+                    updateLoadingProgress(3, 55, `交易数据加载成功（${tradesData.trades.length}笔交易）`);
+                } else {
+                    console.error('❌ 交易数据加载失败:', tradesResult.reason);
+                    updateLoadingProgress(3, 55, '⚠️ 交易数据加载失败，继续加载其他数据...');
+                }
+                
+                // 处理角度数据
+                let angleData = [];
+                if (angleResult.status === 'fulfilled') {
+                    angleData = angleResult.value;
+                    if (!cachedAngles) setTradingCachedData('angleData', angleData, currentDateStr);
+                    console.log('✅ 角度数据:', angleData.length, '个角度');
+                    updateLoadingProgress(4, 70, `角度数据加载成功（${angleData.length}个角度标记）`);
+                } else {
+                    console.error('❌ 角度数据加载失败:', angleResult.reason);
+                    updateLoadingProgress(4, 70, '⚠️ 角度数据加载失败，继续处理...');
+                }
+                
+                // 步骤5: 渲染图表（70-90%）
+                updateLoadingProgress(5, 75, '正在处理交易数据...');
+                
+                // 合并交易（4分钟内）
+                const mergedTrades = mergeTrades(tradesData.trades, 4 * 60 * 1000);
+                console.log('✅ 合并后:', mergedTrades.length, '笔');
+                updateLoadingProgress(5, 80, `交易数据处理完成（合并为${mergedTrades.length}笔）`);
+                
+                // 更新统计
+                updateStats(tradesData.stats, mergedTrades.length);
+                
+                // 渲染图表（包含角度标记和交易评价）
+                updateLoadingProgress(5, 85, '正在渲染图表...');
+                renderChart(trendData, mergedTrades, angleData);
+                updateLoadingProgress(5, 90, '图表渲染完成');
+                
+                // 渲染交易列表
+                renderTradeList(mergedTrades);
+                
+                // 步骤6: 设置交互事件（90-100%）
+                updateLoadingProgress(6, 95, '正在设置交互事件...');
+                
+                // 后台懒加载交易评价（不阻塞页面显示）
+                setTimeout(() => {
+                    loadTradeRatings().catch(err => {
+                        console.warn('⚠️ 交易评价加载失败:', err);
+                    });
+                }, 100);
+                
+                const loadEnd = performance.now();
+                const loadTime = ((loadEnd - loadStart) / 1000).toFixed(2);
+                console.log(`✅ 数据加载完成，耗时: ${loadTime}秒`);
+                
+                updateLoadingProgress(6, 100, `加载完成！耗时 ${loadTime} 秒`);
+                
+                // 立即隐藏加载界面（不再等待）
+                safeHideLoading();
+            } catch (e) {
+                console.error('❌ 加载数据失败:', e);
+                // 即使出错也要隐藏加载界面
+                safeHideLoading();
+                showError('加载数据失败: ' + e.message);
+            }
+        }
+
+        // 获取趋势数据（当日）
+        async function fetchTrendData() {
+            const dateStr = formatDate(currentDate).replace(/-/g, '');
+            console.log('📈 获取趋势数据，日期:', dateStr);
+            
+            const response = await fetch(`/api/coin-change-tracker/history?date=${dateStr}&limit=1440`);
+            const result = await response.json();
+            
+            console.log('📈 API返回:', result);
+            
+            // 检查数据是否有效
+            if (!result.data || result.data.length === 0) {
+                throw new Error(result.message || '获取趋势数据失败：无数据');
+            }
+            
+            // 转换数据格式 - 注意：使用 total_change 作为累计涨跌幅
+            const trendData = (result.data || []).map(item => {
+                // 兼容两种时间格式：
+                // 1. 新格式（优先）：beijing_time字段是"YYYY-MM-DD HH:MM:SS"
+                // 2. 旧格式（fallback）：time字段直接是HH:MM:SS
+                let timeStr = '00:00:00';
+                if (item.beijing_time) {
+                    // 新格式（优先）：从beijing_time提取时间部分
+                    timeStr = item.beijing_time.split(' ')[1] || '00:00:00';
+                } else if (item.time) {
+                    // 旧格式（fallback）：直接使用time字段
+                    timeStr = item.time;
+                }
+                
+                return {
+                    date: item.baseline_date || dateStr,
+                    time: timeStr,
+                    cumulative_pct: item.total_change || 0  // 使用 total_change 字段
+                };
+            });
+            
+            console.log('📈 转换后数据:', trendData.length, '条');
+            if (trendData.length > 0) {
+                console.log('📈 示例数据:', trendData[0], trendData[Math.floor(trendData.length / 2)]);
+            }
+            
+            return trendData;
+        }
+
+        // 获取交易数据（2月1日至当前日期）
+        async function fetchTradesData() {
+            const startDate = '20260201';
+            const endDate = formatDate(currentDate).replace(/-/g, '');
+            
+            console.log('📊 获取交易历史:', { startDate, endDate });
+            
+            try {
+                const response = await fetch('/api/okx-trading/trade-history', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        apiKey: MAIN_ACCOUNT.apiKey,
+                        apiSecret: MAIN_ACCOUNT.apiSecret,
+                        passphrase: MAIN_ACCOUNT.passphrase,
+                        startDate,
+                        endDate
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('获取交易历史失败');
+                }
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.message || '获取交易历史失败');
+                }
+                
+                // 过滤当天的交易
+                const currentDateStr = formatDate(currentDate);
+                console.log('🔍 过滤交易，目标日期:', currentDateStr);
+                
+                const todayTrades = (result.data || []).filter(trade => {
+                    // fillTime_str格式: "2026-02-09 10:17:27"
+                    const tradeDateStr = trade.fillTime_str ? trade.fillTime_str.split(' ')[0] : '';
+                    return tradeDateStr === currentDateStr;
+                });
+                
+                console.log(`✅ 过滤结果: 总共 ${result.data.length} 笔，当天 ${todayTrades.length} 笔`);
+                
+                // 计算统计
+                const stats = calculateStats(todayTrades);
+                
+                return {
+                    trades: todayTrades,
+                    stats
+                };
+            } catch (e) {
+                console.error('❌ 获取交易历史失败:', e);
+                return {
+                    trades: [],
+                    stats: { total: 0, longBuy: 0, longSell: 0, shortBuy: 0, shortSell: 0 }
+                };
+            }
+        }
+
+        // 获取角度数据（仅当天）
+        async function fetchAngleData() {
+            try {
+                // 只获取当天的角度数据
+                const dateStr = formatDate(currentDate).replace(/-/g, '');
+                
+                console.log('📐 获取角度数据（仅当天）:', dateStr);
+                
+                const response = await fetch(`/api/okx-trading/angles?date=${dateStr}`);
+                
+                if (!response.ok) {
+                    throw new Error('获取角度数据失败');
+                }
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    console.warn('⚠️ 获取角度数据失败:', result.message);
+                    return [];
+                }
+                
+                console.log('✅ 角度数据（当天）:', result.data.length, '个');
+                return result.data || [];
+            } catch (e) {
+                console.error('❌ 获取角度数据失败:', e);
+                return [];
+            }
+        }
+
+        // 计算统计数据
+        function calculateStats(trades) {
+            const stats = {
+                total: trades.length,
+                longBuy: 0,
+                longSell: 0,
+                shortBuy: 0,
+                shortSell: 0
+            };
+            
+            trades.forEach(trade => {
+                if (trade.posSide === 'long') {
+                    if (trade.side === 'buy') {
+                        stats.longBuy++;
+                    } else {
+                        stats.longSell++;
+                    }
+                } else if (trade.posSide === 'short') {
+                    if (trade.side === 'sell') {
+                        stats.shortBuy++;
+                    } else {
+                        stats.shortSell++;
+                    }
+                }
+            });
+            
+            return stats;
+        }
+
+        // 合并交易（4分钟内）
+        function mergeTrades(trades, timeWindow) {
+            if (trades.length === 0) return [];
+            
+            // 按时间排序
+            const sortedTrades = [...trades].sort((a, b) => a.fillTime - b.fillTime);
+            
+            const merged = [];
+            let currentGroup = [sortedTrades[0]];
+            
+            for (let i = 1; i < sortedTrades.length; i++) {
+                const currentTrade = sortedTrades[i];
+                const lastTrade = currentGroup[currentGroup.length - 1];
+                
+                // 检查是否在时间窗口内且类型相同
+                const timeDiff = currentTrade.fillTime - lastTrade.fillTime;
+                const sameType = currentTrade.posSide === lastTrade.posSide && 
+                                currentTrade.side === lastTrade.side &&
+                                currentTrade.instId === lastTrade.instId;
+                
+                if (timeDiff <= timeWindow && sameType) {
+                    currentGroup.push(currentTrade);
+                } else {
+                    // 合并当前组
+                    merged.push(mergeGroup(currentGroup));
+                    currentGroup = [currentTrade];
+                }
+            }
+            
+            // 合并最后一组
+            if (currentGroup.length > 0) {
+                merged.push(mergeGroup(currentGroup));
+            }
+            
+            return merged;
+        }
+
+        // 合并一组交易
+        function mergeGroup(group) {
+            if (group.length === 1) {
+                return { ...group[0], mergedCount: 1 };
+            }
+            
+            // 计算平均价格和总数量
+            const totalSz = group.reduce((sum, t) => sum + t.fillSz, 0);
+            const avgPx = group.reduce((sum, t) => sum + t.fillPx * t.fillSz, 0) / totalSz;
+            const totalFee = group.reduce((sum, t) => sum + t.fee, 0);
+            
+            return {
+                ...group[0],
+                fillPx: avgPx,
+                fillSz: totalSz,
+                fee: totalFee,
+                mergedCount: group.length,
+                mergedTrades: group.map(t => t.tradeId)
+            };
+        }
+
+        // 更新统计
+        function updateStats(stats, mergedCount) {
+            document.getElementById('totalTrades').textContent = stats.total;
+            document.getElementById('longBuy').textContent = stats.longBuy;
+            document.getElementById('longSell').textContent = stats.longSell;
+            document.getElementById('shortBuy').textContent = stats.shortBuy;
+            document.getElementById('shortSell').textContent = stats.shortSell;
+            document.getElementById('mergedTotal').textContent = mergedCount;
+        }
+
+        // 渲染图表
+        function renderChart(trendData, trades, angleData = []) {
+            console.log('📊 renderChart被调用，参数检查:');
+            console.log('  - trendData:', trendData);
+            console.log('  - trendData类型:', typeof trendData);
+            console.log('  - trendData是否为数组:', Array.isArray(trendData));
+            console.log('  - trendData长度:', trendData ? trendData.length : 'null/undefined');
+            console.log('  - trades长度:', trades ? trades.length : 'null/undefined');
+            console.log('  - angleData长度:', angleData ? angleData.length : 'null/undefined');
+            
+            // 确保图表已初始化
+            if (!chart) {
+                console.error('❌ 图表未初始化');
+                initChart();
+            }
+            
+            if (!trendData || trendData.length === 0) {
+                console.error('❌ 无趋势数据，显示提示信息');
+                console.error('  - trendData值:', trendData);
+                console.error('  - 条件判断: !trendData =', !trendData, ', length === 0 =', trendData ? trendData.length === 0 : 'N/A');
+                if (chart) {
+                    chart.setOption({
+                        title: {
+                            text: '当日暂无趋势数据',
+                            left: 'center',
+                            top: 'middle',
+                            textStyle: { color: '#999', fontSize: 16 }
+                        }
+                    });
+                }
+                return;
+            }
+            
+            console.log('✅ 趋势数据验证通过，开始渲染图表');
+            
+            // 保存当前数据供角度标记使用
+            currentTrendData = trendData;
+            currentTimes = trendData.map(d => d.time || '00:00:00');
+            currentValues = trendData.map(d => d.cumulative_pct || 0);
+            
+            console.log('📊 渲染图表 - 趋势数据:', trendData.length, '交易数据:', trades.length, '角度数据:', angleData.length, '手动角度:', manualAngles.length);
+            
+            // 准备时间轴和数据
+            const times = currentTimes;
+            const values = currentValues;
+            
+            console.log('📊 时间轴:', times.length, '第一个:', times[0], '最后:', times[times.length - 1]);
+            console.log('📊 数值:', values.length, '范围:', Math.min(...values), '~', Math.max(...values));
+            
+            // 合并API角度和手动角度
+            const allAngles = [...angleData, ...manualAngles];
+            console.log('📐 总角度数:', allAngles.length, '(API:', angleData.length, '手动:', manualAngles.length, ')');
+            
+            // 按类型和时间窗口分组交易（2分钟内相同类型合并为一个标记）
+            const groupedTrades = groupTradesByType(trades, times, values);
+            console.log('📊 分组后的交易:', {
+                '多单开仓': groupedTrades.longBuy.length,
+                '多单平仓': groupedTrades.longSell.length,
+                '空单开仓': groupedTrades.shortBuy.length,
+                '空单平仓': groupedTrades.shortSell.length
+            });
+            
+            // 创建角度标记系列
+            const angleSeries = createAngleSeries(allAngles, times, values);
+            console.log('📐 角度系列:', angleSeries.length, '个系列');
+            
+            // 在角度标记模式下，隐藏交易标记和角度标记，避免遮挡趋势线点位
+            // 修复：默认情况下应该显示标记（angleModeActive默认为false）
+            const tradeSeriesVisible = !angleModeActive;  // false时显示，true时隐藏
+            const angleSeriesVisible = !angleModeActive;  // false时显示，true时隐藏
+            
+            console.log('📊 标记显示状态 - 角度模式:', angleModeActive, '交易标记:', tradeSeriesVisible, '角度标记:', angleSeriesVisible);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'cross' },
+                    formatter: function(params) {
+                        let result = params[0].axisValue + '<br/>';
+                        params.forEach(param => {
+                            if (param.seriesName === '累计涨跌幅') {
+                                result += `${param.marker} ${param.seriesName}: <strong>${param.value}%</strong><br/>`;
+                            } else if (param.seriesType === 'scatter') {
+                                result += `${param.marker} ${param.seriesName}<br/>`;
+                            }
+                        });
+                        return result;
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    top: '5%',  // 标记在峰值上，不需要太多顶部空间
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: times,
+                    boundaryGap: false,
+                    axisLabel: {
+                        rotate: 0,
+                        interval: Math.floor(times.length / 12),
+                        formatter: function(value) {
+                            return value.substring(0, 5);
+                        }
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '涨跌幅 (%)',
+                    axisLabel: {
+                        formatter: '{value}%'
+                    }
+                },
+                series: [
+                    {
+                        name: '累计涨跌幅',
+                        type: 'line',
+                        data: values,
+                        smooth: true,
+                        lineStyle: { width: 2, color: '#4299e1' },
+                        areaStyle: {
+                            color: {
+                                type: 'linear',
+                                x: 0, y: 0, x2: 0, y2: 1,
+                                colorStops: [
+                                    { offset: 0, color: 'rgba(66, 153, 225, 0.3)' },
+                                    { offset: 1, color: 'rgba(66, 153, 225, 0.05)' }
+                                ]
+                            }
+                        }
+                    },
+                    // 只在非角度标记模式下显示交易标记
+                    ...(tradeSeriesVisible ? [
+                        ...createScatterSeries('多单开仓', groupedTrades.longBuy, '#e53e3e', 'circle', '多开'),
+                        ...createScatterSeries('多单平仓', groupedTrades.longSell, '#38a169', 'circle', '多平'),
+                        ...createScatterSeries('空单开仓', groupedTrades.shortBuy, '#dd6b20', 'diamond', '空开'),
+                        ...createScatterSeries('空单平仓', groupedTrades.shortSell, '#3182ce', 'diamond', '空平')
+                    ] : []),
+                    // 只在非角度标记模式下显示角度标记
+                    ...(angleSeriesVisible ? angleSeries : [])
+                ]
+            };
+            
+            console.log('📊 图表Option配置:');
+            console.log('  - series数量:', option.series.length);
+            console.log('  - series列表:', option.series.map(s => s.name || s.type).join(', '));
+            console.log('  - angleSeriesVisible:', angleSeriesVisible, ', angleSeries.length:', angleSeries.length);
+            console.log('  - angleSeries内容:', angleSeries.map(s => `${s.name}(${s.data.length}点)`).join(', '));
+            // 输出散点图series详细信息
+            option.series.forEach((s, idx) => {
+                if (s.type === 'scatter') {
+                    console.log(`  📍 散点系列 ${idx}: ${s.name}, 数据点数: ${s.data.length}, symbolSize: ${s.symbolSize}, z: ${s.z}, symbol: ${s.symbol}`);
+                    console.log(`     前3个数据点:`, s.data.slice(0, 3));
+                    // 检查数据点的value格式
+                    s.data.slice(0, 3).forEach((d, i) => {
+                        console.log(`       数据点${i}: value=[${d.value[0]}, ${d.value[1]}]`);
+                    });
+                }
+            });
+            
+            // 使用 notMerge: true 确保清除旧数据，防止日期切换后的残影
+            if (chart) {
+                chart.setOption(option, {
+                    notMerge: true,  // 不合并，完全替换
+                    replaceMerge: ['series']  // 替换series数组
+                });
+                
+                // 确保图表容器可见
+                const chartContainer = document.getElementById('mainChart');
+                if (chartContainer) {
+                    chartContainer.style.display = 'block';
+                    chartContainer.style.visibility = 'visible';
+                    chartContainer.style.opacity = '1';
+                    console.log('✅ 图表容器已设置为可见');
+                }
+                
+                // 强制图表resize以确保正确显示
+                setTimeout(() => {
+                    if (chart) {
+                        chart.resize();
+                        console.log('✅ 图表已resize');
+                    }
+                }, 100);
+                
+                console.log('✅ 图表渲染完成 - 系列数:', option.series.length, '时间点:', times.length);
+            } else {
+                console.error('❌ 图表对象为null，无法设置选项');
+            }
+        }
+        
+        // 按类型分组交易
+        function groupTradesByType(trades, times, values) {
+            const groups = {
+                longBuy: [],
+                longSell: [],
+                shortBuy: [],
+                shortSell: []
+            };
+            
+            trades.forEach(trade => {
+                // 使用 fillTime_str 或转换 fillTime
+                let timeStr = '';
+                if (trade.fillTime_str) {
+                    // 格式: "2026-02-11 23:09:51"，提取时间部分
+                    timeStr = trade.fillTime_str.split(' ')[1] || '';
+                } else if (trade.fillTime) {
+                    // 转换毫秒时间戳为时间字符串
+                    const tradeTime = new Date(parseInt(trade.fillTime));
+                    timeStr = `${String(tradeTime.getHours()).padStart(2, '0')}:${String(tradeTime.getMinutes()).padStart(2, '0')}:${String(tradeTime.getSeconds()).padStart(2, '0')}`;
+                }
+                
+                if (!timeStr) {
+                    console.warn('⚠️ 交易缺少有效时间:', trade);
+                    return;
+                }
+                
+                const timeIndex = times.findIndex(t => t >= timeStr);
+                
+                if (timeIndex >= 0 && timeIndex < values.length) {
+                    const markData = {
+                        time: times[timeIndex],
+                        value: values[timeIndex],
+                        count: trade.mergedCount || 1,
+                        trade: trade,
+                        rating: tradeRatings[trade.tradeId]  // 添加评价信息
+                    };
+                    
+                    if (trade.posSide === 'long' && trade.side === 'buy') {
+                        groups.longBuy.push(markData);
+                    } else if (trade.posSide === 'long' && trade.side === 'sell') {
+                        groups.longSell.push(markData);
+                    } else if (trade.posSide === 'short' && trade.side === 'sell') {
+                        groups.shortBuy.push(markData);
+                    } else if (trade.posSide === 'short' && trade.side === 'buy') {
+                        groups.shortSell.push(markData);
+                    }
+                }
+            });
+            
+            return groups;
+        }
+        
+        // 创建角度标记系列
+        function createAngleSeries(angleData, times, values) {
+            if (!angleData || angleData.length === 0) {
+                return [];
+            }
+            
+            console.log('📐 创建角度标记:', angleData.length, '个角度');
+            
+            const series = [];
+            
+            // 上升锐角（正值，红色三角形）
+            const upAcute = angleData.filter(a => a.direction === 'up' && a.type === 'acute').map(a => ({
+                time: a.peak_time,
+                value: parseFloat(a.peak_price),  // 转换为数值
+                angle: parseFloat(a.angle),       // 转换为数值
+                date: a.date,
+                hour: a.hour,
+                angle_data: a  // 保存完整的角度数据用于删除
+            }));
+            
+            // 上升钝角（正值，橙色方块）
+            const upObtuse = angleData.filter(a => a.direction === 'up' && a.type === 'obtuse').map(a => ({
+                time: a.peak_time,
+                value: parseFloat(a.peak_price),  // 转换为数值
+                angle: parseFloat(a.angle),       // 转换为数值
+                date: a.date,
+                hour: a.hour,
+                angle_data: a  // 保存完整的角度数据用于删除
+            }));
+            
+            // 下降锐角（负值，蓝色倒三角）
+            const downAcute = angleData.filter(a => a.direction === 'down' && a.type === 'acute').map(a => {
+                const timeInTimes = times.includes(a.peak_time);
+                console.log(`🔍 下降锐角时间 ${a.peak_time} 在times数组中: ${timeInTimes}`);
+                return {
+                    time: a.peak_time,
+                    value: parseFloat(a.peak_price),  // 转换为数值
+                    angle: parseFloat(a.angle),       // 转换为数值
+                    date: a.date,
+                    hour: a.hour,
+                    angle_data: a  // 保存完整的角度数据用于删除
+                };
+            });
+            
+            // 下降钝角（负值，紫色菱形）
+            const downObtuse = angleData.filter(a => a.direction === 'down' && a.type === 'obtuse').map(a => {
+                const timeInTimes = times.includes(a.peak_time);
+                console.log(`🔍 下降钝角时间 ${a.peak_time} 在times数组中: ${timeInTimes}`);
+                return {
+                    time: a.peak_time,
+                    value: parseFloat(a.peak_price),  // 转换为数值
+                    angle: parseFloat(a.angle),       // 转换为数值
+                    date: a.date,
+                    hour: a.hour,
+                    angle_data: a  // 保存完整的角度数据用于删除
+                };
+            });
+            
+            console.log(`📊 角度分类: ↗️上升锐角${upAcute.length} ↗️上升钝角${upObtuse.length} ↘️下降锐角${downAcute.length} ↘️下降钝角${downObtuse.length}`);
+            
+            // 调试：打印角度数据的时间和值
+            if (downAcute.length > 0) {
+                console.log('📐 下降锐角数据:', downAcute.map(a => `${a.time}=${a.value}`).join(', '));
+                // 检查时间是否在times数组中
+                downAcute.forEach(a => {
+                    const inTimes = times.includes(a.time);
+                    console.log(`   ${a.time} 在times中: ${inTimes ? '✅' : '❌'}`);
+                });
+            }
+            if (downObtuse.length > 0) {
+                console.log('📐 下降钝角数据:', downObtuse.map(a => `${a.time}=${a.value}`).join(', '));
+                // 检查时间是否在times数组中
+                downObtuse.forEach(a => {
+                    const inTimes = times.includes(a.time);
+                    console.log(`   ${a.time} 在times中: ${inTimes ? '✅' : '❌'}`);
+                });
+            }
+            
+            // 添加上升锐角系列（红色，三角形）
+            if (upAcute.length > 0) {
+                series.push({
+                    name: '↗️ 上升锐角',
+                    type: 'scatter',
+                    symbol: 'triangle',
+                    symbolSize: 25,
+                    symbolRotate: 0,  // 正三角形，尖端向上
+                    data: upAcute.map(m => ({
+                        value: [m.time, m.value],
+                        angle_data: m.angle_data
+                    })),
+                    itemStyle: { 
+                        color: '#e53e3e',  // 深红色
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    },
+                    label: {
+                        show: true,
+                        formatter: (params) => `${upAcute[params.dataIndex].angle.toFixed(1)}°`,
+                        position: 'top',
+                        fontSize: 12,
+                        fontWeight: 'bold',
+                        color: '#fff',
+                        backgroundColor: '#e53e3e',
+                        padding: [3, 8],
+                        borderRadius: 4,
+                        offset: [0, -10]
+                    },
+                    tooltip: {
+                        formatter: (params) => {
+                            const item = upAcute[params.dataIndex];
+                            const isManual = item.angle_data.manual ? ' [手动]' : '';
+                            return `<strong>↗️ 上升锐角${isManual}</strong><br/>
+                                    时段: ${item.hour}:00-${parseInt(item.hour)+1}:00<br/>
+                                    角度: <strong>${item.angle.toFixed(2)}°</strong><br/>
+                                    峰值: ${item.value.toFixed(2)}%`;
+                        }
+                    },
+                    z: 20
+                });
+            }
+            
+            // 添加上升钝角系列（橙色，方块）
+            if (upObtuse.length > 0) {
+                series.push({
+                    name: '↗️ 上升钝角',
+                    type: 'scatter',
+                    symbol: 'rect',
+                    symbolSize: 22,
+                    data: upObtuse.map(m => ({
+                        value: [m.time, m.value],
+                        angle_data: m.angle_data
+                    })),
+                    itemStyle: { 
+                        color: '#dd6b20',  // 橙色
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    },
+                    label: {
+                        show: true,
+                        formatter: (params) => `${upObtuse[params.dataIndex].angle.toFixed(1)}°`,
+                        position: 'top',
+                        fontSize: 12,
+                        fontWeight: 'bold',
+                        color: '#fff',
+                        backgroundColor: '#dd6b20',
+                        padding: [3, 8],
+                        borderRadius: 4,
+                        offset: [0, -10]
+                    },
+                    tooltip: {
+                        formatter: (params) => {
+                            const item = upObtuse[params.dataIndex];
+                            return `<strong>↗️ 上升钝角</strong><br/>
+                                    时段: ${item.hour}:00-${parseInt(item.hour)+1}:00<br/>
+                                    角度: <strong>${item.angle.toFixed(2)}°</strong><br/>
+                                    峰值: ${item.value.toFixed(2)}%`;
+                        }
+                    },
+                    z: 20
+                });
+            }
+            
+            // 添加下降锐角系列（蓝色，倒三角形）
+            if (downAcute.length > 0) {
+                series.push({
+                    name: '↘️ 下降锐角',
+                    type: 'scatter',
+                    symbol: 'triangle',
+                    symbolSize: 50,  // 增大尺寸：25 -> 50
+                    symbolRotate: 180,  // 倒三角形，尖端向下
+                    data: downAcute.map(m => ({
+                        value: [m.time, m.value],
+                        angle_data: m.angle_data
+                    })),
+                    itemStyle: { 
+                        color: '#3182ce',  // 蓝色
+                        borderColor: '#fff',
+                        borderWidth: 3  // 增加边框：2 -> 3
+                    },
+                    label: {
+                        show: true,
+                        formatter: (params) => `${downAcute[params.dataIndex].angle.toFixed(1)}°`,
+                        position: 'bottom',  // 负值在下方显示标签
+                        fontSize: 14,  // 增大字体：12 -> 14
+                        fontWeight: 'bold',
+                        color: '#fff',
+                        backgroundColor: '#3182ce',
+                        padding: [4, 10],  // 增大内边距
+                        borderRadius: 4,
+                        offset: [0, 15]  // 增大偏移：10 -> 15
+                    },
+                    tooltip: {
+                        formatter: (params) => {
+                            const item = downAcute[params.dataIndex];
+                            const isManual = item.angle_data.manual ? ' [手动]' : '';
+                            return `<strong>↘️ 下降锐角${isManual}</strong><br/>
+                                    时段: ${item.hour}:00-${parseInt(item.hour)+1}:00<br/>
+                                    角度: <strong>${item.angle.toFixed(2)}°</strong><br/>
+                                    谷底: ${item.value.toFixed(2)}%`;
+                        }
+                    },
+                    z: 100  // 提高层级：20 -> 100
+                });
+            }
+            
+            // 添加下降钝角系列（紫色，菱形）
+            if (downObtuse.length > 0) {
+                series.push({
+                    name: '↘️ 下降钝角',
+                    type: 'scatter',
+                    symbol: 'diamond',
+                    symbolSize: 50,  // 增大尺寸：25 -> 50
+                    data: downObtuse.map(m => ({
+                        value: [m.time, m.value],
+                        angle_data: m.angle_data
+                    })),
+                    itemStyle: { 
+                        color: '#805ad5',  // 紫色
+                        borderColor: '#fff',
+                        borderWidth: 3  // 增加边框：2 -> 3
+                    },
+                    label: {
+                        show: true,
+                        formatter: (params) => `${downObtuse[params.dataIndex].angle.toFixed(1)}°`,
+                        position: 'bottom',  // 负值在下方显示标签
+                        fontSize: 14,  // 增大字体：12 -> 14
+                        fontWeight: 'bold',
+                        color: '#fff',
+                        backgroundColor: '#805ad5',
+                        padding: [4, 10],  // 增大内边距
+                        borderRadius: 4,
+                        offset: [0, 15]  // 增大偏移：10 -> 15
+                    },
+                    tooltip: {
+                        formatter: (params) => {
+                            const item = downObtuse[params.dataIndex];
+                            const isManual = item.angle_data.manual ? ' [手动]' : '';
+                            return `<strong>↘️ 下降钝角${isManual}</strong><br/>
+                                    时段: ${item.hour}:00-${parseInt(item.hour)+1}:00<br/>
+                                    角度: <strong>${item.angle.toFixed(2)}°</strong><br/>
+                                    谷底: ${item.value.toFixed(2)}%`;
+                        }
+                    },
+                    z: 100  // 提高层级：20 -> 100
+                });
+            }
+            
+            console.log('📐 角度系列:', series.length, '个系列');
+            
+            return series;
+        }
+        
+        // 创建散点图系列
+        function createScatterSeries(name, marks, color, symbol, label) {
+            if (marks.length === 0) {
+                return [];
+            }
+            
+            return [{
+                name: name,
+                type: 'scatter',
+                symbol: symbol,
+                symbolSize: 30,  // 增大尺寸：16 -> 30
+                data: marks.map(m => ({
+                    value: [m.time, m.value],
+                    trade: m.trade,  // 保存完整交易数据
+                    rating: tradeRatings[m.trade.tradeId]  // 保存评价信息
+                })),
+                itemStyle: { 
+                    color: color,
+                    borderColor: '#fff',
+                    borderWidth: 3,  // 增加边框宽度
+                    shadowBlur: 6,   // 添加阴影
+                    shadowColor: color,
+                    shadowOffsetX: 0,
+                    shadowOffsetY: 2
+                },
+                label: {
+                    show: true,  // 始终显示标签
+                    formatter: (params) => {
+                        const rating = marks[params.dataIndex].rating || tradeRatings[marks[params.dataIndex].trade.tradeId];
+                        let ratingIcon = '';
+                        if (rating) {
+                            ratingIcon = rating.rating === 'correct' ? '\n✅' : '\n❌';
+                        }
+                        return label + ratingIcon;
+                    },
+                    position: 'top',
+                    fontSize: 13,  // 增大字体
+                    fontWeight: 'bold',
+                    color: '#fff',  // 白色文字
+                    backgroundColor: color,  // 使用对应颜色背景
+                    padding: [4, 10],  // 增大内边距
+                    borderRadius: 6,
+                    offset: [0, -8]  // 向上偏移，避免与图标重叠
+                },
+                tooltip: {
+                    formatter: (params) => {
+                        const mark = marks[params.dataIndex];
+                        const trade = mark.trade;
+                        const rating = mark.rating || tradeRatings[trade.tradeId];
+                        
+                        let tooltipHtml = `<strong style="font-size: 14px;">${name}</strong><br/>`;
+                        tooltipHtml += `时间: ${mark.time}<br/>`;
+                        tooltipHtml += `价格: ${mark.value.toFixed(2)}%`;
+                        
+                        if (rating) {
+                            const ratingText = rating.rating === 'correct' ? '<span style="color: #48bb78">✅ 正确</span>' : '<span style="color: #f56565">❌ 错误</span>';
+                            tooltipHtml += `<br/><br/><strong>评价:</strong> ${ratingText}`;
+                            if (rating.note) {
+                                tooltipHtml += `<br/><strong>备注:</strong> ${rating.note}`;
+                            }
+                        } else {
+                            tooltipHtml += `<br/><br/><em style="color: #a0aec0;">点击添加评价</em>`;
+                        }
+                        
+                        return tooltipHtml;
+                    }
+                },
+                emphasis: {
+                    label: {
+                        show: true,
+                        fontSize: 14  // 悬停时字体更大
+                    },
+                    itemStyle: {
+                        borderWidth: 4,
+                        shadowBlur: 10
+                    }
+                },
+                z: 25  // 最高层级，确保在角度标记之上
+            }];
+        }
+
+        // 渲染交易列表
+        function renderTradeList(trades) {
+            const container = document.getElementById('tradeListContent');
+            
+            if (trades.length === 0) {
+                container.innerHTML = '<div class="loading">当日暂无交易</div>';
+                return;
+            }
+            
+            let html = '<table class="trade-table">';
+            html += '<thead><tr>';
+            html += '<th>时间</th>';
+            html += '<th>币种</th>';
+            html += '<th>类型</th>';
+            html += '<th>价格</th>';
+            html += '<th>数量</th>';
+            html += '<th>手续费</th>';
+            html += '<th>交易ID</th>';
+            html += '</tr></thead>';
+            html += '<tbody>';
+            
+            trades.forEach(trade => {
+                // 使用 fillTime_str 或将 fillTime 转换为数字
+                let timeStr = 'N/A';
+                if (trade.fillTime_str) {
+                    // 格式: "2026-02-11 23:09:51"，提取时间部分
+                    timeStr = trade.fillTime_str.split(' ')[1] || 'N/A';
+                } else if (trade.fillTime) {
+                    // 将毫秒时间戳转换为日期
+                    const tradeTime = new Date(parseInt(trade.fillTime));
+                    timeStr = `${String(tradeTime.getHours()).padStart(2, '0')}:${String(tradeTime.getMinutes()).padStart(2, '0')}:${String(tradeTime.getSeconds()).padStart(2, '0')}`;
+                }
+                
+                let typeClass = '';
+                let typeText = '';
+                if (trade.posSide === 'long' && trade.side === 'buy') {
+                    typeClass = 'long-buy';
+                    typeText = '多开';
+                } else if (trade.posSide === 'long' && trade.side === 'sell') {
+                    typeClass = 'long-sell';
+                    typeText = '多平';
+                } else if (trade.posSide === 'short' && trade.side === 'sell') {
+                    typeClass = 'short-buy';
+                    typeText = '空开';
+                } else if (trade.posSide === 'short' && trade.side === 'buy') {
+                    typeClass = 'short-sell';
+                    typeText = '空平';
+                }
+                
+                html += '<tr>';
+                html += `<td>${timeStr}</td>`;
+                html += `<td><strong>${trade.instId.replace('-USDT-SWAP', '')}</strong></td>`;
+                html += `<td><span class="trade-type ${typeClass}">${typeText}</span>`;
+                if (trade.mergedCount > 1) {
+                    html += `<span class="merged-badge">合并${trade.mergedCount}笔</span>`;
+                }
+                html += `</td>`;
+                html += `<td>${parseFloat(trade.fillPx).toFixed(4)}</td>`;
+                html += `<td>${parseFloat(trade.fillSz).toFixed(2)}</td>`;
+                html += `<td>${parseFloat(trade.fee).toFixed(4)}</td>`;
+                html += `<td style="font-size: 11px; color: #718096;">${trade.tradeId}</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // 创建加载进度界面
+        function createLoadingOverlay() {
+            const overlay = document.createElement('div');
+            overlay.id = 'loadingOverlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.75);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(5px);
+                animation: fadeIn 0.3s ease-in-out;
+            `;
+            
+            overlay.innerHTML = `
+                <div style="
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    padding: 40px 50px;
+                    border-radius: 20px;
+                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+                    min-width: 500px;
+                    max-width: 600px;
+                    color: white;
+                    animation: slideUp 0.4s ease-out;
+                ">
+                    <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 600; text-align: center;">
+                        <i class="fas fa-chart-line" style="margin-right: 10px;"></i>
+                        数据加载中
+                    </h2>
+                    
+                    <!-- 进度条 -->
+                    <div style="
+                        background: rgba(255, 255, 255, 0.2);
+                        border-radius: 10px;
+                        height: 30px;
+                        margin-bottom: 20px;
+                        overflow: hidden;
+                        position: relative;
+                    ">
+                        <div id="progressBar" style="
+                            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+                            height: 100%;
+                            width: 0%;
+                            border-radius: 10px;
+                            transition: width 0.3s ease-out;
+                            box-shadow: 0 0 20px rgba(79, 172, 254, 0.5);
+                        "></div>
+                        <div id="progressText" style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            font-weight: 600;
+                            font-size: 14px;
+                            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                        ">0%</div>
+                    </div>
+                    
+                    <!-- 加载步骤列表 -->
+                    <div id="loadingSteps" style="
+                        background: rgba(0, 0, 0, 0.2);
+                        border-radius: 10px;
+                        padding: 20px;
+                        font-size: 14px;
+                    ">
+                        <div id="step1" class="loading-step" style="opacity: 0.5;">
+                            <i class="fas fa-circle" style="font-size: 8px; margin-right: 10px; color: #888;"></i>
+                            <span>📊 初始化图表环境...</span>
+                        </div>
+                        <div id="step2" class="loading-step" style="opacity: 0.5; margin-top: 12px;">
+                            <i class="fas fa-circle" style="font-size: 8px; margin-right: 10px; color: #888;"></i>
+                            <span>📈 加载趋势数据（27币种涨跌幅）...</span>
+                        </div>
+                        <div id="step3" class="loading-step" style="opacity: 0.5; margin-top: 12px;">
+                            <i class="fas fa-circle" style="font-size: 8px; margin-right: 10px; color: #888;"></i>
+                            <span>💼 加载交易历史（开仓/平仓记录）...</span>
+                        </div>
+                        <div id="step4" class="loading-step" style="opacity: 0.5; margin-top: 12px;">
+                            <i class="fas fa-circle" style="font-size: 8px; margin-right: 10px; color: #888;"></i>
+                            <span>📐 加载角度标记（K线形态识别）...</span>
+                        </div>
+                        <div id="step5" class="loading-step" style="opacity: 0.5; margin-top: 12px;">
+                            <i class="fas fa-circle" style="font-size: 8px; margin-right: 10px; color: #888;"></i>
+                            <span>🎨 渲染图表（数据可视化）...</span>
+                        </div>
+                        <div id="step6" class="loading-step" style="opacity: 0.5; margin-top: 12px;">
+                            <i class="fas fa-circle" style="font-size: 8px; margin-right: 10px; color: #888;"></i>
+                            <span>⚙️ 设置交互事件（点击、右键操作）...</span>
+                        </div>
+                    </div>
+                    
+                    <div id="loadingStatus" style="
+                        margin-top: 15px;
+                        text-align: center;
+                        font-size: 13px;
+                        opacity: 0.8;
+                    ">
+                        正在准备数据...
+                    </div>
+                </div>
+            `;
+            
+            // 添加动画样式
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes slideUp {
+                    from {
+                        transform: translateY(30px);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateY(0);
+                        opacity: 1;
+                    }
+                }
+                .loading-step.active {
+                    opacity: 1 !important;
+                }
+                .loading-step.active i {
+                    color: #4facfe !important;
+                    animation: pulse 1s infinite;
+                }
+                .loading-step.completed {
+                    opacity: 1 !important;
+                }
+                .loading-step.completed i {
+                    color: #00f2fe !important;
+                }
+                @keyframes pulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.5; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            return overlay;
+        }
+        
+        // 更新加载进度
+        function updateLoadingProgress(step, percentage, status) {
+            console.log(`📊 进度更新: 步骤${step}, ${percentage}%, ${status}`);
+            
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const loadingStatus = document.getElementById('loadingStatus');
+            const stepElement = document.getElementById(`step${step}`);
+            
+            if (progressBar) {
+                progressBar.style.width = percentage + '%';
+                progressText.textContent = Math.round(percentage) + '%';
+            } else {
+                console.warn('⚠️ 找不到 progressBar 元素');
+            }
+            
+            if (loadingStatus) {
+                loadingStatus.textContent = status;
+            } else {
+                console.warn('⚠️ 找不到 loadingStatus 元素');
+            }
+            
+            // 更新步骤状态
+            if (stepElement) {
+                // 标记当前步骤为活动状态
+                stepElement.classList.add('active');
+                
+                // 标记之前的步骤为已完成
+                for (let i = 1; i < step; i++) {
+                    const prevStep = document.getElementById(`step${i}`);
+                    if (prevStep) {
+                        prevStep.classList.remove('active');
+                        prevStep.classList.add('completed');
+                        const icon = prevStep.querySelector('i');
+                        if (icon) {
+                            icon.className = 'fas fa-check-circle';
+                        }
+                    }
+                }
+            }
+        }
+        
+        function showLoading() {
+            // 移除旧的加载界面（如果存在）
+            const oldOverlay = document.getElementById('loadingOverlay');
+            if (oldOverlay) {
+                oldOverlay.remove();
+            }
+            
+            // 创建新的加载界面
+            const overlay = createLoadingOverlay();
+            document.body.appendChild(overlay);
+            
+            // 同时更新交易列表区域
+            const tradeList = document.getElementById('tradeListContent');
+            if (tradeList) {
+                tradeList.innerHTML = '<div class="loading">数据加载中...</div>';
+            }
+        }
+
+        function hideLoading() {
+            try {
+                console.log('🔄 hideLoading 被调用');
+                
+                // 方法1: 立即移除所有可能的加载界面元素（不等动画）
+                const overlays = document.querySelectorAll('#loadingOverlay, [id^="loadingOverlay"]');
+                console.log('📍 找到加载界面元素数量:', overlays.length);
+                
+                overlays.forEach((overlay, index) => {
+                    console.log(`🗑️  移除第${index + 1}个加载界面`);
+                    overlay.remove();
+                });
+                
+                // 方法2: 确保body没有overflow:hidden样式
+                document.body.style.overflow = '';
+                
+                console.log('✅ 加载界面已强制移除（共' + overlays.length + '个）');
+            } catch (e) {
+                console.error('❌ hideLoading 执行失败:', e);
+                // 最后的保险: 直接清除所有绝对定位的全屏元素
+                try {
+                    const allFixed = document.querySelectorAll('[style*="position: fixed"], [style*="position:fixed"]');
+                    allFixed.forEach(el => {
+                        if (el.id && el.id.includes('loading')) {
+                            console.log('🔥 强制移除:', el.id);
+                            el.remove();
+                        }
+                    });
+                } catch (e2) {
+                    console.error('❌ 强制清理也失败:', e2);
+                }
+            }
+        }
+        
+        // 添加一个最后的保险机制：页面完全加载后5秒内如果还有loading overlay就强制移除
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const remainingOverlays = document.querySelectorAll('#loadingOverlay, [id^="loadingOverlay"]');
+                if (remainingOverlays.length > 0) {
+                    console.warn('⚠️ 检测到残留加载界面，强制清理');
+                    remainingOverlays.forEach(overlay => overlay.remove());
+                    document.body.style.overflow = '';
+                    console.log('✅ 残留加载界面已清理');
+                }
+            }, 5000);  // 5秒后检查
+        });
+        
+        // 旧的hideLoading保留（向后兼容）
+        function hideLoadingOld() {
+            try {
+                const overlay = document.getElementById('loadingOverlay');
+                console.log('🔄 hideLoading 被调用, overlay存在:', !!overlay);
+                
+                if (overlay) {
+                    // 立即隐藏，不等待动画
+                    overlay.style.opacity = '0';
+                    overlay.style.transition = 'opacity 0.3s ease-out';
+                    
+                    // 300ms后移除元素
+                    setTimeout(() => {
+                        overlay.remove();
+                        console.log('✅ 加载界面已移除');
+                    }, 300);
+                } else {
+                    console.warn('⚠️ 找不到加载界面元素');
+                }
+                
+                // 添加淡出动画样式（如果还没有）
+                if (!document.getElementById('fadeOutStyle')) {
+                    const style = document.createElement('style');
+                    style.id = 'fadeOutStyle';
+                    style.textContent = `
+                        @keyframes fadeOut {
+                            from { opacity: 1; }
+                            to { opacity: 0; }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+            } catch (e) {
+                console.error('❌ hideLoading 执行失败:', e);
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('tradeListContent').innerHTML = `<div class="error">${message}</div>`;
+        }
+
+        // ==================== 手动角度标记功能 ====================
+        let angleModeActive = false;
+        let angleDirection = null;  // 'up' 或 'down'
+        let selectedPoints = [];    // 存储选中的点 [A点, C'点]
+        let manualAngles = [];      // 存储手动添加的角度
+        let currentTrendData = [];  // 当前趋势数据
+        let currentTimes = [];      // 当前时间轴
+        let currentValues = [];     // 当前数值
+        
+        // 切换角度标记模式
+        function toggleAngleMode() {
+            angleModeActive = !angleModeActive;
+            const btn = document.getElementById('toggleAngleModeBtn');
+            const hint = document.getElementById('angleModeHint');
+            const cancelBtn = document.getElementById('cancelAngleBtn');
+            const directionButtons = document.getElementById('directionButtons');
+            
+            if (angleModeActive) {
+                btn.textContent = '✅ 角度标记模式 (点击退出)';
+                btn.style.background = '#48bb78';
+                hint.style.display = 'block';
+                cancelBtn.style.display = 'block';
+                directionButtons.style.display = 'flex';
+                selectedPoints = [];
+                angleDirection = null;
+                updateAngleStepInfo();
+                console.log('📐 角度标记模式已激活 - 隐藏交易标记和角度标记');
+                // 重新渲染图表以隐藏标记
+                loadData();
+            } else {
+                btn.textContent = '📐 进入角度标记模式';
+                btn.style.background = '#4299e1';
+                hint.style.display = 'none';
+                cancelBtn.style.display = 'none';
+                directionButtons.style.display = 'none';
+                document.getElementById('angleStepInfo').style.display = 'none';
+                selectedPoints = [];
+                angleDirection = null;
+                // 重置方向按钮样式
+                resetDirectionButtons();
+                console.log('📐 角度标记模式已关闭 - 显示交易标记和角度标记');
+                // 重新渲染图表以显示标记
+                loadData();
+            }
+        }
+        
+        // 选择角度方向
+        function selectDirection(direction) {
+            angleDirection = direction;
+            selectedPoints = [];  // 重置选中的点
+            
+            // 更新按钮样式
+            const upBtn = document.getElementById('upAngleBtn');
+            const downBtn = document.getElementById('downAngleBtn');
+            
+            if (direction === 'up') {
+                upBtn.style.background = '#4caf50';
+                upBtn.style.color = 'white';
+                downBtn.style.background = '#e3f2fd';
+                downBtn.style.color = '#1565c0';
+                console.log('✅ 选择了正角（上升）方向');
+            } else {
+                downBtn.style.background = '#2196f3';
+                downBtn.style.color = 'white';
+                upBtn.style.background = '#e8f5e9';
+                upBtn.style.color = '#2e7d32';
+                console.log('✅ 选择了负角（下降）方向');
+            }
+            
+            updateAngleStepInfo();
+        }
+        
+        // 重置方向按钮样式
+        function resetDirectionButtons() {
+            const upBtn = document.getElementById('upAngleBtn');
+            const downBtn = document.getElementById('downAngleBtn');
+            upBtn.style.background = '#e8f5e9';
+            upBtn.style.color = '#2e7d32';
+            downBtn.style.background = '#e3f2fd';
+            downBtn.style.color = '#1565c0';
+        }
+        
+        // 取消当前角度标记
+        function cancelAngleMarking() {
+            selectedPoints = [];
+            angleDirection = null;
+            resetDirectionButtons();
+            updateAngleStepInfo();
+            console.log('❌ 已取消当前角度标记');
+        }
+        
+        // 更新步骤提示
+        function updateAngleStepInfo() {
+            const stepInfo = document.getElementById('angleStepInfo');
+            const clearBtn = document.getElementById('clearAllAnglesBtn');
+            const hint = document.getElementById('angleModeHint');
+            
+            // 显示/隐藏清除按钮
+            if (manualAngles.length > 0) {
+                clearBtn.style.display = 'block';
+            } else {
+                clearBtn.style.display = 'none';
+            }
+            
+            // 如果没有选择方向
+            if (!angleDirection) {
+                stepInfo.style.display = 'none';
+                hint.innerHTML = '<strong>📍 请先选择角度方向</strong> - ↗️正角（上升）或 ↘️负角（下降）';
+                return;
+            }
+            
+            // 已选择方向
+            const directionText = angleDirection === 'up' ? '↗️正角（上升）' : '↘️负角（下降）';
+            
+            if (selectedPoints.length === 0) {
+                hint.innerHTML = `<strong>📍 已选择${directionText}</strong> - 现在点击A点（峰值/谷底）`;
+                stepInfo.style.display = 'none';
+            } else if (selectedPoints.length === 1) {
+                hint.innerHTML = `<strong>📍 已选择${directionText}</strong> - 现在点击C'点（起始点，时间需晚于B点）`;
+                stepInfo.style.display = 'block';
+                stepInfo.textContent = `已选择 1/2 个点，下一步: C'点（时间需晚于B点）`;
+                highlightSelectedPoints();
+            } else {
+                stepInfo.style.display = 'block';
+                stepInfo.textContent = `已选择 2/2 个点，自动寻找B点...`;
+                highlightSelectedPoints();
+            }
+        }
+        
+        // 高亮显示已选择的点
+        function highlightSelectedPoints() {
+            if (!chart || selectedPoints.length === 0) return;
+            
+            const highlightSeries = selectedPoints.map((point, index) => {
+                const labels = ['A', 'C\'', 'B'];  // A点先选，C'点后选
+                const colors = ['#f56565', '#9f7aea', '#4299e1'];
+                return {
+                    name: `选中点${labels[index]}`,
+                    type: 'scatter',
+                    data: [[point.time, point.value]],
+                    symbol: 'circle',
+                    symbolSize: 20,
+                    itemStyle: {
+                        color: colors[index],
+                        borderColor: '#fff',
+                        borderWidth: 3
+                    },
+                    label: {
+                        show: true,
+                        formatter: labels[index],
+                        position: 'top',
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                        color: colors[index]
+                    },
+                    z: 100
+                };
+            });
+            
+            // 重新渲染图表（保留原有数据，只添加高亮点）
+            if (chart) {
+                const currentOption = chart.getOption();
+                const newSeries = currentOption.series.filter(s => !s.name || !s.name.startsWith('选中点'));
+                chart.setOption({
+                    series: [...newSeries, ...highlightSeries]
+                });
+            } else {
+                console.error('❌ 图表对象为null，无法显示选中点');
+            }
+        }
+        
+        // 自动寻找B点（涨跌幅与C点最接近的点）
+        // 核心逻辑：B点在A点之前，且涨跌幅与C点最接近
+        // 限制：B点必须在A点前的合理时间范围内（120分钟，即2小时）
+        // direction: 'up'正角（上升） 或 'down'负角（下降）
+        function findValleyPoint(peakPoint, cPrimePoint, direction) {
+            const peakIdx = currentTimes.indexOf(peakPoint.time);
+            const cPrimeIdx = currentTimes.indexOf(cPrimePoint.time);
+            
+            if (peakIdx === -1 || cPrimeIdx === -1) {
+                console.error('❌ 找不到峰值或C\'点的索引');
+                return null;
+            }
+            
+            console.log(`🔍 查找B点: A点=${peakPoint.time}(${currentValues[peakIdx].toFixed(2)}%), C点=${cPrimePoint.time}(${cPrimePoint.value.toFixed(2)}%)`);
+            console.log(`   目标: 找A点之前2小时内，涨跌幅最接近C点(${cPrimePoint.value.toFixed(2)}%)的点`);
+            
+            const MIN_TIME_GAP = 2; // 最小间隔2分钟
+            const MAX_TIME_RANGE = 120; // 最大查找范围120分钟（2小时）
+            const cPrimeValue = cPrimePoint.value;
+            
+            let valleyIdx = -1;
+            let minDiff = Infinity;
+            
+            const peakTime = parseTimeToMinutes(currentTimes[peakIdx]);
+            
+            // 从A点往前找，限制在2小时内，寻找涨跌幅最接近C点的点
+            for (let i = peakIdx - 1; i >= 0; i--) {
+                const currentTime = parseTimeToMinutes(currentTimes[i]);
+                const timeDiff = peakTime - currentTime;
+                
+                // 跳过时间间隔太小的点
+                if (timeDiff < MIN_TIME_GAP) continue;
+                
+                // 超过最大查找范围，停止查找
+                if (timeDiff > MAX_TIME_RANGE) {
+                    console.log(`  ⏹️ 已超过最大查找范围(${MAX_TIME_RANGE}分钟)，停止查找`);
+                    break;
+                }
+                
+                // 计算与C点涨跌幅的差距
+                const diff = Math.abs(currentValues[i] - cPrimeValue);
+                
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    valleyIdx = i;
+                    console.log(`  - 候选B点: ${currentTimes[i]} (${currentValues[i].toFixed(2)}%), 时间差=${timeDiff.toFixed(0)}分钟, 涨跌幅差距=${diff.toFixed(2)}%`);
+                }
+            }
+            
+            // 如果没找到有效的B点
+            if (valleyIdx === -1) {
+                console.warn('⚠️ 在A点之前2小时内没有找到有效的B点');
+                alert(`❌ 未找到有效的B点！\n\nA点: ${peakPoint.time} (${currentValues[peakIdx].toFixed(2)}%)\nC点: ${cPrimePoint.time} (${cPrimePoint.value.toFixed(2)}%)\n\n查找范围：A点前2小时内\n需要在此范围内找到涨跌幅接近C点的点\n\n💡 建议：选择时间更近的点或调整时间范围`);
+                return null;
+            }
+            
+            const selectedBTime = parseTimeToMinutes(currentTimes[valleyIdx]);
+            const actualTimeDiff = peakTime - selectedBTime;
+            
+            console.log(`✅ 找到B点: ${currentTimes[valleyIdx]} (${currentValues[valleyIdx].toFixed(2)}%)`);
+            console.log(`   时间差: ${actualTimeDiff.toFixed(0)}分钟, 涨跌幅差距=${minDiff.toFixed(2)}%`);
+            
+            // 验证：B点必须在A点之前
+            const valleyTime = parseTimeToMinutes(currentTimes[valleyIdx]);
+            
+            if (valleyTime >= peakTime) {
+                console.warn('⚠️ B点必须在A点之前');
+                alert(`❌ B点时间异常！\n\nB点时间: ${currentTimes[valleyIdx]}\nA点时间: ${currentTimes[peakIdx]}\n\nB点必须在A点之前！`);
+                return null;
+            }
+            
+            return {
+                time: currentTimes[valleyIdx],
+                value: currentValues[valleyIdx],
+                index: valleyIdx
+            };
+        }
+        
+        // 计算角度
+        function calculateAngleFromPoints(cPrime, peak, valley) {
+            // C'点到A点
+            const c_time_min = parseTimeToMinutes(cPrime.time);
+            const p_time_min = parseTimeToMinutes(peak.time);
+            const v_time_min = parseTimeToMinutes(valley.time);
+            
+            // 时间差（分钟）
+            const time_diff = p_time_min - c_time_min;
+            // 价格差
+            const price_diff = peak.value - cPrime.value;
+            
+            // 图表配置（与后端保持一致）
+            const CHART_WIDTH_PX = 800;
+            const CHART_HEIGHT_PX = 400;
+            const CHART_TIME_RANGE_MIN = 600;  // 10小时
+            const CHART_PRICE_RANGE_PCT = 100; // 100%
+            
+            // 转换为像素
+            const price_diff_px = (price_diff / CHART_PRICE_RANGE_PCT) * CHART_HEIGHT_PX;
+            const time_diff_px = (time_diff / CHART_TIME_RANGE_MIN) * CHART_WIDTH_PX;
+            
+            // 计算角度
+            const angle_rad = Math.atan2(price_diff_px, time_diff_px);
+            const angle_deg = (angle_rad * 180) / Math.PI;
+            
+            // 判断类型
+            const direction = price_diff > 0 ? 'up' : 'down';
+            const angle_type = Math.abs(angle_deg) < 45 ? 'acute' : 'obtuse';
+            
+            return {
+                angle: Math.abs(angle_deg).toFixed(2),
+                type: angle_type,
+                direction: direction,
+                c_prime_time: cPrime.time,
+                c_prime_price: cPrime.value.toFixed(2),
+                peak_time: peak.time,
+                peak_price: peak.value.toFixed(2),
+                valley_time: valley.time,
+                valley_price: valley.value.toFixed(2),
+                price_diff: price_diff.toFixed(2),
+                time_diff: time_diff.toFixed(1)
+            };
+        }
+        
+        // 解析时间字符串为分钟数
+        function parseTimeToMinutes(timeStr) {
+            const parts = timeStr.split(':');
+            return parseInt(parts[0]) * 60 + parseInt(parts[1]) + parseInt(parts[2]) / 60;
+        }
+        
+        // 添加角度标记
+        function addManualAngle() {
+            if (!angleDirection) {
+                alert('❌ 请先选择角度方向（正角或负角）');
+                return;
+            }
+            
+            if (selectedPoints.length !== 2) {
+                console.error('❌ 需要选择2个点（A点和C\'点）');
+                return;
+            }
+            
+            const [peak, cPrime] = selectedPoints;  // 第一个是A点，第二个是C'点
+            
+            // 自动寻找B点，传入方向参数
+            const valley = findValleyPoint(peak, cPrime, angleDirection);
+            if (!valley) {
+                // findValleyPoint已经显示了详细的错误信息
+                selectedPoints.pop();  // 移除C'点，保留A点
+                updateAngleStepInfo();
+                return;
+            }
+            
+            console.log('🔍 自动找到B点:', valley);
+            console.log(`   B点时间: ${valley.time}, C'点时间: ${cPrime.time}`);
+            
+            // 将B点添加到选中点数组用于显示
+            selectedPoints.push(valley);
+            highlightSelectedPoints();
+            
+            const angleInfo = calculateAngleFromPoints(cPrime, peak, valley);
+            
+            // 获取峰值所在的小时
+            const hour = peak.time.substring(0, 2);
+            
+            const directionLabel = angleDirection === 'up' ? '上升' : '下降';
+            const newAngle = {
+                ...angleInfo,
+                hour: hour,
+                date: currentDate.toISOString().split('T')[0].replace(/-/g, ''),
+                manual: true  // 标记为手动添加
+            };
+            
+            manualAngles.push(newAngle);
+            
+            console.log('✅ 已添加手动角度:', newAngle);
+            
+            // 保存到后端
+            saveManualAngleToBackend(newAngle).then(success => {
+                if (success) {
+                    console.log('💾 手动角度已保存到后端');
+                    
+                    // 显示确认消息
+                    const directionText = newAngle.direction === 'up' ? '上升' : '下降';
+                    const typeText = newAngle.type === 'acute' ? '锐角' : '钝角';
+                    alert(`✅ 已添加并保存${directionLabel}${typeText}：${newAngle.angle}°\n\n` +
+                          `A点: ${newAngle.peak_time} (${newAngle.peak_price}%)\n` +
+                          `B点(自动): ${newAngle.valley_time} (${newAngle.valley_price}%)\n` +
+                          `C'点: ${newAngle.c_prime_time} (${newAngle.c_prime_price}%)\n\n` +
+                          `说明: B点时间 ${valley.time} < C'点时间 ${cPrime.time} ✓\n\n` +
+                          `价格变化: ${newAngle.price_diff}%\n` +
+                          `时间跨度: ${newAngle.time_diff}分钟\n\n` +
+                          `💾 已保存到服务器，刷新后仍可见`);
+                } else {
+                    alert('⚠️ 角度已添加到图表，但保存到服务器失败\n刷新页面后将丢失');
+                }
+                
+                // 重置选择
+                selectedPoints = [];
+                updateAngleStepInfo();
+                
+                // 重新渲染图表
+                loadData();
+            });
+        }
+        
+        // 删除角度标记（支持删除所有角度：手动+系统）
+        function deleteAngleMarker(angleData) {
+            const isManual = angleData.manual;
+            const angleType = isManual ? '手动' : '系统';
+            
+            console.log(`🗑️ 准备删除${angleType}角度:`, angleData);
+            
+            // 如果是手动角度，从 manualAngles 数组中移除
+            if (isManual) {
+                const index = manualAngles.findIndex(a => 
+                    a.peak_time === angleData.peak_time && 
+                    a.angle === angleData.angle
+                );
+                
+                if (index >= 0) {
+                    manualAngles.splice(index, 1);
+                    console.log('✅ 已从 manualAngles 移除');
+                }
+            }
+            
+            // 无论是手动还是系统角度，都调用后端删除
+            deleteAngleFromBackend(angleData).then(success => {
+                if (success) {
+                    const directionText = angleData.direction === 'up' ? '上升' : '下降';
+                    const typeText = angleData.type === 'acute' ? '锐角' : '钝角';
+                    const angleSymbol = angleData.direction === 'up' 
+                        ? (angleData.type === 'acute' ? '🔺' : '🟧')
+                        : (angleData.type === 'acute' ? '🔻' : '💎');
+                    
+                    alert(`✅ 角度标记已成功删除！\n\n` +
+                          `━━━━━━━━━━━━━━━━━━━━━━\n` +
+                          `${angleSymbol} ${directionText}${typeText}\n` +
+                          `📐 角度: ${parseFloat(angleData.angle).toFixed(2)}°\n` +
+                          `⏰ 时间: ${angleData.peak_time}\n` +
+                          `📈 价格: ${parseFloat(angleData.peak_price).toFixed(2)}%\n` +
+                          `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+                          `💾 已从服务器删除\n` +
+                          `🔄 图表即将自动刷新`);
+                } else {
+                    alert(`❌ 删除失败\n\n` +
+                          `角度: ${parseFloat(angleData.angle).toFixed(2)}°\n` +
+                          `时间: ${angleData.peak_time}\n\n` +
+                          `请稍后重试或刷新页面`);
+                }
+                
+                // 更新按钮显示
+                updateAngleStepInfo();
+                
+                // 重新渲染图表
+                loadData();
+            });
+            
+            return true;
+        }
+        
+        // 保存手动角度到后端
+        async function saveManualAngleToBackend(angle) {
+            try {
+                const response = await fetch('/api/okx-trading/angles/manual', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        angle: angle,
+                        date: angle.date
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    console.log('💾 后端保存成功:', result);
+                    return true;
+                } else {
+                    console.error('❌ 后端保存失败:', result.message);
+                    return false;
+                }
+            } catch (error) {
+                console.error('❌ 保存请求失败:', error);
+                return false;
+            }
+        }
+        
+        // 从后端删除角度（支持手动和系统角度）
+        async function deleteAngleFromBackend(angle) {
+            try {
+                const response = await fetch('/api/okx-trading/angles/manual', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        date: angle.date,
+                        peak_time: angle.peak_time,
+                        angle: angle.angle
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    console.log('💾 后端删除成功:', result);
+                    return true;
+                } else {
+                    console.error('❌ 后端删除失败:', result.message);
+                    return false;
+                }
+            } catch (error) {
+                console.error('❌ 删除请求失败:', error);
+                return false;
+            }
+        }
+        
+        // 兼容旧函数名
+        async function deleteManualAngleFromBackend(angle) {
+            return await deleteAngleFromBackend(angle);
+        }
+        
+        // 清除所有手动角度
+        async function clearAllManualAngles() {
+            if (manualAngles.length === 0) {
+                alert('没有手动角度需要清除');
+                return;
+            }
+            
+            if (confirm(`确定要清除所有 ${manualAngles.length} 个手动角度标记吗？\n\n注意：这将从服务器永久删除！`)) {
+                const count = manualAngles.length;
+                const anglesToDelete = [...manualAngles];  // 复制数组
+                
+                // 逐个删除
+                let successCount = 0;
+                for (const angle of anglesToDelete) {
+                    const success = await deleteManualAngleFromBackend(angle);
+                    if (success) successCount++;
+                }
+                
+                // 清空本地数组
+                manualAngles = [];
+                console.log(`🗑️ 已清除 ${count} 个手动角度（后端成功: ${successCount}）`);
+                
+                // 更新按钮显示
+                updateAngleStepInfo();
+                
+                // 重新渲染图表
+                loadData();
+                
+                if (successCount === count) {
+                    alert(`✅ 已清除所有 ${count} 个手动角度标记并保存`);
+                } else {
+                    alert(`⚠️ 已清除 ${count} 个手动角度标记\n后端成功删除: ${successCount}/${count}`);
+                }
+            }
+        }
+        
+        // 设置图表事件监听器
+        function setupChartEventListeners() {
+            if (!chart) {
+                console.error('❌ 图表未初始化，无法设置事件监听');
+                return;
+            }
+            
+            // 点击事件 - 处理交易标记评价和角度标记
+            chart.on('click', function(params) {
+                // 优先处理交易标记点击（开仓/平仓）
+                if (params.componentType === 'series' && 
+                    (params.seriesName.includes('开仓') || params.seriesName.includes('平仓'))) {
+                    
+                    // 获取交易数据
+                    const trade = params.data.trade;
+                    if (trade) {
+                        console.log('🖱️ 点击交易标记:', trade.tradeId);
+                        openTradeRatingModal(trade);
+                    } else {
+                        console.warn('⚠️ 无法获取交易数据');
+                    }
+                    return;  // 阻止后续处理
+                }
+                
+                // 角度标记模式的点击处理
+                if (!angleModeActive) return;
+                
+                // 检查是否已选择方向
+                if (!angleDirection) {
+                    alert('⚠️ 请先选择角度方向（↗️正角 或 ↘️负角）');
+                    return;
+                }
+                
+                // 只处理趋势线上的点击
+                if (params.componentType === 'series' && params.seriesName === '累计涨跌幅') {
+                    const clickedPoint = {
+                        time: params.name,
+                        value: params.value,
+                        index: params.dataIndex
+                    };
+                    
+                    selectedPoints.push(clickedPoint);
+                    const pointName = selectedPoints.length === 1 ? 'A点' : 'C\'点';
+                    console.log(`📍 已选择${pointName}:`, clickedPoint);
+                    
+                    updateAngleStepInfo();
+                    
+                    // 选择完2个点后，自动找B点并询问是否添加
+                    if (selectedPoints.length === 2) {
+                        const directionText = angleDirection === 'up' ? '↗️正角（上升）' : '↘️负角（下降）';
+                        setTimeout(() => {
+                            if (confirm(`${directionText}\n已选择A点和C\'点，是否自动寻找B点并添加角度标记？\n\n提醒：C'点时间必须晚于B点`)) {
+                                addManualAngle();
+                            } else {
+                                selectedPoints = [];
+                                updateAngleStepInfo();
+                            }
+                        }, 100);
+                    }
+                }
+            });
+            
+            // 右键事件 - 删除角度（支持删除所有角度，包括系统生成的）
+            chart.on('contextmenu', function(params) {
+                params.event.event.preventDefault();
+                
+                // 检查是否点击的是角度标记
+                if (params.componentType === 'series' && 
+                    (params.seriesName.includes('上升') || params.seriesName.includes('下降'))) {
+                    
+                    // 查找对应的角度数据
+                    const angleData = params.data.angle_data;
+                    if (angleData) {
+                        const angleType = angleData.manual ? '🖐️ 手动添加' : '🤖 系统生成';
+                        const directionText = angleData.direction === 'up' ? '上升' : '下降';
+                        const typeText = angleData.type === 'acute' ? '锐角' : '钝角';
+                        const angleSymbol = angleData.direction === 'up' 
+                            ? (angleData.type === 'acute' ? '🔺' : '🟧')
+                            : (angleData.type === 'acute' ? '🔻' : '💎');
+                        
+                        if (confirm(`🗑️ 确定要删除这个角度标记吗？\n\n` +
+                                  `━━━━━━━━━━━━━━━━━━━━━━\n` +
+                                  `${angleSymbol} 标记类型: ${angleType}\n` +
+                                  `📊 角度类型: ${directionText}${typeText}\n` +
+                                  `📐 角度值: ${parseFloat(angleData.angle).toFixed(2)}°\n` +
+                                  `⏰ 峰值时间: ${angleData.peak_time}\n` +
+                                  `📈 价格变化: ${parseFloat(angleData.peak_price).toFixed(2)}%\n` +
+                                  `🕐 时段: ${angleData.hour}:00-${parseInt(angleData.hour)+1}:00\n` +
+                                  `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+                                  `✅ 删除后会立即生效\n` +
+                                  `💡 适用于纠正系统识别错误的角度`)) {
+                            deleteAngleMarker(angleData);
+                        }
+                    } else {
+                        alert('❌ 无法获取角度数据\n\n请稍后重试或刷新页面');
+                    }
+                }
+            });
+            
+            console.log('✅ 图表事件监听器已设置');
+        }
+        
+        // ==================== 交易评价功能 ====================
+        
+        let currentTradeForRating = null;
+        let selectedRating = null;
+        let tradeRatings = {};  // 存储交易评价 {tradeId: {rating, note}}
+        
+        // 加载交易评价数据
+        async function loadTradeRatings() {
+            try {
+                const dateStr = formatDate(currentDate).replace(/-/g, '');
+                const response = await fetch(`/api/okx-trading/trade-ratings?date=${dateStr}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    // 转换为 {tradeId: {rating, note}} 格式
+                    tradeRatings = {};
+                    result.ratings.forEach(r => {
+                        tradeRatings[r.tradeId] = {
+                            rating: r.rating,
+                            note: r.note
+                        };
+                    });
+                    console.log('✅ 加载交易评价:', Object.keys(tradeRatings).length, '条');
+                } else {
+                    console.warn('⚠️ 加载交易评价失败:', result.message);
+                }
+            } catch (error) {
+                console.error('❌ 加载交易评价失败:', error);
+            }
+        }
+        
+        // 打开评价模态框
+        function openTradeRatingModal(trade) {
+            currentTradeForRating = trade;
+            selectedRating = null;
+            
+            // 填充交易信息
+            const tradeTime = new Date(trade.fillTime);
+            const timeStr = `${String(tradeTime.getHours()).padStart(2, '0')}:${String(tradeTime.getMinutes()).padStart(2, '0')}:${String(tradeTime.getSeconds()).padStart(2, '0')}`;
+            
+            let typeText = '';
+            let typeColor = '';
+            if (trade.posSide === 'long' && trade.side === 'buy') {
+                typeText = '🔴 多单开仓';
+                typeColor = '#e53e3e';
+            } else if (trade.posSide === 'long' && trade.side === 'sell') {
+                typeText = '🟢 多单平仓';
+                typeColor = '#38a169';
+            } else if (trade.posSide === 'short' && trade.side === 'sell') {
+                typeText = '🟠 空单开仓';
+                typeColor = '#dd6b20';
+            } else if (trade.posSide === 'short' && trade.side === 'buy') {
+                typeText = '🔵 空单平仓';
+                typeColor = '#3182ce';
+            }
+            
+            const infoHtml = `
+                <div style="display: grid; grid-template-columns: auto 1fr; gap: 8px; line-height: 1.8;">
+                    <div style="color: #718096;">时间:</div>
+                    <div style="font-weight: 600;">${timeStr}</div>
+                    
+                    <div style="color: #718096;">币种:</div>
+                    <div style="font-weight: 600;">${trade.instId.replace('-USDT-SWAP', '')}</div>
+                    
+                    <div style="color: #718096;">类型:</div>
+                    <div style="font-weight: 600; color: ${typeColor};">${typeText}</div>
+                    
+                    <div style="color: #718096;">价格:</div>
+                    <div>${parseFloat(trade.fillPx).toFixed(4)}</div>
+                    
+                    <div style="color: #718096;">数量:</div>
+                    <div>${parseFloat(trade.fillSz).toFixed(2)}</div>
+                </div>
+            `;
+            
+            document.getElementById('tradeInfoDisplay').innerHTML = infoHtml;
+            
+            // 如果已有评价，回显并显示删除按钮
+            const existingRating = tradeRatings[trade.tradeId];
+            const deleteBtn = document.getElementById('deleteRatingBtn');
+            
+            if (existingRating) {
+                selectedRating = existingRating.rating;
+                document.getElementById('ratingNote').value = existingRating.note || '';
+                updateNoteCharCount();
+                updateRatingButtons();
+                deleteBtn.style.display = 'block';  // 显示删除按钮
+            } else {
+                document.getElementById('ratingNote').value = '';
+                updateNoteCharCount();
+                updateRatingButtons();
+                deleteBtn.style.display = 'none';  // 隐藏删除按钮
+            }
+            
+            // 显示模态框
+            const modal = document.getElementById('tradeRatingModal');
+            modal.style.display = 'flex';
+        }
+        
+        // 关闭评价模态框
+        function closeRatingModal() {
+            document.getElementById('tradeRatingModal').style.display = 'none';
+            currentTradeForRating = null;
+            selectedRating = null;
+        }
+        
+        // 选择评价
+        function selectRating(rating) {
+            selectedRating = rating;
+            updateRatingButtons();
+        }
+        
+        // 更新评价按钮样式
+        function updateRatingButtons() {
+            const correctBtn = document.getElementById('ratingCorrect');
+            const incorrectBtn = document.getElementById('ratingIncorrect');
+            
+            if (selectedRating === 'correct') {
+                correctBtn.style.background = '#48bb78';
+                correctBtn.style.borderColor = '#48bb78';
+                correctBtn.style.color = 'white';
+                incorrectBtn.style.background = 'white';
+                incorrectBtn.style.borderColor = '#e2e8f0';
+                incorrectBtn.style.color = '#2d3748';
+            } else if (selectedRating === 'incorrect') {
+                incorrectBtn.style.background = '#f56565';
+                incorrectBtn.style.borderColor = '#f56565';
+                incorrectBtn.style.color = 'white';
+                correctBtn.style.background = 'white';
+                correctBtn.style.borderColor = '#e2e8f0';
+                correctBtn.style.color = '#2d3748';
+            } else {
+                correctBtn.style.background = 'white';
+                correctBtn.style.borderColor = '#e2e8f0';
+                correctBtn.style.color = '#2d3748';
+                incorrectBtn.style.background = 'white';
+                incorrectBtn.style.borderColor = '#e2e8f0';
+                incorrectBtn.style.color = '#2d3748';
+            }
+        }
+        
+        // 更新字符计数
+        function updateNoteCharCount() {
+            const note = document.getElementById('ratingNote').value;
+            document.getElementById('noteCharCount').textContent = note.length;
+        }
+        
+        // 监听备注输入
+        document.addEventListener('DOMContentLoaded', function() {
+            const noteInput = document.getElementById('ratingNote');
+            if (noteInput) {
+                noteInput.addEventListener('input', updateNoteCharCount);
+            }
+        });
+        
+        // 保存交易评价
+        async function saveTradeRating() {
+            if (!currentTradeForRating) {
+                alert('❌ 没有选择交易');
+                return;
+            }
+            
+            if (!selectedRating) {
+                alert('⚠️ 请选择评价结果（正确或错误）');
+                return;
+            }
+            
+            const note = document.getElementById('ratingNote').value.trim();
+            const dateStr = formatDate(currentDate).replace(/-/g, '');
+            
+            try {
+                const response = await fetch('/api/okx-trading/trade-ratings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        tradeId: currentTradeForRating.tradeId,
+                        date: dateStr,
+                        rating: selectedRating,
+                        note: note
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // 更新本地缓存
+                    tradeRatings[currentTradeForRating.tradeId] = {
+                        rating: selectedRating,
+                        note: note
+                    };
+                    
+                    console.log('✅ 评价保存成功:', currentTradeForRating.tradeId);
+                    
+                    alert('✅ 评价保存成功！');
+                    closeRatingModal();
+                    
+                    // 重新渲染图表以显示评价标记
+                    loadData();
+                } else {
+                    alert('❌ 保存失败: ' + result.message);
+                }
+            } catch (error) {
+                console.error('❌ 保存评价失败:', error);
+                alert('❌ 保存失败: ' + error.message);
+            }
+        }
+        
+        // 删除交易评价
+        async function deleteTradeRating() {
+            if (!currentTradeForRating) {
+                alert('❌ 没有选择交易');
+                return;
+            }
+            
+            // 确认删除
+            if (!confirm('🗑️ 确定要删除这个交易的评价吗？\n\n删除后将无法恢复。')) {
+                return;
+            }
+            
+            const dateStr = formatDate(currentDate).replace(/-/g, '');
+            
+            try {
+                const response = await fetch('/api/okx-trading/trade-ratings', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        tradeId: currentTradeForRating.tradeId,
+                        date: dateStr
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // 从本地缓存中删除
+                    delete tradeRatings[currentTradeForRating.tradeId];
+                    
+                    console.log('🗑️ 评价删除成功:', currentTradeForRating.tradeId);
+                    
+                    alert('✅ 评价已删除！');
+                    closeRatingModal();
+                    
+                    // 重新渲染图表
+                    loadData();
+                } else {
+                    alert('❌ 删除失败: ' + result.message);
+                }
+            } catch (error) {
+                console.error('❌ 删除评价失败:', error);
+                alert('❌ 删除失败: ' + error.message);
+            }
+        }
+
+        // 切换说明文档面板的展开/收起状态
+        function toggleInfoPanel() {
+            const content = document.getElementById('infoContent');
+            const toggle = document.getElementById('infoToggle');
+            
+            if (content.classList.contains('collapsed')) {
+                // 展开
+                content.classList.remove('collapsed');
+                toggle.classList.remove('collapsed');
+                toggle.textContent = '▼';
+                // 保存状态到localStorage
+                localStorage.setItem('infoPanelExpanded', 'true');
+            } else {
+                // 收起
+                content.classList.add('collapsed');
+                toggle.classList.add('collapsed');
+                toggle.textContent = '▶';
+                // 保存状态到localStorage
+                localStorage.setItem('infoPanelExpanded', 'false');
+            }
+        }
+
+        // 页面加载时恢复说明文档面板状态
+        document.addEventListener('DOMContentLoaded', function() {
+            const infoPanelExpanded = localStorage.getItem('infoPanelExpanded');
+            // 默认收起状态，只有明确设置为true时才展开
+            if (infoPanelExpanded === 'true') {
+                const content = document.getElementById('infoContent');
+                const toggle = document.getElementById('infoToggle');
+                content.classList.remove('collapsed');
+                toggle.classList.remove('collapsed');
+                toggle.textContent = '▼';
+            }
+        });
+    </script>
+</body>
+</html>

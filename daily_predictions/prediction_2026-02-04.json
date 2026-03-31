@@ -1,0 +1,15 @@
+{
+  "date": "2026-02-04",
+  "timestamp": "2026-02-04 02:00:00",
+  "analysis_time": "02:00:00",
+  "color_counts": {
+    "green": 0,
+    "red": 12,
+    "yellow": 0,
+    "blank": 0,
+    "blank_ratio": 0.0
+  },
+  "signal": "做空",
+  "description": "🔴 只有红色柱子，预判下跌行情，建议做空。操作提示：相对高点做空",
+  "is_temp": false
+}

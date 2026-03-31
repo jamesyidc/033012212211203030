@@ -1,0 +1,5 @@
+{"timestamp": "2026-02-23T02:13:12.121848", "time": "2026-02-23 02:13:12", "account_id": "account_poit_main", "strategy_type": "top_performers", "allowed": false, "reason": "用户已暂停所有策略", "trigger_price": 67000, "btc_price": null}
+{"timestamp": "2026-02-18T01:56:08.416370", "time": "2026-02-18 01:56:08", "account_id": "account_poit_main", "strategy_type": "top_performers", "allowed": true, "reason": "User enabled strategy", "trigger_price": 67000, "btc_price": null}
+{"timestamp": "2026-02-18T01:58:55.406478", "time": "2026-02-18 01:58:55", "account_id": "account_poit_main", "strategy_type": "top_performers", "allowed": true, "reason": "User enabled strategy", "trigger_price": 67000, "btc_price": null}
+{"timestamp": "2026-02-18T02:39:37.169463", "time": "2026-02-18 02:39:37", "account_id": "account_poit_main", "strategy_type": "top_performers", "allowed": true, "reason": "User enabled strategy", "trigger_price": 67000, "btc_price": null}
+{"timestamp": "2026-02-23T02:18:50.917252", "time": "2026-02-23 02:18:50", "account_id": "account_poit_main", "strategy_type": "top_performers", "allowed": false, "reason": "管理员暂停所有策略", "trigger_price": 67000, "btc_price": null}

@@ -1,0 +1,251 @@
+{
+  "apps": [
+    {
+      "name": "flask-app",
+      "script": "/home/user/webapp/core_code/app.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "1G",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/flask-app-out.log",
+      "error_file": "/home/user/webapp/logs/flask-app-error.log"
+    },
+    {
+      "name": "signal-collector",
+      "script": "/home/user/webapp/source_code/signal_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/signal-collector-out.log",
+      "error_file": "/home/user/webapp/logs/signal-collector-error.log"
+    },
+    {
+      "name": "liquidation-1h-collector",
+      "script": "/home/user/webapp/source_code/liquidation_1h_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/liquidation-1h-collector-out.log",
+      "error_file": "/home/user/webapp/logs/liquidation-1h-collector-error.log"
+    },
+    {
+      "name": "crypto-index-collector",
+      "script": "/home/user/webapp/source_code/crypto_index_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/crypto-index-collector-out.log",
+      "error_file": "/home/user/webapp/logs/crypto-index-collector-error.log"
+    },
+    {
+      "name": "price-speed-collector",
+      "script": "/home/user/webapp/source_code/price_speed_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/price-speed-collector-out.log",
+      "error_file": "/home/user/webapp/logs/price-speed-collector-error.log"
+    },
+    {
+      "name": "sar-jsonl-collector",
+      "script": "/home/user/webapp/source_code/sar_jsonl_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/sar-jsonl-collector-out.log",
+      "error_file": "/home/user/webapp/logs/sar-jsonl-collector-error.log"
+    },
+    {
+      "name": "price-comparison-collector",
+      "script": "/home/user/webapp/source_code/price_comparison_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/price-comparison-collector-out.log",
+      "error_file": "/home/user/webapp/logs/price-comparison-collector-error.log"
+    },
+    {
+      "name": "financial-indicators-collector",
+      "script": "/home/user/webapp/source_code/financial_indicators_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/financial-indicators-collector-out.log",
+      "error_file": "/home/user/webapp/logs/financial-indicators-collector-error.log"
+    },
+    {
+      "name": "okx-day-change-collector",
+      "script": "/home/user/webapp/source_code/okx_day_change_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/okx-day-change-collector-out.log",
+      "error_file": "/home/user/webapp/logs/okx-day-change-collector-error.log"
+    },
+    {
+      "name": "price-baseline-collector",
+      "script": "/home/user/webapp/source_code/price_baseline_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/price-baseline-collector-out.log",
+      "error_file": "/home/user/webapp/logs/price-baseline-collector-error.log"
+    },
+    {
+      "name": "sar-bias-stats-collector",
+      "script": "/home/user/webapp/source_code/sar_bias_stats_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/sar-bias-stats-collector-out.log",
+      "error_file": "/home/user/webapp/logs/sar-bias-stats-collector-error.log"
+    },
+    {
+      "name": "panic-wash-collector",
+      "script": "/home/user/webapp/source_code/panic_wash_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/panic-wash-collector-out.log",
+      "error_file": "/home/user/webapp/logs/panic-wash-collector-error.log"
+    },
+    {
+      "name": "coin-change-tracker",
+      "script": "/home/user/webapp/source_code/coin_change_tracker_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/coin-change-tracker-out.log",
+      "error_file": "/home/user/webapp/logs/coin-change-tracker-error.log"
+    },
+    {
+      "name": "coin-price-tracker",
+      "script": "/home/user/webapp/source_code/coin_price_tracker_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/coin-price-tracker-out.log",
+      "error_file": "/home/user/webapp/logs/coin-price-tracker-error.log"
+    },
+    {
+      "name": "data-health-monitor",
+      "script": "/home/user/webapp/source_code/data_health_monitor.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/data-health-monitor-out.log",
+      "error_file": "/home/user/webapp/logs/data-health-monitor-error.log"
+    },
+    {
+      "name": "system-health-monitor",
+      "script": "/home/user/webapp/source_code/system_health_monitor.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/system-health-monitor-out.log",
+      "error_file": "/home/user/webapp/logs/system-health-monitor-error.log"
+    },
+    {
+      "name": "market-sentiment-collector",
+      "script": "/home/user/webapp/source_code/market_sentiment_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/market-sentiment-collector-out.log",
+      "error_file": "/home/user/webapp/logs/market-sentiment-collector-error.log"
+    },
+    {
+      "name": "price-position-collector",
+      "script": "/home/user/webapp/source_code/price_position_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/price-position-collector-out.log",
+      "error_file": "/home/user/webapp/logs/price-position-collector-error.log"
+    },
+    {
+      "name": "new-high-low-collector",
+      "script": "/home/user/webapp/source_code/new_high_low_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/new-high-low-collector-out.log",
+      "error_file": "/home/user/webapp/logs/new-high-low-collector-error.log"
+    }
+  ]
+}

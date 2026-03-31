@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统状态 - 深色主题</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #00d4ff;
+            padding: 40px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(42, 45, 71, 0.95);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            padding: 30px;
+        }
+        h1 {
+            color: #00d4ff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .status-item {
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(0, 212, 255, 0.1);
+            border-left: 3px solid #00d4ff;
+        }
+        .success { color: #00ff88; }
+        .info { color: #00d4ff; }
+        a {
+            color: #00d4ff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .timestamp {
+            text-align: center;
+            margin-top: 30px;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✅ 深色主题系统状态</h1>
+        
+        <div class="status-item">
+            <span class="success">✓</span> <strong>Flask服务:</strong> 正常运行
+        </div>
+        
+        <div class="status-item">
+            <span class="success">✓</span> <strong>深色主题:</strong> 已应用
+            <br><small class="info">背景: #1a1a2e → #16213e</small>
+        </div>
+        
+        <div class="status-item">
+            <span class="success">✓</span> <strong>端口:</strong> 5000
+        </div>
+        
+        <div class="status-item">
+            <span class="info">📊</span> <strong>功能模块:</strong>
+            <br>• <a href="/">首页导航</a>
+            <br>• <a href="/query">历史查询</a>
+            <br>• <a href="/chart">趋势图表</a>
+            <br>• <a href="/timeline">时间轴</a>
+        </div>
+        
+        <div class="status-item">
+            <span class="info">🔌</span> <strong>API接口:</strong>
+            <br>• <a href="/api/stats">/api/stats</a> - 统计数据
+            <br>• <a href="/api/latest">/api/latest</a> - 最新数据
+            <br>• <a href="/api/chart?page=0">/api/chart</a> - 图表数据
+        </div>
+        
+        <div class="timestamp">
+            生成时间: <span id="time"></span>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('time').textContent = new Date().toLocaleString('zh-CN');
+    </script>
+</body>
+</html>

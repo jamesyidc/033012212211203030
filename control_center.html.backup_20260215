@@ -1,0 +1,3261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>中控系统 - OKX交易 + 数据分析 v2.2 (27币种)</title>
+    <!-- Version: 2.2.0-27coins | Updated: 2025-12-07 06:30 -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: #0a0e27;
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* 左侧：OKX页面 */
+        .left-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #1a1f3a;
+        }
+
+        .panel-header {
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1229 100%);
+            padding: 15px 20px;
+            border-bottom: 2px solid #2a3558;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .symbol-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .symbol-input input {
+            padding: 8px 12px;
+            background: #0f1229;
+            border: 1px solid #2a3558;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 14px;
+            width: 180px;
+        }
+
+        .symbol-input input:focus {
+            outline: none;
+            border-color: #2962ff;
+        }
+
+        .symbol-input button {
+            padding: 8px 16px;
+            background: #2962ff;
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .symbol-input button:hover {
+            background: #1e4fd9;
+        }
+
+        /* 快速选择币种按钮 */
+        .quick-select {
+            display: flex;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #0f1229;
+            border-bottom: 1px solid #1a1f3a;
+            flex-wrap: wrap;
+        }
+
+        .quick-btn {
+            padding: 6px 12px;
+            background: #1a1f3a;
+            border: 1px solid #2a3558;
+            border-radius: 6px;
+            color: #e0e0e0;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .quick-btn:hover {
+            background: #2a3558;
+            border-color: #3a4578;
+        }
+
+        .quick-btn.active {
+            background: #2962ff;
+            border-color: #2962ff;
+            color: #fff;
+        }
+
+        /* 时间段选择按钮 */
+        .time-btn {
+            padding: 6px 12px;
+            background: #1a1f3a;
+            border: 1px solid #2a3558;
+            border-radius: 6px;
+            color: #e0e0e0;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .time-btn:hover {
+            background: #2a3558;
+            border-color: #3a4578;
+        }
+
+        .time-btn.active {
+            background: #ffa726;
+            border-color: #ffa726;
+            color: #000;
+            font-weight: 600;
+        }
+
+        /* 币种选择按钮 */
+        .coin-select-btn {
+            padding: 10px 12px;
+            background: #0f1229;
+            border: 2px solid #2a3558;
+            border-radius: 8px;
+            color: #e0e0e0;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .coin-select-btn:hover {
+            background: #1a1f3a;
+            border-color: #3a4578;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .coin-select-btn.active {
+            background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+            border-color: #00ff88;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        }
+
+        .iframe-container {
+            flex: 1;
+            position: relative;
+            background: #000;
+        }
+
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* 深度图标识框 */
+        .depth-chart-marker {
+            position: absolute;
+            border: 3px solid #ffa726;
+            pointer-events: all;
+            z-index: 5;
+            box-shadow: 0 0 10px rgba(255, 167, 38, 0.5);
+            cursor: move;
+        }
+        
+        .depth-chart-marker.dragging {
+            opacity: 0.7;
+        }
+
+        .marker-label {
+            position: absolute;
+            background: rgba(255, 167, 38, 0.9);
+            color: #000;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .marker-label.top {
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .marker-label.bottom {
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* 刻度线 */
+        .scale-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: rgba(255, 167, 38, 0.6);
+            left: 0;
+        }
+
+        .scale-label {
+            position: absolute;
+            right: -45px;
+            top: -8px;
+            background: rgba(255, 167, 38, 0.9);
+            color: #000;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 3px;
+        }
+
+        /* 调整控制面板 */
+        .marker-controls {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background: rgba(10, 14, 39, 0.95);
+            border: 2px solid #2a3558;
+            border-radius: 8px;
+            padding: 15px;
+            z-index: 20;
+            min-width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .marker-controls.collapsed {
+            padding: 8px 15px;
+            min-width: auto;
+        }
+
+        .marker-controls.collapsed .control-content {
+            display: none;
+        }
+
+        .controls-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .controls-header .title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .collapse-btn {
+            background: none;
+            border: none;
+            color: #8b8fa4;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .collapse-btn:hover {
+            color: #fff;
+        }
+
+        .marker-controls.collapsed .collapse-btn {
+            transform: rotate(180deg);
+        }
+
+        .control-group {
+            margin-bottom: 10px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 12px;
+            color: #8b8fa4;
+            margin-bottom: 5px;
+        }
+
+        .control-group input {
+            width: 60px;
+            padding: 4px 8px;
+            background: #1a1f3a;
+            border: 1px solid #2a3558;
+            border-radius: 4px;
+            color: #e0e0e0;
+            font-size: 12px;
+        }
+
+        .control-group button {
+            padding: 4px 12px;
+            background: #2962ff;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+
+        .control-group button:hover {
+            background: #1e4fd9;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 14, 39, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .loading-text {
+            font-size: 16px;
+            color: #8b8fa4;
+        }
+
+        /* 右侧：数据分析 */
+        .right-panel {
+            width: 450px;
+            display: flex;
+            flex-direction: column;
+            background: #0a0e27;
+            overflow-y: auto;
+        }
+
+        .stats-section {
+            padding: 20px;
+        }
+
+        .stats-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #1a1f3a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 深度线评分卡片 */
+        .score-card {
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1229 100%);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #2a3558;
+        }
+
+        .score-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .score-label {
+            font-size: 12px;
+            color: #8b8fa4;
+            text-transform: uppercase;
+        }
+
+        .score-value {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .score-value.long {
+            color: #00ff88;
+        }
+
+        .score-value.short {
+            color: #ff4d4f;
+        }
+
+        .score-bar {
+            height: 8px;
+            background: #0a0e27;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+
+        .score-bar-fill.long {
+            background: linear-gradient(90deg, #00ff88 0%, #00cc66 100%);
+        }
+
+        .score-bar-fill.short {
+            background: linear-gradient(90deg, #ff4d4f 0%, #cc0000 100%);
+        }
+
+        /* 20档分布 */
+        .distribution-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 4px;
+            margin-top: 10px;
+        }
+
+        .dist-cell {
+            aspect-ratio: 1;
+            background: #0a0e27;
+            border-radius: 3px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dist-cell-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            transition: height 0.3s ease;
+        }
+
+        .dist-cell-fill.long {
+            background: #00ff88;
+        }
+
+        .dist-cell-fill.short {
+            background: #ff4d4f;
+        }
+
+        /* 数据统计卡片 */
+        .stat-card {
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1229 100%);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #2a3558;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #1a1f3a;
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #8b8fa4;
+        }
+
+        .stat-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+
+        .stat-value.green {
+            color: #00ff88;
+        }
+
+        .stat-value.red {
+            color: #ff4d4f;
+        }
+
+        .stat-value.yellow {
+            color: #ffa726;
+        }
+
+        /* SAR统计卡片 */
+        .sar-coin-card {
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1229 100%);
+            border: 2px solid #2d3455;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .sar-coin-card:hover {
+            /* 移除悬浮效果 */
+        }
+
+        .sar-coin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #1a1f3a;
+        }
+
+        .sar-coin-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .sar-trend {
+            font-size: 13px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: #1a1f3a;
+        }
+
+        .sar-trend.bullish {
+            color: #00ff88;
+            background: rgba(0, 255, 136, 0.15);
+        }
+
+        .sar-trend.bearish {
+            color: #ff4d4f;
+            background: rgba(255, 77, 79, 0.15);
+        }
+
+        .sar-coin-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 6px;
+        }
+
+        .sar-rsi {
+            font-size: 13px;
+            font-weight: 600;
+            color: #ffa726;
+        }
+
+        .sar-price {
+            font-size: 13px;
+            font-weight: 600;
+            color: #00bfff;
+        }
+
+        .sar-update-time {
+            font-size: 10px;
+            color: #8b8fa4;
+            margin-top: 6px;
+            text-align: right;
+        }
+
+        /* 监控状态 */
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: rgba(0, 255, 136, 0.2);
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00ff88;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .update-time {
+            font-size: 11px;
+            color: #8b8fa4;
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        /* 滚动条 */
+        .right-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .right-panel::-webkit-scrollbar-track {
+            background: #0a0e27;
+        }
+
+        .right-panel::-webkit-scrollbar-thumb {
+            background: #2a3558;
+            border-radius: 3px;
+        }
+
+        /* 控制按钮 */
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .control-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn.start {
+            background: #00ff88;
+            color: #0a0e27;
+        }
+
+        .control-btn.start:hover {
+            background: #00cc66;
+        }
+
+        .control-btn.stop {
+            background: #ff4d4f;
+            color: #fff;
+        }
+
+        .control-btn.stop:hover {
+            background: #cc0000;
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .control-btn.memory {
+            background: #9c27b0;
+            color: #fff;
+        }
+
+        .control-btn.memory:hover {
+            background: #7b1fa2;
+        }
+
+        .control-btn.refresh {
+            background: #2196f3;
+            color: #fff;
+        }
+
+        .control-btn.refresh:hover {
+            background: #1976d2;
+        }
+
+        /* 内存状态指示器 */
+        .memory-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(26, 31, 58, 0.95);
+            border: 1px solid #2a3558;
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #e0e0e0;
+            font-size: 12px;
+            z-index: 9999;
+            min-width: 200px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .memory-indicator .memory-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .memory-indicator .memory-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 4px 0;
+        }
+
+        .memory-indicator .memory-value {
+            font-weight: 600;
+            color: #00ff88;
+        }
+
+        .memory-indicator .memory-value.warning {
+            color: #ffa726;
+        }
+
+        .memory-indicator .memory-value.danger {
+            color: #ff4d4f;
+        }
+
+        /* 通知动画 */
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        /* 脉动动画 - 用于自动刷新指示器 */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                box-shadow: 0 0 8px #00ff88;
+            }
+            50% {
+                opacity: 0.5;
+                box-shadow: 0 0 16px #00ff88;
+            }
+        }
+
+        /* 旋转动画 - 用于加载指示器 */
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 左侧：OKX页面 -->
+        <div class="left-panel">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <span>📊</span>
+                    <span>OKX交易页面</span>
+                </div>
+                <div class="symbol-input">
+                    <input type="text" id="symbolInput" value="eth-usdt-swap" placeholder="输入交易对 (如: eth-usdt-swap)">
+                    <button onclick="loadOkexPage()">加载</button>
+                </div>
+            </div>
+            <!-- 快速选择币种 -->
+            <div class="quick-select" style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+                <button class="quick-btn active" onclick="quickSelect('eth-usdt-swap')">ETH</button>
+                <button class="quick-btn active" onclick="quickSelect('xrp-usdt-swap')">XRP</button>
+                <button class="quick-btn active" onclick="quickSelect('bnb-usdt-swap')">BNB</button>
+                <button class="quick-btn active" onclick="quickSelect('sol-usdt-swap')">SOL</button>
+                <button class="quick-btn active" onclick="quickSelect('trx-usdt-swap')">TRX</button>
+                <button class="quick-btn active" onclick="quickSelect('ton-usdt-swap')">TON</button>
+                <button class="quick-btn active" onclick="quickSelect('etc-usdt-swap')">ETC</button>
+                <button class="quick-btn active" onclick="quickSelect('link-usdt-swap')">LINK</button>
+                <button class="quick-btn active" onclick="quickSelect('cro-usdt-swap')">CRO</button>
+                <button class="quick-btn active" onclick="quickSelect('dot-usdt-swap')">DOT</button>
+                <button class="quick-btn active" onclick="quickSelect('aave-usdt-swap')">AAVE</button>
+                <button class="quick-btn active" onclick="quickSelect('near-usdt-swap')">NEAR</button>
+                <button class="quick-btn active" onclick="quickSelect('apt-usdt-swap')">APT</button>
+                <button class="quick-btn active" onclick="quickSelect('crv-usdt-swap')">CRV</button>
+                <button class="quick-btn active" onclick="quickSelect('stx-usdt-swap')">STX</button>
+                <button class="quick-btn active" onclick="quickSelect('ldo-usdt-swap')">LDO</button>
+                <button class="quick-btn active" onclick="quickSelect('doge-usdt-swap')">DOGE</button>
+                <button class="quick-btn active" onclick="quickSelect('ltc-usdt-swap')">LTC</button>
+                <button class="quick-btn active" onclick="quickSelect('sui-usdt-swap')">SUI</button>
+                <button onclick="selectAll()" style="padding: 8px 16px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 6px; color: #00ff88; cursor: pointer; font-size: 14px; margin-left: 10px;">全选</button>
+                <button onclick="clearAll()" style="padding: 8px 16px; background: #1a1f3a; border: 1px solid #ff4d4f; border-radius: 6px; color: #ff4d4f; cursor: pointer; font-size: 14px;">清空</button>
+            </div>
+            <div class="iframe-container">
+                <div class="loading-overlay" id="loadingOverlay">
+                    <div class="loading-text">正在加载OKX页面...</div>
+                </div>
+                <iframe id="okexIframe" src="https://www.okx.com/zh-hans/trade-swap/eth-usdt-swap"></iframe>
+                
+                <!-- 深度图标识框 -->
+                <div class="depth-chart-marker" id="depthMarker" style="display: none;">
+                    <div class="marker-label top">100分</div>
+                    <div class="marker-label bottom">0分</div>
+                    
+                    <!-- 刻度线：从顶部开始，每10%一条 -->
+                    <div class="scale-line" style="top: 10%;">
+                        <div class="scale-label">90分</div>
+                    </div>
+                    <div class="scale-line" style="top: 20%;">
+                        <div class="scale-label">80分</div>
+                    </div>
+                    <div class="scale-line" style="top: 30%;">
+                        <div class="scale-label">70分</div>
+                    </div>
+                    <div class="scale-line" style="top: 40%;">
+                        <div class="scale-label">60分</div>
+                    </div>
+                    <div class="scale-line" style="top: 50%;">
+                        <div class="scale-label">50分</div>
+                    </div>
+                    <div class="scale-line" style="top: 60%;">
+                        <div class="scale-label">40分</div>
+                    </div>
+                    <div class="scale-line" style="top: 70%;">
+                        <div class="scale-label">30分</div>
+                    </div>
+                    <div class="scale-line" style="top: 80%;">
+                        <div class="scale-label">20分</div>
+                    </div>
+                    <div class="scale-line" style="top: 90%;">
+                        <div class="scale-label">10分</div>
+                    </div>
+                </div>
+                
+                <!-- 调整控制面板 -->
+                <div class="marker-controls" id="markerControls">
+                    <div class="controls-header" onclick="toggleControls()">
+                        <div class="title">📐 深度图框定位</div>
+                        <button class="collapse-btn" id="collapseBtn">▼</button>
+                    </div>
+                    
+                    <div class="control-content" id="controlContent">
+                    <div class="control-group">
+                        <label>左边距 (px)</label>
+                        <input type="number" id="markerLeft" value="165" step="5">
+                        <button onclick="updateMarker()">应用</button>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>顶部距离 (px)</label>
+                        <input type="number" id="markerTop" value="140" step="5">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>宽度 (px)</label>
+                        <input type="number" id="markerWidth" value="400" step="5">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>高度 (px)</label>
+                        <input type="number" id="markerHeight" value="275" step="5">
+                    </div>
+                    
+                    <div class="control-group">
+                        <button onclick="toggleMarker()" style="width: 100%; background: #00ff88; color: #000;">显示/隐藏标识框</button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：数据分析 -->
+        <div class="right-panel">
+            <div class="stats-section">
+                <!-- 历史数据多时间段显示 -->
+                <div class="stat-card" style="margin-bottom: 20px;">
+                    <div class="stats-title" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span>📊</span>
+                            <span>历史深度评分曲线</span>
+                            <span style="font-size: 12px; color: #00ff88; background: rgba(0, 255, 136, 0.1); padding: 2px 8px; border-radius: 4px; border: 1px solid #00ff88;">v2.1 自动刷新</span>
+                        </div>
+                        <!-- 币种选择下拉框 -->
+                        <select id="historyCoinSelect" onchange="switchHistoryCoin()" style="padding: 6px 12px; background: #1a1f3a; border: 1px solid #2d3455; border-radius: 6px; color: #fff; font-size: 14px; cursor: pointer;">
+                            <option value="BTC-USDT-SWAP">BTC</option>
+                            <option value="ETH-USDT-SWAP" selected>ETH</option>
+                            <option value="XRP-USDT-SWAP">XRP</option>
+                            <option value="BNB-USDT-SWAP">BNB</option>
+                            <option value="SOL-USDT-SWAP">SOL</option>
+                            <option value="LTC-USDT-SWAP">LTC</option>
+                            <option value="DOGE-USDT-SWAP">DOGE</option>
+                            <option value="SUI-USDT-SWAP">SUI</option>
+                            <option value="TRX-USDT-SWAP">TRX</option>
+                            <option value="TON-USDT-SWAP">TON</option>
+                            <option value="ETC-USDT-SWAP">ETC</option>
+                            <option value="BCH-USDT-SWAP">BCH</option>
+                            <option value="HBAR-USDT-SWAP">HBAR</option>
+                            <option value="XLM-USDT-SWAP">XLM</option>
+                            <option value="FIL-USDT-SWAP">FIL</option>
+                            <option value="LINK-USDT-SWAP">LINK</option>
+                            <option value="CRO-USDT-SWAP">CRO</option>
+                            <option value="DOT-USDT-SWAP">DOT</option>
+                            <option value="AAVE-USDT-SWAP">AAVE</option>
+                            <option value="UNI-USDT-SWAP">UNI</option>
+                            <option value="NEAR-USDT-SWAP">NEAR</option>
+                            <option value="APT-USDT-SWAP">APT</option>
+                            <option value="CFX-USDT-SWAP">CFX</option>
+                            <option value="CRV-USDT-SWAP">CRV</option>
+                            <option value="STX-USDT-SWAP">STX</option>
+                            <option value="LDO-USDT-SWAP">LDO</option>
+                            <option value="TAO-USDT-SWAP">TAO</option>
+                        </select>
+                    </div>
+                    
+                    <!-- 时间段选择 -->
+                    <div style="display: flex; gap: 8px; margin-bottom: 15px; margin-top: 15px; flex-wrap: wrap;">
+                        <button class="time-btn" onclick="switchTimeRange('3m')" data-range="3m">3分钟</button>
+                        <button class="time-btn active" onclick="switchTimeRange('1h')" data-range="1h">1小时</button>
+                        <button class="time-btn" onclick="switchTimeRange('3h')" data-range="3h">3小时</button>
+                        <button class="time-btn" onclick="switchTimeRange('6h')" data-range="6h">6小时</button>
+                        <button class="time-btn" onclick="switchTimeRange('12h')" data-range="12h">12小时</button>
+                        <button class="time-btn" onclick="switchTimeRange('24h')" data-range="24h">24小时</button>
+                    </div>
+                    
+                    <!-- 历史数据图表 -->
+                    <!-- 主图表包含：做多评分、做空评分、多空差值、价格波动 -->
+                    <div style="position: relative;">
+                        <!-- 加载状态指示器 -->
+                        <div id="chartLoadingIndicator" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; display: none; text-align: center;">
+                            <div style="width: 60px; height: 60px; border: 4px solid rgba(0, 255, 136, 0.2); border-top: 4px solid #00ff88; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px;"></div>
+                            <div style="color: #00ff88; font-size: 14px; font-weight: 600;">加载中...</div>
+                            <div id="loadingStatus" style="color: #8b8fa4; font-size: 12px; margin-top: 8px;">正在获取数据</div>
+                        </div>
+                        <canvas id="historyChart" width="800" height="380" style="width: 100%; height: 380px;"></canvas>
+                    </div>
+                    
+                    <!-- 图例 -->
+                    <div style="display: flex; justify-content: center; gap: 20px; margin-top: 10px; font-size: 13px; color: #8b8fa4; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <div style="width: 20px; height: 3px; background: #00ff88;"></div>
+                            <span>做多评分</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <div style="width: 20px; height: 3px; background: #ff4d4f;"></div>
+                            <span>做空评分</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <div style="width: 20px; height: 2px; background: #ffa726; border-top: 2px dashed #ffa726;"></div>
+                            <span>多空差值</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <div style="width: 20px; height: 2px; background: #bb86fc; border-top: 2px dashed #bb86fc;"></div>
+                            <span>价格涨跌幅</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 统计信息 -->
+                    <div style="margin-top: 15px; padding: 12px; background: rgba(15, 18, 41, 0.6); border-radius: 8px; font-size: 13px; border: 1px solid rgba(139, 143, 164, 0.2);">
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+                            <div>
+                                <span style="color: #8b8fa4;">当前时段:</span>
+                                <span style="color: #fff; margin-left: 5px; font-weight: 600;" id="currentRange">1小时</span>
+                            </div>
+                            <div>
+                                <span style="color: #8b8fa4;">数据点数:</span>
+                                <span style="color: #fff; margin-left: 5px; font-weight: 600;" id="dataPoints">--</span>
+                            </div>
+                            <div>
+                                <span style="color: #8b8fa4;">平均做多:</span>
+                                <span style="color: #00ff88; margin-left: 5px; font-weight: 600;" id="avgLong">--</span>
+                            </div>
+                            <div>
+                                <span style="color: #8b8fa4;">平均做空:</span>
+                                <span style="color: #ff4d4f; margin-left: 5px; font-weight: 600;" id="avgShort">--</span>
+                            </div>
+                        </div>
+                        <!-- 自动刷新状态指示器 -->
+                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(139, 143, 164, 0.2); display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="width: 8px; height: 8px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 8px #00ff88; animation: pulse 2s ease-in-out infinite;"></span>
+                                <span style="color: #8b8fa4; font-size: 12px;">自动刷新已启用 (30秒/次)</span>
+                            </div>
+                            <div>
+                                <span style="color: #8b8fa4; font-size: 11px;">上次刷新:</span>
+                                <span style="color: #00ff88; margin-left: 5px; font-size: 11px;" id="lastRefreshTime">--</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 价格涨跌曲线图表（已整合到主图表，此容器隐藏） -->
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(187, 134, 252, 0.05); border: 2px solid rgba(187, 134, 252, 0.3); border-radius: 12px; display: none;">
+                        <!-- 标题 -->
+                        <div style="font-size: 14px; color: #bb86fc; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-weight: 600;">
+                            <div style="width: 20px; height: 2px; background: #bb86fc; border-top: 2px dotted #bb86fc;"></div>
+                            <span>价格涨跌百分比曲线（已集成到主图表）</span>
+                        </div>
+                        
+                        <!-- 价格曲线 -->
+                        <canvas id="priceChart" width="800" height="120" style="width: 100%; height: 120px;"></canvas>
+                        
+                        <!-- 统计信息 -->
+                        <div style="margin-top: 12px; padding: 10px; background: rgba(15, 18, 41, 0.6); border-radius: 8px; font-size: 12px; border: 1px solid rgba(139, 143, 164, 0.2);">
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                                <div>
+                                    <span style="color: #8b8fa4;">当前时段:</span>
+                                    <span style="color: #fff; margin-left: 5px;" id="currentRange">1小时</span>
+                                </div>
+                                <div>
+                                    <span style="color: #8b8fa4;">数据点数:</span>
+                                    <span style="color: #fff; margin-left: 5px;" id="dataPoints">--</span>
+                                </div>
+                                <div>
+                                    <span style="color: #8b8fa4;">平均做多:</span>
+                                    <span style="color: #00ff88; margin-left: 5px;" id="avgLong">--</span>
+                                </div>
+                                <div>
+                                    <span style="color: #8b8fa4;">平均做空:</span>
+                                    <span style="color: #ff4d4f; margin-left: 5px;" id="avgShort">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SAR统计面板 -->
+                <div class="stat-card" style="margin-bottom: 20px;">
+                    <div class="stats-title" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span>🎯</span>
+                            <span>SAR趋势统计</span>
+                            <!-- 布林带象限指示器 -->
+                            <span id="bollingerQuadrant" style="font-size: 12px; padding: 3px 10px; border-radius: 4px; font-weight: 600; border: 1px solid;">--</span>
+                        </div>
+                        <!-- SAR币种显示（跟随历史深度评分的选择） -->
+                        <div id="sarCoinDisplay" style="padding: 6px 12px; background: #1a1f3a; border: 1px solid #2d3455; border-radius: 6px; color: #00ff88; font-size: 14px; font-weight: 600;">
+                            TAO
+                        </div>
+                    </div>
+                    
+                    <!-- SAR单币种显示 -->
+                    <div style="margin-top: 15px;">
+                        <div class="sar-coin-card" id="sarSingleCard" style="max-width: 500px; margin: 0 auto;">
+                            <div class="sar-coin-header">
+                                <span class="sar-coin-name" id="sarCoinName">TAO</span>
+                                <span class="sar-trend" id="sarTrend">--</span>
+                            </div>
+                            <div class="sar-coin-info">
+                                <div style="font-size: 12px; color: #8b8fa4;">RSI(5m)</div>
+                                <div class="sar-rsi" id="sarRsi" style="font-size: 16px;">--</div>
+                            </div>
+                            <div class="sar-coin-info">
+                                <div style="font-size: 12px; color: #8b8fa4;">价格</div>
+                                <div class="sar-price" id="sarPrice" style="font-size: 16px;">--</div>
+                            </div>
+
+                            <div class="sar-update-time" id="sarUpdateTime">--</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 12px; padding: 8px; background: rgba(139, 143, 164, 0.1); border-left: 3px solid #8b8fa4; border-radius: 4px; font-size: 11px; color: #8b8fa4;">
+                        💡 SAR: 在K线上方=空头 | 在K线下方=多头 | 自动计数转换次数 | 每5分钟更新
+                    </div>
+                </div>
+
+                <div class="stats-title">
+                    <span>📈</span>
+                    <span>深度线评分系统</span>
+                    <div class="status-indicator" id="monitorStatus">
+                        <div class="status-dot"></div>
+                        <span>监控中</span>
+                    </div>
+                </div>
+
+                <!-- 已选币种显示 -->
+                <div class="stat-card" style="margin-bottom: 15px; background: linear-gradient(135deg, #1a1f3a 0%, #0f1229 100%);">
+                    <div style="font-size: 14px; color: #8b8fa4; margin-bottom: 10px;">
+                        <span>📊</span>
+                        <span>已选监控币种</span>
+                    </div>
+                    <div style="padding: 12px; background: #0f1229; border-radius: 6px; border: 1px solid #2d3455;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="color: #8b8fa4; font-size: 13px;">选中数量:</span>
+                            <span style="color: #00ff88; font-weight: 600; font-size: 16px;" id="selectedCount">27</span>
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;" id="selectedCoinsDisplay">
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">BTC</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">ETH</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">XRP</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">BNB</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">SOL</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">LTC</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">DOGE</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">SUI</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">TRX</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">TON</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">ETC</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">BCH</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">HBAR</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">XLM</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">FIL</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">LINK</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">CRO</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">DOT</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">AAVE</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">UNI</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">NEAR</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">APT</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">CFX</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">CRV</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">STX</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">LDO</span>
+                            <span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">TAO</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px; padding: 8px; background: rgba(0, 255, 136, 0.1); border-left: 3px solid #00ff88; border-radius: 4px; font-size: 12px; color: #8b8fa4;">
+                        💡 提示：点击左侧币种按钮进行多选，启动监控将监控所有选中的币种
+                    </div>
+                </div>
+
+                <!-- 控制按钮 -->
+                <div class="control-buttons">
+                    <button class="control-btn start" onclick="startMonitor()" id="startBtn">启动监控 (27个币种)</button>
+                    <button class="control-btn stop" onclick="stopMonitor()" id="stopBtn" disabled>停止监控</button>
+                </div>
+                
+                <!-- 内存管理按钮 -->
+                <div class="control-buttons">
+                    <button class="control-btn memory" onclick="manualClearMemory()" title="立即释放内存">🧹 释放内存</button>
+                    <button class="control-btn refresh" onclick="hardRefresh()" title="硬刷新页面">🔄 硬刷新</button>
+                </div>
+
+                <!-- 做多得分 -->
+                <div class="score-card">
+                    <div class="score-header">
+                        <div class="score-label">做多得分</div>
+                        <div class="score-value long" id="longScore">--</div>
+                    </div>
+                    <div class="score-bar">
+                        <div class="score-bar-fill long" id="longScoreBar" style="width: 0%"></div>
+                    </div>
+                    <div class="distribution-grid" id="longDistribution">
+                        <!-- 动态生成20个格子 -->
+                    </div>
+                </div>
+
+                <!-- 做空得分 -->
+                <div class="score-card">
+                    <div class="score-header">
+                        <div class="score-label">做空得分</div>
+                        <div class="score-value short" id="shortScore">--</div>
+                    </div>
+                    <div class="score-bar">
+                        <div class="score-bar-fill short" id="shortScoreBar" style="width: 0%"></div>
+                    </div>
+                    <div class="distribution-grid" id="shortDistribution">
+                        <!-- 动态生成20个格子 -->
+                    </div>
+                </div>
+
+                <!-- 深度线位置标注 -->
+                <div class="stat-card">
+                    <div class="stats-title">
+                        <span>📍</span>
+                        <span>深度线位置标注</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">做多线顶部（Y轴）</span>
+                        <span class="stat-value green" id="longTop">--</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">做多线底部（Y轴）</span>
+                        <span class="stat-value green" id="longBottom">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">做空线顶部（Y轴）</span>
+                        <span class="stat-value red" id="shortTop">--</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">做空线底部（Y轴）</span>
+                        <span class="stat-value red" id="shortBottom">0</span>
+                    </div>
+                </div>
+
+                <!-- 深度统计 -->
+                <div class="stat-card">
+                    <div class="stats-title">
+                        <span>💰</span>
+                        <span>深度统计</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">买盘累积量</span>
+                        <span class="stat-value green" id="bidVolume">--</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">卖盘累积量</span>
+                        <span class="stat-value red" id="askVolume">--</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">中间价</span>
+                        <span class="stat-value yellow" id="midPrice">--</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">数据条数</span>
+                        <span class="stat-value" id="dataCount">--</span>
+                    </div>
+                </div>
+
+                <div class="update-time" id="updateTime">最后更新: --</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 自动构建API URL - 支持e2b.dev域名
+        const API_BASE_URL = 'https://5009-i6z1n4prnsqw4uzv0af9z-2e77fc33.sandbox.novita.ai';
+        
+        console.log('🔗 API Base URL:', API_BASE_URL);
+        
+        // 历史数据API URL (端口5011)
+        const HISTORY_API_URL = 'https://5011-i6z1n4prnsqw4uzv0af9z-2e77fc33.sandbox.novita.ai';
+        
+        console.log('🔗 History API URL:', HISTORY_API_URL);
+        
+        // 价格监控API URL (端口5006)
+        const PRICE_API_URL = 'https://5006-i6z1n4prnsqw4uzv0af9z-2e77fc33.sandbox.novita.ai';
+        
+        console.log('🔗 Price API URL:', PRICE_API_URL);
+        
+        // 要监控的币种列表
+        const MONITOR_SYMBOLS = [
+            'BTC-USDT-SWAP',
+            'ETH-USDT-SWAP',
+            'XRP-USDT-SWAP', 
+            'BNB-USDT-SWAP',
+            'SOL-USDT-SWAP',
+            'LTC-USDT-SWAP',
+            'DOGE-USDT-SWAP',
+            'SUI-USDT-SWAP',
+            'TRX-USDT-SWAP',
+            'TON-USDT-SWAP',
+            'ETC-USDT-SWAP',
+            'BCH-USDT-SWAP',
+            'HBAR-USDT-SWAP',
+            'XLM-USDT-SWAP',
+            'FIL-USDT-SWAP',
+            'LINK-USDT-SWAP',
+            'CRO-USDT-SWAP',
+            'DOT-USDT-SWAP',
+            'AAVE-USDT-SWAP',
+            'UNI-USDT-SWAP',
+            'NEAR-USDT-SWAP',
+            'APT-USDT-SWAP',
+            'CFX-USDT-SWAP',
+            'CRV-USDT-SWAP',
+            'STX-USDT-SWAP',
+            'LDO-USDT-SWAP',
+            'TAO-USDT-SWAP'
+        ];
+        
+        let currentSymbol = 'ETH-USDT-SWAP';
+        let updateInterval;
+        let saveDataInterval; // 定时保存数据到数据库
+        let priceUpdateInterval; // 实时价格更新定时器（0.5秒）
+        let trendCanvas, trendCtx;
+        let historyCanvas, historyCtx;
+        let priceCanvas, priceCtx;
+        let currentTimeRange = '1h'; // 当前选中的时间范围
+        
+        // ⚡ 性能优化：添加币种数据缓存
+        let symbolDataCache = {}; // 格式: { 'BTC-1h': { data, timestamp }, ... }
+        let scoreHistory = {
+            long: [],
+            short: [],
+            timestamps: []
+        };
+        // 实时价格变化历史（用于价格曲线实时显示）
+        let realtimePriceHistory = {
+            prices: [],        // 实际价格
+            changes: [],       // 涨跌幅百分比
+            timestamps: [],    // 时间戳
+            basePrice: null    // 基准价格（用于计算涨跌幅）
+        };
+        let historyData = {
+            '3m': { long: [], short: [], timestamps: [], price_change: [], price_actual: [] },
+            '1h': { long: [], short: [], timestamps: [], price_change: [], price_actual: [] },
+            '3h': { long: [], short: [], timestamps: [], price_change: [], price_actual: [] },
+            '6h': { long: [], short: [], timestamps: [], price_change: [], price_actual: [] },
+            '12h': { long: [], short: [], timestamps: [], price_change: [], price_actual: [] },
+            '24h': { long: [], short: [], timestamps: [], price_change: [], price_actual: [] }
+        };
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 初始化分布网格
+            initDistributionGrid('longDistribution', 20);
+            initDistributionGrid('shortDistribution', 20);
+
+            // 初始化历史图表Canvas
+            historyCanvas = document.getElementById('historyChart');
+            historyCtx = historyCanvas.getContext('2d');
+            priceCanvas = document.getElementById('priceChart');
+            priceCtx = priceCanvas.getContext('2d');
+            
+            // iframe加载完成
+            document.getElementById('okexIframe').onload = function() {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            };
+
+            // 检查监控状态
+            checkMonitorStatus();
+            
+            // 加载历史数据
+            loadHistoryData('1h');
+            
+            // 🎯 初始化SAR币种显示（与历史深度评分的默认币种同步）
+            updateSarCoinDisplay(currentSymbol);
+            
+            // 启动历史数据自动刷新（每30秒刷新一次）
+            console.log('✅ 历史数据自动刷新已启动（每30秒）');
+            setInterval(() => {
+                console.log('🔄 自动刷新历史数据...', new Date().toLocaleTimeString());
+                loadHistoryData(currentTimeRange);
+            }, 30000);
+            
+            // 启动定时保存数据（每30秒保存一次）
+            startAutoSave();
+        });
+
+        function initDistributionGrid(containerId, count) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            for (let i = 0; i < count; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'dist-cell';
+                cell.innerHTML = `<div class="dist-cell-fill ${containerId.includes('long') ? 'long' : 'short'}"></div>`;
+                container.appendChild(cell);
+            }
+        }
+
+        function loadOkexPage() {
+            const symbol = document.getElementById('symbolInput').value.trim();
+            if (!symbol) {
+                alert('请输入交易对');
+                return;
+            }
+            
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            const iframe = document.getElementById('okexIframe');
+            iframe.src = `https://www.okx.com/zh-hans/trade-swap/${symbol}`;
+            
+            // 更新当前币种
+            currentSymbol = symbol.toUpperCase().replace(/-/g, '-');
+        }
+
+        // 快速选择币种（左侧OKX页面）
+        // 存储选中的币种列表（支持多选）
+        let selectedSymbols = [...MONITOR_SYMBOLS]; // 默认全部选中（19个币种）
+        
+        // 全选所有币种
+        function selectAll() {
+            selectedSymbols = [...MONITOR_SYMBOLS];
+            document.querySelectorAll('.quick-btn').forEach(btn => {
+                btn.classList.add('active');
+            });
+            updateSelectedDisplay();
+            console.log('✅ 全选所有币种:', selectedSymbols.join(', '));
+            alert(`✅ 已选中全部 ${selectedSymbols.length} 个币种`);
+        }
+        
+        // 清空所有选择（保留第一个）
+        function clearAll() {
+            selectedSymbols = [MONITOR_SYMBOLS[0]]; // 保留第一个
+            document.querySelectorAll('.quick-btn').forEach((btn, index) => {
+                if (index === 0) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            updateSelectedDisplay();
+            console.log('🔄 已清空，保留:', selectedSymbols[0]);
+            alert('🔄 已清空选择，保留 ETH');
+        }
+        
+        function quickSelect(symbol) {
+            const upperSymbol = symbol.toUpperCase();
+            const btn = event.target;
+            
+            // 切换选中状态（多选模式）
+            if (btn.classList.contains('active')) {
+                // 如果已选中，则取消选中
+                if (selectedSymbols.length > 1) { // 至少保留一个选中
+                    btn.classList.remove('active');
+                    selectedSymbols = selectedSymbols.filter(s => s !== upperSymbol);
+                    console.log('❌ 取消选择:', upperSymbol);
+                } else {
+                    console.log('⚠️ 至少需要选择一个币种');
+                    return;
+                }
+            } else {
+                // 如果未选中，则添加选中
+                btn.classList.add('active');
+                selectedSymbols.push(upperSymbol);
+                console.log('✅ 添加选择:', upperSymbol);
+            }
+            
+            // 更新右侧显示
+            updateSelectedDisplay();
+            
+            // 更新显示的币种列表
+            console.log('📊 当前选中币种:', selectedSymbols.join(', '));
+            
+            // 更新输入框显示第一个选中的币种
+            document.getElementById('symbolInput').value = selectedSymbols[0].toLowerCase();
+            
+            // 自动加载第一个选中币种的OKX页面
+            loadOkexPage();
+            
+            // 如果监控正在运行，更新监控列表
+            if (document.getElementById('startBtn').disabled) {
+                console.log('🔄 监控币种已更新为:', selectedSymbols.join(', '));
+            }
+        }
+        
+        // 更新右侧选中币种的显示
+        function updateSelectedDisplay() {
+            // 更新数量
+            document.getElementById('selectedCount').textContent = selectedSymbols.length;
+            
+            // 更新币种标签
+            const displayDiv = document.getElementById('selectedCoinsDisplay');
+            displayDiv.innerHTML = selectedSymbols.map(symbol => {
+                const coinName = symbol.split('-')[0]; // 提取币种名称
+                return `<span style="padding: 4px 10px; background: #1a1f3a; border: 1px solid #00ff88; border-radius: 4px; color: #00ff88; font-size: 12px;">${coinName}</span>`;
+            }).join('');
+        }
+
+        // 选择监控币种（右侧评分系统）
+        function selectMonitorCoin(symbol, btnElement) {
+            // 更新当前监控的币种
+            currentSymbol = symbol;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.coin-select-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            if (btnElement) {
+                btnElement.classList.add('active');
+            }
+            
+            // 更新显示的当前币种
+            document.getElementById('currentMonitorSymbol').textContent = symbol;
+            
+            // 如果监控正在运行，重新加载该币种的数据
+            const isMonitoring = !document.getElementById('startBtn').disabled;
+            if (isMonitoring) {
+                // 立即更新数据
+                updateData();
+                console.log('✅ 已切换监控币种到:', symbol);
+            }
+            
+            // 重新加载历史数据
+            loadHistoryData(currentTimeRange);
+        }
+
+        async function startMonitor() {
+            try {
+                // 监控选中的币种
+                const response = await fetch(`${API_BASE_URL}/api/depth/score/start`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ symbols: selectedSymbols })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('startBtn').disabled = true;
+                    document.getElementById('stopBtn').disabled = false;
+                    startUpdate();
+                    
+                    // 显示正在监控的币种
+                    const symbolsText = selectedSymbols.map(s => s.split('-')[0]).join(', ');
+                    alert(`✅ 监控已启动\n正在监控 ${selectedSymbols.length} 个币种:\n${symbolsText}`);
+                    
+                    // 更新按钮文本
+                    document.getElementById('startBtn').textContent = `启动监控 (${selectedSymbols.length}个币种)`;
+                } else {
+                    alert('启动失败: ' + data.message);
+                }
+            } catch (error) {
+                console.error('启动监控失败:', error);
+                alert('启动失败，请检查API服务');
+            }
+        }
+
+        async function stopMonitor() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/depth/score/stop`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('startBtn').disabled = false;
+                    document.getElementById('stopBtn').disabled = true;
+                    stopUpdate();
+                    alert('监控已停止');
+                }
+            } catch (error) {
+                console.error('停止监控失败:', error);
+            }
+        }
+
+        async function checkMonitorStatus() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/depth/score/status`);
+                const data = await response.json();
+                
+                if (data.success && data.is_running) {
+                    // 监控正在运行
+                    document.getElementById('startBtn').disabled = true;
+                    document.getElementById('stopBtn').disabled = false;
+                    startUpdate();
+                    console.log('✅ 监控已在运行中');
+                } else {
+                    // 监控未运行，自动启动
+                    console.log('⚠️ 监控未运行，自动启动中...');
+                    await autoStartMonitor();
+                }
+            } catch (error) {
+                console.error('检查状态失败:', error);
+                // 即使检查失败，也尝试启动监控
+                console.log('⚠️ 无法检查状态，尝试自动启动...');
+                await autoStartMonitor();
+            }
+        }
+        
+        // 自动启动监控（不显示alert）
+        async function autoStartMonitor() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/depth/score/start`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ symbols: selectedSymbols })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('startBtn').disabled = true;
+                    document.getElementById('stopBtn').disabled = false;
+                    startUpdate();
+                    console.log('✅ 监控已自动启动，监控币种:', selectedSymbols);
+                    
+                    // 更新按钮文本
+                    document.getElementById('startBtn').textContent = `启动监控 (${selectedSymbols.length}个币种)`;
+                    
+                    // 显示简短的通知（不用alert打断）
+                    showNotification(`✅ 深度线评分系统已自动启动 (${selectedSymbols.length}个币种)`);
+                } else {
+                    console.error('自动启动失败:', data.message);
+                }
+            } catch (error) {
+                console.error('自动启动监控失败:', error);
+            }
+        }
+        
+        // 显示通知（非侵入式）
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+                color: #0a0e27;
+                padding: 15px 25px;
+                border-radius: 8px;
+                box-shadow: 0 4px 20px rgba(0, 255, 136, 0.4);
+                font-weight: 600;
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // 3秒后自动消失
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        function startUpdate() {
+            if (updateInterval) clearInterval(updateInterval);
+            updateData(); // 立即更新一次
+            updateInterval = setInterval(updateData, 2000); // 每2秒更新
+            
+            // 启动实时价格更新（每0.5秒）
+            if (priceUpdateInterval) clearInterval(priceUpdateInterval);
+            updateRealtimePrice(); // 立即更新一次
+            priceUpdateInterval = setInterval(updateRealtimePrice, 500); // 每0.5秒更新价格
+        }
+
+        function stopUpdate() {
+            if (updateInterval) {
+                clearInterval(updateInterval);
+                updateInterval = null;
+            }
+            if (priceUpdateInterval) {
+                clearInterval(priceUpdateInterval);
+                priceUpdateInterval = null;
+            }
+        }
+        
+        // 实时价格更新函数（每0.5秒调用）
+        async function updateRealtimePrice() {
+            try {
+                // 从 change-monitor-api 获取实时价格数据
+                const response = await fetch(`https://5013-i6z1n4prnsqw4uzv0af9z-2e77fc33.sandbox.novita.ai/api/change/data`);
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    // 找到当前选中币种的数据
+                    const coinData = result.data.find(coin => coin.symbol === currentSymbol);
+                    
+                    if (coinData && coinData.price) {
+                        const currentPrice = coinData.price;
+                        const timestamp = Date.now();
+                        
+                        // 如果是第一次记录，设置基准价格
+                        if (realtimePriceHistory.basePrice === null) {
+                            realtimePriceHistory.basePrice = currentPrice;
+                        }
+                        
+                        // 计算涨跌幅（相对于基准价格）
+                        const changePercent = ((currentPrice - realtimePriceHistory.basePrice) / realtimePriceHistory.basePrice) * 100;
+                        
+                        // 记录数据
+                        realtimePriceHistory.prices.push(currentPrice);
+                        realtimePriceHistory.changes.push(changePercent);
+                        realtimePriceHistory.timestamps.push(timestamp);
+                        
+                        // 只保留最近3分钟的数据（360个点，每0.5秒一个）
+                        const maxPoints = 360;
+                        if (realtimePriceHistory.prices.length > maxPoints) {
+                            realtimePriceHistory.prices.shift();
+                            realtimePriceHistory.changes.shift();
+                            realtimePriceHistory.timestamps.shift();
+                        }
+                        
+                        // 重新绘制实时价格曲线
+                        drawRealtimePriceChart();
+                    }
+                }
+            } catch (error) {
+                console.error('更新实时价格失败:', error);
+            }
+        }
+
+        async function updateData() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/depth/score/current/${currentSymbol}`);
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    const data = result.data;
+                    
+                    // 更新得分
+                    document.getElementById('longScore').textContent = data.long_score.toFixed(2);
+                    document.getElementById('shortScore').textContent = data.short_score.toFixed(2);
+                    
+                    // 更新进度条
+                    document.getElementById('longScoreBar').style.width = data.long_score + '%';
+                    document.getElementById('shortScoreBar').style.width = data.short_score + '%';
+                    
+                    // 更新分布
+                    updateDistribution('longDistribution', data.long_distribution);
+                    updateDistribution('shortDistribution', data.short_distribution);
+                    
+                    // 更新深度线位置标注
+                    document.getElementById('longTop').textContent = formatNumber(data.max_bid_volume);
+                    document.getElementById('longBottom').textContent = '0';
+                    document.getElementById('shortTop').textContent = formatNumber(data.max_ask_volume);
+                    document.getElementById('shortBottom').textContent = '0';
+                    
+                    // 更新统计数据
+                    document.getElementById('bidVolume').textContent = formatNumber(data.max_bid_volume);
+                    document.getElementById('askVolume').textContent = formatNumber(data.max_ask_volume);
+                    document.getElementById('midPrice').textContent = data.mid_price.toFixed(2);
+                    
+                    // 记录历史数据用于曲线图
+                    scoreHistory.long.push(data.long_score);
+                    scoreHistory.short.push(data.short_score);
+                    scoreHistory.timestamps.push(new Date(data.timestamp));
+                    
+                    // 只保留3分钟数据（180个点，每2秒更新一次）
+                    const maxPoints = 90;
+                    if (scoreHistory.long.length > maxPoints) {
+                        scoreHistory.long.shift();
+                        scoreHistory.short.shift();
+                        scoreHistory.timestamps.shift();
+                    }
+                    
+                    // 绘制曲线图
+                    drawTrendChart();
+                    
+                    // 更新时间
+                    const now = new Date();
+                    document.getElementById('updateTime').textContent = `最后更新: ${now.toLocaleTimeString()}`;
+                }
+                
+                // 获取历史数据条数
+                const historyResponse = await fetch(`${API_BASE_URL}/api/depth/score/status`);
+                const historyData = await historyResponse.json();
+                if (historyData.success && historyData.history_counts) {
+                    const count = historyData.history_counts[currentSymbol] || 0;
+                    document.getElementById('dataCount').textContent = count + ' 条';
+                }
+                
+            } catch (error) {
+                console.error('更新数据失败:', error);
+            }
+        }
+
+        function updateDistribution(containerId, distribution) {
+            const container = document.getElementById(containerId);
+            const cells = container.querySelectorAll('.dist-cell-fill');
+            const maxCount = Math.max(...distribution, 1);
+            
+            distribution.forEach((count, index) => {
+                if (cells[index]) {
+                    const percentage = (count / maxCount) * 100;
+                    cells[index].style.height = percentage + '%';
+                }
+            });
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(2) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(2) + 'K';
+            }
+            return num.toFixed(2);
+        }
+
+        // 深度图标识框控制
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+        let markerStartLeft = 0;
+        let markerStartTop = 0;
+
+        function toggleMarker() {
+            const marker = document.getElementById('depthMarker');
+            if (marker.style.display === 'none') {
+                marker.style.display = 'block';
+                updateMarker();
+                initDragHandlers();
+            } else {
+                marker.style.display = 'none';
+            }
+        }
+
+        function updateMarker() {
+            const marker = document.getElementById('depthMarker');
+            const left = document.getElementById('markerLeft').value;
+            const top = document.getElementById('markerTop').value;
+            const width = document.getElementById('markerWidth').value;
+            const height = document.getElementById('markerHeight').value;
+            
+            marker.style.left = left + 'px';
+            marker.style.top = top + 'px';
+            marker.style.width = width + 'px';
+            marker.style.height = height + 'px';
+            
+            console.log('深度图框位置:', { left, top, width, height });
+        }
+
+        function initDragHandlers() {
+            const marker = document.getElementById('depthMarker');
+            
+            marker.onmousedown = function(e) {
+                isDragging = true;
+                marker.classList.add('dragging');
+                dragStartX = e.clientX;
+                dragStartY = e.clientY;
+                markerStartLeft = parseInt(marker.style.left) || 0;
+                markerStartTop = parseInt(marker.style.top) || 0;
+                e.preventDefault();
+            };
+
+            document.onmousemove = function(e) {
+                if (!isDragging) return;
+                
+                const deltaX = e.clientX - dragStartX;
+                const deltaY = e.clientY - dragStartY;
+                
+                const newLeft = markerStartLeft + deltaX;
+                const newTop = markerStartTop + deltaY;
+                
+                document.getElementById('markerLeft').value = newLeft;
+                document.getElementById('markerTop').value = newTop;
+                updateMarker();
+            };
+
+            document.onmouseup = function() {
+                if (isDragging) {
+                    isDragging = false;
+                    marker.classList.remove('dragging');
+                }
+            };
+        }
+
+        // 绘制3分钟曲线图
+        function drawTrendChart() {
+            if (!trendCtx || scoreHistory.long.length === 0) return;
+            
+            const width = trendCanvas.width;
+            const height = trendCanvas.height;
+            const padding = { top: 30, right: 50, bottom: 40, left: 50 };
+            const chartWidth = width - padding.left - padding.right;
+            const chartHeight = height - padding.top - padding.bottom;
+            
+            // 清空画布
+            trendCtx.fillStyle = '#0f1229';
+            trendCtx.fillRect(0, 0, width, height);
+            
+            // 绘制网格
+            trendCtx.strokeStyle = '#1a1f3a';
+            trendCtx.lineWidth = 1;
+            
+            // 横向网格（Y轴，0-100分）
+            for (let i = 0; i <= 10; i++) {
+                const y = padding.top + (chartHeight / 10) * i;
+                trendCtx.beginPath();
+                trendCtx.moveTo(padding.left, y);
+                trendCtx.lineTo(padding.left + chartWidth, y);
+                trendCtx.stroke();
+                
+                // Y轴刻度标签
+                const score = 100 - (i * 10);
+                trendCtx.fillStyle = '#8b8fa4';
+                trendCtx.font = '14px sans-serif';
+                trendCtx.textAlign = 'right';
+                trendCtx.fillText(score, padding.left - 10, y + 5);
+            }
+            
+            // 纵向网格（时间轴）
+            const timeSteps = 6;
+            for (let i = 0; i <= timeSteps; i++) {
+                const x = padding.left + (chartWidth / timeSteps) * i;
+                trendCtx.beginPath();
+                trendCtx.moveTo(x, padding.top);
+                trendCtx.lineTo(x, padding.top + chartHeight);
+                trendCtx.stroke();
+            }
+            
+            // 绘制做多曲线（绿色）
+            if (scoreHistory.long.length > 1) {
+                trendCtx.strokeStyle = '#00ff88';
+                trendCtx.lineWidth = 3;
+                trendCtx.beginPath();
+                
+                scoreHistory.long.forEach((score, index) => {
+                    const x = padding.left + (chartWidth / Math.max(scoreHistory.long.length - 1, 1)) * index;
+                    const y = padding.top + chartHeight - (score / 100) * chartHeight;
+                    
+                    if (index === 0) {
+                        trendCtx.moveTo(x, y);
+                    } else {
+                        trendCtx.lineTo(x, y);
+                    }
+                });
+                
+                trendCtx.stroke();
+            }
+            
+            // 绘制做空曲线（红色）
+            if (scoreHistory.short.length > 1) {
+                trendCtx.strokeStyle = '#ff4d4f';
+                trendCtx.lineWidth = 3;
+                trendCtx.beginPath();
+                
+                scoreHistory.short.forEach((score, index) => {
+                    const x = padding.left + (chartWidth / Math.max(scoreHistory.short.length - 1, 1)) * index;
+                    const y = padding.top + chartHeight - (score / 100) * chartHeight;
+                    
+                    if (index === 0) {
+                        trendCtx.moveTo(x, y);
+                    } else {
+                        trendCtx.lineTo(x, y);
+                    }
+                });
+                
+                trendCtx.stroke();
+            }
+            
+            // 绘制多空差值曲线（黄色）
+            if (scoreHistory.long.length > 1 && scoreHistory.short.length > 1) {
+                trendCtx.strokeStyle = '#ffa726';
+                trendCtx.lineWidth = 2;
+                trendCtx.setLineDash([5, 5]); // 虚线样式
+                trendCtx.beginPath();
+                
+                const diffScores = scoreHistory.long.map((longScore, index) => {
+                    return longScore - scoreHistory.short[index];
+                });
+                
+                // 找出差值的最大最小值用于缩放
+                const maxDiff = Math.max(...diffScores.map(Math.abs));
+                const scaleFactor = maxDiff > 0 ? 50 / maxDiff : 1; // 缩放到±50的范围
+                
+                diffScores.forEach((diff, index) => {
+                    const x = padding.left + (chartWidth / Math.max(diffScores.length - 1, 1)) * index;
+                    // 将差值映射到50分的位置（图表中间）
+                    const scaledDiff = diff * scaleFactor;
+                    const y = padding.top + chartHeight / 2 - scaledDiff * (chartHeight / 100);
+                    
+                    if (index === 0) {
+                        trendCtx.moveTo(x, y);
+                    } else {
+                        trendCtx.lineTo(x, y);
+                    }
+                });
+                
+                trendCtx.stroke();
+                trendCtx.setLineDash([]); // 恢复实线
+                
+                // 绘制50分参考线（差值0点）
+                trendCtx.strokeStyle = '#8b8fa4';
+                trendCtx.lineWidth = 1;
+                trendCtx.setLineDash([3, 3]);
+                trendCtx.beginPath();
+                const midY = padding.top + chartHeight / 2;
+                trendCtx.moveTo(padding.left, midY);
+                trendCtx.lineTo(padding.left + chartWidth, midY);
+                trendCtx.stroke();
+                trendCtx.setLineDash([]);
+            }
+            
+            // 绘制图例
+            trendCtx.font = '16px sans-serif';
+            
+            // 做多图例
+            trendCtx.fillStyle = '#00ff88';
+            trendCtx.fillRect(padding.left, 10, 30, 4);
+            trendCtx.fillText('做多', padding.left + 40, 20);
+            
+            // 做空图例
+            trendCtx.fillStyle = '#ff4d4f';
+            trendCtx.fillRect(padding.left + 120, 10, 30, 4);
+            trendCtx.fillText('做空', padding.left + 160, 20);
+            
+            // X轴标签
+            trendCtx.fillStyle = '#8b8fa4';
+            trendCtx.font = '14px sans-serif';
+            trendCtx.textAlign = 'center';
+            trendCtx.fillText('3分钟变化趋势', width / 2, height - 10);
+        }
+
+        // 控制面板折叠/展开
+        function toggleControls() {
+            const controls = document.getElementById('markerControls');
+            const btn = document.getElementById('collapseBtn');
+            
+            controls.classList.toggle('collapsed');
+            
+            if (controls.classList.contains('collapsed')) {
+                btn.textContent = '▲';
+            } else {
+                btn.textContent = '▼';
+            }
+        }
+
+        // 监听输入框变化
+        document.addEventListener('DOMContentLoaded', () => {
+            ['markerLeft', 'markerTop', 'markerWidth', 'markerHeight'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updateMarker);
+            });
+        });
+
+        // ==================== 历史数据功能 ====================
+        
+        // 切换时间范围
+        function switchTimeRange(range) {
+            currentTimeRange = range;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.time-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.range === range) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // 更新显示的时间段名称
+            const rangeNames = {
+                '3m': '3分钟',
+                '1h': '1小时',
+                '3h': '3小时',
+                '6h': '6小时',
+                '12h': '12小时',
+                '24h': '24小时'
+            };
+            document.getElementById('currentRange').textContent = rangeNames[range];
+            
+            // 加载并显示该时间段的历史数据
+            loadHistoryData(range);
+        }
+
+        // 切换历史数据显示的币种
+        function switchHistoryCoin() {
+            const select = document.getElementById('historyCoinSelect');
+            const selectedSymbol = select.value;
+            
+            console.log('🔄 切换历史币种:', selectedSymbol);
+            
+            // 更新当前币种（仅用于历史数据显示，不影响实时监控）
+            const oldSymbol = currentSymbol;
+            currentSymbol = selectedSymbol;
+            
+            // ⚡ 优化：只清空当前时间段的缓存，而不是所有时间段
+            // 这样切换币种时只需要加载一个时间段的数据，大幅提升速度
+            if (historyData[currentTimeRange]) {
+                historyData[currentTimeRange] = { long: [], short: [], timestamps: [], price_change: [], price_actual: [] };
+            }
+            
+            // 重置实时价格历史数据
+            realtimePriceHistory = {
+                prices: [],
+                changes: [],
+                timestamps: [],
+                basePrice: null
+            };
+            
+            // 📊 显示加载提示
+            console.log(`⏳ 正在加载 ${selectedSymbol} 的 ${currentTimeRange} 数据...`);
+            
+            // 重新加载当前时间段的历史数据
+            loadHistoryData(currentTimeRange);
+            
+            // 🎯 同步更新SAR显示的币种
+            updateSarCoinDisplay(selectedSymbol);
+            
+            console.log(`✅ 历史数据已切换: ${oldSymbol} → ${selectedSymbol}`);
+        }
+
+        // 加载历史数据
+        let loadingHistory = false; // 防止重复加载
+        async function loadHistoryData(range) {
+            // ⚡ 防抖：如果正在加载，跳过
+            if (loadingHistory) {
+                console.log('⏭️ 跳过重复加载请求');
+                return;
+            }
+            
+            loadingHistory = true;
+            const startTime = Date.now();
+            
+            // 显示加载指示器
+            showLoadingIndicator(`正在加载 ${currentSymbol} ${getRangeLabel(range)} 数据...`);
+            
+            try {
+                console.log(`📥 开始加载 ${currentSymbol} 的 ${range} 数据...`);
+                
+                // 同时请求深度历史数据和价格历史数据
+                const [depthResponse, priceResponse] = await Promise.all([
+                    fetch(`${HISTORY_API_URL}/api/depth/history/${currentSymbol}?range=${range}`),
+                    fetch(`${PRICE_API_URL}/api/price/history/${currentSymbol}`)
+                ]);
+                
+                const depthData = await depthResponse.json();
+                const priceData = await priceResponse.json();
+                
+                if (depthData.success && depthData.history && depthData.history.length > 0) {
+                    historyData[range] = {
+                        long: depthData.history.map(d => d.long_score),
+                        short: depthData.history.map(d => d.short_score),
+                        timestamps: depthData.history.map(d => new Date(d.timestamp)),
+                        price_change: [],
+                        price_actual: []
+                    };
+                    
+                    // 如果价格数据可用，添加价格变化百分比
+                    if (priceData.success && priceData.data && priceData.data.length > 0) {
+                        // 🎯 关键修复：价格数据使用独立的高密度数据点，不对齐到深度数据
+                        // 这样可以保留0.5秒采集频率的优势，显示流畅的价格波动曲线
+                        
+                        // 根据时间范围筛选价格数据
+                        const rangeMs = {
+                            '3m': 3 * 60 * 1000,
+                            '1h': 60 * 60 * 1000,
+                            '3h': 3 * 60 * 60 * 1000,
+                            '6h': 6 * 60 * 60 * 1000,
+                            '12h': 12 * 60 * 60 * 1000,
+                            '24h': 24 * 60 * 60 * 1000
+                        }[range];
+                        
+                        const now = Date.now();
+                        const filteredPriceData = priceData.data.filter(p => (now - p.timestamp) <= rangeMs);
+                        
+                        // ✨ 新策略：直接使用价格数据的所有点，不对齐（保持高密度）
+                        historyData[range].price_change = filteredPriceData.map(p => p.change_percent);
+                        historyData[range].price_actual = filteredPriceData.map(p => p.price);
+                        historyData[range].price_timestamps = filteredPriceData.map(p => p.timestamp);
+                        
+                        console.log(`📊 价格数据加载: ${filteredPriceData.length}个点 (独立高密度数据)`);
+                    }
+                } else {
+                    // 如果没有历史数据，使用空数据
+                    historyData[range] = { long: [], short: [], timestamps: [], price_change: [], price_actual: [] };
+                }
+                
+                // 绘制历史图表
+                drawHistoryChart(range);
+                
+                // 更新统计信息
+                updateHistoryStats(range);
+                
+                const loadTime = Date.now() - startTime;
+                console.log(`✅ 数据加载完成，耗时: ${loadTime}ms`);
+                
+                // 更新最后刷新时间
+                updateLastRefreshTime();
+                
+            } catch (error) {
+                console.error('❌ 加载历史数据失败:', error);
+                // 使用空数据
+                historyData[range] = { long: [], short: [], timestamps: [], price_change: [], price_actual: [] };
+                drawHistoryChart(range);
+            } finally {
+                loadingHistory = false; // 释放加载锁
+                // 隐藏加载指示器
+                hideLoadingIndicator();
+            }
+        }
+
+        // 绘制历史图表
+        function drawHistoryChart(range) {
+            const data = historyData[range];
+            
+            if (!historyCtx || !data || data.long.length === 0) {
+                // 清空画布并显示友好的提示
+                if (historyCtx) {
+                    historyCtx.clearRect(0, 0, historyCanvas.width, historyCanvas.height);
+                    
+                    // 背景
+                    historyCtx.fillStyle = '#0f1229';
+                    historyCtx.fillRect(0, 0, historyCanvas.width, historyCanvas.height);
+                    
+                    // 主标题
+                    historyCtx.fillStyle = '#8b8fa4';
+                    historyCtx.font = 'bold 18px sans-serif';
+                    historyCtx.textAlign = 'center';
+                    historyCtx.fillText('📊 暂无历史数据', historyCanvas.width / 2, historyCanvas.height / 2 - 30);
+                    
+                    // 提示文字
+                    historyCtx.font = '14px sans-serif';
+                    historyCtx.fillStyle = '#6b7089';
+                    historyCtx.fillText('请先启动监控，系统会自动保存历史数据', historyCanvas.width / 2, historyCanvas.height / 2 + 5);
+                    historyCtx.fillText('数据积累大约需要几分钟', historyCanvas.width / 2, historyCanvas.height / 2 + 30);
+                }
+                return;
+            }
+
+            const width = historyCanvas.width;
+            const height = historyCanvas.height;
+            const padding = 40;
+            
+            // 清空画布
+            historyCtx.clearRect(0, 0, width, height);
+            
+            // 背景
+            historyCtx.fillStyle = '#0f1229';
+            historyCtx.fillRect(0, 0, width, height);
+            
+            const maxPoints = data.long.length;
+            const xStep = (width - padding * 2) / Math.max(maxPoints - 1, 1);
+            const yMax = 100;
+            
+            // 绘制网格线
+            historyCtx.strokeStyle = '#1a1f3a';
+            historyCtx.lineWidth = 1;
+            for (let i = 0; i <= 5; i++) {
+                const y = padding + (height - padding * 2) * (i / 5);
+                historyCtx.beginPath();
+                historyCtx.moveTo(padding, y);
+                historyCtx.lineTo(width - padding, y);
+                historyCtx.stroke();
+                
+                // Y轴刻度
+                historyCtx.fillStyle = '#8b8fa4';
+                historyCtx.font = 'bold 14px sans-serif';
+                historyCtx.textAlign = 'right';
+                historyCtx.fillText((100 - i * 20).toString(), padding - 10, y + 5);
+            }
+            
+            // 绘制图例
+            const legendY = padding - 20;
+            const legendStartX = padding + 80;
+            const legendSpacing = 120;
+            
+            // 做多图例
+            historyCtx.strokeStyle = '#00ff88';
+            historyCtx.lineWidth = 2.5;
+            historyCtx.beginPath();
+            historyCtx.moveTo(legendStartX, legendY);
+            historyCtx.lineTo(legendStartX + 20, legendY);
+            historyCtx.stroke();
+            historyCtx.fillStyle = '#00ff88';
+            historyCtx.font = 'bold 12px sans-serif';
+            historyCtx.textAlign = 'left';
+            historyCtx.fillText('做多评分', legendStartX + 25, legendY + 4);
+            
+            // 做空图例
+            historyCtx.strokeStyle = '#ff4d4f';
+            historyCtx.lineWidth = 2.5;
+            historyCtx.beginPath();
+            historyCtx.moveTo(legendStartX + legendSpacing, legendY);
+            historyCtx.lineTo(legendStartX + legendSpacing + 20, legendY);
+            historyCtx.stroke();
+            historyCtx.fillStyle = '#ff4d4f';
+            historyCtx.fillText('做空评分', legendStartX + legendSpacing + 25, legendY + 4);
+            
+            // 多空差值图例
+            historyCtx.strokeStyle = '#ffa726';
+            historyCtx.lineWidth = 2.5;
+            historyCtx.setLineDash([5, 5]);
+            historyCtx.beginPath();
+            historyCtx.moveTo(legendStartX + legendSpacing * 2, legendY);
+            historyCtx.lineTo(legendStartX + legendSpacing * 2 + 20, legendY);
+            historyCtx.stroke();
+            historyCtx.setLineDash([]);
+            historyCtx.fillStyle = '#ffa726';
+            historyCtx.fillText('多空差值', legendStartX + legendSpacing * 2 + 25, legendY + 4);
+            
+            // 价格波动图例
+            historyCtx.strokeStyle = '#bb86fc';
+            historyCtx.lineWidth = 2.5;
+            historyCtx.setLineDash([4, 4]);
+            historyCtx.beginPath();
+            historyCtx.moveTo(legendStartX + legendSpacing * 3, legendY);
+            historyCtx.lineTo(legendStartX + legendSpacing * 3 + 20, legendY);
+            historyCtx.stroke();
+            historyCtx.setLineDash([]);
+            historyCtx.fillStyle = '#bb86fc';
+            historyCtx.fillText('价格波动', legendStartX + legendSpacing * 3 + 25, legendY + 4);
+            
+            // 绘制做多线（绿色）
+            if (data.long.length > 0) {
+                historyCtx.strokeStyle = '#00ff88';
+                historyCtx.lineWidth = 2;
+                historyCtx.beginPath();
+                data.long.forEach((score, i) => {
+                    const x = padding + i * xStep;
+                    const y = padding + (height - padding * 2) * (1 - score / yMax);
+                    if (i === 0) {
+                        historyCtx.moveTo(x, y);
+                    } else {
+                        historyCtx.lineTo(x, y);
+                    }
+                });
+                historyCtx.stroke();
+            }
+            
+            // 绘制做空线（红色）
+            if (data.short.length > 0) {
+                historyCtx.strokeStyle = '#ff4d4f';
+                historyCtx.lineWidth = 2;
+                historyCtx.beginPath();
+                data.short.forEach((score, i) => {
+                    const x = padding + i * xStep;
+                    const y = padding + (height - padding * 2) * (1 - score / yMax);
+                    if (i === 0) {
+                        historyCtx.moveTo(x, y);
+                    } else {
+                        historyCtx.lineTo(x, y);
+                    }
+                });
+                historyCtx.stroke();
+            }
+            
+            // 绘制多空差值线（橙色虚线）
+            if (data.long.length > 0 && data.short.length > 0) {
+                historyCtx.strokeStyle = '#ffa726';
+                historyCtx.lineWidth = 2;
+                historyCtx.setLineDash([5, 5]);
+                historyCtx.beginPath();
+                data.long.forEach((longScore, i) => {
+                    const diff = longScore - data.short[i];
+                    const x = padding + i * xStep;
+                    const y = padding + (height - padding * 2) * (1 - (diff + 50) / 100); // 映射到-50到+50范围
+                    if (i === 0) {
+                        historyCtx.moveTo(x, y);
+                    } else {
+                        historyCtx.lineTo(x, y);
+                    }
+                });
+                historyCtx.stroke();
+                historyCtx.setLineDash([]);
+            }
+            
+            // ===== 在同一个canvas上绘制价格涨跌幅曲线 =====
+            // 绘制价格涨跌幅曲线（使用右侧Y轴，显示百分比）
+            if (data.price_change && data.price_change.length > 0) {
+                const validChanges = data.price_change.filter(c => c !== null && c !== undefined);
+                
+                if (validChanges.length > 0) {
+                    // 找出涨跌幅的实际范围
+                    const minChange = Math.min(...validChanges);
+                    const maxChange = Math.max(...validChanges);
+                    const actualRange = maxChange - minChange; // 实际数据的跨度
+                    const centerValue = (maxChange + minChange) / 2; // 数据的中心值
+                    
+                    // 🎯 智能自适应显示范围：
+                    // 让曲线占据图表高度的60-80%，确保波动清晰可见
+                    // 计算方法：实际范围 × 2（让数据占图表的50%）再 × 1.2（留20%余量）
+                    // 如果实际范围<0.1%，设定最小显示范围为0.3%（让微小波动也能看到）
+                    let halfRange;
+                    if (actualRange < 0.1) {
+                        // 极小波动：使用0.15%半范围（总范围0.3%）
+                        halfRange = 0.15;
+                    } else if (actualRange < 1.0) {
+                        // 小波动（0.1%-1%）：使用实际范围的1.2倍
+                        halfRange = actualRange / 2 * 1.2;
+                    } else {
+                        // 正常波动（>1%）：使用实际范围的1.5倍
+                        halfRange = actualRange / 2 * 1.5;
+                    }
+                    
+                    const displayMin = centerValue - halfRange;
+                    const displayMax = centerValue + halfRange;
+                    const displayRange = displayMax - displayMin;
+                    
+                    // 调试日志
+                    console.log(`📊 价格涨跌幅数据: Min=${minChange.toFixed(4)}%, Max=${maxChange.toFixed(4)}%, Center=${centerValue.toFixed(4)}%`);
+                    console.log(`📐 显示范围: ${displayMin.toFixed(4)}% ~ ${displayMax.toFixed(4)}% (总跨度=${displayRange.toFixed(4)}%)`);
+                    console.log(`📈 涨跌幅样本 (前10个):`, validChanges.slice(0, 10).map(c => c.toFixed(4)));
+                    console.log(`🔍 数据统计: 总数=${validChanges.length}, 平均=${(validChanges.reduce((a,b)=>a+b,0)/validChanges.length).toFixed(4)}%`);
+                    
+                    // 绘制右侧Y轴刻度（涨跌幅%）
+                    historyCtx.fillStyle = '#bb86fc';
+                    historyCtx.font = 'bold 13px sans-serif';
+                    historyCtx.textAlign = 'left';
+                    for (let i = 0; i <= 5; i++) {
+                        const y = padding + (height - padding * 2) * (i / 5);
+                        // 从最大值到最小值
+                        const percentValue = displayMax - (i / 5) * displayRange;
+                        historyCtx.fillText(`${percentValue > 0 ? '+' : ''}${percentValue.toFixed(3)}%`, width - padding + 10, y + 5);
+                    }
+                    
+                    // 如果0%在显示范围内，绘制0%参考线
+                    if (displayMin < 0 && displayMax > 0) {
+                        const zeroY = padding + (height - padding * 2) * ((displayMax - 0) / displayRange);
+                        historyCtx.strokeStyle = 'rgba(187, 134, 252, 0.3)';
+                        historyCtx.lineWidth = 1;
+                        historyCtx.setLineDash([2, 2]);
+                        historyCtx.beginPath();
+                        historyCtx.moveTo(padding, zeroY);
+                        historyCtx.lineTo(width - padding, zeroY);
+                        historyCtx.stroke();
+                        historyCtx.setLineDash([]);
+                    }
+                    
+                    // 绘制价格涨跌幅曲线（紫色虚线）
+                    historyCtx.strokeStyle = '#bb86fc';
+                    historyCtx.lineWidth = 2.5;
+                    historyCtx.setLineDash([4, 4]);
+                    historyCtx.beginPath();
+                    
+                    // 🎯 使用价格数据自己的时间范围来计算X坐标
+                    const priceTimeStamps = data.price_timestamps || [];
+                    const priceDataLength = data.price_change.length;
+                    
+                    // 如果有时间戳数据，使用时间范围；否则使用索引
+                    let useTimeBasedX = priceTimeStamps.length === priceDataLength && priceDataLength > 1;
+                    let timeMin = useTimeBasedX ? Math.min(...priceTimeStamps) : 0;
+                    let timeMax = useTimeBasedX ? Math.max(...priceTimeStamps) : priceDataLength - 1;
+                    let timeRange = timeMax - timeMin || 1;
+                    
+                    let validPoints = 0;
+                    data.price_change.forEach((change, i) => {
+                        if (change !== null && change !== undefined) {
+                            // 根据时间戳计算X坐标（如果有时间戳）
+                            let x;
+                            if (useTimeBasedX && priceTimeStamps[i]) {
+                                const timeRatio = (priceTimeStamps[i] - timeMin) / timeRange;
+                                x = padding + timeRatio * (width - padding * 2);
+                            } else {
+                                // 降级方案：使用索引
+                                const priceXStep = (width - padding * 2) / Math.max(priceDataLength - 1, 1);
+                                x = padding + i * priceXStep;
+                            }
+                            
+                            // 将涨跌幅映射到canvas高度
+                            // normalizedY = 0 表示displayMax位置（顶部）
+                            // normalizedY = 1 表示displayMin位置（底部）
+                            const normalizedY = (displayMax - change) / displayRange;
+                            const y = padding + (height - padding * 2) * normalizedY;
+                            
+                            if (validPoints === 0) {
+                                historyCtx.moveTo(x, y);
+                            } else {
+                                historyCtx.lineTo(x, y);
+                            }
+                            validPoints++;
+                        }
+                    });
+                    
+                    historyCtx.stroke();
+                    historyCtx.setLineDash([]);
+                    
+                    // 绘制最新涨跌幅标签
+                    const lastChange = validChanges[validChanges.length - 1];
+                    const lastIndex = data.price_change.length - 1 - [...data.price_change].reverse().findIndex(c => c !== null && c !== undefined);
+                    const lastX = padding + lastIndex * xStep;
+                    const normalizedY = (displayMax - lastChange) / displayRange;
+                    const lastY = padding + (height - padding * 2) * normalizedY;
+                    
+                    // 涨跌幅标签背景
+                    const text = `${lastChange > 0 ? '+' : ''}${lastChange.toFixed(2)}%`;
+                    historyCtx.font = 'bold 14px sans-serif';
+                    const textMetrics = historyCtx.measureText(text);
+                    const boxPadding = 6;
+                    
+                    historyCtx.fillStyle = lastChange >= 0 ? 'rgba(0, 255, 136, 0.25)' : 'rgba(255, 77, 79, 0.25)';
+                    historyCtx.fillRect(
+                        lastX - boxPadding,
+                        lastY - 18,
+                        textMetrics.width + boxPadding * 2,
+                        22
+                    );
+                    
+                    // 涨跌幅标签文字
+                    historyCtx.fillStyle = lastChange >= 0 ? '#00ff88' : '#ff4d4f';
+                    historyCtx.textAlign = 'left';
+                    historyCtx.fillText(text, lastX, lastY - 3);
+                }
+            }
+            
+            // 仍然调用drawPriceChart以保持独立价格图表的更新（如果需要）
+            drawPriceChart(data, maxPoints, xStep);
+        }
+
+        // 绘制独立的价格曲线图表（归一化到0-100范围，与深度评分同步）
+        function drawPriceChart(data, maxPoints, xStep) {
+            if (!priceCtx || !data || !data.price_actual || data.price_actual.length === 0) {
+                // 清空画布并显示提示
+                if (priceCtx) {
+                    priceCtx.clearRect(0, 0, priceCanvas.width, priceCanvas.height);
+                    priceCtx.fillStyle = '#0f1229';
+                    priceCtx.fillRect(0, 0, priceCanvas.width, priceCanvas.height);
+                    
+                    priceCtx.fillStyle = '#6b7089';
+                    priceCtx.font = '13px sans-serif';
+                    priceCtx.textAlign = 'center';
+                    priceCtx.fillText('暂无价格数据', priceCanvas.width / 2, priceCanvas.height / 2);
+                }
+                return;
+            }
+
+            const width = priceCanvas.width;
+            const height = priceCanvas.height;
+            const padding = 40;
+            
+            // 清空画布
+            priceCtx.clearRect(0, 0, width, height);
+            
+            // 背景
+            priceCtx.fillStyle = '#0f1229';
+            priceCtx.fillRect(0, 0, width, height);
+            
+            // 获取实际价格数据并计算范围
+            const prices = data.price_actual.filter(p => p > 0);
+            if (prices.length === 0) return;
+            
+            const minPrice = Math.min(...prices);
+            const maxPrice = Math.max(...prices);
+            const priceRange = maxPrice - minPrice;
+            
+            // 归一化函数：将价格映射到0-100范围
+            const normalizePriceToScore = (price) => {
+                if (priceRange === 0) return 50; // 如果价格没有变化，返回中间值
+                return ((price - minPrice) / priceRange) * 100;
+            };
+            
+            // 绘制网格线（5条横线，与主图一致）
+            priceCtx.strokeStyle = '#1a1f3a';
+            priceCtx.lineWidth = 1;
+            for (let i = 0; i <= 5; i++) {
+                const y = padding + (height - padding * 2) * (i / 5);
+                priceCtx.beginPath();
+                priceCtx.moveTo(padding, y);
+                priceCtx.lineTo(width - padding, y);
+                priceCtx.stroke();
+                
+                // Y轴刻度 - 显示实际价格
+                const scoreValue = 100 - i * 20;
+                // 将评分值反向映射到价格
+                const priceValue = minPrice + (scoreValue / 100) * priceRange;
+                priceCtx.fillStyle = '#bb86fc';
+                priceCtx.font = 'bold 14px sans-serif';
+                priceCtx.textAlign = 'right';
+                priceCtx.fillText(priceValue.toFixed(2), padding - 10, y + 5);
+            }
+            
+            // 绘制价格曲线（归一化后，紫色虚线）
+            priceCtx.strokeStyle = '#bb86fc';
+            priceCtx.lineWidth = 2.5;
+            priceCtx.setLineDash([3, 3]);
+            priceCtx.beginPath();
+            
+            let validPoints = 0;
+            data.price_actual.forEach((price, i) => {
+                if (price > 0) {
+                    const x = padding + i * xStep;
+                    const normalizedScore = normalizePriceToScore(price);
+                    const y = padding + (height - padding * 2) * (1 - normalizedScore / 100);
+                    
+                    if (validPoints === 0) {
+                        priceCtx.moveTo(x, y);
+                    } else {
+                        priceCtx.lineTo(x, y);
+                    }
+                    validPoints++;
+                }
+            });
+            
+            priceCtx.stroke();
+            priceCtx.setLineDash([]);
+            
+            // 绘制数值标签（最新值）
+            if (prices.length > 0) {
+                const lastPrice = prices[prices.length - 1];
+                const lastIndex = data.price_actual.lastIndexOf(lastPrice);
+                const lastX = padding + lastIndex * xStep;
+                const normalizedScore = normalizePriceToScore(lastPrice);
+                const lastY = padding + (height - padding * 2) * (1 - normalizedScore / 100);
+                
+                // 计算涨跌幅
+                const firstPrice = prices[0];
+                const changePercent = ((lastPrice - firstPrice) / firstPrice) * 100;
+                
+                // 绘制数值背景框
+                const text = `${lastPrice.toFixed(3)} (${changePercent > 0 ? '+' : ''}${changePercent.toFixed(2)}%)`;
+                priceCtx.font = 'bold 15px sans-serif';
+                const textMetrics = priceCtx.measureText(text);
+                const textWidth = textMetrics.width;
+                const boxPadding = 8;
+                
+                priceCtx.fillStyle = changePercent >= 0 ? 'rgba(0, 255, 136, 0.2)' : 'rgba(255, 77, 79, 0.2)';
+                priceCtx.fillRect(
+                    lastX - textWidth / 2 - boxPadding, 
+                    lastY - 20, 
+                    textWidth + boxPadding * 2, 
+                    28
+                );
+                
+                // 绘制数值文字
+                priceCtx.fillStyle = changePercent >= 0 ? '#00ff88' : '#ff4d4f';
+                priceCtx.textAlign = 'center';
+                priceCtx.fillText(text, lastX, lastY - 2);
+            }
+            
+            // 在右上角显示价格范围
+            priceCtx.fillStyle = '#8b8fa4';
+            priceCtx.font = 'bold 13px sans-serif';
+            priceCtx.textAlign = 'right';
+            priceCtx.fillText(`价格范围: ${minPrice.toFixed(2)} - ${maxPrice.toFixed(2)}`, width - padding, padding - 10);
+        }
+        
+        // 绘制实时价格涨跌曲线（每0.5秒更新）
+        function drawRealtimePriceChart() {
+            if (!priceCtx || !realtimePriceHistory.prices || realtimePriceHistory.prices.length === 0) {
+                return;
+            }
+
+            const width = priceCanvas.width;
+            const height = priceCanvas.height;
+            const padding = 40;
+            
+            // 清空画布
+            priceCtx.clearRect(0, 0, width, height);
+            
+            // 背景
+            priceCtx.fillStyle = '#0f1229';
+            priceCtx.fillRect(0, 0, width, height);
+            
+            // 获取价格涨跌幅数据
+            const changes = realtimePriceHistory.changes;
+            const prices = realtimePriceHistory.prices;
+            
+            if (changes.length === 0) return;
+            
+            // 计算涨跌幅范围
+            const minChange = Math.min(...changes);
+            const maxChange = Math.max(...changes);
+            const changeRange = maxChange - minChange;
+            
+            // 如果范围太小，使用固定范围
+            const displayRange = changeRange < 0.1 ? 0.1 : changeRange;
+            const displayMin = minChange - displayRange * 0.1;
+            const displayMax = maxChange + displayRange * 0.1;
+            
+            // 计算X轴步长
+            const maxPoints = Math.min(changes.length, 360);
+            const xStep = (width - padding * 2) / Math.max(maxPoints - 1, 1);
+            
+            // 绘制网格线（5条横线）
+            priceCtx.strokeStyle = '#1a1f3a';
+            priceCtx.lineWidth = 1;
+            for (let i = 0; i <= 5; i++) {
+                const y = padding + (height - padding * 2) * (i / 5);
+                priceCtx.beginPath();
+                priceCtx.moveTo(padding, y);
+                priceCtx.lineTo(width - padding, y);
+                priceCtx.stroke();
+                
+                // Y轴刻度 - 显示涨跌幅百分比
+                const changeValue = displayMax - (displayMax - displayMin) * (i / 5);
+                priceCtx.fillStyle = '#bb86fc';
+                priceCtx.font = 'bold 14px sans-serif';
+                priceCtx.textAlign = 'right';
+                priceCtx.fillText(`${changeValue > 0 ? '+' : ''}${changeValue.toFixed(2)}%`, padding - 10, y + 5);
+            }
+            
+            // 绘制0%参考线（如果在范围内）
+            if (displayMin <= 0 && displayMax >= 0) {
+                const zeroY = padding + (height - padding * 2) * ((displayMax - 0) / (displayMax - displayMin));
+                priceCtx.strokeStyle = '#4a5066';
+                priceCtx.lineWidth = 1;
+                priceCtx.setLineDash([5, 5]);
+                priceCtx.beginPath();
+                priceCtx.moveTo(padding, zeroY);
+                priceCtx.lineTo(width - padding, zeroY);
+                priceCtx.stroke();
+                priceCtx.setLineDash([]);
+            }
+            
+            // 绘制价格涨跌曲线
+            priceCtx.strokeStyle = '#bb86fc';
+            priceCtx.lineWidth = 2.5;
+            priceCtx.setLineDash([3, 3]);
+            priceCtx.beginPath();
+            
+            changes.forEach((changePercent, i) => {
+                const x = padding + i * xStep;
+                // 归一化到图表范围
+                const normalizedValue = (displayMax - changePercent) / (displayMax - displayMin);
+                const y = padding + (height - padding * 2) * normalizedValue;
+                
+                if (i === 0) {
+                    priceCtx.moveTo(x, y);
+                } else {
+                    priceCtx.lineTo(x, y);
+                }
+            });
+            
+            priceCtx.stroke();
+            priceCtx.setLineDash([]);
+            
+            // 绘制数值标签（最新值）
+            if (changes.length > 0 && prices.length > 0) {
+                const lastChange = changes[changes.length - 1];
+                const lastPrice = prices[prices.length - 1];
+                const lastX = padding + (changes.length - 1) * xStep;
+                const normalizedValue = (displayMax - lastChange) / (displayMax - displayMin);
+                const lastY = padding + (height - padding * 2) * normalizedValue;
+                
+                // 绘制数值背景框
+                const text = `${lastPrice.toFixed(3)} (${lastChange > 0 ? '+' : ''}${lastChange.toFixed(2)}%)`;
+                priceCtx.font = 'bold 15px sans-serif';
+                const textMetrics = priceCtx.measureText(text);
+                const textWidth = textMetrics.width;
+                const boxPadding = 8;
+                
+                priceCtx.fillStyle = lastChange >= 0 ? 'rgba(0, 255, 136, 0.2)' : 'rgba(255, 77, 79, 0.2)';
+                priceCtx.fillRect(
+                    lastX - textWidth / 2 - boxPadding, 
+                    lastY - 20, 
+                    textWidth + boxPadding * 2, 
+                    28
+                );
+                
+                // 绘制数值文字
+                priceCtx.fillStyle = lastChange >= 0 ? '#00ff88' : '#ff4d4f';
+                priceCtx.textAlign = 'center';
+                priceCtx.fillText(text, lastX, lastY - 2);
+            }
+            
+            // 在右上角显示更新频率和数据点数
+            priceCtx.fillStyle = '#8b8fa4';
+            priceCtx.font = 'bold 13px sans-serif';
+            priceCtx.textAlign = 'right';
+            priceCtx.fillText(`实时监控 (0.5秒/次) · ${changes.length}点`, width - padding, padding - 10);
+        }
+
+        // 更新历史统计信息
+        function updateHistoryStats(range) {
+            const data = historyData[range];
+            
+            if (!data || data.long.length === 0) {
+                document.getElementById('dataPoints').textContent = '0';
+                document.getElementById('avgLong').textContent = '--';
+                document.getElementById('avgShort').textContent = '--';
+                return;
+            }
+            
+            // 数据点数
+            document.getElementById('dataPoints').textContent = data.long.length;
+            
+            // 平均做多评分
+            const avgLong = data.long.reduce((a, b) => a + b, 0) / data.long.length;
+            document.getElementById('avgLong').textContent = avgLong.toFixed(1);
+            
+            // 平均做空评分
+            const avgShort = data.short.reduce((a, b) => a + b, 0) / data.short.length;
+            document.getElementById('avgShort').textContent = avgShort.toFixed(1);
+        }
+
+        // 更新最后刷新时间
+        function updateLastRefreshTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const lastRefreshElement = document.getElementById('lastRefreshTime');
+            if (lastRefreshElement) {
+                lastRefreshElement.textContent = timeStr;
+            }
+        }
+
+        // 显示加载指示器
+        function showLoadingIndicator(message = '正在加载数据...') {
+            const indicator = document.getElementById('chartLoadingIndicator');
+            const statusElement = document.getElementById('loadingStatus');
+            if (indicator) {
+                indicator.style.display = 'block';
+                if (statusElement) {
+                    statusElement.textContent = message;
+                }
+            }
+        }
+
+        // 隐藏加载指示器
+        function hideLoadingIndicator() {
+            const indicator = document.getElementById('chartLoadingIndicator');
+            if (indicator) {
+                indicator.style.display = 'none';
+            }
+        }
+
+        // 获取时间范围标签
+        function getRangeLabel(range) {
+            const labels = {
+                '3m': '3分钟',
+                '1h': '1小时',
+                '3h': '3小时',
+                '6h': '6小时',
+                '12h': '12小时',
+                '24h': '24小时'
+            };
+            return labels[range] || range;
+        }
+
+        // 更新布林带象限显示
+        function updateBollingerQuadrant(data) {
+            const quadrantElement = document.getElementById('bollingerQuadrant');
+            if (!quadrantElement) return;
+            
+            if (data.bollinger && data.bollinger.quadrant) {
+                const quadrant = data.bollinger.quadrant;
+                const label = data.bollinger.quadrant_label;
+                
+                // 根据象限设置不同的样式
+                let color, bgColor, borderColor;
+                switch (quadrant) {
+                    case 1:
+                        // 第一象限 - 红色（超买，价格 > UB）
+                        color = '#ff4d4f';
+                        bgColor = 'rgba(255, 77, 79, 0.1)';
+                        borderColor = '#ff4d4f';
+                        break;
+                    case 2:
+                        // 第二象限 - 橙色（偏强，UB > 价格 > BOLL）
+                        color = '#ffa726';
+                        bgColor = 'rgba(255, 167, 38, 0.1)';
+                        borderColor = '#ffa726';
+                        break;
+                    case 3:
+                        // 第三象限 - 蓝色（偏弱，BOLL > 价格 > LB）
+                        color = '#64b5f6';
+                        bgColor = 'rgba(100, 181, 246, 0.1)';
+                        borderColor = '#64b5f6';
+                        break;
+                    case 4:
+                        // 第四象限 - 绿色（超卖，价格 < LB）
+                        color = '#00ff88';
+                        bgColor = 'rgba(0, 255, 136, 0.1)';
+                        borderColor = '#00ff88';
+                        break;
+                }
+                
+                quadrantElement.textContent = label;
+                quadrantElement.style.color = color;
+                quadrantElement.style.backgroundColor = bgColor;
+                quadrantElement.style.borderColor = borderColor;
+            } else {
+                quadrantElement.textContent = '--';
+                quadrantElement.style.color = '#8b8fa4';
+                quadrantElement.style.backgroundColor = 'rgba(139, 143, 164, 0.1)';
+                quadrantElement.style.borderColor = '#8b8fa4';
+            }
+        }
+
+        // 启动自动保存
+        function startAutoSave() {
+            // 每30秒保存一次当前评分数据到数据库
+            saveDataInterval = setInterval(() => {
+                saveCurrentScore();
+            }, 30000); // 30秒
+        }
+
+        // 保存当前评分到数据库（保存所有选中币种的数据）
+        async function saveCurrentScore() {
+            try {
+                // 从 depth API 获取所有选中币种的当前评分
+                const promises = selectedSymbols.map(async (symbol) => {
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/depth/score/${symbol}`);
+                        const data = await response.json();
+                        
+                        if (data.success && data.scores) {
+                            // 保存到历史数据库
+                            await fetch(`${HISTORY_API_URL}/api/depth/history/save`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    symbol: symbol,
+                                    long_score: data.scores.long_score,
+                                    short_score: data.scores.short_score,
+                                    timestamp: new Date().toISOString()
+                                })
+                            });
+                            return { symbol, success: true };
+                        }
+                    } catch (error) {
+                        console.error(`保存 ${symbol} 数据失败:`, error);
+                        return { symbol, success: false };
+                    }
+                });
+                
+                const results = await Promise.all(promises);
+                const successCount = results.filter(r => r.success).length;
+                
+                if (successCount > 0) {
+                    console.log(`✅ 已保存 ${successCount}/${selectedSymbols.length} 个币种的评分数据`);
+                    
+                    // 更新当前时间范围的历史数据
+                    loadHistoryData(currentTimeRange);
+                }
+            } catch (error) {
+                console.error('批量保存评分数据失败:', error);
+            }
+        }
+
+        // 停止自动保存
+        function stopAutoSave() {
+            if (saveDataInterval) {
+                clearInterval(saveDataInterval);
+                saveDataInterval = null;
+            }
+        }
+
+        // =================== SAR统计功能 ===================
+        
+        const SAR_API_URL = 'https://5012-i6z1n4prnsqw4uzv0af9z-2e77fc33.sandbox.novita.ai';
+        
+        let sarUpdateInterval = null;
+        let currentSarSymbol = 'ETH-USDT-SWAP'; // 默认显示ETH
+        let allSarData = {}; // 缓存所有币种的SAR数据
+        
+        // 切换SAR币种
+        // 更新SAR币种显示（跟随历史深度评分的选择）
+        function updateSarCoinDisplay(symbol) {
+            currentSarSymbol = symbol;
+            
+            // 更新显示的币种名称
+            const coinName = symbol.split('-')[0];
+            const displayElement = document.getElementById('sarCoinDisplay');
+            if (displayElement) {
+                displayElement.textContent = coinName;
+            }
+            
+            console.log(`🔄 SAR币种已同步到: ${currentSarSymbol}`);
+            
+            // 立即更新SAR显示数据
+            if (allSarData[currentSarSymbol]) {
+                updateSarDisplay(currentSarSymbol, allSarData[currentSarSymbol]);
+            } else {
+                // 如果缓存中没有数据，立即获取
+                updateSarData();
+            }
+        }
+        
+        // 启动SAR数据更新
+        function startSarUpdate() {
+            if (sarUpdateInterval) {
+                clearInterval(sarUpdateInterval);
+            }
+            updateSarData(); // 立即更新一次
+            sarUpdateInterval = setInterval(updateSarData, 300000); // 每5分钟更新一次
+        }
+        
+        // 停止SAR数据更新
+        function stopSarUpdate() {
+            if (sarUpdateInterval) {
+                clearInterval(sarUpdateInterval);
+                sarUpdateInterval = null;
+            }
+        }
+        
+        // 更新所有币种的SAR数据
+        async function updateSarData() {
+            try {
+                const response = await fetch(`${SAR_API_URL}/api/sar/data`);
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    allSarData = result.data; // 缓存所有数据
+                    
+                    // 更新当前选中币种的显示
+                    if (allSarData[currentSarSymbol]) {
+                        updateSarDisplay(currentSarSymbol, allSarData[currentSarSymbol]);
+                    }
+                    
+                    console.log('✅ SAR数据更新成功');
+                }
+            } catch (error) {
+                console.error('❌ SAR数据更新失败:', error);
+            }
+        }
+        
+        // 更新SAR显示
+        function updateSarDisplay(symbol, data) {
+            try {
+                const coinName = symbol.split('-')[0];
+                
+                // 更新币种名称
+                const coinNameElement = document.getElementById('sarCoinName');
+                if (coinNameElement) {
+                    coinNameElement.textContent = coinName;
+                }
+                
+                // 更新趋势状态
+                const trendElement = document.getElementById('sarTrend');
+                if (trendElement) {
+                    trendElement.textContent = data.display || '--';
+                    
+                    // 根据趋势类型设置样式
+                    trendElement.classList.remove('bullish', 'bearish');
+                    if (data.trend === 'bullish') {
+                        trendElement.classList.add('bullish');
+                    } else if (data.trend === 'bearish') {
+                        trendElement.classList.add('bearish');
+                    }
+                }
+                
+                // 更新RSI
+                const rsiElement = document.getElementById('sarRsi');
+                if (rsiElement && data.rsi !== null) {
+                    rsiElement.textContent = data.rsi.toFixed(2);
+                    
+                    // RSI颜色变化
+                    if (data.rsi > 70) {
+                        rsiElement.style.color = '#ff4d4f'; // 超买-红色
+                    } else if (data.rsi < 30) {
+                        rsiElement.style.color = '#00ff88'; // 超卖-绿色
+                    } else {
+                        rsiElement.style.color = '#ffa726'; // 正常-橙色
+                    }
+                }
+                
+                // 更新价格
+                const priceElement = document.getElementById('sarPrice');
+                if (priceElement && data.price !== null) {
+                    priceElement.textContent = parseFloat(data.price).toFixed(data.price > 100 ? 2 : 4);
+                }
+                
+                // 更新布林带象限显示
+                updateBollingerQuadrant(data);
+                
+                // 更新时间（显示北京时间）
+                const updateElement = document.getElementById('sarUpdateTime');
+                if (updateElement && data.update_time) {
+                    // 后端返回的是UTC时间，需要转换为北京时间（UTC+8）
+                    const utcTime = new Date(data.update_time + ' UTC');
+                    const beijingTime = new Date(utcTime.getTime() + 8 * 60 * 60 * 1000);
+                    const timeStr = beijingTime.toLocaleTimeString('zh-CN', { 
+                        hour12: false,
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
+                    updateElement.textContent = timeStr + ' (北京时间)';
+                }
+            } catch (error) {
+                console.error(`更新${symbol}的SAR显示失败:`, error);
+            }
+        }
+        
+        // 页面加载时启动SAR更新
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🎯 启动SAR统计监控...');
+            startSarUpdate();
+        });
+        
+        // ===== 内存管理功能 =====
+        let memoryMonitorInterval = null;
+        let autoMemoryClearInterval = null;
+        let memoryStats = {
+            usedJSHeapSize: 0,
+            totalJSHeapSize: 0,
+            jsHeapSizeLimit: 0
+        };
+        
+        // 初始化内存管理
+        function initMemoryManagement() {
+            console.log('🧹 初始化内存管理系统...');
+            
+            // 创建内存指示器
+            const indicator = document.createElement('div');
+            indicator.className = 'memory-indicator';
+            indicator.id = 'memoryIndicator';
+            indicator.innerHTML = `
+                <div class="memory-title">
+                    <span>💾</span>
+                    <span>内存监控</span>
+                </div>
+                <div class="memory-item">
+                    <span>已用内存:</span>
+                    <span class="memory-value" id="usedMemory">--</span>
+                </div>
+                <div class="memory-item">
+                    <span>内存限制:</span>
+                    <span class="memory-value" id="memoryLimit">--</span>
+                </div>
+                <div class="memory-item">
+                    <span>使用率:</span>
+                    <span class="memory-value" id="memoryUsage">--</span>
+                </div>
+                <div class="memory-item">
+                    <span>下次清理:</span>
+                    <span class="memory-value" id="nextClear">--</span>
+                </div>
+            `;
+            document.body.appendChild(indicator);
+            
+            // 启动内存监控（每秒更新）
+            startMemoryMonitor();
+            
+            // 启动自动内存清理（10分钟一次）
+            startAutoMemoryClear();
+            
+            console.log('✅ 内存管理系统已启动（10分钟自动清理）');
+        }
+        
+        // 启动内存监控
+        function startMemoryMonitor() {
+            if (memoryMonitorInterval) {
+                clearInterval(memoryMonitorInterval);
+            }
+            
+            memoryMonitorInterval = setInterval(() => {
+                updateMemoryDisplay();
+            }, 1000); // 每秒更新一次
+        }
+        
+        // 更新内存显示
+        function updateMemoryDisplay() {
+            if (!performance.memory) {
+                document.getElementById('usedMemory').textContent = '不支持';
+                document.getElementById('memoryLimit').textContent = '不支持';
+                document.getElementById('memoryUsage').textContent = '不支持';
+                return;
+            }
+            
+            const memory = performance.memory;
+            memoryStats.usedJSHeapSize = memory.usedJSHeapSize;
+            memoryStats.totalJSHeapSize = memory.totalJSHeapSize;
+            memoryStats.jsHeapSizeLimit = memory.jsHeapSizeLimit;
+            
+            const usedMB = (memory.usedJSHeapSize / 1024 / 1024).toFixed(1);
+            const limitMB = (memory.jsHeapSizeLimit / 1024 / 1024).toFixed(1);
+            const usagePercent = ((memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100).toFixed(1);
+            
+            document.getElementById('usedMemory').textContent = `${usedMB} MB`;
+            document.getElementById('memoryLimit').textContent = `${limitMB} MB`;
+            
+            const usageElement = document.getElementById('memoryUsage');
+            usageElement.textContent = `${usagePercent}%`;
+            
+            // 根据使用率设置颜色
+            if (usagePercent >= 80) {
+                usageElement.className = 'memory-value danger';
+            } else if (usagePercent >= 60) {
+                usageElement.className = 'memory-value warning';
+            } else {
+                usageElement.className = 'memory-value';
+            }
+            
+            // 如果内存使用率超过85%，自动触发清理
+            if (usagePercent >= 85) {
+                console.warn(`⚠️ 内存使用率过高 (${usagePercent}%)，自动触发清理...`);
+                clearMemory();
+            }
+        }
+        
+        // 启动自动内存清理
+        function startAutoMemoryClear() {
+            if (autoMemoryClearInterval) {
+                clearInterval(autoMemoryClearInterval);
+            }
+            
+            let countdown = 600; // 10分钟 = 600秒
+            
+            autoMemoryClearInterval = setInterval(() => {
+                countdown--;
+                
+                const minutes = Math.floor(countdown / 60);
+                const seconds = countdown % 60;
+                document.getElementById('nextClear').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (countdown <= 0) {
+                    console.log('⏰ 定时触发内存清理（10分钟）...');
+                    clearMemory();
+                    countdown = 600; // 重置倒计时
+                }
+            }, 1000);
+        }
+        
+        // 清理内存
+        function clearMemory() {
+            console.log('🧹 开始清理内存...');
+            
+            const beforeUsed = performance.memory ? (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1) : 0;
+            
+            try {
+                // 1. 清理历史数据（保留最近100个数据点）
+                Object.keys(historyData).forEach(range => {
+                    if (historyData[range].long && historyData[range].long.length > 100) {
+                        historyData[range].long = historyData[range].long.slice(-100);
+                        historyData[range].short = historyData[range].short.slice(-100);
+                        historyData[range].timestamps = historyData[range].timestamps.slice(-100);
+                        historyData[range].price_change = historyData[range].price_change.slice(-100);
+                        historyData[range].price_actual = historyData[range].price_actual.slice(-100);
+                    }
+                });
+                
+                // 2. 清理Canvas缓存（重绘）
+                if (historyCtx) {
+                    historyCtx.clearRect(0, 0, historyCanvas.width, historyCanvas.height);
+                    drawHistoryChart(currentTimeRange);
+                }
+                
+                // 3. 清空iframe缓存（可选，会导致重新加载）
+                // const iframe = document.getElementById('okexIframe');
+                // if (iframe) {
+                //     iframe.contentWindow.location.reload();
+                // }
+                
+                // 4. 强制垃圾回收（仅在支持的浏览器中）
+                if (window.gc) {
+                    window.gc();
+                    console.log('✅ 已触发垃圾回收');
+                }
+                
+                // 5. 清理全局变量缓存
+                if (window.performance && window.performance.memory) {
+                    const afterUsed = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1);
+                    const freed = (beforeUsed - afterUsed).toFixed(1);
+                    console.log(`✅ 内存清理完成: ${beforeUsed}MB → ${afterUsed}MB (释放 ${freed}MB)`);
+                    showNotification(`✅ 内存清理完成\n释放: ${freed}MB`, 'success');
+                } else {
+                    console.log('✅ 内存清理完成');
+                    showNotification('✅ 内存清理完成', 'success');
+                }
+                
+            } catch (error) {
+                console.error('❌ 内存清理失败:', error);
+                showNotification('❌ 内存清理失败', 'error');
+            }
+        }
+        
+        // 手动清理内存
+        function manualClearMemory() {
+            console.log('🖱️ 用户手动触发内存清理...');
+            clearMemory();
+            
+            // 重置自动清理倒计时
+            if (autoMemoryClearInterval) {
+                clearInterval(autoMemoryClearInterval);
+                startAutoMemoryClear();
+            }
+        }
+        
+        // 硬刷新页面
+        function hardRefresh() {
+            console.log('🔄 硬刷新页面（清除缓存）...');
+            showNotification('🔄 正在硬刷新页面...', 'info');
+            
+            // 延迟200ms后刷新，确保通知显示
+            setTimeout(() => {
+                window.location.reload(true); // 强制从服务器重新加载
+            }, 200);
+        }
+        
+        // 页面加载时初始化内存管理
+        // 注释掉内存监控显示（根据用户要求）
+        // document.addEventListener('DOMContentLoaded', () => {
+        //     initMemoryManagement();
+        // });
+        
+        // 页面卸载时清理定时器
+        window.addEventListener('beforeunload', () => {
+            if (memoryMonitorInterval) {
+                clearInterval(memoryMonitorInterval);
+            }
+            if (autoMemoryClearInterval) {
+                clearInterval(autoMemoryClearInterval);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "date": "2026-02-25",
+  "total_bullish": 33,
+  "total_bearish": 7,
+  "total_points": 292,
+  "unique_bullish_symbols": [
+    "ADA",
+    "CRO",
+    "DOGE",
+    "ETH",
+    "FIL",
+    "LINK",
+    "STX",
+    "SUI",
+    "TRX",
+    "UNI",
+    "XLM"
+  ],
+  "unique_bearish_symbols": [
+    "FIL",
+    "NEAR",
+    "SUI"
+  ],
+  "unique_bullish_count": 11,
+  "unique_bearish_count": 3,
+  "generated_at": "2026-02-28 22:15:29"
+}

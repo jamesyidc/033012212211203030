@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>预警测试页面</title>
+</head>
+<body style="padding: 20px; background: #f0f0f0;">
+    <h1>🔍 预警模块测试</h1>
+    
+    <div style="background: yellow; padding: 20px; margin: 20px 0; border: 3px solid red;">
+        <h2>如果您能看到这个黄色框，说明页面已更新</h2>
+        <p>当前时间：2025-12-29 10:50</p>
+    </div>
+
+    <!-- 预警快速入口 -->
+    <div id="warning-quick-entry" style="background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%); border-left: 5px solid #ef4444; border-radius: 12px; padding: 20px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2); cursor: pointer;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div style="font-size: 48px;">⚠️</div>
+                <div>
+                    <div style="font-size: 22px; font-weight: bold; color: #c53030; margin-bottom: 5px;">
+                        锚点单预警监控
+                    </div>
+                    <div style="font-size: 14px; color: #742a2a;">
+                        实时监控 -8%预警 | -10%触发维护 | 完整操作留痕
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 20px; align-items: center;">
+                <div style="text-align: center; padding: 10px 20px; background: rgba(255,255,255,0.7); border-radius: 8px;">
+                    <div style="font-size: 28px; font-weight: bold; color: #ef4444;">1</div>
+                    <div style="font-size: 12px; color: #742a2a;">临界预警</div>
+                </div>
+                <div style="text-align: center; padding: 10px 20px; background: rgba(255,255,255,0.7); border-radius: 8px;">
+                    <div style="font-size: 28px; font-weight: bold; color: #f59e0b;">0</div>
+                    <div style="font-size: 12px; color: #742a2a;">普通预警</div>
+                </div>
+                <div style="padding: 12px 24px; background: #ef4444; color: white; border-radius: 8px; font-weight: bold; font-size: 14px;">
+                    点击查看详情 →
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="background: white; padding: 20px; margin: 20px 0; border-radius: 8px;">
+        <h3>测试说明</h3>
+        <ol>
+            <li>如果您能看到上面的<strong>红色渐变预警横幅</strong>，说明代码正常</li>
+            <li>如果看不到，说明是浏览器缓存问题</li>
+            <li>请使用 <strong>Ctrl+Shift+R</strong> (Windows) 或 <strong>Cmd+Shift+R</strong> (Mac) 强制刷新</li>
+            <li>或者清空浏览器缓存后重新访问</li>
+        </ol>
+    </div>
+
+    <hr>
+
+    <div style="background: #e3f2fd; padding: 20px; border-left: 4px solid #2196f3;">
+        <h3>📍 真实页面地址</h3>
+        <p><a href="/anchor-system" style="font-size: 18px;">点击这里访问真实的锚点系统页面</a></p>
+        <p style="color: #666; font-size: 14px;">
+            真实页面的预警入口在页面顶部，4个统计卡片的下方
+        </p>
+    </div>
+</body>
+</html>

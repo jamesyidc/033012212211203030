@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Drive 配置管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        h1 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .status-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .status-value {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .status-value.good {
+            color: #10b981;
+        }
+        
+        .status-value.warning {
+            color: #f59e0b;
+        }
+        
+        .status-value.error {
+            color: #ef4444;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+        
+        .help-text {
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 6px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.6s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .home-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .home-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        .schedule-info {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            color: #92400e;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+        
+        .schedule-info strong {
+            display: block;
+            margin-bottom: 6px;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="home-link">← 返回首页</a>
+    
+    <div class="container">
+        <h1>
+            <span>📁</span>
+            Google Drive 配置管理
+        </h1>
+        <p class="subtitle">管理首页数据的Google Drive文件夹配置和数据采集</p>
+        
+        <div id="alertBox" class="alert"></div>
+        
+        <!-- 当前状态 -->
+        <div class="section">
+            <div class="section-title">
+                <span>📊</span>
+                当前数据状态
+            </div>
+            <div class="status-card">
+                <div class="status-row">
+                    <span class="status-label">最新数据时间</span>
+                    <span class="status-value" id="latestTime">加载中...</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">数据延迟</span>
+                    <span class="status-value" id="dataDelay">加载中...</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">急涨/急跌</span>
+                    <span class="status-value" id="rushData">加载中...</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">当前状态</span>
+                    <span class="status-value" id="currentStatus">加载中...</span>
+                </div>
+            </div>
+            
+            <div class="schedule-info">
+                <strong>⏰ 自动触发规则：</strong>
+                • 每天 00:10 自动触发数据采集<br>
+                • 如果数据延迟超过20分钟（00:10后超过20分钟无数据），将自动执行<br>
+                • 守护进程每5分钟检查一次
+            </div>
+        </div>
+        
+        <!-- 配置管理 -->
+        <div class="section">
+            <div class="section-title">
+                <span>⚙️</span>
+                文件夹配置
+            </div>
+            <div class="form-group">
+                <label for="folderUrl">首页数据 Google Drive 文件夹链接</label>
+                <input 
+                    type="text" 
+                    id="folderUrl" 
+                    placeholder="https://drive.google.com/drive/folders/xxxxx?usp=sharing"
+                    value=""
+                >
+                <p class="help-text">
+                    请提供包含"首页数据"文件夹的共享链接。系统会根据日期（单数/双数）自动选择对应的父文件夹。
+                </p>
+            </div>
+            <div class="form-group">
+                <label>当前配置</label>
+                <div class="status-card">
+                    <div class="status-row">
+                        <span class="status-label">父文件夹URL</span>
+                        <span class="status-value" id="currentFolderUrl">加载中...</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">单数日期父文件夹ID</span>
+                        <span class="status-value" id="oddFolderId">加载中...</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">双数日期父文件夹ID</span>
+                        <span class="status-value" id="evenFolderId">加载中...</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">当前日期文件夹ID</span>
+                        <span class="status-value" id="todayFolderId">加载中...</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">上次更新时间</span>
+                        <span class="status-value" id="lastUpdate">加载中...</span>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-primary" onclick="updateConfig()">
+                <span>💾</span>
+                更新配置
+            </button>
+        </div>
+        
+        <!-- 手动操作 -->
+        <div class="section">
+            <div class="section-title">
+                <span>🎮</span>
+                手动操作
+            </div>
+            <div class="button-group">
+                <button class="btn-success" onclick="manualTrigger()">
+                    <span>▶️</span>
+                    手动触发数据采集
+                </button>
+                <button class="btn-secondary" onclick="refreshStatus()">
+                    <span>🔄</span>
+                    刷新状态
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 加载配置和状态
+        async function loadConfig() {
+            try {
+                const response = await fetch('/api/gdrive-config/get');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const config = data.config;
+                    document.getElementById('currentFolderUrl').textContent = config.parent_folder_url || '未设置';
+                    document.getElementById('oddFolderId').textContent = config.root_folder_odd || '未设置';
+                    document.getElementById('evenFolderId').textContent = config.root_folder_even || '未设置';
+                    document.getElementById('todayFolderId').textContent = config.folder_id || '未设置';
+                    document.getElementById('lastUpdate').textContent = config.last_updated || '未知';
+                    
+                    if (config.parent_folder_url) {
+                        document.getElementById('folderUrl').value = config.parent_folder_url;
+                    }
+                }
+            } catch (error) {
+                console.error('加载配置失败:', error);
+            }
+        }
+        
+        // 加载最新数据状态
+        async function loadLatestData() {
+            try {
+                const response = await fetch('/api/gdrive-config/latest-data');
+                const result = await response.json();
+                
+                if (result.success && result.has_data) {
+                    const data = result.data;
+                    document.getElementById('latestTime').textContent = data.snapshot_time;
+                    
+                    const delay = data.delay_minutes;
+                    const delayEl = document.getElementById('dataDelay');
+                    delayEl.textContent = `${delay} 分钟`;
+                    
+                    if (delay < 10) {
+                        delayEl.className = 'status-value good';
+                    } else if (delay < 30) {
+                        delayEl.className = 'status-value warning';
+                    } else {
+                        delayEl.className = 'status-value error';
+                    }
+                    
+                    document.getElementById('rushData').textContent = `${data.rush_up} / ${data.rush_down}`;
+                    document.getElementById('currentStatus').textContent = data.status || '正常';
+                } else {
+                    document.getElementById('latestTime').textContent = '暂无数据';
+                    document.getElementById('dataDelay').textContent = '-';
+                    document.getElementById('rushData').textContent = '-';
+                    document.getElementById('currentStatus').textContent = '暂无数据';
+                }
+            } catch (error) {
+                console.error('加载数据状态失败:', error);
+            }
+        }
+        
+        // 更新配置
+        async function updateConfig() {
+            const folderUrl = document.getElementById('folderUrl').value.trim();
+            
+            if (!folderUrl) {
+                showAlert('请输入Google Drive文件夹链接', 'error');
+                return;
+            }
+            
+            try {
+                const btn = event.target;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="loading"></span> 更新中...';
+                
+                const response = await fetch('/api/gdrive-config/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        parent_folder_url: folderUrl
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('配置更新成功！', 'success');
+                    await loadConfig();
+                } else {
+                    showAlert('更新失败: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showAlert('更新失败: ' + error.message, 'error');
+            } finally {
+                const btn = event.target;
+                btn.disabled = false;
+                btn.innerHTML = '<span>💾</span> 更新配置';
+            }
+        }
+        
+        // 手动触发
+        async function manualTrigger() {
+            if (!confirm('确定要手动触发数据采集吗？')) {
+                return;
+            }
+            
+            try {
+                const btn = event.target;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="loading"></span> 执行中...';
+                
+                const response = await fetch('/api/gdrive-config/manual-trigger', {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('手动触发成功！数据采集已开始，请稍后刷新查看结果。', 'success');
+                    setTimeout(() => {
+                        loadLatestData();
+                    }, 5000);
+                } else {
+                    showAlert('触发失败: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showAlert('触发失败: ' + error.message, 'error');
+            } finally {
+                const btn = event.target;
+                btn.disabled = false;
+                btn.innerHTML = '<span>▶️</span> 手动触发数据采集';
+            }
+        }
+        
+        // 刷新状态
+        async function refreshStatus() {
+            await Promise.all([loadConfig(), loadLatestData()]);
+            showAlert('状态已刷新', 'info');
+        }
+        
+        // 显示提示
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.className = `alert alert-${type}`;
+            alertBox.textContent = message;
+            alertBox.style.display = 'block';
+            
+            setTimeout(() => {
+                alertBox.style.display = 'none';
+            }, 5000);
+        }
+        
+        // 页面加载时初始化
+        window.addEventListener('DOMContentLoaded', async () => {
+            await Promise.all([loadConfig(), loadLatestData()]);
+            
+            // 每30秒自动刷新数据状态
+            setInterval(loadLatestData, 30000);
+        });
+    </script>
+</body>
+</html>

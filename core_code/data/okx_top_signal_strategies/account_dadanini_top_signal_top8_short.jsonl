@@ -1,0 +1,1 @@
+{"timestamp": "2026-03-23T03:57:15.717127", "time": "2026-03-23 03:57:15", "account_id": "account_dadanini", "strategy_type": "top8_short", "enabled": false, "rsi_threshold": 1800, "max_order_usdt": 5.0, "position_percent": 1.5, "leverage": 10, "description": "见顶信号+涨幅前8做空策略"}

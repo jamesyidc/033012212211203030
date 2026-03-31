@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>币种池 - 从星星系统筛选的优质币种池</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0f766e 0%, #059669 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 420px;
+            width: 100%;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            text-decoration: none;
+            color: #fff;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* 主卡片 */
+        .main-card {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* 标题 */
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        /* 币种列表框 */
+        .coin-box {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: left;
+        }
+
+        .coin-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .coin-row:last-child {
+            border-bottom: none;
+        }
+
+        .coin-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+            flex-shrink: 0;
+            font-weight: 500;
+        }
+
+        .coin-value {
+            font-size: 13px;
+            color: white;
+            font-weight: 500;
+            flex: 1;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        .coin-count {
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        /* 颜色标记 */
+        .badge-v1 {
+            color: #fbbf24;
+        }
+
+        .badge-v2 {
+            color: #60a5fa;
+        }
+
+        .badge-rush-up {
+            color: #4ade80;
+        }
+
+        .badge-rush-gt {
+            color: #34d399;
+        }
+
+        .badge-priority {
+            color: #fb923c;
+        }
+
+        .badge-long-pool {
+            color: #22c55e;
+            font-weight: 600;
+        }
+
+        .badge-short-pool {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        /* 做多币种池卡片 */
+        .long-pool-card {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* 做空币种池卡片 */
+        .short-pool-card {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .long-pool-title, .short-pool-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .long-pool-subtitle, .short-pool-subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 20px;
+        }
+
+        .long-pool-coins, .short-pool-coins {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .long-pool-count, .short-pool-count {
+            font-size: 48px;
+            font-weight: 900;
+            color: #fbbf24;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .long-pool-list, .short-pool-list {
+            font-size: 15px;
+            line-height: 1.8;
+            color: white;
+            font-weight: 500;
+        }
+
+        .coin-frequency {
+            display: inline-block;
+            background: rgba(251, 191, 36, 0.3);
+            padding: 2px 8px;
+            border-radius: 8px;
+            margin-left: 3px;
+            font-size: 12px;
+            color: #fbbf24;
+            font-weight: bold;
+        }
+
+        /* 查看详情按钮 */
+        .detail-btn {
+            display: inline-block;
+            padding: 15px 50px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #10b981;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .detail-btn:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 更新时间 */
+        .update-time {
+            margin-top: 20px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* 加载动画 */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 16px;
+        }
+
+        @media (max-width: 480px) {
+            .main-card {
+                padding: 30px 20px;
+            }
+
+            .title {
+                font-size: 24px;
+            }
+
+            .coin-label {
+                font-size: 12px;
+                width: 80px;
+            }
+
+            .coin-value {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-btn">← 返回首页</a>
+        
+        <div id="loading" class="loading">
+            加载中...
+        </div>
+
+        <div id="content" style="display: none;">
+            <!-- 做多币种池卡片 -->
+            <div class="long-pool-card">
+                <div class="long-pool-title">
+                    🚀 做多币种池
+                </div>
+                <div class="long-pool-subtitle">出现2次及以上的高频优质币种</div>
+                <div class="long-pool-coins">
+                    <div class="long-pool-count" id="long-pool-count">0</div>
+                    <div class="long-pool-list" id="long-pool-list">-</div>
+                </div>
+            </div>
+
+            <!-- 做空币种池卡片 -->
+            <div class="short-pool-card">
+                <div class="short-pool-title">
+                    📉 做空币种池
+                </div>
+                <div class="short-pool-subtitle">满足2个及以上条件的做空币种</div>
+                <div class="short-pool-coins">
+                    <div class="short-pool-count" id="short-pool-count">0</div>
+                    <div class="short-pool-list" id="short-pool-list">-</div>
+                </div>
+            </div>
+
+            <!-- 做多币种池详情卡片 -->
+            <div class="main-card" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);">
+                <!-- 标题 -->
+                <h1 class="title">🚀 做多币种池</h1>
+                <p class="subtitle">从星星系统筛选的优质币种池，5大维度智能分类</p>
+
+                <!-- 币种列表 -->
+                <div class="coin-box">
+                    <div class="coin-row">
+                        <span class="coin-label">V1币种:</span>
+                        <span class="coin-value">
+                            <span class="badge-v1 coin-count" id="v1-count">0个</span>
+                        </span>
+                    </div>
+                    <div class="coin-row" style="border-bottom: 2px solid rgba(255, 255, 255, 0.15); padding-bottom: 15px; margin-bottom: 15px;">
+                        <span class="coin-value badge-v1" id="v1-coins" style="text-align: left; padding-left: 0;">-</span>
+                    </div>
+
+                    <div class="coin-row">
+                        <span class="coin-label">V2币种:</span>
+                        <span class="coin-value">
+                            <span class="badge-v2 coin-count" id="v2-count">0个</span>
+                        </span>
+                    </div>
+                    <div class="coin-row" style="border-bottom: 2px solid rgba(255, 255, 255, 0.15); padding-bottom: 15px; margin-bottom: 15px;">
+                        <span class="coin-value badge-v2" id="v2-coins" style="text-align: left; padding-left: 0;">-</span>
+                    </div>
+
+                    <div class="coin-row">
+                        <span class="coin-label">急涨>急跌:</span>
+                        <span class="coin-value">
+                            <span class="badge-rush-gt coin-count" id="rush-gt-count">0个</span>
+                        </span>
+                    </div>
+                    <div class="coin-row" style="border-bottom: 2px solid rgba(255, 255, 255, 0.15); padding-bottom: 15px; margin-bottom: 15px;">
+                        <span class="coin-value badge-rush-gt" id="rush-gt-coins" style="text-align: left; padding-left: 0;">-</span>
+                    </div>
+
+                    <div class="coin-row">
+                        <span class="coin-label">只有急涨:</span>
+                        <span class="coin-value">
+                            <span class="badge-rush-up coin-count" id="only-rush-count">0个</span>
+                        </span>
+                    </div>
+                    <div class="coin-row" style="border-bottom: 2px solid rgba(255, 255, 255, 0.15); padding-bottom: 15px; margin-bottom: 15px;">
+                        <span class="coin-value badge-rush-up" id="only-rush-coins" style="text-align: left; padding-left: 0;">-</span>
+                    </div>
+
+                    <div class="coin-row">
+                        <span class="coin-label">优先级≥4:</span>
+                        <span class="coin-value">
+                            <span class="badge-priority coin-count" id="priority-count">0个</span>
+                        </span>
+                    </div>
+                    <div class="coin-row" style="padding-bottom: 0;">
+                        <span class="coin-value badge-priority" id="priority-coins" style="text-align: left; padding-left: 0;">-</span>
+                    </div>
+                </div>
+
+                <!-- 查看详情按钮 -->
+                <a href="/star-system" class="detail-btn">查看详情</a>
+
+                <!-- 更新时间 -->
+                <div class="update-time" id="update-time">最后更新: -</div>
+            </div>
+
+            <!-- 做空币种池详情卡片 -->
+            <div class="main-card" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); margin-top: 30px;">
+                <!-- 标题 -->
+                <h1 class="title">📉 做空币种池</h1>
+                <p class="subtitle">符合做空条件的币种池，4大维度智能分类</p>
+
+                <!-- 币种列表 -->
+                <div class="coin-box">
+                    <div class="coin-row">
+                        <span class="coin-label">只有急跌:</span>
+                        <span class="coin-value">
+                            <span class="badge-rush-up coin-count" id="only-rush-down-count">0个</span>
+                        </span>
+                    </div>
+                    <div class="coin-row" style="border-bottom: 2px solid rgba(255, 255, 255, 0.15); padding-bottom: 15px; margin-bottom: 15px;">
+                        <span class="coin-value badge-rush-up" id="only-rush-down-coins" style="text-align: left; padding-left: 0;">-</span>
+                    </div>
+
+                    <div class="coin-row">
+                        <span class="coin-label">急跌>急涨:</span>
+                        <span class="coin-value">
+                            <span class="badge-rush-gt coin-count" id="rush-down-gt-up-count">0个</span>
+                        </span>
+                    </div>
+                    <div class="coin-row" style="border-bottom: 2px solid rgba(255, 255, 255, 0.15); padding-bottom: 15px; margin-bottom: 15px;">
+                        <span class="coin-value badge-rush-gt" id="rush-down-gt-up-coins" style="text-align: left; padding-left: 0;">-</span>
+                    </div>
+
+                    <div class="coin-row">
+                        <span class="coin-label">V1成交量:</span>
+                        <span class="coin-value">
+                            <span class="badge-v1 coin-count" id="short-v1-count">0个</span>
+                        </span>
+                    </div>
+                    <div class="coin-row" style="border-bottom: 2px solid rgba(255, 255, 255, 0.15); padding-bottom: 15px; margin-bottom: 15px;">
+                        <span class="coin-value badge-v1" id="short-v1-coins" style="text-align: left; padding-left: 0;">-</span>
+                    </div>
+
+                    <div class="coin-row">
+                        <span class="coin-label">V2成交量:</span>
+                        <span class="coin-value">
+                            <span class="badge-v2 coin-count" id="short-v2-count">0个</span>
+                        </span>
+                    </div>
+                    <div class="coin-row" style="padding-bottom: 0;">
+                        <span class="coin-value badge-v2" id="short-v2-coins" style="text-align: left; padding-left: 0;">-</span>
+                    </div>
+                </div>
+
+                <!-- 查看详情按钮 -->
+                <a href="/star-system" class="detail-btn" style="background: rgba(255, 255, 255, 0.95); color: #ef4444;">查看详情</a>
+
+                <!-- 更新时间 -->
+                <div class="update-time" id="update-time-short">最后更新: -</div>
+            </div>
+
+            <!-- 新增：三大趋势数据框 -->
+            <div style="margin-top: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px;">
+                <!-- 大趋势 -->
+                <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.35) 0%, rgba(118, 75, 162, 0.35) 100%); border: 3px solid rgba(102, 126, 234, 0.7); border-radius: 20px; padding: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.2);">
+                    <div style="font-size: 22px; font-weight: bold; color: #a5b4fc; margin-bottom: 20px; text-align: center; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">
+                        📈 大趋势判断
+                    </div>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="font-size: 14px; color: rgba(255,255,255,0.8); margin-bottom: 12px;">当前趋势得分</div>
+                        <div id="macro-trend-score" style="font-size: 64px; font-weight: 900; color: #10b981; margin-bottom: 12px; text-shadow: 2px 2px 6px rgba(0,0,0,0.3);">-</div>
+                        <div id="macro-trend-text" style="font-size: 20px; font-weight: bold; color: #10b981; text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">-</div>
+                    </div>
+                    <!-- 得分说明 -->
+                    <div style="background: rgba(0,0,0,0.2); border-radius: 12px; padding: 15px; margin-top: 15px;">
+                        <div style="font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.8;">
+                            <div style="margin-bottom: 5px;">📊 基于因子：</div>
+                            <div id="macro-factors" style="margin-left: 8px; color: rgba(255,255,255,0.75); font-size: 12px;">
+                                • 星星差值<br>
+                                • BTC 涨跌幅<br>
+                                • ETH 涨跌幅
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 中趋势 -->
+                <div style="background: linear-gradient(135deg, rgba(255, 234, 167, 0.35) 0%, rgba(253, 203, 110, 0.35) 100%); border: 3px solid rgba(255, 193, 7, 0.7); border-radius: 20px; padding: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.2);">
+                    <div style="font-size: 22px; font-weight: bold; color: #fbbf24; margin-bottom: 20px; text-align: center; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">
+                        ⚠️ 中趋势限制
+                    </div>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="font-size: 14px; color: rgba(255,255,255,0.8); margin-bottom: 12px;">限制条件触发</div>
+                        <div id="medium-trend-count" style="font-size: 64px; font-weight: 900; color: #f59e0b; margin-bottom: 12px; text-shadow: 2px 2px 6px rgba(0,0,0,0.3);">-</div>
+                        <div id="medium-trend-text" style="font-size: 18px; font-weight: bold; color: #f59e0b; text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">-</div>
+                    </div>
+                    <!-- 权限状态 -->
+                    <div style="background: rgba(0,0,0,0.2); border-radius: 12px; padding: 15px; margin-top: 15px;">
+                        <div style="font-size: 13px; color: rgba(255,255,255,0.85); line-height: 2;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <span>📈 做多权限：</span>
+                                <span id="can-long-status" style="font-weight: bold; font-size: 14px;">-</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>📉 做空权限：</span>
+                                <span id="can-short-status" style="font-weight: bold; font-size: 14px;">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 小趋势 -->
+                <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.35) 0%, rgba(5, 150, 105, 0.35) 100%); border: 3px solid rgba(16, 185, 129, 0.7); border-radius: 20px; padding: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.2);">
+                    <div style="font-size: 22px; font-weight: bold; color: #10b981; margin-bottom: 20px; text-align: center; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">
+                        💰 小趋势仓位
+                    </div>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="font-size: 14px; color: rgba(255,255,255,0.8); margin-bottom: 12px;">建议总仓位</div>
+                        <div id="small-trend-position" style="font-size: 64px; font-weight: 900; color: #10b981; margin-bottom: 12px; text-shadow: 2px 2px 6px rgba(0,0,0,0.3);">-</div>
+                        <div id="small-trend-text" style="font-size: 18px; font-weight: bold; color: #10b981; text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">-</div>
+                    </div>
+                    <!-- 仓位细分 -->
+                    <div style="background: rgba(0,0,0,0.2); border-radius: 12px; padding: 15px; margin-top: 15px;">
+                        <div style="font-size: 13px; color: rgba(255,255,255,0.85); line-height: 2;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <span>⭐ 星星仓位：</span>
+                                <span id="star-position" style="font-weight: bold; font-size: 14px;">-</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>📊 持仓量仓位：</span>
+                                <span id="oi-position" style="font-weight: bold; font-size: 14px;">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 加载数据
+        function loadData() {
+            fetch('/api/star-system/data')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // 收集所有币种列表
+                        const v1Coins = data.v1v2_data?.v1_coins || [];
+                        const v2Coins = data.v1v2_data?.v2_coins || [];
+                        const rushGt = data.coin_lists?.rush_up_gt_down_coins || [];
+                        const onlyRush = data.coin_lists?.only_rush_up_coins || [];
+                        const priority = data.coin_lists?.priority_high_coins || [];
+                        
+                        // 统计所有币种的出现次数
+                        const allCoins = [...v1Coins, ...v2Coins, ...rushGt, ...onlyRush, ...priority];
+                        const frequencyMap = {};
+                        allCoins.forEach(coin => {
+                            frequencyMap[coin] = (frequencyMap[coin] || 0) + 1;
+                        });
+                        
+                        // 按出现次数排序（次数多的在前）
+                        const sortedCoins = Object.keys(frequencyMap).sort((a, b) => {
+                            return frequencyMap[b] - frequencyMap[a];
+                        });
+                        
+                        // 格式化币种显示（添加出现次数）
+                        function formatCoinsWithCount(coins) {
+                            return coins.map(coin => `${coin}(${frequencyMap[coin]})`).join(', ');
+                        }
+                        
+                        // V1币种 - 显示出现次数
+                        document.getElementById('v1-count').textContent = v1Coins.length + '个';
+                        document.getElementById('v1-coins').textContent = v1Coins.length > 0 ? formatCoinsWithCount(v1Coins) : '-';
+
+                        // V2币种 - 显示出现次数
+                        document.getElementById('v2-count').textContent = v2Coins.length + '个';
+                        document.getElementById('v2-coins').textContent = v2Coins.length > 0 ? formatCoinsWithCount(v2Coins) : '-';
+                        
+                        // 急涨>急跌 - 按出现次数排序并显示
+                        const rushGtSorted = rushGt.sort((a, b) => {
+                            return sortedCoins.indexOf(a) - sortedCoins.indexOf(b);
+                        });
+                        document.getElementById('rush-gt-count').textContent = rushGtSorted.length + '个';
+                        document.getElementById('rush-gt-coins').textContent = rushGtSorted.length > 0 ? formatCoinsWithCount(rushGtSorted) : '-';
+
+                        // 只有急涨 - 按出现次数排序并显示
+                        const onlyRushSorted = onlyRush.sort((a, b) => {
+                            return sortedCoins.indexOf(a) - sortedCoins.indexOf(b);
+                        });
+                        document.getElementById('only-rush-count').textContent = onlyRushSorted.length + '个';
+                        document.getElementById('only-rush-coins').textContent = onlyRushSorted.length > 0 ? formatCoinsWithCount(onlyRushSorted) : '-';
+
+                        // 优先级≥4 - 按出现次数排序并显示
+                        const prioritySorted = priority.sort((a, b) => {
+                            return sortedCoins.indexOf(a) - sortedCoins.indexOf(b);
+                        });
+                        document.getElementById('priority-count').textContent = prioritySorted.length + '个';
+                        document.getElementById('priority-coins').textContent = prioritySorted.length > 0 ? formatCoinsWithCount(prioritySorted) : '-';
+
+                        // 做多币种池 - 出现大于等于2次的币种
+                        const longPoolCoins = sortedCoins.filter(coin => frequencyMap[coin] >= 2);
+                        document.getElementById('long-pool-count').textContent = longPoolCoins.length;
+                        
+                        if (longPoolCoins.length > 0) {
+                            const longPoolHtml = longPoolCoins.map(coin => {
+                                const frequency = frequencyMap[coin];
+                                return `${coin}<span class="coin-frequency">×${frequency}</span>`;
+                            }).join(', ');
+                            document.getElementById('long-pool-list').innerHTML = longPoolHtml;
+                        } else {
+                            document.getElementById('long-pool-list').textContent = '暂无符合条件的币种';
+                        }
+
+                        // 做空币种池 - 统计符合做空条件的币种
+                        const onlyRushDown = data.coin_lists?.only_rush_down_coins || [];
+                        const rushDownGtUp = data.coin_lists?.rush_down_gt_up_coins || [];
+                        
+                        // 收集所有做空条件的币种（去重）
+                        const shortConditionsMap = {};
+                        
+                        // 1. 只有急跌
+                        onlyRushDown.forEach(coin => {
+                            if (!shortConditionsMap[coin]) shortConditionsMap[coin] = [];
+                            shortConditionsMap[coin].push('只有急跌');
+                        });
+                        
+                        // 2. 急跌>急涨
+                        rushDownGtUp.forEach(coin => {
+                            if (!shortConditionsMap[coin]) shortConditionsMap[coin] = [];
+                            if (!shortConditionsMap[coin].includes('急跌>急涨')) {
+                                shortConditionsMap[coin].push('急跌>急涨');
+                            }
+                        });
+                        
+                        // 3. V1成交量
+                        v1Coins.forEach(coin => {
+                            if (!shortConditionsMap[coin]) shortConditionsMap[coin] = [];
+                            if (!shortConditionsMap[coin].includes('V1')) {
+                                shortConditionsMap[coin].push('V1');
+                            }
+                        });
+                        
+                        // 4. V2成交量
+                        v2Coins.forEach(coin => {
+                            if (!shortConditionsMap[coin]) shortConditionsMap[coin] = [];
+                            if (!shortConditionsMap[coin].includes('V2')) {
+                                shortConditionsMap[coin].push('V2');
+                            }
+                        });
+                        
+                        // 获取所有做空币种并按条件数量排序，筛选满足>=2个条件的币种
+                        const allShortPoolCoins = Object.keys(shortConditionsMap).sort((a, b) => {
+                            return shortConditionsMap[b].length - shortConditionsMap[a].length;
+                        });
+                        
+                        // 只显示满足2个及以上条件的币种
+                        const shortPoolCoins = allShortPoolCoins.filter(coin => shortConditionsMap[coin].length >= 2);
+                        
+                        document.getElementById('short-pool-count').textContent = shortPoolCoins.length;
+                        
+                        if (shortPoolCoins.length > 0) {
+                            const shortPoolHtml = shortPoolCoins.map(coin => {
+                                const conditions = shortConditionsMap[coin];
+                                const conditionCount = conditions.length;
+                                return `${coin}<span class="coin-frequency">×${conditionCount}</span>`;
+                            }).join(', ');
+                            document.getElementById('short-pool-list').innerHTML = shortPoolHtml;
+                        } else {
+                            document.getElementById('short-pool-list').textContent = '暂无符合条件的币种';
+                        }
+
+                        // 做空币种池详情 - 只有急跌
+                        const onlyRushDownSorted = onlyRushDown.sort((a, b) => {
+                            return (frequencyMap[b] || 0) - (frequencyMap[a] || 0);
+                        });
+                        document.getElementById('only-rush-down-count').textContent = onlyRushDownSorted.length + '个';
+                        document.getElementById('only-rush-down-coins').textContent = onlyRushDownSorted.length > 0 ? 
+                            onlyRushDownSorted.map(coin => `${coin}(${frequencyMap[coin] || 1})`).join(', ') : '-';
+
+                        // 做空币种池详情 - 急跌>急涨
+                        const rushDownGtUpSorted = rushDownGtUp.sort((a, b) => {
+                            return (frequencyMap[b] || 0) - (frequencyMap[a] || 0);
+                        });
+                        document.getElementById('rush-down-gt-up-count').textContent = rushDownGtUpSorted.length + '个';
+                        document.getElementById('rush-down-gt-up-coins').textContent = rushDownGtUpSorted.length > 0 ? 
+                            rushDownGtUpSorted.map(coin => `${coin}(${frequencyMap[coin] || 1})`).join(', ') : '-';
+
+                        // 做空币种池详情 - V1和V2（复用相同数据）
+                        document.getElementById('short-v1-count').textContent = v1Coins.length + '个';
+                        document.getElementById('short-v1-coins').textContent = v1Coins.length > 0 ? formatCoinsWithCount(v1Coins) : '-';
+                        
+                        document.getElementById('short-v2-count').textContent = v2Coins.length + '个';
+                        document.getElementById('short-v2-coins').textContent = v2Coins.length > 0 ? formatCoinsWithCount(v2Coins) : '-';
+
+                        // 更新时间
+                        document.getElementById('update-time').textContent = '最后更新: ' + data.update_time;
+                        document.getElementById('update-time-short').textContent = '最后更新: ' + data.update_time;
+
+                        // 显示内容
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('content').style.display = 'block';
+                    }
+                })
+                .catch(err => {
+                    console.error('加载数据失败:', err);
+                    document.getElementById('loading').textContent = '加载失败，请刷新页面重试';
+                });
+
+            // 加载开仓逻辑数据（三大趋势）
+            fetch('/api/opening-logic/suggestion')
+                .then(res => res.json())
+                .then(response => {
+                    if (response.success && response.data) {
+                        const data = response.data;
+                        
+                        // 大趋势数据
+                        const trendScore = data.trend_score || 0;
+                        const trendText = data.trend || '-';
+                        let trendColor = '#10b981'; // 默认绿色
+                        if (trendScore >= 10) trendColor = '#22c55e';
+                        else if (trendScore >= 5) trendColor = '#10b981';
+                        else if (trendScore >= 2) trendColor = '#84cc16';
+                        else if (trendScore <= -10) trendColor = '#ef4444';
+                        else if (trendScore <= -5) trendColor = '#f87171';
+                        else if (trendScore <= -2) trendColor = '#fb923c';
+                        else trendColor = '#fbbf24';
+                        
+                        document.getElementById('macro-trend-score').textContent = trendScore > 0 ? '+' + trendScore : trendScore;
+                        document.getElementById('macro-trend-score').style.color = trendColor;
+                        document.getElementById('macro-trend-text').textContent = trendText;
+                        document.getElementById('macro-trend-text').style.color = trendColor;
+                        
+                        // 显示得分因子详情
+                        if (data.raw_data) {
+                            const raw = data.raw_data;
+                            let factorsHtml = '';
+                            if (raw.star_data) {
+                                const starDiff = raw.star_data.solid_stars - raw.star_data.hollow_stars;
+                                factorsHtml += `• 星星差值: ${starDiff > 0 ? '+' : ''}${starDiff}<br>`;
+                            }
+                            if (raw.btc_eth_change) {
+                                factorsHtml += `• BTC: ${raw.btc_eth_change.BTC >= 0 ? '+' : ''}${raw.btc_eth_change.BTC.toFixed(2)}%<br>`;
+                                factorsHtml += `• ETH: ${raw.btc_eth_change.ETH >= 0 ? '+' : ''}${raw.btc_eth_change.ETH.toFixed(2)}%`;
+                            }
+                            if (factorsHtml) {
+                                document.getElementById('macro-factors').innerHTML = factorsHtml;
+                            }
+                        }
+                        
+                        // 中趋势数据（限制条件）
+                        const restrictionCount = data.restrictions ? data.restrictions.length : 0;
+                        const restrictionText = restrictionCount === 0 ? '无限制' : restrictionCount + ' 条限制';
+                        const restrictionColor = restrictionCount === 0 ? '#10b981' : '#f59e0b';
+                        
+                        document.getElementById('medium-trend-count').textContent = restrictionCount;
+                        document.getElementById('medium-trend-count').style.color = restrictionColor;
+                        document.getElementById('medium-trend-text').textContent = restrictionText;
+                        document.getElementById('medium-trend-text').style.color = restrictionColor;
+                        
+                        // 显示做多做空权限
+                        const canLong = data.can_long !== undefined ? data.can_long : true;
+                        const canShort = data.can_short !== undefined ? data.can_short : true;
+                        
+                        document.getElementById('can-long-status').textContent = canLong ? '✅ 允许' : '🚫 禁止';
+                        document.getElementById('can-long-status').style.color = canLong ? '#10b981' : '#ef4444';
+                        
+                        document.getElementById('can-short-status').textContent = canShort ? '✅ 允许' : '🚫 禁止';
+                        document.getElementById('can-short-status').style.color = canShort ? '#10b981' : '#ef4444';
+                        
+                        // 小趋势数据（建议仓位）
+                        if (data.position_info) {
+                            const positionPercent = data.position_info.position_percent || 0;
+                            const positionLevel = data.position_info.position_level || '-';
+                            const positionType = data.position_info.position_type || 'neutral';
+                            const starPosition = data.position_info.star_position || 0;
+                            const oiPosition = data.position_info.oi_position || 0;
+                            
+                            let positionColor = '#10b981';
+                            if (positionType === 'long') positionColor = '#10b981';
+                            else if (positionType === 'short') positionColor = '#ef4444';
+                            else positionColor = '#fbbf24';
+                            
+                            document.getElementById('small-trend-position').textContent = positionPercent + '%';
+                            document.getElementById('small-trend-position').style.color = positionColor;
+                            document.getElementById('small-trend-text').textContent = positionLevel;
+                            document.getElementById('small-trend-text').style.color = positionColor;
+                            
+                            // 显示仓位细分
+                            document.getElementById('star-position').textContent = starPosition + '%';
+                            document.getElementById('star-position').style.color = positionColor;
+                            document.getElementById('oi-position').textContent = oiPosition + '%';
+                            document.getElementById('oi-position').style.color = positionColor;
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error('获取开仓逻辑数据失败:', err);
+                });
+        }
+
+        // 页面加载时执行
+        loadData();
+
+        // 每60秒刷新一次
+        setInterval(loadData, 60000);
+    </script>
+</body>
+</html>

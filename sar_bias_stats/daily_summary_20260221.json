@@ -1,0 +1,18 @@
+{
+  "date": "2026-02-21",
+  "total_bullish": 15,
+  "total_bearish": 9,
+  "total_points": 286,
+  "unique_bullish_symbols": [
+    "DOT",
+    "ETC",
+    "SOL",
+    "STX"
+  ],
+  "unique_bearish_symbols": [
+    "NEAR"
+  ],
+  "unique_bullish_count": 4,
+  "unique_bearish_count": 1,
+  "generated_at": "2026-02-28 22:15:29"
+}

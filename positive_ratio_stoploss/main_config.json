@@ -1,0 +1,8 @@
+{
+  "last_status": null,
+  "last_ratio": null,
+  "last_check_time": null,
+  "enabled": false,
+  "threshold": 42.5,
+  "allow_once": true
+}

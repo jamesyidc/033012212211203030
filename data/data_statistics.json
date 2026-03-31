@@ -1,0 +1,581 @@
+{
+  "scan_time": "2026-03-15 19:12:08",
+  "summary": {
+    "total_directories": 9,
+    "total_files": 40,
+    "total_records": 1166,
+    "total_size_mb": 0.5245876312255859
+  },
+  "directories": {
+    "root": {
+      "files": [
+        {
+          "name": "favorite_symbols.jsonl",
+          "path": "favorite_symbols.jsonl",
+          "records": 1,
+          "size": 315,
+          "size_mb": 0.0,
+          "dates": {
+            "min": "2026-03-15",
+            "max": "2026-03-15"
+          },
+          "modified": "2026-03-15 17:20:49"
+        },
+        {
+          "name": "backup_history.jsonl",
+          "path": "backup_history.jsonl",
+          "records": 6,
+          "size": 3189,
+          "size_mb": 0.0,
+          "dates": {
+            "min": "2026-03-16",
+            "max": "2026-03-16"
+          },
+          "modified": "2026-03-15 18:56:32"
+        }
+      ],
+      "total_records": 7,
+      "total_size": 3504,
+      "date_range": {
+        "min": "2026-03-15",
+        "max": "2026-03-16"
+      }
+    },
+    "okx_trading_logs": {
+      "files": [
+        {
+          "name": "trading_log_20260316.jsonl",
+          "path": "okx_trading_logs/trading_log_20260316.jsonl",
+          "records": 8,
+          "size": 2183,
+          "size_mb": 0.0,
+          "dates": {
+            "min": "2026-03-16",
+            "max": "2026-03-16"
+          },
+          "modified": "2026-03-15 17:21:28"
+        }
+      ],
+      "total_records": 8,
+      "total_size": 2183,
+      "date_range": {
+        "min": "2026-03-16",
+        "max": "2026-03-16"
+      }
+    },
+    "panic_jsonl": {
+      "files": [
+        {
+          "name": "panic_wash_index.jsonl",
+          "path": "panic_jsonl/panic_wash_index.jsonl",
+          "records": 34,
+          "size": 31874,
+          "size_mb": 0.03,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:10:22"
+        }
+      ],
+      "total_records": 34,
+      "total_size": 31874,
+      "date_range": {
+        "min": null,
+        "max": null
+      }
+    },
+    "sar_bias_stats": {
+      "files": [
+        {
+          "name": "bias_stats_20260316.jsonl",
+          "path": "sar_bias_stats/bias_stats_20260316.jsonl",
+          "records": 24,
+          "size": 11512,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:10:00"
+        }
+      ],
+      "total_records": 24,
+      "total_size": 11512,
+      "date_range": {
+        "min": null,
+        "max": null
+      }
+    },
+    "market_sentiment": {
+      "files": [
+        {
+          "name": "market_sentiment_20260316.jsonl",
+          "path": "market_sentiment/market_sentiment_20260316.jsonl",
+          "records": 7,
+          "size": 4247,
+          "size_mb": 0.0,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 18:59:59"
+        }
+      ],
+      "total_records": 7,
+      "total_size": 4247,
+      "date_range": {
+        "min": null,
+        "max": null
+      }
+    },
+    "sar_jsonl": {
+      "files": [
+        {
+          "name": "AAVE.jsonl",
+          "path": "sar_jsonl/AAVE.jsonl",
+          "records": 24,
+          "size": 6853,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:10"
+        },
+        {
+          "name": "APT.jsonl",
+          "path": "sar_jsonl/APT.jsonl",
+          "records": 24,
+          "size": 6849,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:11"
+        },
+        {
+          "name": "BCH.jsonl",
+          "path": "sar_jsonl/BCH.jsonl",
+          "records": 24,
+          "size": 6815,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:11"
+        },
+        {
+          "name": "BNB.jsonl",
+          "path": "sar_jsonl/BNB.jsonl",
+          "records": 24,
+          "size": 6847,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:12"
+        },
+        {
+          "name": "BTC.jsonl",
+          "path": "sar_jsonl/BTC.jsonl",
+          "records": 24,
+          "size": 6916,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:12"
+        },
+        {
+          "name": "CFX.jsonl",
+          "path": "sar_jsonl/CFX.jsonl",
+          "records": 24,
+          "size": 6824,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:12"
+        },
+        {
+          "name": "CRO.jsonl",
+          "path": "sar_jsonl/CRO.jsonl",
+          "records": 24,
+          "size": 6805,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:13"
+        },
+        {
+          "name": "CRV.jsonl",
+          "path": "sar_jsonl/CRV.jsonl",
+          "records": 24,
+          "size": 6841,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:13"
+        },
+        {
+          "name": "DOGE.jsonl",
+          "path": "sar_jsonl/DOGE.jsonl",
+          "records": 24,
+          "size": 6826,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:13"
+        },
+        {
+          "name": "DOT.jsonl",
+          "path": "sar_jsonl/DOT.jsonl",
+          "records": 24,
+          "size": 6789,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:14"
+        },
+        {
+          "name": "ETC.jsonl",
+          "path": "sar_jsonl/ETC.jsonl",
+          "records": 24,
+          "size": 6794,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:14"
+        },
+        {
+          "name": "ETH.jsonl",
+          "path": "sar_jsonl/ETH.jsonl",
+          "records": 24,
+          "size": 6853,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:14"
+        },
+        {
+          "name": "FIL.jsonl",
+          "path": "sar_jsonl/FIL.jsonl",
+          "records": 24,
+          "size": 6845,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:15"
+        },
+        {
+          "name": "HBAR.jsonl",
+          "path": "sar_jsonl/HBAR.jsonl",
+          "records": 24,
+          "size": 6842,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:15"
+        },
+        {
+          "name": "LDO.jsonl",
+          "path": "sar_jsonl/LDO.jsonl",
+          "records": 24,
+          "size": 6824,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:15"
+        },
+        {
+          "name": "LINK.jsonl",
+          "path": "sar_jsonl/LINK.jsonl",
+          "records": 24,
+          "size": 6853,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:16"
+        },
+        {
+          "name": "LTC.jsonl",
+          "path": "sar_jsonl/LTC.jsonl",
+          "records": 24,
+          "size": 6849,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:16"
+        },
+        {
+          "name": "NEAR.jsonl",
+          "path": "sar_jsonl/NEAR.jsonl",
+          "records": 24,
+          "size": 6887,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:16"
+        },
+        {
+          "name": "OKB.jsonl",
+          "path": "sar_jsonl/OKB.jsonl",
+          "records": 24,
+          "size": 6809,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:17"
+        },
+        {
+          "name": "SOL.jsonl",
+          "path": "sar_jsonl/SOL.jsonl",
+          "records": 24,
+          "size": 6799,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:17"
+        },
+        {
+          "name": "STX.jsonl",
+          "path": "sar_jsonl/STX.jsonl",
+          "records": 24,
+          "size": 6796,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:18"
+        },
+        {
+          "name": "SUI.jsonl",
+          "path": "sar_jsonl/SUI.jsonl",
+          "records": 24,
+          "size": 6835,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:18"
+        },
+        {
+          "name": "TAO.jsonl",
+          "path": "sar_jsonl/TAO.jsonl",
+          "records": 24,
+          "size": 6784,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:18"
+        },
+        {
+          "name": "TON.jsonl",
+          "path": "sar_jsonl/TON.jsonl",
+          "records": 24,
+          "size": 6839,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:19"
+        },
+        {
+          "name": "TRX.jsonl",
+          "path": "sar_jsonl/TRX.jsonl",
+          "records": 24,
+          "size": 6796,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:19"
+        },
+        {
+          "name": "UNI.jsonl",
+          "path": "sar_jsonl/UNI.jsonl",
+          "records": 24,
+          "size": 6818,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:19"
+        },
+        {
+          "name": "XLM.jsonl",
+          "path": "sar_jsonl/XLM.jsonl",
+          "records": 24,
+          "size": 6828,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:20"
+        },
+        {
+          "name": "XRP.jsonl",
+          "path": "sar_jsonl/XRP.jsonl",
+          "records": 24,
+          "size": 6849,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:20"
+        },
+        {
+          "name": "ADA.jsonl",
+          "path": "sar_jsonl/ADA.jsonl",
+          "records": 24,
+          "size": 6811,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:20"
+        }
+      ],
+      "total_records": 696,
+      "total_size": 198076,
+      "date_range": {
+        "min": null,
+        "max": null
+      }
+    },
+    "coin_change_tracker": {
+      "files": [
+        {
+          "name": "rsi_20260316.jsonl",
+          "path": "coin_change_tracker/rsi_20260316.jsonl",
+          "records": 21,
+          "size": 10471,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:09:53"
+        },
+        {
+          "name": "coin_change_20260316.jsonl",
+          "path": "coin_change_tracker/coin_change_20260316.jsonl",
+          "records": 101,
+          "size": 246389,
+          "size_mb": 0.23,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:11:02"
+        },
+        {
+          "name": "velocity_20260316.jsonl",
+          "path": "coin_change_tracker/velocity_20260316.jsonl",
+          "records": 100,
+          "size": 15354,
+          "size_mb": 0.01,
+          "dates": {
+            "min": null,
+            "max": null
+          },
+          "modified": "2026-03-15 19:11:02"
+        }
+      ],
+      "total_records": 222,
+      "total_size": 272214,
+      "date_range": {
+        "min": null,
+        "max": null
+      }
+    },
+    "positive_ratio_stats": {
+      "files": [
+        {
+          "name": "positive_ratio_20260316.jsonl",
+          "path": "positive_ratio_stats/positive_ratio_20260316.jsonl",
+          "records": 160,
+          "size": 23966,
+          "size_mb": 0.02,
+          "dates": {
+            "min": "2026-03-16",
+            "max": "2026-03-16"
+          },
+          "modified": "2026-03-15 18:08:27"
+        }
+      ],
+      "total_records": 160,
+      "total_size": 23966,
+      "date_range": {
+        "min": "2026-03-16",
+        "max": "2026-03-16"
+      }
+    },
+    "okx_pnl_statistics": {
+      "files": [
+        {
+          "name": "pnl_records.jsonl",
+          "path": "okx_pnl_statistics/pnl_records.jsonl",
+          "records": 8,
+          "size": 2494,
+          "size_mb": 0.0,
+          "dates": {
+            "min": "2026-03-15",
+            "max": "2026-03-15"
+          },
+          "modified": "2026-03-15 17:21:28"
+        }
+      ],
+      "total_records": 8,
+      "total_size": 2494,
+      "date_range": {
+        "min": "2026-03-15",
+        "max": "2026-03-15"
+      }
+    }
+  }
+}

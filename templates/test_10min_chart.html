@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>测试10分钟柱状图</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+</head>
+<body>
+    <h1>测试10分钟上涨占比柱状图加载</h1>
+    <div id="upRatioBarChart" style="width: 1000px; height: 300px; border: 1px solid #ccc;"></div>
+    <div id="log" style="margin-top: 20px; padding: 10px; background: #f0f0f0; font-family: monospace; white-space: pre-wrap;"></div>
+    
+    <script>
+        const logEl = document.getElementById('log');
+        function log(msg) {
+            logEl.textContent += msg + '\n';
+            console.log(msg);
+        }
+        
+        // 初始化图表
+        const chartDom = document.getElementById('upRatioBarChart');
+        const upRatioBarChart = echarts.init(chartDom);
+        log('✅ ECharts实例已创建');
+        
+        // 测试load10MinUpRatioFromAPI
+        async function load10MinUpRatioFromAPI(date) {
+            try {
+                log(`📊 开始加载10分钟上涨占比聚合数据，日期: ${date}`);
+                
+                // 格式化日期为YYYYMMDD格式
+                let dateStr = '';
+                if (date) {
+                    dateStr = typeof date === 'string' ? date.replace(/-/g, '') : date;
+                }
+                
+                // 调用聚合数据API
+                const apiUrl = `/api/coin-change-tracker/aggregated/10min_up_ratio?date=${dateStr}&_t=${Date.now()}`;
+                log(`📡 API请求: ${apiUrl}`);
+                
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API请求失败: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                log(`📊 API响应: success=${result.success}, data.length=${result.data ? result.data.length : 0}`);
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    // 提取时间标签和上涨占比数据
+                    const timeLabels = [];
+                    const barData = [];
+                    
+                    result.data.forEach(item => {
+                        timeLabels.push(item.time_range);
+                        barData.push({
+                            value: parseFloat(item.avg_up_ratio).toFixed(2),
+                            itemStyle: {
+                                color: item.color === 'green' ? '#10b981' : item.color === 'red' ? '#ef4444' : '#f59e0b'
+                            }
+                        });
+                    });
+                    
+                    log(`📊 准备渲染图表: ${timeLabels.length} 个时间点`);
+                    
+                    // 配置图表
+                    const chartOption = {
+                        title: {
+                            text: '10分钟上涨占比平均值',
+                            left: 'center'
+                        },
+                        tooltip: {
+                            trigger: 'axis',
+                            formatter: function(params) {
+                                const p = params[0];
+                                return `${p.axisValue}<br/>上涨占比: ${p.data.value}%`;
+                            }
+                        },
+                        xAxis: {
+                            type: 'category',
+                            data: timeLabels,
+                            axisLabel: {
+                                rotate: 45,
+                                interval: Math.floor(timeLabels.length / 24)
+                            }
+                        },
+                        yAxis: {
+                            type: 'value',
+                            name: '上涨占比 (%)',
+                            axisLabel: {
+                                formatter: '{value}%'
+                            }
+                        },
+                        series: [{
+                            name: '10分钟平均上涨占比',
+                            type: 'bar',
+                            data: barData
+                        }]
+                    };
+                    
+                    upRatioBarChart.setOption(chartOption, true);
+                    log(`✅ 10分钟上涨占比图表已更新，数据点数: ${result.data.length}`);
+                } else {
+                    log('⚠️ 10分钟上涨占比数据为空或加载失败');
+                }
+            } catch (error) {
+                log('❌ 加载10分钟上涨占比数据失败: ' + error.message);
+            }
+        }
+        
+        // 测试加载
+        log('🚀 开始测试...');
+        setTimeout(() => {
+            load10MinUpRatioFromAPI('2026-03-13');
+        }, 500);
+    </script>
+</body>
+</html>

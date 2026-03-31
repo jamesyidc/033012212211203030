@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OKX加密货币指数 - 27币种加权指数</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f1229 0%, #1a1f3a 100%);
+            color: #e0e6ed;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #ffd93d 0%, #ff6b6b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header .subtitle {
+            color: #8b95a5;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        /* 返回首页按钮 */
+        .home-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 217, 61, 0.3);
+            border-radius: 25px;
+            color: #ffd93d;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .home-button:hover {
+            background: rgba(255, 217, 61, 0.2);
+            border-color: rgba(255, 217, 61, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 217, 61, 0.3);
+        }
+
+        .home-button:active {
+            transform: translateY(0);
+        }
+
+        /* 指数主显示卡片 */
+        .index-main-card {
+            background: linear-gradient(135deg, rgba(255, 217, 61, 0.1) 0%, rgba(255, 107, 107, 0.1) 100%);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(255, 217, 61, 0.3);
+            box-shadow: 0 8px 32px rgba(255, 217, 61, 0.2);
+        }
+
+        .index-value-large {
+            font-size: 72px;
+            font-weight: 700;
+            text-align: center;
+            color: #ffd93d;
+            text-shadow: 0 0 20px rgba(255, 217, 61, 0.5);
+            margin-bottom: 20px;
+        }
+
+        .index-change-large {
+            font-size: 36px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .index-change-large.positive {
+            color: #ff6b6b;  /* 涨红色 */
+        }
+
+        .index-change-large.negative {
+            color: #00ff88;  /* 跌绿色 */
+        }
+
+        .index-info {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .index-info-item {
+            text-align: center;
+        }
+
+        .index-info-label {
+            color: #8b95a5;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .index-info-value {
+            color: #e0e6ed;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        /* 图表容器 */
+        .chart-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chart-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #e0e6ed;
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 400px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+
+        /* 成分币种表格 */
+        .components-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .component-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .component-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 217, 61, 0.5);
+            box-shadow: 0 6px 20px rgba(255, 217, 61, 0.15);
+        }
+
+        .component-card.large-weight {
+            border: 2px solid rgba(255, 217, 61, 0.5);
+            background: rgba(255, 217, 61, 0.08);
+        }
+
+        .component-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .component-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffd93d;
+        }
+
+        .component-weight {
+            font-size: 14px;
+            color: #8b95a5;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .component-price {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #e0e6ed;
+        }
+
+        .component-change {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .component-change.positive {
+            color: #ff6b6b;  /* 涨红色 */
+        }
+
+        .component-change.negative {
+            color: #00ff88;  /* 跌绿色 */
+        }
+
+        .component-contribution {
+            font-size: 12px;
+            color: #8b95a5;
+            margin-top: 5px;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #00ff88;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #8b95a5;
+        }
+    </style>
+</head>
+<body>
+    <!-- 返回首页按钮 -->
+    <a href="/" class="home-button">
+        <span>🏠</span>
+        <span>返回首页</span>
+    </a>
+
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>📊 OKX加密货币指数</h1>
+            <div class="subtitle">27个主流币种加权指数 | BTC 10% + ETH 6% + 其他25币种各3.36% | 每10秒更新</div>
+        </div>
+
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText">连接中...</span>
+            </div>
+            <div class="status-item">
+                <span id="updateTime">更新时间: --</span>
+            </div>
+        </div>
+
+        <!-- 指数主显示 -->
+        <div class="index-main-card">
+            <div class="index-value-large" id="indexValue">--</div>
+            <div class="index-change-large" id="indexChange">--</div>
+            
+            <div class="index-info">
+                <div class="index-info-item">
+                    <div class="index-info-label">基准值</div>
+                    <div class="index-info-value" id="baseValue">1000.00</div>
+                </div>
+                <div class="index-info-item">
+                    <div class="index-info-label">有效成分</div>
+                    <div class="index-info-value" id="validComponents">--</div>
+                </div>
+                <div class="index-info-item">
+                    <div class="index-info-label">总成分数</div>
+                    <div class="index-info-value">27</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 平均位置显示 -->
+        <div class="chart-container" style="margin-bottom: 30px;">
+            <div class="chart-title">📍 市场平均位置</div>
+            <div class="index-info" style="margin-top: 0;">
+                <div class="index-info-item">
+                    <div class="index-info-label">4小时平均位置</div>
+                    <div class="index-info-value" id="position4h" style="color: #3b82f6;">--</div>
+                </div>
+                <div class="index-info-item">
+                    <div class="index-info-label">12小时平均位置</div>
+                    <div class="index-info-value" id="position12h" style="color: #8b5cf6;">--</div>
+                </div>
+                <div class="index-info-item">
+                    <div class="index-info-label">24小时平均位置</div>
+                    <div class="index-info-value" id="position24h" style="color: #ec4899;">--</div>
+                </div>
+                <div class="index-info-item">
+                    <div class="index-info-label">48小时平均位置</div>
+                    <div class="index-info-value" id="position48h" style="color: #f59e0b;">--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 12小时走势图（分页） -->
+        <div class="chart-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div class="chart-title" style="margin-bottom: 0;">📈 指数12小时走势图</div>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <button id="prevPageBtn" onclick="changePage(-1)" style="padding: 8px 16px; background: rgba(255, 217, 61, 0.2); border: 1px solid #ffd93d; border-radius: 6px; color: #ffd93d; cursor: pointer; font-size: 14px; transition: all 0.3s;">← 上一页</button>
+                    <span id="pageInfo" style="color: #ffd93d; font-weight: 600; min-width: 120px; text-align: center;">第 1 / 1 页</span>
+                    <button id="nextPageBtn" onclick="changePage(1)" style="padding: 8px 16px; background: rgba(255, 217, 61, 0.2); border: 1px solid #ffd93d; border-radius: 6px; color: #ffd93d; cursor: pointer; font-size: 14px; transition: all 0.3s;">下一页 →</button>
+                </div>
+            </div>
+            <canvas id="indexChart" class="chart-canvas"></canvas>
+        </div>
+
+        <!-- 5分钟K线图 -->
+        <div class="chart-container">
+            <div class="chart-title">📊 5分钟K线图（Crypto Index）</div>
+            <canvas id="klineChart" class="chart-canvas" style="height: 500px;"></canvas>
+        </div>
+
+        <!-- 成分币种详情 -->
+        <div class="chart-container">
+            <div class="chart-title">🪙 成分币种详情</div>
+            <div class="components-grid" id="componentsGrid">
+                <div class="loading">正在加载成分数据...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/index';
+        const UPDATE_INTERVAL = 2000; // 前端每2秒刷新一次
+
+        let indexData = {};
+        let chartCtx = null;
+        let klineCtx = null;
+        let currentPage = 1;
+        let totalPages = 1;
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initChart();
+            initKlineChart();
+            startIndexMonitoring();
+            startDataUpdate();
+        });
+
+        // 初始化指数图表
+        function initChart() {
+            const canvas = document.getElementById('indexChart');
+            chartCtx = canvas.getContext('2d');
+            
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * 2;
+            canvas.height = rect.height * 2;
+            chartCtx.scale(2, 2);
+        }
+
+        // 初始化K线图表
+        function initKlineChart() {
+            const canvas = document.getElementById('klineChart');
+            klineCtx = canvas.getContext('2d');
+            
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * 2;
+            canvas.height = rect.height * 2;
+            klineCtx.scale(2, 2);
+        }
+
+        // 启动指数监控
+        async function startIndexMonitoring() {
+            try {
+                const response = await fetch(`${API_BASE}/start`, { method: 'POST' });
+                const result = await response.json();
+                console.log('指数监控启动:', result);
+            } catch (error) {
+                console.error('启动监控失败:', error);
+            }
+        }
+
+        // 开始数据更新
+        function startDataUpdate() {
+            updateData();
+            setInterval(updateData, UPDATE_INTERVAL);
+        }
+
+        // 更新数据
+        async function updateData() {
+            try {
+                // 获取当前指数值
+                const currentResponse = await fetch(`${API_BASE}/current`);
+                const currentData = await currentResponse.json();
+
+                // 获取成分详情
+                const componentsResponse = await fetch(`${API_BASE}/components`);
+                const componentsData = await componentsResponse.json();
+
+                // 获取历史数据（分页）
+                const historyResponse = await fetch(`${API_BASE}/history?page=${currentPage}`);
+                const historyData = await historyResponse.json();
+
+                // 获取K线数据
+                const klinesResponse = await fetch(`${API_BASE}/klines`);
+                const klinesData = await klinesResponse.json();
+
+                // 获取平均位置数据
+                const positionResponse = await fetch('/api/position/summary');
+                const positionData = await positionResponse.json();
+
+                if (currentData.success) {
+                    updateIndexDisplay(currentData.data);
+                    updateStatus(true);
+                }
+
+                if (componentsData.success) {
+                    updateComponentsDisplay(componentsData.data);
+                }
+
+                if (historyData.success) {
+                    totalPages = historyData.total_pages || 1;
+                    currentPage = historyData.current_page || 1;
+                    updatePageInfo();
+                    drawChart(historyData.data);
+                }
+
+                if (klinesData.success) {
+                    drawKlineChart(klinesData.data);
+                }
+
+                if (positionData.success && positionData.averages) {
+                    updatePositionDisplay(positionData.averages);
+                }
+
+            } catch (error) {
+                console.error('数据更新失败:', error);
+                updateStatus(false);
+            }
+        }
+
+        // 更新指数显示
+        function updateIndexDisplay(data) {
+            document.getElementById('indexValue').textContent = data.value.toFixed(2);
+            document.getElementById('baseValue').textContent = data.base_value.toFixed(2);
+            document.getElementById('validComponents').textContent = `${data.valid_components} / 27`;
+
+            const changeElement = document.getElementById('indexChange');
+            const changePercent = data.change_percent;
+            const changeSign = changePercent >= 0 ? '+' : '';
+            
+            changeElement.textContent = `${changeSign}${changePercent.toFixed(2)}%`;
+            changeElement.className = `index-change-large ${changePercent >= 0 ? 'positive' : 'negative'}`;
+        }
+
+        // 更新成分显示
+        function updateComponentsDisplay(components) {
+            const grid = document.getElementById('componentsGrid');
+            
+            // 按权重排序（大权重在前）
+            const sortedComponents = Object.values(components).sort((a, b) => b.weight - a.weight);
+            
+            grid.innerHTML = sortedComponents.map(comp => {
+                const changePercent = comp.change_percent;
+                const changeSign = changePercent >= 0 ? '+' : '';
+                const changeClass = changePercent >= 0 ? 'positive' : 'negative';
+                const isLargeWeight = comp.weight >= 0.06; // BTC和ETH
+                
+                return `
+                    <div class="component-card ${isLargeWeight ? 'large-weight' : ''}">
+                        <div class="component-header">
+                            <div class="component-name">${comp.name}</div>
+                            <div class="component-weight">${(comp.weight * 100).toFixed(2)}%</div>
+                        </div>
+                        <div class="component-price">$${comp.price.toFixed(comp.price > 1000 ? 1 : 4)}</div>
+                        <div class="component-change ${changeClass}">${changeSign}${changePercent.toFixed(2)}%</div>
+                        <div class="component-contribution">指数贡献: ${changeSign}${comp.weighted_contribution.toFixed(3)}%</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 更新平均位置显示
+        function updatePositionDisplay(positions) {
+            document.getElementById('position4h').textContent = positions['4h'] !== undefined ? positions['4h'].toFixed(2) : '--';
+            document.getElementById('position12h').textContent = positions['12h'] !== undefined ? positions['12h'].toFixed(2) : '--';
+            document.getElementById('position24h').textContent = positions['24h'] !== undefined ? positions['24h'].toFixed(2) : '--';
+            document.getElementById('position48h').textContent = positions['48h'] !== undefined ? positions['48h'].toFixed(2) : '--';
+        }
+
+        // 翻页功能
+        function changePage(delta) {
+            const newPage = currentPage + delta;
+            if (newPage < 1 || newPage > totalPages) return;
+            currentPage = newPage;
+            updateData();
+        }
+
+        // 更新页码信息
+        function updatePageInfo() {
+            document.getElementById('pageInfo').textContent = `第 ${currentPage} / ${totalPages} 页`;
+            document.getElementById('prevPageBtn').disabled = currentPage <= 1;
+            document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
+            
+            // 更新按钮样式
+            const prevBtn = document.getElementById('prevPageBtn');
+            const nextBtn = document.getElementById('nextPageBtn');
+            
+            prevBtn.style.opacity = currentPage <= 1 ? '0.5' : '1';
+            prevBtn.style.cursor = currentPage <= 1 ? 'not-allowed' : 'pointer';
+            nextBtn.style.opacity = currentPage >= totalPages ? '0.5' : '1';
+            nextBtn.style.cursor = currentPage >= totalPages ? 'not-allowed' : 'pointer';
+        }
+
+        // 绘制图表（带日期分割线）
+        function drawChart(history) {
+            if (!history || history.length < 2) return;
+
+            const canvas = document.getElementById('indexChart');
+            const ctx = chartCtx;
+            const rect = canvas.getBoundingClientRect();
+            
+            const padding = { top: 40, right: 80, bottom: 60, left: 60 };
+            const chartWidth = rect.width - padding.left - padding.right;
+            const chartHeight = rect.height - padding.top - padding.bottom;
+
+            ctx.clearRect(0, 0, rect.width, rect.height);
+
+            // 找到最小和最大变化百分比
+            const values = history.map(h => h.change_percent);
+            let minChange = Math.min(...values);
+            let maxChange = Math.max(...values);
+
+            // 添加边距
+            const range = maxChange - minChange;
+            const margin = range * 0.1 || 0.1;
+            minChange -= margin;
+            maxChange += margin;
+
+            // 绘制网格
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#8b95a5';
+
+            // 水平网格线
+            const ySteps = 8;
+            for (let i = 0; i <= ySteps; i++) {
+                const y = padding.top + (chartHeight / ySteps) * i;
+                const changeValue = maxChange - ((maxChange - minChange) / ySteps) * i;
+
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(padding.left + chartWidth, y);
+                ctx.stroke();
+
+                const label = changeValue.toFixed(2) + '%';
+                ctx.textAlign = 'right';
+                ctx.fillText(label, padding.left - 10, y + 4);
+            }
+
+            // 0%线
+            if (minChange < 0 && maxChange > 0) {
+                const zeroY = padding.top + chartHeight - ((0 - minChange) / (maxChange - minChange)) * chartHeight;
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.moveTo(padding.left, zeroY);
+                ctx.lineTo(padding.left + chartWidth, zeroY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+
+            // 绘制曲线
+            ctx.strokeStyle = '#ffd93d';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.shadowColor = '#ffd93d';
+            ctx.shadowBlur = 10;
+
+            ctx.beginPath();
+            history.forEach((point, index) => {
+                const x = padding.left + (chartWidth / (history.length - 1)) * index;
+                const normalizedY = (point.change_percent - minChange) / (maxChange - minChange);
+                const y = padding.top + chartHeight - normalizedY * chartHeight;
+
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // 绘制终点标记
+            const lastPoint = history[history.length - 1];
+            const lastX = padding.left + chartWidth;
+            const lastNormalizedY = (lastPoint.change_percent - minChange) / (maxChange - minChange);
+            const lastY = padding.top + chartHeight - lastNormalizedY * chartHeight;
+
+            ctx.fillStyle = '#ffd93d40';
+            ctx.beginPath();
+            ctx.arc(lastX, lastY, 8, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#ffd93d';
+            ctx.beginPath();
+            ctx.arc(lastX, lastY, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.font = 'bold 14px Arial';
+            const label = (lastPoint.change_percent >= 0 ? '+' : '') + lastPoint.change_percent.toFixed(2) + '%';
+            ctx.fillText(label, lastX + 12, lastY + 5);
+
+            // 绘制日期分割竖线
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([]);
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#ffd93d';
+            ctx.textAlign = 'center';
+
+            let lastDate = null;
+            history.forEach((point, index) => {
+                const date = new Date(point.time);
+                const dateStr = date.toLocaleDateString('zh-CN');
+                
+                // 当日期变化时，绘制竖线
+                if (lastDate && dateStr !== lastDate) {
+                    const x = padding.left + (chartWidth / (history.length - 1)) * index;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(x, padding.top);
+                    ctx.lineTo(x, padding.top + chartHeight);
+                    ctx.stroke();
+                    
+                    // 绘制日期标签
+                    ctx.fillText(dateStr, x, padding.top + chartHeight + 30);
+                }
+                lastDate = dateStr;
+            });
+
+            // 绘制第一个日期标签
+            if (history.length > 0) {
+                const firstDate = new Date(history[0].time);
+                const firstDateStr = firstDate.toLocaleDateString('zh-CN');
+                ctx.fillText(firstDateStr, padding.left, padding.top + chartHeight + 30);
+            }
+        }
+
+        // 绘制K线图（蜡烛图 + 成交量）
+        function drawKlineChart(klines) {
+            if (!klines || klines.length < 1) return;
+
+            const canvas = document.getElementById('klineChart');
+            const ctx = klineCtx;
+            const rect = canvas.getBoundingClientRect();
+            
+            // 图表分区：使用全高度绘制K线（不绘制成交量）
+            const padding = { top: 40, right: 80, bottom: 80, left: 60 };
+            const klineHeight = rect.height - padding.top - padding.bottom;
+            const chartWidth = rect.width - padding.left - padding.right;
+
+            ctx.clearRect(0, 0, rect.width, rect.height);
+
+            // 找到K线价格范围（使用我们的字段名）
+            const prices = klines.flatMap(k => [k.high_price || k.high, k.low_price || k.low]);
+            let minPrice = Math.min(...prices);
+            let maxPrice = Math.max(...prices);
+            const priceRange = maxPrice - minPrice;
+            const priceMargin = priceRange * 0.1 || 1;
+            minPrice -= priceMargin;
+            maxPrice += priceMargin;
+
+            // 绘制K线区域网格
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#8b95a5';
+
+            // 水平网格线（价格）
+            const ySteps = 6;
+            for (let i = 0; i <= ySteps; i++) {
+                const y = padding.top + (klineHeight / ySteps) * i;
+                const priceValue = maxPrice - ((maxPrice - minPrice) / ySteps) * i;
+
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(padding.left + chartWidth, y);
+                ctx.stroke();
+
+                const label = priceValue.toFixed(2);
+                ctx.textAlign = 'right';
+                ctx.fillText(label, padding.left - 10, y + 4);
+            }
+
+            // 绘制K线
+            const candleWidth = Math.max(4, (chartWidth / klines.length) * 0.6);
+            const candleGap = (chartWidth / klines.length) * 0.4;
+
+            klines.forEach((kline, index) => {
+                const x = padding.left + (chartWidth / klines.length) * index + candleGap / 2;
+                
+                // 使用我们的字段名
+                const open = kline.open_price || kline.open || 0;
+                const close = kline.close_price || kline.close || 0;
+                const high = kline.high_price || kline.high || 0;
+                const low = kline.low_price || kline.low || 0;
+                
+                // 计算价格位置
+                const openY = padding.top + klineHeight - ((open - minPrice) / (maxPrice - minPrice)) * klineHeight;
+                const closeY = padding.top + klineHeight - ((close - minPrice) / (maxPrice - minPrice)) * klineHeight;
+                const highY = padding.top + klineHeight - ((high - minPrice) / (maxPrice - minPrice)) * klineHeight;
+                const lowY = padding.top + klineHeight - ((low - minPrice) / (maxPrice - minPrice)) * klineHeight;
+
+                // 判断涨跌（中国习惯：涨红跌绿）
+                const isRising = close >= open;
+                const color = isRising ? '#ff6b6b' : '#00ff88';
+
+                // 绘制上下影线
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(x + candleWidth / 2, highY);
+                ctx.lineTo(x + candleWidth / 2, lowY);
+                ctx.stroke();
+
+                // 绘制实体
+                const bodyTop = Math.min(openY, closeY);
+                const bodyHeight = Math.abs(closeY - openY) || 1;
+                
+                ctx.fillStyle = color;
+                ctx.fillRect(x, bodyTop, candleWidth, bodyHeight);
+                
+                // 如果是平盘（开盘价=收盘价），绘制一条横线
+                if (Math.abs(closeY - openY) < 1) {
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(x, openY);
+                    ctx.lineTo(x + candleWidth, openY);
+                    ctx.stroke();
+                }
+            });
+
+            // 绘制时间轴
+            const timeStep = Math.ceil(klines.length / 8);
+            for (let i = 0; i < klines.length; i += timeStep) {
+                const x = padding.left + (chartWidth / klines.length) * i;
+                const kline = klines[i];
+                const timestamp = kline.timestamp || '';
+                let timeStr = '';
+                
+                if (timestamp) {
+                    const date = new Date(timestamp);
+                    timeStr = date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+                }
+                
+                ctx.fillStyle = '#8b95a5';
+                ctx.font = '11px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(timeStr, x, padding.top + klineHeight + 30);
+            }
+
+            // 标题和统计信息
+            ctx.fillStyle = '#ffd93d';
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText(`5分钟K线 | ${klines.length}根`, padding.left, padding.top - 15);
+            
+            // 显示最新价格和涨跌
+            if (klines.length > 0) {
+                const latest = klines[klines.length - 1];
+                const latestClose = latest.close_price || latest.close || 0;
+                const latestOpen = latest.open_price || latest.open || 0;
+                const change = latestClose - latestOpen;
+                const changePercent = latestOpen > 0 ? (change / latestOpen * 100) : 0;
+                
+                const changeColor = change >= 0 ? '#00ff88' : '#ff6b6b';
+                const changeSign = change >= 0 ? '+' : '';
+                
+                ctx.fillStyle = changeColor;
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'right';
+                ctx.fillText(
+                    `最新: ${latestClose.toFixed(2)} (${changeSign}${changePercent.toFixed(2)}%)`,
+                    padding.left + chartWidth,
+                    padding.top - 15
+                );
+            }
+        }
+
+        // 更新状态
+        function updateStatus(isOnline = true) {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            const updateTime = document.getElementById('updateTime');
+
+            if (isOnline) {
+                statusDot.style.background = '#00ff88';
+                statusText.textContent = '指数实时更新中';
+                updateTime.textContent = '更新时间: ' + new Date().toLocaleTimeString('zh-CN');
+            } else {
+                statusDot.style.background = '#ff6b6b';
+                statusText.textContent = '连接失败';
+                updateTime.textContent = '更新时间: --';
+            }
+        }
+    </script>
+</body>
+</html>

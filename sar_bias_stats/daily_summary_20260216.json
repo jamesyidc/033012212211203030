@@ -1,0 +1,17 @@
+{
+  "date": "2026-02-16",
+  "total_bullish": 11,
+  "total_bearish": 6,
+  "total_points": 258,
+  "unique_bullish_symbols": [
+    "TAO",
+    "TON"
+  ],
+  "unique_bearish_symbols": [
+    "CRO",
+    "TON"
+  ],
+  "unique_bullish_count": 2,
+  "unique_bearish_count": 2,
+  "generated_at": "2026-02-28 22:15:29"
+}

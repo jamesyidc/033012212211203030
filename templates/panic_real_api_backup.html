@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 恐慌清洗指数 - 真实API数据</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            background: #0a0e27;
+            color: #eee;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 20px;
+            border-bottom: 2px solid #00d4ff44;
+        }
+        .main-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+        .api-status {
+            text-align: center;
+            color: #4ade80;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        .stats-grid {
+            max-width: 1400px;
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            padding: 0 20px;
+        }
+        .stat-card {
+            background: #16213e;
+            border: 1px solid #00d4ff33;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .stat-card:hover {
+            border-color: #00d4ff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 212, 255, 0.2);
+        }
+        .stat-card.highlight {
+            border: 2px solid #f5576c;
+            background: linear-gradient(135deg, #16213e 0%, #2d1b3d 100%);
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #00d4ff;
+            margin: 10px 0;
+        }
+        .stat-card.highlight .stat-value {
+            color: #f5576c;
+            font-size: 32px;
+        }
+        .stat-unit {
+            font-size: 12px;
+            color: #666;
+        }
+        .data-source {
+            text-align: center;
+            padding: 10px;
+            color: #666;
+            font-size: 12px;
+        }
+        .api-badge {
+            display: inline-block;
+            background: #4ade80;
+            color: #000;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="main-title">
+            🔥 恐慌清洗指数 <span class="api-badge">REAL API</span>
+        </div>
+        <div class="api-status" id="apiStatus">正在连接API...</div>
+    </div>
+
+    <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+            <div class="stat-label">加载中...</div>
+            <div class="stat-value">--</div>
+        </div>
+    </div>
+
+    <div class="data-source">
+        📡 数据来源: /api/panic-v3/latest | 每60秒自动刷新
+    </div>
+
+    <script>
+        let refreshInterval = null;
+        
+        async function loadRealData() {
+            try {
+                document.getElementById('apiStatus').innerHTML = '⏳ 正在获取最新数据...';
+                
+                // 调用真实API
+                const response = await fetch('/api/panic-v3/latest');
+                const result = await response.json();
+                
+                if (!result.success || !result.data) {
+                    throw new Error('API返回数据异常');
+                }
+                
+                const data = result.data;
+                
+                // 计算恐慌级别
+                const panicIndex = (data.panic_index * 100).toFixed(2);
+                let panicLevel = data.panic_level || '低恐慌';
+                let cardClass = '';
+                
+                if (data.panic_index > 0.15) {
+                    cardClass = 'red';
+                } else if (data.panic_index > 0.08) {
+                    cardClass = 'yellow';
+                } else {
+                    cardClass = 'green';
+                }
+                
+                // 渲染统计卡片
+                const html = `
+                    <div class="stat-card highlight">
+                        <div class="stat-label">恐慌清洗指数</div>
+                        <div class="stat-value">${panicIndex}%</div>
+                        <div class="stat-unit">${panicLevel}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">1小时爆仓金额</div>
+                        <div class="stat-value">$${data.liquidation_1h.toFixed(2)}</div>
+                        <div class="stat-unit">万美元</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">24小时爆仓金额</div>
+                        <div class="stat-value">$${data.liquidation_24h.toFixed(2)}</div>
+                        <div class="stat-unit">万美元</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">24小时爆仓人数</div>
+                        <div class="stat-value">${data.liquidation_count_24h.toFixed(2)}</div>
+                        <div class="stat-unit">万人</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">全网持仓量</div>
+                        <div class="stat-value">$${data.open_interest.toFixed(2)}</div>
+                        <div class="stat-unit">亿美元</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">最后更新</div>
+                        <div class="stat-value">${data.beijing_time.split(' ')[1]}</div>
+                        <div class="stat-unit">北京时间</div>
+                    </div>
+                `;
+                
+                document.getElementById('statsGrid').innerHTML = html;
+                
+                const now = new Date().toLocaleTimeString('zh-CN');
+                document.getElementById('apiStatus').innerHTML = `✅ 数据加载成功 | 更新时间: ${now}`;
+                
+                console.log('✅ 真实API数据:', data);
+                
+            } catch (error) {
+                console.error('❌ API加载失败:', error);
+                document.getElementById('apiStatus').innerHTML = '❌ API连接失败';
+                document.getElementById('statsGrid').innerHTML = `
+                    <div class="stat-card" style="grid-column: 1/-1;">
+                        <div class="stat-label">数据加载失败</div>
+                        <div class="stat-value" style="color: #f5576c;">ERROR</div>
+                        <div class="stat-unit">${error.message}</div>
+                    </div>
+                `;
+            }
+        }
+        
+        // 页面加载时立即获取数据
+        loadRealData();
+        
+        // 每60秒刷新一次
+        refreshInterval = setInterval(loadRealData, 60000);
+        
+        console.log('🚀 真实API数据页面已启动');
+        console.log('📡 API端点: /api/panic-v3/latest');
+        console.log('⏱️  刷新间隔: 60秒');
+    </script>
+</body>
+</html>

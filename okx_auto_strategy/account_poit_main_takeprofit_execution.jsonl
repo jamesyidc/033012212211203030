@@ -1,0 +1,4 @@
+{"timestamp": "2026-02-23T02:13:12.122113", "time": "2026-02-23 02:13:12", "account_id": "account_poit_main", "takeprofit_type": "rsi", "allowed": false, "reason": "用户已暂停所有策略", "rsi_value": 1900, "profit_value": null}
+{"timestamp": "2026-02-19T06:47:35.095585", "time": "2026-02-19 06:47:35", "account_id": "account_poit_main", "takeprofit_type": "rsi", "allowed": false, "reason": "关闭RSI止盈监控", "rsi_value": 1900, "profit_value": null}
+{"timestamp": "2026-02-19T08:25:04.850648", "time": "2026-02-19 08:25:04", "account_id": "account_poit_main", "takeprofit_type": "rsi", "allowed": true, "reason": "开启RSI止盈监控，阈值1900", "rsi_value": 1900, "profit_value": null}
+{"timestamp": "2026-02-19T19:05:00.064190", "time": "2026-02-19 19:05:00", "account_id": "account_poit_main", "takeprofit_type": "rsi", "allowed": false, "reason": "RSI止盈已触发并执行，RSI=2027.02", "rsi_value": 2027.02, "profit_value": null}

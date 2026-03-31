@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统配置管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .config-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .system-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-healthy {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-unhealthy {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-unknown {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 80px;
+            height: 40px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: 0.4s;
+            border-radius: 40px;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 32px;
+            width: 32px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        input:checked + .slider {
+            background: linear-gradient(135deg, #ea6666 0%, #a24b76 100%);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(40px);
+        }
+
+        .role-status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .role-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .role-secondary {
+            background: linear-gradient(135deg, #ea6666 0%, #a24b76 100%);
+            color: white;
+        }
+
+        .health-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .health-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .health-item h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .health-info {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .secondary-system {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .secondary-system h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 系统配置管理</h1>
+            <p>主副系统切换 | 健康监控 | Telegram通知</p>
+        </div>
+
+        <!-- 消息提示 -->
+        <div id="alertContainer"></div>
+
+        <!-- 当前系统角色 -->
+        <div class="config-card">
+            <div class="card-title">当前系统角色</div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <span id="currentRoleDisplay" class="role-status role-primary">主系统</span>
+                    <p style="margin-top: 10px; color: #666;">
+                        <strong>Telegram消息：</strong>
+                        <span id="telegramStatusDisplay">启用</span>
+                    </p>
+                </div>
+                <div>
+                    <label class="switch">
+                        <input type="checkbox" id="roleToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主系统配置 -->
+        <div class="config-card">
+            <div class="card-title">主系统配置</div>
+            <div class="form-group">
+                <label for="primaryUrl">系统地址</label>
+                <input type="url" id="primaryUrl" placeholder="https://example.com">
+            </div>
+            <div class="form-group">
+                <label for="primaryName">系统名称</label>
+                <input type="text" id="primaryName" placeholder="主系统" value="主系统">
+            </div>
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="primaryEnabled" checked>
+                <label for="primaryEnabled">启用监控</label>
+            </div>
+            <div class="health-info">
+                <strong>状态：</strong>
+                <span id="primaryStatus" class="system-status status-unknown">未知</span>
+            </div>
+            <div class="health-info">
+                <strong>最后检查：</strong>
+                <span id="primaryLastCheck">未检查</span>
+            </div>
+            <div class="health-info">
+                <strong>连续失败次数：</strong>
+                <span id="primaryFailures">0</span>
+            </div>
+        </div>
+
+        <!-- 副系统配置 -->
+        <div class="config-card">
+            <div class="card-title">副系统配置（最多3个）</div>
+            
+            <div id="secondarySystemsContainer">
+                <!-- 副系统1 -->
+                <div class="secondary-system">
+                    <h3>副系统1</h3>
+                    <div class="form-group">
+                        <label>系统地址</label>
+                        <input type="url" class="secondary-url" data-index="0" placeholder="https://example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>系统名称</label>
+                        <input type="text" class="secondary-name" data-index="0" placeholder="副系统1" value="副系统1">
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" class="secondary-enabled" data-index="0">
+                        <label>启用监控</label>
+                    </div>
+                    <div class="health-info">
+                        <strong>状态：</strong>
+                        <span class="secondary-status system-status status-unknown" data-index="0">未知</span>
+                    </div>
+                    <div class="health-info">
+                        <strong>最后检查：</strong>
+                        <span class="secondary-last-check" data-index="0">未检查</span>
+                    </div>
+                    <div class="health-info">
+                        <strong>连续失败次数：</strong>
+                        <span class="secondary-failures" data-index="0">0</span>
+                    </div>
+                </div>
+
+                <!-- 副系统2 -->
+                <div class="secondary-system">
+                    <h3>副系统2</h3>
+                    <div class="form-group">
+                        <label>系统地址</label>
+                        <input type="url" class="secondary-url" data-index="1" placeholder="https://example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>系统名称</label>
+                        <input type="text" class="secondary-name" data-index="1" placeholder="副系统2" value="副系统2">
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" class="secondary-enabled" data-index="1">
+                        <label>启用监控</label>
+                    </div>
+                    <div class="health-info">
+                        <strong>状态：</strong>
+                        <span class="secondary-status system-status status-unknown" data-index="1">未知</span>
+                    </div>
+                    <div class="health-info">
+                        <strong>最后检查：</strong>
+                        <span class="secondary-last-check" data-index="1">未检查</span>
+                    </div>
+                    <div class="health-info">
+                        <strong>连续失败次数：</strong>
+                        <span class="secondary-failures" data-index="1">0</span>
+                    </div>
+                </div>
+
+                <!-- 副系统3 -->
+                <div class="secondary-system">
+                    <h3>副系统3</h3>
+                    <div class="form-group">
+                        <label>系统地址</label>
+                        <input type="url" class="secondary-url" data-index="2" placeholder="https://example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>系统名称</label>
+                        <input type="text" class="secondary-name" data-index="2" placeholder="副系统3" value="副系统3">
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" class="secondary-enabled" data-index="2">
+                        <label>启用监控</label>
+                    </div>
+                    <div class="health-info">
+                        <strong>状态：</strong>
+                        <span class="secondary-status system-status status-unknown" data-index="2">未知</span>
+                    </div>
+                    <div class="health-info">
+                        <strong>最后检查：</strong>
+                        <span class="secondary-last-check" data-index="2">未检查</span>
+                    </div>
+                    <div class="health-info">
+                        <strong>连续失败次数：</strong>
+                        <span class="secondary-failures" data-index="2">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 健康检查配置 -->
+        <div class="config-card">
+            <div class="card-title">健康检查配置</div>
+            <div class="form-group">
+                <label for="checkInterval">检查间隔（秒）</label>
+                <input type="number" id="checkInterval" value="180" min="60" max="3600">
+                <small style="color: #666;">建议：180秒（3分钟）</small>
+            </div>
+            <div class="form-group">
+                <label for="checkTimeout">超时时间（秒）</label>
+                <input type="number" id="checkTimeout" value="30" min="5" max="120">
+                <small style="color: #666;">建议：30秒</small>
+            </div>
+            <div class="form-group">
+                <label for="failureThreshold">失败阈值（次）</label>
+                <input type="number" id="failureThreshold" value="2" min="1" max="10">
+                <small style="color: #666;">连续失败N次后发送Telegram通知</small>
+            </div>
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="notifyEnabled" checked>
+                <label for="notifyEnabled">启用Telegram通知</label>
+            </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="config-card">
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="saveConfig()">💾 保存配置</button>
+                <button class="btn btn-secondary" onclick="loadConfig()">🔄 刷新状态</button>
+                <button class="btn btn-secondary" onclick="window.location.href='/'">🏠 返回首页</button>
+            </div>
+        </div>
+
+        <!-- 系统健康状态 -->
+        <div class="config-card">
+            <div class="card-title">系统健康状态</div>
+            <div class="health-grid" id="healthGrid">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentConfig = null;
+
+        // 页面加载时获取配置
+        window.addEventListener('DOMContentLoaded', () => {
+            loadConfig();
+            
+            // 角色切换开关
+            document.getElementById('roleToggle').addEventListener('change', function() {
+                const newRole = this.checked ? 'secondary' : 'primary';
+                toggleRole(newRole);
+            });
+            
+            // 每30秒刷新健康状态
+            setInterval(loadHealthStatus, 30000);
+        });
+
+        function showAlert(message, type = 'success') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alertContainer.appendChild(alert);
+
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        async function loadConfig() {
+            try {
+                const response = await fetch('/api/system-role/config');
+                const result = await response.json();
+
+                if (!result.success) {
+                    showAlert('加载配置失败: ' + result.error, 'danger');
+                    return;
+                }
+
+                currentConfig = result.data;
+                populateForm(currentConfig);
+                loadHealthStatus();
+
+            } catch (error) {
+                showAlert('加载配置异常: ' + error.message, 'danger');
+            }
+        }
+
+        function populateForm(config) {
+            // 当前角色
+            const role = config.current_role || 'primary';
+            const roleToggle = document.getElementById('roleToggle');
+            const roleDisplay = document.getElementById('currentRoleDisplay');
+            const telegramDisplay = document.getElementById('telegramStatusDisplay');
+
+            roleToggle.checked = (role === 'secondary');
+            
+            if (role === 'primary') {
+                roleDisplay.textContent = '主系统';
+                roleDisplay.className = 'role-status role-primary';
+            } else {
+                roleDisplay.textContent = '副系统';
+                roleDisplay.className = 'role-status role-secondary';
+            }
+
+            telegramDisplay.textContent = config.telegram_enabled ? '启用' : '禁用';
+            telegramDisplay.style.color = config.telegram_enabled ? 'green' : 'red';
+
+            // 主系统
+            const primary = config.primary_system || {};
+            document.getElementById('primaryUrl').value = primary.url || '';
+            document.getElementById('primaryName').value = primary.name || '主系统';
+            document.getElementById('primaryEnabled').checked = primary.enabled !== false;
+            
+            // 副系统
+            const secondaries = config.secondary_systems || [];
+            for (let i = 0; i < 3; i++) {
+                const secondary = secondaries[i] || {};
+                document.querySelector(`.secondary-url[data-index="${i}"]`).value = secondary.url || '';
+                document.querySelector(`.secondary-name[data-index="${i}"]`).value = secondary.name || `副系统${i+1}`;
+                document.querySelector(`.secondary-enabled[data-index="${i}"]`).checked = secondary.enabled || false;
+            }
+
+            // 健康检查配置
+            const healthCheck = config.health_check || {};
+            document.getElementById('checkInterval').value = healthCheck.interval_seconds || 180;
+            document.getElementById('checkTimeout').value = healthCheck.timeout_seconds || 30;
+            document.getElementById('failureThreshold').value = healthCheck.failure_threshold || 2;
+            document.getElementById('notifyEnabled').checked = healthCheck.notify_on_failure !== false;
+        }
+
+        async function saveConfig() {
+            try {
+                // 收集表单数据
+                const config = {
+                    current_role: document.getElementById('roleToggle').checked ? 'secondary' : 'primary',
+                    telegram_enabled: document.getElementById('roleToggle').checked ? false : true,
+                    primary_system: {
+                        url: document.getElementById('primaryUrl').value,
+                        name: document.getElementById('primaryName').value,
+                        enabled: document.getElementById('primaryEnabled').checked,
+                        last_check: currentConfig?.primary_system?.last_check || null,
+                        last_success: currentConfig?.primary_system?.last_success || null,
+                        consecutive_failures: currentConfig?.primary_system?.consecutive_failures || 0,
+                        status: currentConfig?.primary_system?.status || 'unknown'
+                    },
+                    secondary_systems: [],
+                    health_check: {
+                        interval_seconds: parseInt(document.getElementById('checkInterval').value),
+                        timeout_seconds: parseInt(document.getElementById('checkTimeout').value),
+                        failure_threshold: parseInt(document.getElementById('failureThreshold').value),
+                        notify_on_failure: document.getElementById('notifyEnabled').checked
+                    },
+                    last_update: null,
+                    last_notification: currentConfig?.last_notification || null
+                };
+
+                // 收集副系统数据
+                for (let i = 0; i < 3; i++) {
+                    const secondary = currentConfig?.secondary_systems?.[i] || {};
+                    config.secondary_systems.push({
+                        url: document.querySelector(`.secondary-url[data-index="${i}"]`).value,
+                        name: document.querySelector(`.secondary-name[data-index="${i}"]`).value,
+                        enabled: document.querySelector(`.secondary-enabled[data-index="${i}"]`).checked,
+                        last_check: secondary.last_check || null,
+                        last_success: secondary.last_success || null,
+                        consecutive_failures: secondary.consecutive_failures || 0,
+                        status: secondary.status || 'unknown'
+                    });
+                }
+
+                const response = await fetch('/api/system-role/config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(config)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert('配置保存成功！', 'success');
+                    currentConfig = result.data;
+                } else {
+                    showAlert('保存失败: ' + result.error, 'danger');
+                }
+
+            } catch (error) {
+                showAlert('保存异常: ' + error.message, 'danger');
+            }
+        }
+
+        async function toggleRole(newRole) {
+            try {
+                const response = await fetch('/api/system-role/toggle', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ role: newRole })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert(result.message, 'success');
+                    loadConfig();
+                } else {
+                    showAlert('切换失败: ' + result.error, 'danger');
+                    // 恢复开关状态
+                    document.getElementById('roleToggle').checked = (newRole !== 'primary');
+                }
+
+            } catch (error) {
+                showAlert('切换异常: ' + error.message, 'danger');
+                document.getElementById('roleToggle').checked = (newRole !== 'primary');
+            }
+        }
+
+        async function loadHealthStatus() {
+            try {
+                const response = await fetch('/api/system-role/health-status');
+                const result = await response.json();
+
+                if (!result.success) {
+                    console.error('加载健康状态失败:', result.error);
+                    return;
+                }
+
+                const data = result.data;
+
+                // 更新主系统状态
+                updateSystemStatus('primary', data.primary_system);
+
+                // 更新副系统状态
+                data.secondary_systems.forEach((system, index) => {
+                    updateSystemStatus('secondary', system, index);
+                });
+
+            } catch (error) {
+                console.error('加载健康状态异常:', error);
+            }
+        }
+
+        function updateSystemStatus(type, system, index = null) {
+            let statusClass = 'status-unknown';
+            if (system.status === 'healthy') statusClass = 'status-healthy';
+            if (system.status === 'unhealthy') statusClass = 'status-unhealthy';
+
+            const lastCheck = system.last_check ? new Date(system.last_check).toLocaleString('zh-CN') : '未检查';
+
+            if (type === 'primary') {
+                const statusEl = document.getElementById('primaryStatus');
+                statusEl.textContent = system.status === 'healthy' ? '健康' : 
+                                      system.status === 'unhealthy' ? '异常' : '未知';
+                statusEl.className = `system-status ${statusClass}`;
+                
+                document.getElementById('primaryLastCheck').textContent = lastCheck;
+                document.getElementById('primaryFailures').textContent = system.consecutive_failures || 0;
+            } else {
+                const statusEl = document.querySelector(`.secondary-status[data-index="${index}"]`);
+                statusEl.textContent = system.status === 'healthy' ? '健康' : 
+                                      system.status === 'unhealthy' ? '异常' : '未知';
+                statusEl.className = `secondary-status system-status ${statusClass}`;
+                
+                document.querySelector(`.secondary-last-check[data-index="${index}"]`).textContent = lastCheck;
+                document.querySelector(`.secondary-failures[data-index="${index}"]`).textContent = system.consecutive_failures || 0;
+            }
+        }
+    </script>
+</body>
+</html>

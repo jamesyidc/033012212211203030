@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>测试行情预测功能</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        #result { margin-top: 20px; padding: 15px; border: 1px solid #ccc; background: #f9f9f9; }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>测试行情预测功能</h1>
+    <button onclick="testPrediction()">点击测试loadDailyPrediction()</button>
+    <div id="result"></div>
+    
+    <script>
+        async function testPrediction() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>正在测试...</p>';
+            
+            try {
+                // 获取北京时间
+                const beijingTime = new Date(Date.now() + 8 * 3600000);
+                const hour = beijingTime.getUTCHours();
+                const minute = beijingTime.getUTCMinutes();
+                const beijingDate = `${beijingTime.getUTCFullYear()}-${String(beijingTime.getUTCMonth() + 1).padStart(2, '0')}-${String(beijingTime.getUTCDate()).padStart(2, '0')}`;
+                
+                resultDiv.innerHTML += `<p>🕐 北京时间: ${hour}:${String(minute).padStart(2, '0')}, 日期: ${beijingDate}</p>`;
+                
+                // 判断是0-2点还是2点后
+                if (hour >= 0 && hour < 2) {
+                    resultDiv.innerHTML += `<p class="success">✅ 当前是0-2点，应该显示实时统计</p>`;
+                    
+                    // 获取历史数据
+                    const historyUrl = `/api/coin-change-tracker/history?date=${beijingDate}&_t=${Date.now()}`;
+                    resultDiv.innerHTML += `<p>📡 请求URL: ${historyUrl}</p>`;
+                    
+                    const response = await fetch(historyUrl, { cache: 'no-store' });
+                    const data = await response.json();
+                    
+                    resultDiv.innerHTML += `<p>📊 API响应: success=${data.success}, count=${data.count}</p>`;
+                    
+                    if (data.success && data.data && data.data.length > 0) {
+                        resultDiv.innerHTML += `<p class="success">✅ 数据可用，共${data.data.length}条记录</p>`;
+                        resultDiv.innerHTML += `<p>第一条: ${JSON.stringify(data.data[0])}</p>`;
+                    } else {
+                        resultDiv.innerHTML += `<p class="error">❌ 无数据</p>`;
+                    }
+                } else {
+                    resultDiv.innerHTML += `<p>ℹ️ 当前不在0-2点（hour=${hour}），应该加载保存的预判数据</p>`;
+                    
+                    const url = `/api/coin-change-tracker/daily-prediction?_t=${Date.now()}`;
+                    resultDiv.innerHTML += `<p>📡 请求URL: ${url}</p>`;
+                    
+                    const response = await fetch(url, { cache: 'no-store' });
+                    const data = await response.json();
+                    
+                    resultDiv.innerHTML += `<p>📊 API响应: success=${data.success}</p>`;
+                    resultDiv.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML += `<p class="error">❌ 错误: ${error.message}</p>`;
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>

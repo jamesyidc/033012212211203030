@@ -1,0 +1,10 @@
+{
+  "sender": {
+    "enabled": true,
+    "auth_token": "",
+    "allowed_ips": []
+  },
+  "endpoints": {
+    "enabled_codes": []
+  }
+}

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram通知设置</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-buttons {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+        }
+
+        .btn-success {
+            background: #10b981;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .settings-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .settings-card h2 {
+            color: #1f2937;
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .toggle-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .toggle-item:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-label {
+            font-size: 14px;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .toggle-description {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 26px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #10b981;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        .save-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .save-btn:hover {
+            background: #059669;
+        }
+
+        .save-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .status-message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .status-message.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .status-message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ Telegram通知设置</h1>
+            <div class="header-buttons">
+                <a href="/" class="btn">🏠 返回首页</a>
+                <a href="/telegram-dashboard" class="btn">📱 查看推送历史</a>
+            </div>
+        </div>
+
+        <!-- major-events监控系统已停用 (2026-02-19) -->
+
+        <!-- 其他系统 -->
+        <div class="settings-card">
+            <h2>📊 其他监控系统</h2>
+            <div id="otherSystemsToggles">
+                <!-- 将通过JavaScript动态填充 -->
+            </div>
+        </div>
+
+        <button class="save-btn" onclick="saveSettings()">💾 保存设置</button>
+        <div class="status-message" id="statusMessage"></div>
+    </div>
+
+    <script>
+        let config = null;
+
+        // 系统描述映射
+        const systemDescriptions = {
+            // major-events系统已停用 (2026-02-19)
+            
+            // 其他系统
+            'extreme_tracking': '🎯 来源：extreme_value_tracker.py | 27个币种极值突破提醒（中度/重度跳幅）',
+            'support_resistance': '📏 来源：support_resistance_snapshot.py | 支撑压力线突破信号',
+            'alert_system': '⚠️ 来源：未知 | 计次预警系统（需确认具体来源）',
+            'trading_signals': '💹 来源：未知 | 交易信号系统（需确认具体来源）'
+        };
+
+        // 加载配置
+        async function loadConfig() {
+            try {
+                const response = await fetch('/api/telegram/notification-config');
+                const data = await response.json();
+                
+                if (data.success) {
+                    config = data.data;
+                    renderToggles();
+                } else {
+                    showMessage('加载配置失败: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showMessage('加载配置失败: ' + error.message, 'error');
+            }
+        }
+
+        // 渲染开关
+        function renderToggles() {
+            // major-events系统已停用，跳过相关渲染
+
+            // 渲染其他系统开关
+            const otherSystemsContainer = document.getElementById('otherSystemsToggles');
+            otherSystemsContainer.innerHTML = '';
+            
+            const otherSystems = [
+                { key: 'extreme_tracking', data: config.extreme_tracking },
+                { key: 'support_resistance', data: config.support_resistance },
+                { key: 'alert_system', data: config.alert_system },
+                { key: 'trading_signals', data: config.trading_signals }
+            ];
+
+            otherSystems.forEach(system => {
+                if (system.data) {
+                    const item = createToggleItem(
+                        system.key,
+                        system.data.name,
+                        system.data.enabled
+                    );
+                    otherSystemsContainer.appendChild(item);
+                }
+            });
+        }
+
+        // 创建开关项
+        function createToggleItem(dataKey, label, enabled) {
+            const item = document.createElement('div');
+            item.className = 'toggle-item';
+            
+            const labelDiv = document.createElement('div');
+            
+            // 主标签
+            const labelSpan = document.createElement('div');
+            labelSpan.className = 'toggle-label';
+            labelSpan.textContent = label;
+            labelDiv.appendChild(labelSpan);
+            
+            // 添加描述信息
+            const description = systemDescriptions[dataKey];
+            if (description) {
+                const descSpan = document.createElement('div');
+                descSpan.className = 'toggle-description';
+                descSpan.textContent = description;
+                labelDiv.appendChild(descSpan);
+            }
+            
+            const switchLabel = document.createElement('label');
+            switchLabel.className = 'toggle-switch';
+            
+            const input = document.createElement('input');
+            input.type = 'checkbox';
+            input.checked = enabled;
+            input.dataset.key = dataKey;
+            
+            const slider = document.createElement('span');
+            slider.className = 'slider';
+            
+            switchLabel.appendChild(input);
+            switchLabel.appendChild(slider);
+            
+            item.appendChild(labelDiv);
+            item.appendChild(switchLabel);
+            
+            return item;
+        }
+
+        // 保存设置
+        async function saveSettings() {
+            try {
+                // 收集所有开关状态
+                const inputs = document.querySelectorAll('input[type="checkbox"]');
+                
+                inputs.forEach(input => {
+                    const keys = input.dataset.key.split('.');
+                    const checked = input.checked;
+                    
+                    if (keys.length === 2 && keys[0] === 'events') {
+                        // major-events系统已停用，跳过
+                    } else {
+                        // 其他系统
+                        if (config[keys[0]]) {
+                            config[keys[0]].enabled = checked;
+                        }
+                    }
+                });
+
+                // 发送到服务器
+                const response = await fetch('/api/telegram/notification-config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(config)
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('✅ 设置已保存成功！', 'success');
+                } else {
+                    showMessage('保存失败: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showMessage('保存失败: ' + error.message, 'error');
+            }
+        }
+
+        // 显示消息
+        function showMessage(message, type) {
+            const msgDiv = document.getElementById('statusMessage');
+            msgDiv.textContent = message;
+            msgDiv.className = 'status-message ' + type;
+            msgDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                msgDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // 页面加载时加载配置
+        window.addEventListener('DOMContentLoaded', loadConfig);
+    </script>
+</body>
+</html>

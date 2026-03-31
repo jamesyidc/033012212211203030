@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>角度数据测试 - 2月2-6日</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .date-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .date-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+        .angle-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .angle-item {
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .angle-up {
+            background: #fef5e7;
+            border-left: 4px solid #f39c12;
+        }
+        .angle-down {
+            background: #ebf5fb;
+            border-left: 4px solid #3498db;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        .summary {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📊 2月2-6日角度数据测试</h1>
+    <div id="content">
+        <div class="loading">正在加载数据...</div>
+    </div>
+
+    <script>
+        async function loadAllDates() {
+            const dates = [
+                { date: '20260202', display: '2月2日' },
+                { date: '20260203', display: '2月3日' },
+                { date: '20260204', display: '2月4日' },
+                { date: '20260205', display: '2月5日' },
+                { date: '20260206', display: '2月6日' }
+            ];
+
+            const content = document.getElementById('content');
+            content.innerHTML = '';
+
+            for (const { date, display } of dates) {
+                try {
+                    const response = await fetch(`/api/okx-trading/angles?date=${date}`);
+                    const result = await response.json();
+
+                    if (result.success) {
+                        const angles = result.data;
+                        const upAngles = angles.filter(a => a.direction === 'up');
+                        const downAngles = angles.filter(a => a.direction === 'down');
+
+                        const card = document.createElement('div');
+                        card.className = 'date-card';
+                        card.innerHTML = `
+                            <div class="date-title">📅 ${display}</div>
+                            <div class="summary">
+                                <strong>总计：${angles.length}个角度</strong>
+                                （↗️ ${upAngles.length}个上升 + ↘️ ${downAngles.length}个下降）
+                            </div>
+                            <div class="angle-list">
+                                ${angles.slice(0, 10).map(a => `
+                                    <div class="angle-item angle-${a.direction === 'up' ? 'up' : 'down'}">
+                                        <div>${a.direction === 'up' ? '↗️' : '↘️'} ${a.type === 'acute' ? '锐角' : '钝角'}</div>
+                                        <div><strong>${a.angle.toFixed(1)}°</strong></div>
+                                        <div>${a.hour}:00 (${a.peak_price.toFixed(1)}%)</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            ${angles.length > 10 ? `<p style="margin-top: 10px; color: #7f8c8d;">... 还有 ${angles.length - 10} 个角度</p>` : ''}
+                        `;
+                        content.appendChild(card);
+                    }
+                } catch (error) {
+                    console.error(`加载 ${date} 失败:`, error);
+                }
+            }
+        }
+
+        loadAllDates();
+    </script>
+</body>
+</html>

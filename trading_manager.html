@@ -1,0 +1,2964 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交易管理系统</title>
+    <link rel="stylesheet" href="/static/css/trading_manager.css">
+</head>
+<body>
+    <!-- 全局页面加载指示器 -->
+    <div id="page-loader">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">交易管理系统</div>
+        <div class="loader-subtext">正在加载...</div>
+    </div>
+    
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+                <h1>🤖 自动交易管理系统 <span style="color: #f39c12; font-size: 0.6em;">📊 模拟交易</span></h1>
+                <p class="subtitle">
+                    第二阶段：开仓规则 | 补仓规则 | 系统配置 | 
+                    <span style="color: #7f8c8d;">OKEx数据校准</span>
+                </p>
+            </div>
+            <div style="text-align: right;">
+                <a href="/" class="btn btn-success" style="display: inline-block; text-decoration: none; margin-bottom: 10px; margin-right: 10px;">
+                    🏠 返回首页
+                </a>
+                <button onclick="refreshCurrentTab()" class="btn btn-primary" style="margin-bottom: 10px;">
+                    🔄 刷新当前页
+                </button>
+                <div id="last-update-time" style="color: #666; font-size: 0.9em;">
+                    最后更新: --:--:--
+                </div>
+                <div id="auto-refresh-status" style="color: #999; font-size: 0.85em;">
+                    自动刷新: 30秒
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin: 15px 0; text-align: center;">
+            <a href="/dashboard" style="display: inline-block; padding: 8px 15px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; margin: 0 5px; font-size: 14px;">📊 实时仪表板</a>
+            <a href="/simulated-trades" style="display: inline-block; padding: 8px 15px; background: #10b981; color: white; text-decoration: none; border-radius: 5px; margin: 0 5px; font-size: 14px;">📋 模拟交易详情</a>
+            <a href="/anchor-system" style="display: inline-block; padding: 8px 15px; background: #f59e0b; color: white; text-decoration: none; border-radius: 5px; margin: 0 5px; font-size: 14px;">⚓ 锚点系统</a>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTabOptimized('config')">⚙️ 系统配置</button>
+            <button class="tab" onclick="switchTabOptimized('realtime-positions')">📊 实时仓位</button>
+            <button class="tab" onclick="switchTabOptimized('statistics')">📊 统计数据</button>
+            <button class="tab" onclick="switchTabOptimized('stop-profit-loss')">💰 止盈止损</button>
+            <button class="tab" onclick="switchTabOptimized('anchors')">⚓ 锚点单</button>
+            <button class="tab" onclick="switchTabOptimized('correction')">🔧 纠错系统</button>
+            <button class="tab" onclick="switchTabOptimized('orders')">📋 挂单记录</button>
+            <button class="tab" onclick="switchTabOptimized('positions')">📈 开仓记录</button>
+            <button class="tab" onclick="switchTabOptimized('adds')">➕ 补仓记录</button>
+        </div>
+        
+        <!-- 系统配置 -->
+        <div id="config-tab" class="tab-content active">
+            <div class="card">
+                <h2>当前配置</h2>
+                <div id="current-config" class="loading">加载中...</div>
+            </div>
+            
+            <div class="card">
+                <h2>修改配置</h2>
+                <form id="config-form" onsubmit="updateConfig(event)">
+                    <div class="config-grid">
+                        <div class="form-group">
+                            <label class="form-label">市场模式</label>
+                            <select class="form-control" name="market_mode">
+                                <option value="manual">手动</option>
+                                <option value="auto">自动</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">市场趋势</label>
+                            <select class="form-control" name="market_trend">
+                                <option value="neutral">中性</option>
+                                <option value="bullish">多头主导</option>
+                                <option value="bearish">空头主导</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">总本金 (USDT)</label>
+                            <input type="number" class="form-control" name="total_capital" value="1000" step="0.01">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">可开仓百分比 (%)</label>
+                            <input type="number" class="form-control" name="position_limit_percent" value="60" step="1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">锚点单上限 (USDT)</label>
+                            <input type="number" class="form-control" name="anchor_capital_limit" value="200" step="0.01">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">🔼 允许开多单</label>
+                            <div class="switch-container">
+                                <label class="switch">
+                                    <input type="checkbox" name="allow_long" id="allow-long-checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                                <span id="allow-long-text">禁止</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">🔽 允许开空单</label>
+                            <div class="switch-container">
+                                <label class="switch">
+                                    <input type="checkbox" name="allow_short" id="allow-short-checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span id="allow-short-text">允许</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">📌 允许开锚点单</label>
+                            <div class="switch-container">
+                                <label class="switch">
+                                    <input type="checkbox" name="allow_anchor" id="allow-anchor-checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span id="allow-anchor-text">允许</span>
+                            </div>
+                            <small style="color: #666;">即使禁止开空单，也可以开锚点单</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">📈 多单最大仓位 (USDT)</label>
+                            <input type="number" class="form-control" name="max_long_position" value="500" step="0.01">
+                            <small style="color: #666;">多单方向的最大持仓金额</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">📉 空单最大仓位 (USDT)</label>
+                            <input type="number" class="form-control" name="max_short_position" value="600" step="0.01">
+                            <small style="color: #666;">空单方向的最大持仓金额</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">💰 单币种最大占比 (%)</label>
+                            <input type="number" class="form-control" name="max_single_coin_percent" value="10" step="0.1" min="0" max="100">
+                            <small style="color: #666;">单个币种最大占可开仓额的百分比（默认10%）</small>
+                        </div>
+                        
+                        <div class="form-group" style="background: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                            <label class="form-label" style="color: #d97706; font-weight: bold;">🧪 模拟交易模式</label>
+                            <div class="switch-container">
+                                <label class="switch">
+                                    <input type="checkbox" name="simulation_mode" id="simulation-mode-checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span id="simulation-mode-text" style="color: #d97706; font-weight: bold;">✅ 模拟中</span>
+                            </div>
+                            <small style="color: #92400e; display: block; margin-top: 8px;">
+                                ⚠️ 开启后不会执行真实交易，用于测试策略。确认无误后再关闭进入实盘模式。
+                            </small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">⚡ 系统启用</label>
+                            <div class="switch-container">
+                                <label class="switch">
+                                    <input type="checkbox" name="enabled" id="enabled-checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                                <span id="enabled-text">关闭</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <button type="submit" class="btn btn-primary">💾 保存配置</button>
+                    </div>
+                </form>
+                <div id="config-message" style="margin-top: 10px;"></div>
+            </div>
+        </div>
+        
+        <!-- 实时仓位 -->
+        <div id="realtime-positions-tab" class="tab-content">
+            <div class="card">
+                <h2>📊 模拟交易持仓</h2>
+                <div style="margin-bottom: 15px; padding: 10px; background: #dbeafe; border-left: 4px solid #3b82f6; border-radius: 4px;">
+                    <strong>💡 说明：</strong>
+                    <span style="color: #1e40af;">
+                        这是模拟交易系统的持仓数据，用于测试和验证交易策略。
+                        所有持仓都是模拟的，不涉及实际资金。
+                    </span>
+                </div>
+                <div id="realtime-positions-content" class="loading">加载中...</div>
+            </div>
+            
+            <div class="card">
+                <h2>📈 持仓统计</h2>
+                <div id="positions-stats-content" class="loading">加载中...</div>
+            </div>
+        </div>
+        
+        <!-- 统计数据 -->
+        <div id="statistics-tab" class="tab-content">
+            <div class="card">
+                <h2>统计概览</h2>
+                <div id="statistics-content" class="loading">加载中...</div>
+            </div>
+        </div>
+        
+        <!-- 止盈止损 -->
+        <div id="stop-profit-loss-tab" class="tab-content">
+            <!-- 止盈规则说明 -->
+            <div class="card" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left: 4px solid #f59e0b; margin-bottom: 20px;">
+                <h2 style="color: #92400e;">📋 止盈止损规则说明</h2>
+                <p style="color: #78350f; margin-bottom: 15px; font-size: 0.95em;">
+                    ⚙️ 根据<strong>市场配置</strong>和<strong>仓位方向</strong>自动选择合适的止盈规则
+                </p>
+                
+                <!-- 空单止盈规则 -->
+                <div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #fbbf24;">
+                    <h3 style="color: #dc2626; margin-top: 0; margin-bottom: 15px; font-size: 1.1em;">
+                        🔻 空单止盈规则
+                    </h3>
+                    
+                    <!-- 允许开多单（保守） -->
+                    <div style="margin-bottom: 15px; padding: 12px; background: #fef2f2; border-radius: 6px; border-left: 3px solid #ef4444;">
+                        <h4 style="color: #b91c1c; margin: 0 0 10px 0; font-size: 1em;">
+                            场景1：允许开多单（市场看空不强烈）- 保守止盈
+                        </h4>
+                        <table style="width: 100%; font-size: 0.9em; margin-top: 10px;">
+                            <thead>
+                                <tr style="background: #fee2e2;">
+                                    <th style="padding: 8px; text-align: center; color: #991b1b;">盈利率</th>
+                                    <th style="padding: 8px; text-align: center; color: #991b1b;">止盈比例</th>
+                                    <th style="padding: 8px; text-align: center; color: #991b1b;">保留仓位</th>
+                                    <th style="padding: 8px; text-align: left; color: #991b1b;">说明</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td style="text-align: center; padding: 6px;">10%</td><td style="text-align: center; color: #dc2626; font-weight: bold;">20%</td><td style="text-align: center;">80%</td><td>止盈剩余总仓位的20%</td></tr>
+                                <tr><td style="text-align: center; padding: 6px;">20%</td><td style="text-align: center; color: #dc2626; font-weight: bold;">25%</td><td style="text-align: center;">75%</td><td>止盈剩余总仓位的25%</td></tr>
+                                <tr><td style="text-align: center; padding: 6px;">30%</td><td style="text-align: center; color: #dc2626; font-weight: bold;">35%</td><td style="text-align: center;">65%</td><td>止盈剩余总仓位的35%</td></tr>
+                                <tr><td style="text-align: center; padding: 6px;">40%</td><td style="text-align: center; color: #dc2626; font-weight: bold;">75%</td><td style="text-align: center;">25%</td><td>止盈剩余总仓位的75%</td></tr>
+                                <tr style="background: #fef3c7;"><td style="text-align: center; padding: 6px; font-weight: bold;">50%</td><td style="text-align: center; color: #dc2626; font-weight: bold;">全部-2U</td><td style="text-align: center; font-weight: bold;">2U</td><td style="font-weight: bold;">留2U底仓，其他全部止盈</td></tr>
+                            </tbody>
+                        </table>
+                        <p style="margin-top: 10px; color: #7c2d12; font-size: 0.85em;">
+                            💡 <strong>示例</strong>：初始100U → 盈利10%止盈20U(剩80U) → 盈利20%止盈20U(剩60U) → 盈利30%止盈21U(剩39U) → 盈利40%止盈29.25U(剩9.75U) → 盈利50%止盈7.75U(剩2U)
+                        </p>
+                    </div>
+                    
+                    <!-- 不允许开多单（激进） -->
+                    <div style="padding: 12px; background: #fef2f2; border-radius: 6px; border-left: 3px solid #dc2626;">
+                        <h4 style="color: #991b1b; margin: 0 0 10px 0; font-size: 1em;">
+                            场景2：不允许开多单（市场强烈看空）- 激进止盈
+                        </h4>
+                        <table style="width: 100%; font-size: 0.9em; margin-top: 10px;">
+                            <thead>
+                                <tr style="background: #fee2e2;">
+                                    <th style="padding: 8px; text-align: center; color: #991b1b;">盈利率</th>
+                                    <th style="padding: 8px; text-align: center; color: #991b1b;">止盈比例</th>
+                                    <th style="padding: 8px; text-align: center; color: #991b1b;">保留仓位</th>
+                                    <th style="padding: 8px; text-align: left; color: #991b1b;">说明</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background: #fffbeb;"><td style="text-align: center; padding: 6px; font-weight: bold;">5%</td><td style="text-align: center; color: #dc2626; font-weight: bold;">25%</td><td style="text-align: center;">75%</td><td>⭐ 更早止盈</td></tr>
+                                <tr><td style="text-align: center; padding: 6px;">10%</td><td style="text-align: center; color: #dc2626; font-weight: bold;">30%</td><td style="text-align: center;">70%</td><td>止盈剩余总仓位的30%</td></tr>
+                                <tr><td style="text-align: center; padding: 6px;">20%</td><td style="text-align: center; color: #dc2626; font-weight: bold;">40%</td><td style="text-align: center;">60%</td><td>止盈剩余总仓位的40%</td></tr>
+                                <tr><td style="text-align: center; padding: 6px;">30%</td><td style="text-align: center; color: #dc2626; font-weight: bold;">50%</td><td style="text-align: center;">50%</td><td>止盈剩余总仓位的50%</td></tr>
+                                <tr><td style="text-align: center; padding: 6px;">40%</td><td style="text-align: center; color: #dc2626; font-weight: bold;">75%</td><td style="text-align: center;">25%</td><td>止盈剩余总仓位的75%</td></tr>
+                                <tr style="background: #fef3c7;"><td style="text-align: center; padding: 6px; font-weight: bold;">50%</td><td style="text-align: center; color: #dc2626; font-weight: bold;">全部-2U</td><td style="text-align: center; font-weight: bold;">2U</td><td style="font-weight: bold;">留2U底仓，其他全部止盈</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- 多单止盈规则 -->
+                <div style="padding: 15px; background: white; border-radius: 8px; border: 1px solid #fbbf24;">
+                    <h3 style="color: #16a34a; margin-top: 0; margin-bottom: 15px; font-size: 1.1em;">
+                        🔺 多单止盈规则
+                    </h3>
+                    
+                    <!-- 允许开多单（激进） -->
+                    <div style="margin-bottom: 15px; padding: 12px; background: #f0fdf4; border-radius: 6px; border-left: 3px solid #22c55e;">
+                        <h4 style="color: #15803d; margin: 0 0 10px 0; font-size: 1em;">
+                            场景1：允许开多单（市场看多强烈）- 激进止盈
+                        </h4>
+                        <table style="width: 100%; font-size: 0.9em; margin-top: 10px;">
+                            <thead>
+                                <tr style="background: #dcfce7;">
+                                    <th style="padding: 8px; text-align: center; color: #166534;">盈利率</th>
+                                    <th style="padding: 8px; text-align: center; color: #166534;">止盈比例</th>
+                                    <th style="padding: 8px; text-align: center; color: #166534;">保留仓位</th>
+                                    <th style="padding: 8px; text-align: left; color: #166534;">说明</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td style="text-align: center; padding: 6px;">10%</td><td style="text-align: center; color: #16a34a; font-weight: bold;">20%</td><td style="text-align: center;">80%</td><td>止盈剩余总仓位的20%</td></tr>
+                                <tr><td style="text-align: center; padding: 6px;">20%</td><td style="text-align: center; color: #16a34a; font-weight: bold;">50%</td><td style="text-align: center;">50%</td><td>止盈剩余总仓位的50%</td></tr>
+                                <tr><td style="text-align: center; padding: 6px;">30%</td><td style="text-align: center; color: #16a34a; font-weight: bold;">75%</td><td style="text-align: center;">25%</td><td>止盈剩余总仓位的75%</td></tr>
+                                <tr style="background: #fef3c7;"><td style="text-align: center; padding: 6px; font-weight: bold;">40%</td><td style="text-align: center; color: #16a34a; font-weight: bold;">100%</td><td style="text-align: center; font-weight: bold;">0</td><td style="font-weight: bold;">⭐ 全部止盈，不留底仓</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 不允许开多单（更激进） -->
+                    <div style="padding: 12px; background: #f0fdf4; border-radius: 6px; border-left: 3px solid #16a34a;">
+                        <h4 style="color: #166534; margin: 0 0 10px 0; font-size: 1em;">
+                            场景2：不允许开多单（市场看多不强烈）- 更激进止盈
+                        </h4>
+                        <table style="width: 100%; font-size: 0.9em; margin-top: 10px;">
+                            <thead>
+                                <tr style="background: #dcfce7;">
+                                    <th style="padding: 8px; text-align: center; color: #166534;">盈利率</th>
+                                    <th style="padding: 8px; text-align: center; color: #166534;">止盈比例</th>
+                                    <th style="padding: 8px; text-align: center; color: #166534;">保留仓位</th>
+                                    <th style="padding: 8px; text-align: left; color: #166534;">说明</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background: #fffbeb;"><td style="text-align: center; padding: 6px; font-weight: bold;">5%</td><td style="text-align: center; color: #16a34a; font-weight: bold;">25%</td><td style="text-align: center;">75%</td><td>⭐ 更早止盈</td></tr>
+                                <tr><td style="text-align: center; padding: 6px;">10%</td><td style="text-align: center; color: #16a34a; font-weight: bold;">50%</td><td style="text-align: center;">50%</td><td>止盈剩余总仓位的50%</td></tr>
+                                <tr><td style="text-align: center; padding: 6px;">20%</td><td style="text-align: center; color: #16a34a; font-weight: bold;">75%</td><td style="text-align: center;">25%</td><td>止盈剩余总仓位的75%</td></tr>
+                                <tr><td style="text-align: center; padding: 6px;">30%</td><td style="text-align: center; color: #16a34a; font-weight: bold;">75%</td><td style="text-align: center;">25%</td><td>止盈剩余总仓位的75%</td></tr>
+                                <tr style="background: #fef3c7;"><td style="text-align: center; padding: 6px; font-weight: bold;">40%</td><td style="text-align: center; color: #16a34a; font-weight: bold;">100%</td><td style="text-align: center; font-weight: bold;">0</td><td style="font-weight: bold;">⭐ 全部止盈，不留底仓</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- 规则特点 -->
+                <div style="margin-top: 15px; padding: 12px; background: #e0f2fe; border-radius: 6px; border-left: 3px solid #0284c7;">
+                    <h4 style="color: #075985; margin: 0 0 10px 0; font-size: 1em;">
+                        🎯 规则特点
+                    </h4>
+                    <ul style="margin: 0; padding-left: 20px; color: #0c4a6e; font-size: 0.9em; line-height: 1.8;">
+                        <li><strong>分级止盈</strong>：随着盈利增加，逐步止盈锁定利润</li>
+                        <li><strong>动态调整</strong>：根据市场配置(allow_long)自动切换规则</li>
+                        <li><strong>累积计算</strong>：每次止盈基于剩余仓位计算，不是初始仓位</li>
+                        <li><strong>保底机制</strong>：空单50%盈利留2U底仓，多单40%全部止盈</li>
+                        <li><strong>⚠️ 锚点单例外</strong>：锚点单不做止盈止损，只做维护（亏损≥10%触发）</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- 止盈止损监控 -->
+            <div class="card" style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); border-left: 4px solid #10b981;">
+                <h2 style="color: #047857;">💰 止盈止损监控</h2>
+                <p style="color: #065f46; margin-bottom: 15px; font-size: 0.95em;">
+                    📊 自动监控仓位盈亏，按规则分批止盈止损
+                </p>
+                <div style="margin-bottom: 15px;">
+                    <button class="btn btn-primary" onclick="scanStopProfitLoss()">🔍 手动扫描</button>
+                    <button class="btn btn-success" onclick="loadStopProfitLossLogs()">🔄 刷新日志</button>
+                </div>
+                <div id="stop-profit-loss-content" class="loading">加载中...</div>
+            </div>
+            
+            <!-- 止盈止损决策日志 -->
+            <div class="card" style="margin-top: 20px; background: #f8f9fa;">
+                <h2 style="color: #333;">📋 止盈止损决策日志</h2>
+                <p style="color: #666; margin-bottom: 15px; font-size: 0.95em;">
+                    📊 记录所有止盈止损触发的完整决策过程
+                </p>
+                <div id="stop-profit-loss-logs" class="loading">加载中...</div>
+            </div>
+        </div>
+        
+        <!-- 开仓记录 -->
+        <div id="positions-tab" class="tab-content">
+            <div class="card">
+                <h2>开仓记录（不包含锚点单维护）</h2>
+                
+                <!-- 开仓条件说明 -->
+                <div style="margin-bottom: 20px; padding: 15px; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 8px; border-left: 4px solid #22c55e;">
+                    <h3 style="color: #15803d; margin-top: 0; margin-bottom: 15px; font-size: 1.1em;">
+                        📋 开仓条件说明
+                    </h3>
+                    
+                    <!-- 做多条件 -->
+                    <div style="margin-bottom: 15px; padding: 12px; background: white; border-radius: 6px; border: 1px solid #86efac;">
+                        <h4 style="color: #16a34a; margin: 0 0 10px 0; font-size: 1em;">
+                            🔺 做多开仓条件
+                        </h4>
+                        <ul style="margin: 0; padding-left: 20px; color: #166534; font-size: 0.9em; line-height: 1.8;">
+                            <li><strong>大前提</strong>: 系统配置允许开多单（allow_long = true）</li>
+                            <li><strong>触发条件</strong>: 锚点单盈利 ≥ +40%</li>
+                            <li><strong>币种选择</strong>: 优先考虑前6个币种（按市值/交易量排序）</li>
+                            <li><strong>开仓逻辑</strong>: 当锚点单达到40%盈利时，判断为超跌反弹机会</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- 做空条件 -->
+                    <div style="padding: 12px; background: white; border-radius: 6px; border: 1px solid #fca5a5;">
+                        <h4 style="color: #dc2626; margin: 0 0 10px 0; font-size: 1em;">
+                            🔻 做空开仓条件（锚点单）
+                        </h4>
+                        <ul style="margin: 0; padding-left: 20px; color: #991b1b; font-size: 0.9em; line-height: 1.8;">
+                            <li><strong>大前提1</strong>: 系统配置允许开空单（allow_short = true）</li>
+                            <li><strong>大前提2</strong>: ⚠️ <span style="background: #fee; padding: 2px 6px; border-radius: 3px; font-weight: bold;">锚点单处于亏损状态（当前价格 > 锚点单开仓价格）</span></li>
+                            <li><strong>触发条件</strong>: 在逃顶的高潮期介入</li>
+                            <li><strong>具体指标</strong>: 
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    <li>压力线1 + 压力线2 距离 ≥ 18%</li>
+                                    <li>当前价格位置 ≥ 90%（接近压力线1）</li>
+                                    <li>距离压力线1 ≤ 2%</li>
+                                </ul>
+                            </li>
+                            <li><strong>币种选择</strong>: 优先考虑前6个币种</li>
+                            <li><strong>开仓逻辑</strong>: 在锚点单亏损、价格冲高时做空防护</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- 优先级币种 -->
+                    <div style="margin-top: 15px; padding: 10px; background: #fef3c7; border-radius: 6px; border: 1px solid #fbbf24;">
+                        <p style="margin: 0; color: #92400e; font-size: 0.9em;">
+                            ⭐ <strong>优先级前6个币种示例</strong>: CFX, FIL, CELO, UNI, CRV, LDO（根据市值/交易量动态排序）
+                        </p>
+                    </div>
+                </div>
+                
+                <div id="positions-content" class="loading">加载中...</div>
+            </div>
+            
+            <!-- 开仓决策日志 -->
+            <div class="card" style="margin-top: 20px; background: #f8f9fa;">
+                <h2 style="color: #333;">📋 开仓决策日志</h2>
+                <p style="color: #666; margin-bottom: 15px; font-size: 0.95em;">
+                    📊 记录开仓的完整决策过程（压力线检查、单币种限制等）
+                </p>
+                <div style="margin-bottom: 15px;">
+                    <button class="btn btn-success" onclick="loadOpenDecisionLogs()">🔄 刷新日志</button>
+                </div>
+                <div id="open-decision-logs" class="loading">加载中...</div>
+            </div>
+        </div>
+        
+        <!-- 补仓记录 -->
+        <div id="adds-tab" class="tab-content">
+            <div class="card">
+                <h2>补仓记录（不包含锚点单维护）</h2>
+                <div id="adds-content" class="loading">加载中...</div>
+            </div>
+            
+            <!-- 补仓决策日志 -->
+            <div class="card" style="margin-top: 20px; background: #f8f9fa;">
+                <h2 style="color: #333;">📋 补仓决策日志</h2>
+                <p style="color: #666; margin-bottom: 15px; font-size: 0.95em;">
+                    📊 记录补仓的完整决策过程（颗粒度计算、补仓阶段判断等）
+                </p>
+                <div style="margin-bottom: 15px;">
+                    <button class="btn btn-success" onclick="loadAddDecisionLogs()">🔄 刷新日志</button>
+                </div>
+                <div id="add-decision-logs" class="loading">加载中...</div>
+            </div>
+        </div>
+        
+        <!-- 锚点单记录 -->
+        <div id="anchors-tab" class="tab-content">
+            <div class="card" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left: 4px solid #f59e0b;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h2 style="color: #d97706; margin: 0;">⚓ 锚点单记录</h2>
+                    <span id="anchor-price-update-time" style="color: #92400e; font-size: 0.85em; font-style: italic;">
+                        ⏰ 价格更新时间: 加载中...
+                    </span>
+                </div>
+                <p style="color: #92400e; margin-bottom: 15px; font-size: 0.95em;">
+                    🔒 锚点单是防护性空单，只在出现逃顶信号时触发 | 只有锚点单才能补仓
+                </p>
+                <div id="anchors-content" class="loading">加载中...</div>
+            </div>
+            
+            <!-- 锚点单决策日志 -->
+            <div class="card" style="margin-top: 20px; background: #f8f9fa;">
+                <h2 style="color: #333;">📋 锚点单决策日志</h2>
+                <p style="color: #666; margin-bottom: 15px; font-size: 0.95em;">
+                    📊 实时展示锚点单开仓和补仓的决策过程
+                </p>
+                <div style="margin-bottom: 15px;">
+                    <button class="btn btn-primary" onclick="scanAnchorOpportunities()">🔍 手动扫描</button>
+                    <button class="btn btn-success" onclick="loadAnchorDecisionLogs()">🔄 刷新日志</button>
+                    <a href="/anchor-auto-monitor" target="_blank" class="btn btn-primary" style="margin-left: 10px;">📊 打开监控页面</a>
+                </div>
+                <div id="anchor-decision-logs" class="loading">加载中...</div>
+            </div>
+            
+            <!-- 锚点单维护 -->
+            <div class="card" style="margin-top: 20px; background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-left: 4px solid #ef4444;">
+                <h2 style="color: #b91c1c;">🔧 锚点单维护</h2>
+                <p style="color: #7f1d1d; margin-bottom: 15px; font-size: 0.95em;">
+                    ⚠️  当锚点单亏损≥10%时触发维护：买入10倍持仓 → 平掉到剩余1U | ✅ 锚点单不做止盈止损
+                </p>
+                <div style="margin-bottom: 15px;">
+                    <button class="btn btn-danger" onclick="scanAnchorMaintenance()">🔍 扫描维护需求</button>
+                    <button class="btn btn-success" onclick="loadAnchorMaintenanceLogs()">🔄 刷新日志</button>
+                </div>
+                <div id="anchor-maintenance-triggers" class="loading" style="display:none;">加载中...</div>
+            </div>
+            
+            <!-- 锚点单维护日志 -->
+            <div class="card" style="margin-top: 20px; background: #f8f9fa;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h2 style="color: #333; margin: 0;">📋 锚点单维护日志</h2>
+                    <div style="color: #666; font-size: 13px;" id="maintenance-last-check">
+                        ⏰ 最后检测: 加载中...
+                    </div>
+                </div>
+                <p style="color: #666; margin-bottom: 15px; font-size: 0.95em;">
+                    📊 记录锚点单维护的完整决策过程和执行结果 | ⏱️ 每30秒自动检测一次
+                </p>
+                <div id="anchor-maintenance-logs" class="loading">加载中...</div>
+            </div>
+            
+            <!-- ⚠️ 锚点单预警监控 -->
+            <div class="card" style="margin-top: 20px; border-left: 4px solid #f59e0b;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div>
+                        <h2 style="color: #d97706;">⚠️ 锚点单预警监控</h2>
+                        <p style="color: #92400e; margin-bottom: 0; font-size: 0.95em;">
+                            🔍 -8%预警 | ⚡ -10%触发维护 | 📋 完整操作留痕
+                        </p>
+                    </div>
+                    <button class="btn btn-primary" onclick="refreshTradingManagerWarnings()" style="font-size: 14px;">
+                        🔄 刷新预警
+                    </button>
+                </div>
+                
+                <!-- 预警统计卡片 -->
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px;">
+                    <div style="background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #7c3aed;" id="tm-warning-total">-</div>
+                        <div style="font-size: 12px; color: #5b21b6; margin-top: 5px;">监控锚点</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #dc2626;" id="tm-warning-critical">-</div>
+                        <div style="font-size: 12px; color: #991b1b; margin-top: 5px;">临界预警 (≤-10%)</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #d97706;" id="tm-warning-normal">-</div>
+                        <div style="font-size: 12px; color: #92400e; margin-top: 5px;">普通预警 (-8%~-10%)</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #059669;" id="tm-warning-safe">-</div>
+                        <div style="font-size: 12px; color: #065f46; margin-top: 5px;">正常状态</div>
+                    </div>
+                </div>
+                
+                <!-- 预警列表 -->
+                <div id="tm-anchor-warnings-list">
+                    <div style="text-align: center; padding: 30px; color: #718096;">
+                        <div style="font-size: 40px; margin-bottom: 10px;">⏳</div>
+                        <div>加载中...</div>
+                    </div>
+                </div>
+                
+                <!-- 操作日志 -->
+                <div style="margin-top: 25px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
+                    <h3 style="color: #4b5563; margin-bottom: 15px; font-size: 16px;">📋 预警操作日志</h3>
+                    <div id="tm-warning-logs-list" style="max-height: 400px; overflow-y: auto;">
+                        <div style="text-align: center; padding: 20px; color: #9ca3af;">
+                            加载中...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 纠错系统 -->
+        <div id="correction-tab" class="tab-content">
+            <div class="card" style="background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%); border-left: 4px solid #ea580c;">
+                <h2 style="color: #c2410c;">🔧 锚点单纠错系统</h2>
+                <p style="color: #7c2d12; margin-bottom: 15px; font-size: 0.95em;">
+                    ⚠️ 检测极端盈利的锚点单（盈利≥100%且开仓>15天），自动纠错并重置
+                </p>
+                
+                <!-- 纠错规则说明 -->
+                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="color: #ea580c; margin-top: 0;">📋 纠错规则</h3>
+                    <ul style="color: #666; line-height: 1.8;">
+                        <li><strong>触发条件</strong>: 锚点单盈利 ≥ 100%（10x杠杆）且开仓时间 > 15天</li>
+                        <li><strong>检测原因</strong>: 极端盈利通常意味着开仓价格过时，不能反映当前市场</li>
+                        <li><strong>纠错操作</strong>:
+                            <ol style="margin: 10px 0;">
+                                <li>删除旧的锚点单</li>
+                                <li>平掉所有相关持仓（包括由此产生的多单）</li>
+                                <li>使用当前价格重新创建新锚点单</li>
+                            </ol>
+                        </li>
+                        <li><strong>示例</strong>: TAO空单从627U跌到226U（+640%盈利，超过100%阈值）</li>
+                    </ul>
+                </div>
+                
+                <!-- 扫描按钮 -->
+                <div style="margin-bottom: 20px;">
+                    <button class="btn btn-warning" onclick="scanExtremeAnchors()" style="font-size: 16px; padding: 10px 20px;">
+                        🔍 扫描极端锚点单
+                    </button>
+                    <button class="btn btn-danger" onclick="correctAllAnchors()" style="font-size: 16px; padding: 10px 20px; margin-left: 10px;">
+                        🔧 一键纠错全部
+                    </button>
+                    <span id="scan-status" style="margin-left: 15px; color: #666;"></span>
+                </div>
+                
+                <!-- 扫描结果 -->
+                <div id="extreme-anchors-result" style="display: none; margin-top: 20px;">
+                    <h3 style="color: #c2410c;">🚨 扫描结果</h3>
+                    <div id="extreme-anchors-list"></div>
+                </div>
+            </div>
+            
+            <!-- 纠错执行日志 -->
+            <div class="card" style="margin-top: 20px; background: #f8f9fa;">
+                <h2 style="color: #333;">📋 纠错执行日志</h2>
+                <p style="color: #666; margin-bottom: 15px; font-size: 0.95em;">
+                    📊 记录纠错系统的执行历史和结果
+                </p>
+                <div id="correction-logs">
+                    <div class="loading">暂无日志</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 挂单记录 -->
+        <div id="orders-tab" class="tab-content">
+            <div class="card" style="background: linear-gradient(135deg, #fef3c7 0%, #fcd34d 100%); border-left: 4px solid #f59e0b;">
+                <h2 style="color: #92400e;">🎯 条件单管理（不占资金）</h2>
+                <p style="color: #78350f; margin-bottom: 15px; font-size: 0.95em;">
+                    💡 为已开仓的锚点单自动创建条件单：价格上涨5%时挂5倍持仓，上涨10%时挂10倍持仓
+                </p>
+                <div style="margin-bottom: 15px;">
+                    <button class="btn btn-warning" onclick="createAutoConditionalOrders()">⚡ 创建条件单</button>
+                    <button class="btn btn-success" onclick="loadConditionalOrders()">🔄 刷新条件单</button>
+                </div>
+                <div id="conditional-orders-content" class="loading">暂未加载</div>
+            </div>
+            
+            <div class="card" style="background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); border-left: 4px solid #6366f1; margin-top: 20px;">
+                <h2 style="color: #4338ca;">📋 保护挂单记录</h2>
+                <p style="color: #312e81; margin-bottom: 15px; font-size: 0.95em;">
+                    🛡️ 为锚点单服务的保护挂单，防止急速拉升（币价+4%/10倍 和 +10%/20倍）
+                </p>
+                <div style="margin-bottom: 15px;">
+                    <button class="btn btn-success" onclick="loadProtectOrders()">🔄 刷新挂单</button>
+                    <button class="btn btn-primary" onclick="scanProtectOrderTrigger()">🔍 检查触发</button>
+                </div>
+                <div id="orders-content" class="loading">加载中...</div>
+            </div>
+            
+            <!-- 挂单决策日志 -->
+            <div class="card" style="margin-top: 20px; background: #f8f9fa;">
+                <h2 style="color: #333;">📋 挂单决策日志</h2>
+                <p style="color: #666; margin-bottom: 15px; font-size: 0.95em;">
+                    📊 记录保护挂单创建和触发的决策过程
+                </p>
+                <div id="protect-order-logs" class="loading">加载中...</div>
+            </div>
+        </div>
+        
+        <!-- 决策记录 -->
+    </div>
+    
+    <script>
+        // 切换Tab
+        function switchTab(tabName) {
+            // 隐藏所有tab内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 移除所有tab的active状态
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示选中的tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+            
+            // 加载数据
+            loadTabData(tabName);
+        }
+        
+        // 加载Tab数据
+        function loadTabData(tabName) {
+            switch(tabName) {
+                case 'config':
+                    loadConfig();
+                    break;
+                case 'realtime-positions':
+                    loadRealtimePositions();
+                    break;
+                case 'statistics':
+                    loadStatistics();
+                    break;
+                case 'stop-profit-loss':
+                    loadStopProfitLossLogs();
+                    break;
+                case 'anchors':
+                    loadAnchors();
+                    loadAnchorDecisionLogs();
+                    loadAnchorMaintenanceLogs();
+                    break;
+                case 'positions':
+                    loadPositions();
+                    loadOpenDecisionLogs();
+                    break;
+                case 'adds':
+                    loadAdds();
+                    loadAddDecisionLogs();
+                    break;
+                case 'orders':
+                    loadConditionalOrders();  // 加载条件单
+                    loadProtectOrders();       // 加载保护挂单
+                    break;
+            }
+        }
+        
+        // 加载配置
+        function loadConfig() {
+            fetch('/api/trading/config')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const config = data.config;
+                        
+                        // 显示当前配置
+                        const html = `
+                            <div class="config-grid">
+                                <div class="config-item">
+                                    <div class="config-label">系统状态</div>
+                                    <div class="config-value">
+                                        <span class="status-badge ${config.enabled ? 'status-enabled' : 'status-disabled'}">
+                                            ${config.enabled ? '✅ 已启用' : '⏸️ 已关闭'}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="config-item">
+                                    <div class="config-label">市场趋势</div>
+                                    <div class="config-value">
+                                        <span class="status-badge status-${config.market_trend}">
+                                            ${config.market_trend === 'bullish' ? '📈 多头主导' : 
+                                              config.market_trend === 'bearish' ? '📉 空头主导' : '➡️ 中性'}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="config-item">
+                                    <div class="config-label">总本金</div>
+                                    <div class="config-value">${config.total_capital} USDT</div>
+                                </div>
+                                
+                                <div class="config-item">
+                                    <div class="config-label">可开仓额</div>
+                                    <div class="config-value">${(config.total_capital * config.position_limit_percent / 100).toFixed(2)} USDT (${config.position_limit_percent}%)</div>
+                                </div>
+                                
+                                <div class="config-item">
+                                    <div class="config-label">锚点单上限</div>
+                                    <div class="config-value">${config.anchor_capital_limit} USDT</div>
+                                </div>
+                                
+                                <div class="config-item">
+                                    <div class="config-label">允许开多单</div>
+                                    <div class="config-value">${config.allow_long ? '✅ 是' : '❌ 否'}</div>
+                                </div>
+                                
+                                <div class="config-item">
+                                    <div class="config-label">允许开空单</div>
+                                    <div class="config-value">${config.allow_short ? '✅ 是' : '❌ 否'}</div>
+                                </div>
+                                
+                                <div class="config-item">
+                                    <div class="config-label">允许锚点单</div>
+                                    <div class="config-value">${config.allow_anchor ? '✅ 是' : '❌ 否'}</div>
+                                </div>
+                                
+                                <div class="config-item" style="background: ${config.simulation_mode !== false ? '#fef3c7' : '#fee2e2'}; border-left: 4px solid ${config.simulation_mode !== false ? '#f59e0b' : '#dc2626'};">
+                                    <div class="config-label" style="color: ${config.simulation_mode !== false ? '#d97706' : '#dc2626'}; font-weight: bold;">🧪 交易模式</div>
+                                    <div class="config-value" style="color: ${config.simulation_mode !== false ? '#d97706' : '#dc2626'}; font-weight: bold;">
+                                        ${config.simulation_mode !== false ? '✅ 模拟交易' : '⚡ 实盘交易'}
+                                    </div>
+                                </div>
+                                
+                                <div class="config-item">
+                                    <div class="config-label">单币种最大占比</div>
+                                    <div class="config-value">${config.max_single_coin_percent || 10}%</div>
+                                </div>
+                                
+                                <div class="config-item">
+                                    <div class="config-label">单币种上限</div>
+                                    <div class="config-value">${((config.total_capital * config.position_limit_percent / 100) * ((config.max_single_coin_percent || 10) / 100)).toFixed(2)} USDT</div>
+                                </div>
+                                
+                                <div class="config-item">
+                                    <div class="config-label">空单颗粒度</div>
+                                    <div class="config-value">${config.min_granularity}%</div>
+                                </div>
+                                
+                                <div class="config-item">
+                                    <div class="config-label">多单颗粒度</div>
+                                    <div class="config-value">${config.long_granularity}%</div>
+                                </div>
+                                
+                                <div class="config-item">
+                                    <div class="config-label">最后更新</div>
+                                    <div class="config-value" style="font-size: 0.9em;">${config.updated_at}</div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        document.getElementById('current-config').innerHTML = html;
+                        
+                        // 填充表单
+                        document.querySelector('[name="market_mode"]').value = config.market_mode;
+                        document.querySelector('[name="market_trend"]').value = config.market_trend;
+                        document.querySelector('[name="total_capital"]').value = config.total_capital;
+                        document.querySelector('[name="position_limit_percent"]').value = config.position_limit_percent;
+                        document.querySelector('[name="anchor_capital_limit"]').value = config.anchor_capital_limit;
+                        document.getElementById('allow-long-checkbox').checked = config.allow_long || false;
+                        document.getElementById('allow-short-checkbox').checked = config.allow_short !== false;
+                        document.getElementById('allow-anchor-checkbox').checked = config.allow_anchor !== false;
+                        document.querySelector('[name="max_long_position"]').value = config.max_long_position || 500;
+                        document.querySelector('[name="max_short_position"]').value = config.max_short_position || 600;
+                        document.querySelector('[name="max_single_coin_percent"]').value = config.max_single_coin_percent || 10;
+                        document.getElementById('simulation-mode-checkbox').checked = config.simulation_mode !== false;
+                        document.getElementById('enabled-checkbox').checked = config.enabled;
+                        updateSwitchText();
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('current-config').innerHTML = `<div class="alert alert-danger">加载失败: ${err.message}</div>`;
+                });
+        }
+        
+        // 更新开关文本
+        function updateSwitchText() {
+            const allowLong = document.getElementById('allow-long-checkbox').checked;
+            const allowShort = document.getElementById('allow-short-checkbox').checked;
+            const allowAnchor = document.getElementById('allow-anchor-checkbox').checked;
+            const simulationMode = document.getElementById('simulation-mode-checkbox').checked;
+            const enabled = document.getElementById('enabled-checkbox').checked;
+            
+            document.getElementById('allow-long-text').textContent = allowLong ? '允许' : '禁止';
+            document.getElementById('allow-short-text').textContent = allowShort ? '允许' : '禁止';
+            document.getElementById('allow-anchor-text').textContent = allowAnchor ? '允许' : '禁止';
+            document.getElementById('simulation-mode-text').textContent = simulationMode ? '✅ 模拟中' : '⚡ 实盘';
+            document.getElementById('simulation-mode-text').style.color = simulationMode ? '#d97706' : '#dc2626';
+            document.getElementById('simulation-mode-text').style.fontWeight = 'bold';
+            document.getElementById('enabled-text').textContent = enabled ? '开启' : '关闭';
+        }
+        
+        // 监听开关变化
+        document.getElementById('allow-long-checkbox').addEventListener('change', updateSwitchText);
+        document.getElementById('allow-short-checkbox').addEventListener('change', updateSwitchText);
+        document.getElementById('allow-anchor-checkbox').addEventListener('change', updateSwitchText);
+        document.getElementById('simulation-mode-checkbox').addEventListener('change', updateSwitchText);
+        document.getElementById('enabled-checkbox').addEventListener('change', updateSwitchText);
+        
+        // 更新配置
+        function updateConfig(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const config = {
+                market_mode: formData.get('market_mode'),
+                market_trend: formData.get('market_trend'),
+                total_capital: parseFloat(formData.get('total_capital')),
+                position_limit_mode: 'manual',
+                position_limit_percent: parseFloat(formData.get('position_limit_percent')),
+                anchor_capital_limit: parseFloat(formData.get('anchor_capital_limit')),
+                anchor_capital_percent: 10,
+                allow_long: document.getElementById('allow-long-checkbox').checked,
+                allow_short: document.getElementById('allow-short-checkbox').checked,
+                allow_anchor: document.getElementById('allow-anchor-checkbox').checked,
+                max_long_position: parseFloat(formData.get('max_long_position')),
+                max_short_position: parseFloat(formData.get('max_short_position')),
+                max_single_coin_percent: parseFloat(formData.get('max_single_coin_percent')),
+                simulation_mode: document.getElementById('simulation-mode-checkbox').checked,
+                min_granularity: 1,
+                long_granularity: 10,
+                enabled: document.getElementById('enabled-checkbox').checked
+            };
+            
+            fetch('/api/trading/config', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(config)
+            })
+            .then(res => res.json())
+            .then(data => {
+                const msgDiv = document.getElementById('config-message');
+                if (data.success) {
+                    msgDiv.innerHTML = '<div class="alert alert-success">✅ 配置已保存</div>';
+                    loadConfig(); // 重新加载
+                } else {
+                    msgDiv.innerHTML = `<div class="alert alert-danger">❌ 保存失败: ${data.error}</div>`;
+                }
+                
+                setTimeout(() => msgDiv.innerHTML = '', 3000);
+            })
+            .catch(err => {
+                document.getElementById('config-message').innerHTML = `<div class="alert alert-danger">❌ 保存失败: ${err.message}</div>`;
+            });
+        }
+        
+        // 加载统计数据
+        function loadStatistics() {
+            fetch('/api/trading/statistics')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const stats = data.statistics;
+                        
+                        const html = `
+                            <div class="stats-grid">
+                                <div class="stat-box">
+                                    <div class="stat-value">${stats.position_opens.count}</div>
+                                    <div class="stat-label">开仓次数</div>
+                                </div>
+                                
+                                <div class="stat-box">
+                                    <div class="stat-value">${stats.position_opens.total_nominal.toFixed(2)}</div>
+                                    <div class="stat-label">开仓总额 (USDT)</div>
+                                </div>
+                                
+                                <div class="stat-box">
+                                    <div class="stat-value">${stats.position_adds.count}</div>
+                                    <div class="stat-label">补仓次数</div>
+                                </div>
+                                
+                                <div class="stat-box">
+                                    <div class="stat-value">${stats.position_adds.total_nominal.toFixed(2)}</div>
+                                    <div class="stat-label">补仓总额 (USDT)</div>
+                                </div>
+                                
+                                <div class="stat-box">
+                                    <div class="stat-value" style="color: ${stats.unrealized_pnl >= 0 ? '#10b981' : '#ef4444'}">${stats.unrealized_pnl >= 0 ? '+' : ''}${stats.unrealized_pnl.toFixed(2)}</div>
+                                    <div class="stat-label">未平仓盈亏 (USDT)</div>
+                                </div>
+                                
+                                <div class="stat-box">
+                                    <div class="stat-value">${stats.stop_profit.toFixed(2)}</div>
+                                    <div class="stat-label">止盈金额 (USDT)</div>
+                                </div>
+                                
+                                <div class="stat-box">
+                                    <div class="stat-value">${stats.stop_loss.toFixed(2)}</div>
+                                    <div class="stat-label">止损金额 (USDT)</div>
+                                </div>
+                                
+                                <div class="stat-box">
+                                    <div class="stat-value" style="color: #f59e0b;">${stats.anchor_positions.count}</div>
+                                    <div class="stat-label">锚点单数量</div>
+                                </div>
+                                
+                                <div class="stat-box">
+                                    <div class="stat-value" style="color: #f59e0b;">${stats.anchor_positions.total_nominal.toFixed(2)}</div>
+                                    <div class="stat-label">锚点单开单金额 (USDT)</div>
+                                </div>
+                                
+                                <div class="stat-box">
+                                    <div class="stat-value">${(stats.pending_orders.pending || 0)}</div>
+                                    <div class="stat-label">待触发挂单</div>
+                                </div>
+                                
+                                <div class="stat-box">
+                                    <div class="stat-value">${stats.position_opens.total_margin.toFixed(2)}</div>
+                                    <div class="stat-label">保证金占用 (USDT)</div>
+                                </div>
+                                
+                                <div class="stat-box">
+                                    <div class="stat-value">${Object.values(stats.trading_decisions).reduce((sum, d) => sum + d.total, 0)}</div>
+                                    <div class="stat-label">决策总数</div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        document.getElementById('statistics-content').innerHTML = html;
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('statistics-content').innerHTML = `<div class="alert alert-danger">加载失败: ${err.message}</div>`;
+                });
+        }
+        
+        // 加载锚点单记录
+        // 🚀 平滑数据更新：只更新变化的数据，不重新渲染整个表格
+        function loadAnchors(silent = false) {
+            const contentDiv = document.getElementById('anchors-content');
+            
+            // 首次加载显示加载指示器
+            if (!silent && (!contentDiv.querySelector('table') || contentDiv.innerHTML.includes('加载中'))) {
+                contentDiv.innerHTML = '<div class="loading-indicator"><div class="loading-spinner"></div>加载中...</div>';
+            }
+            
+            // 🚀 减少一次加载量，提升响应速度
+            fetch('/api/trading/positions/opens?is_anchor=1&limit=20')
+                .then(res => res.json())
+                .then(data => {
+                    console.log('📊 锚点单API返回数据:', data);
+                    console.log('  - success:', data.success);
+                    console.log('  - records length:', data.records ? data.records.length : 0);
+                    console.log('  - total:', data.total);
+                    
+                    if (data.success && data.records) {
+                        // 更新价格更新时间
+                        const updateTimeEl = document.getElementById('anchor-price-update-time');
+                        if (updateTimeEl) {
+                            if (data.price_update_time) {
+                                updateTimeEl.innerHTML = `⏰ 价格更新时间: ${data.price_update_time}`;
+                                updateTimeEl.style.color = '#059669'; // 绿色表示有数据
+                            } else {
+                                updateTimeEl.innerHTML = '⏰ 价格更新时间: 暂无数据';
+                                updateTimeEl.style.color = '#dc2626'; // 红色表示无数据
+                            }
+                        }
+                        
+                        if (data.records.length === 0) {
+                            console.log('⚠️ 锚点单记录为空');
+                            contentDiv.innerHTML = `
+                                <div class="empty-state">
+                                    <p style="font-size: 1.2em; margin-bottom: 10px;">暂无锚点单记录</p>
+                                    <p style="color: #666; font-size: 0.9em;">锚点单会在出现逃顶信号时自动触发</p>
+                                    <p style="color: #666; font-size: 0.9em;">触发条件：距离压力线1 ≤ 2% + 位置 ≥ 90% + 压力线1&2存在</p>
+                                </div>
+                            `;
+                            return;
+                        }
+                        
+                        console.log('✅ 渲染锚点单表格，记录数:', data.records.length);
+                        
+                        // 检查表格是否已存在
+                        const existingTable = contentDiv.querySelector('table tbody');
+                        
+                        if (!existingTable) {
+                            // 首次加载：创建完整表格
+                            console.log('🆕 首次渲染锚点单表格');
+                            renderAnchorsTable(data.records);
+                        } else {
+                            // 后续更新：只更新数据单元格（平滑更新）
+                            console.log('🔄 平滑更新锚点单数据');
+                            updateAnchorsData(data.records);
+                        }
+                    } else {
+                        console.error('❌ API返回数据异常:', data);
+                        if (!silent) {
+                            contentDiv.innerHTML = `<div class="alert alert-danger">API返回数据异常</div>`;
+                        }
+                    }
+                })
+                .catch(err => {
+                    if (!silent) {
+                        contentDiv.innerHTML = `<div class="alert alert-danger">加载失败: ${err.message}</div>`;
+                    }
+                });
+        }
+        
+        // 渲染完整表格（首次加载）
+        function renderAnchorsTable(records) {
+            const rows = records.map((r, index) => {
+                const profitRate = r.profit_rate !== null && r.profit_rate !== undefined ? 
+                    r.profit_rate.toFixed(2) : 'N/A';
+                const profitClass = parseFloat(profitRate) >= 0 ? 'profit-positive' : 'profit-negative';
+                
+                // 🔧 修复：计算当前保证金（10x杠杆）
+                const currentMargin = r.current_price ? (r.open_size * r.current_price / 10) : (r.open_size * r.open_price / 10);
+                
+                return `
+                    <tr data-inst-id="${r.inst_id}" data-row-index="${index}" style="background: ${r.has_adds ? '#fef3c7' : 'white'};">
+                        <td>${r.timestamp}</td>
+                        <td><strong style="color: #d97706;">${r.inst_id}</strong></td>
+                        <td><span class="pos-side-${r.pos_side}">🔽 ${r.pos_side === 'short' ? '做空' : '做多'}</span></td>
+                        <td class="data-open-price">${r.open_price.toFixed(4)}</td>
+                        <td class="data-current-price">${r.current_price ? r.current_price.toFixed(4) : 'N/A'}</td>
+                        <td class="data-profit-rate"><span class="${profitClass}">${profitRate}%</span></td>
+                        <td>${r.open_size.toFixed(2)} 张</td>
+                        <td class="data-total-adds">${r.total_adds || 0}</td>
+                        <td class="data-total-size">${currentMargin.toFixed(4)} USDT</td>
+                        <td>${r.granularity || 'small'}</td>
+                        <td><span style="color: #f59e0b;">⚓ 锚点单</span></td>
+                        <td>
+                            <button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.85em;" 
+                                    onclick="closeAnchorPosition(${r.id}, '${r.inst_id}', 1.0)">
+                                平仓保留1U
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            const html = `
+                <div style="margin-bottom: 15px; padding: 10px; background: #fef3c7; border-radius: 5px;">
+                    <p style="margin: 0; color: #92400e; font-size: 0.9em;">
+                        📌 共 <strong id="anchor-count">${records.length}</strong> 个锚点单 | 
+                        ⚠️ 只有锚点单才能触发补仓 | 
+                        🔒 锚点单在逃顶信号时触发，用于防护资金
+                    </p>
+                </div>
+                <table id="anchors-table">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>币种</th>
+                            <th>方向</th>
+                            <th>开仓价</th>
+                            <th>当前价</th>
+                            <th>盈亏率</th>
+                            <th>初始开仓额</th>
+                            <th>补仓次数</th>
+                            <th>当前总额</th>
+                            <th>颗粒度</th>
+                            <th>类型</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            `;
+            
+            document.getElementById('anchors-content').innerHTML = html;
+        }
+        
+        // 平滑更新数据（只更新变化的单元格）
+        function updateAnchorsData(records) {
+            const tbody = document.querySelector('#anchors-table tbody');
+            if (!tbody) return;
+            
+            // 更新总数
+            const countEl = document.getElementById('anchor-count');
+            if (countEl) countEl.textContent = records.length;
+            
+            records.forEach((r, index) => {
+                const row = tbody.querySelector(`tr[data-inst-id="${r.inst_id}"]`);
+                if (!row) return; // 如果行不存在，跳过（可能是新记录）
+                
+                // 只更新可能变化的数据单元格
+                
+                // 1. 当前价
+                const currentPriceCell = row.querySelector('.data-current-price');
+                if (currentPriceCell && r.current_price) {
+                    const newPrice = r.current_price.toFixed(4);
+                    if (currentPriceCell.textContent !== newPrice) {
+                        // 添加闪烁动画提示数据更新
+                        currentPriceCell.textContent = newPrice;
+                        currentPriceCell.style.transition = 'background-color 0.3s';
+                        currentPriceCell.style.backgroundColor = '#fef3c7';
+                        setTimeout(() => {
+                            currentPriceCell.style.backgroundColor = '';
+                        }, 300);
+                    }
+                }
+                
+                // 2. 盈亏率
+                const profitRateCell = row.querySelector('.data-profit-rate');
+                if (profitRateCell && r.profit_rate !== null && r.profit_rate !== undefined) {
+                    const profitRate = r.profit_rate.toFixed(2);
+                    const profitClass = parseFloat(profitRate) >= 0 ? 'profit-positive' : 'profit-negative';
+                    const currentProfit = profitRateCell.querySelector('span').textContent.replace('%', '');
+                    
+                    if (currentProfit !== profitRate) {
+                        profitRateCell.innerHTML = `<span class="${profitClass}">${profitRate}%</span>`;
+                        // 添加闪烁动画
+                        profitRateCell.style.transition = 'background-color 0.3s';
+                        profitRateCell.style.backgroundColor = profitClass === 'profit-positive' ? '#d1fae5' : '#fee2e2';
+                        setTimeout(() => {
+                            profitRateCell.style.backgroundColor = '';
+                        }, 300);
+                    }
+                }
+                
+                // 3. 补仓次数
+                const totalAddsCell = row.querySelector('.data-total-adds');
+                if (totalAddsCell) {
+                    const newAdds = r.total_adds || 0;
+                    if (totalAddsCell.textContent !== newAdds.toString()) {
+                        totalAddsCell.textContent = newAdds;
+                        // 补仓次数变化时高亮整行
+                        row.style.background = '#fef3c7';
+                    }
+                }
+                
+                // 4. 当前总额（保证金）
+                const totalSizeCell = row.querySelector('.data-total-size');
+                if (totalSizeCell && r.current_price) {
+                    const currentMargin = r.open_size * r.current_price / 10;
+                    const newMargin = currentMargin.toFixed(4) + ' USDT';
+                    if (totalSizeCell.textContent !== newMargin) {
+                        totalSizeCell.textContent = newMargin;
+                    }
+                }
+            });
+        }
+        
+        // 加载锚点单决策日志
+        function loadAnchorDecisionLogs() {
+            fetch('/api/trading/anchor/trigger-history?limit=10')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.history.length === 0) {
+                            document.getElementById('anchor-decision-logs').innerHTML = '<div class="empty-state">暂无决策日志</div>';
+                            return;
+                        }
+                        
+                        let html = '<div style="max-height: 600px; overflow-y: auto;">';
+                        
+                        for (const log of data.history) {
+                            const typeBadge = log.trigger_type === 'new' ? 
+                                '<span style="background:#8b5cf6;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">新建</span>' :
+                                '<span style="background:#f59e0b;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">维护</span>';
+                            
+                            let actionBadge = '';
+                            if (log.action_taken === 'created') {
+                                actionBadge = '<span style="background:#10b981;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">✅ 已创建</span>';
+                            } else if (log.action_taken === 'add_position_ready') {
+                                actionBadge = '<span style="background:#3b82f6;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">🔄 准备补仓</span>';
+                            } else if (log.action_taken === 'monitored') {
+                                actionBadge = '<span style="background:#6b7280;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">👁️ 监控</span>';
+                            } else if (log.action_taken === 'skipped') {
+                                actionBadge = '<span style="background:#9ca3af;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">⏭️ 跳过</span>';
+                            } else if (log.action_taken === 'failed') {
+                                actionBadge = '<span style="background:#ef4444;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">❌ 失败</span>';
+                            }
+                            
+                            html += `
+                                <div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:15px;margin-bottom:15px;border-left:4px solid ${log.action_taken === 'created' || log.action_taken === 'add_position_ready' ? '#10b981' : '#6b7280'};">
+                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                                        <div>
+                                            <strong style="font-size:16px;">${log.inst_id}</strong>
+                                            ${typeBadge}
+                                            ${actionBadge}
+                                        </div>
+                                        <div style="color:#666;font-size:13px;">${log.timestamp}</div>
+                                    </div>
+                                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px;font-size:14px;">
+                                        <div>
+                                            <span style="color:#666;">压力线1:</span>
+                                            <span style="font-weight:bold;">${log.pressure1.toFixed(4)}</span>
+                                        </div>
+                                        <div>
+                                            <span style="color:#666;">压力线2:</span>
+                                            <span style="font-weight:bold;">${log.pressure2.toFixed(4)}</span>
+                                        </div>
+                                        <div>
+                                            <span style="color:#666;">当前价:</span>
+                                            <span style="font-weight:bold;">${log.current_price.toFixed(4)}</span>
+                                        </div>
+                                        ${log.open_amount ? `<div>
+                                            <span style="color:#666;">开仓金额:</span>
+                                            <span style="font-weight:bold;color:#10b981;">${log.open_amount.toFixed(2)} USDT</span>
+                                        </div>` : ''}
+                                        <div>
+                                            <span style="color:#666;">已有锚点单:</span>
+                                            <span style="font-weight:bold;">${log.has_existing_anchor ? '✅ 是' : '❌ 否'}</span>
+                                        </div>
+                                    </div>
+                                    ${log.skip_reason ? `
+                                        <div style="background:#fef3c7;padding:10px;border-radius:5px;margin-top:10px;font-size:13px;color:#92400e;">
+                                            <strong>原因:</strong> ${log.skip_reason}
+                                        </div>
+                                    ` : ''}
+                                    ${log.trigger_reason ? `
+                                        <div style="color:#666;font-size:13px;margin-top:5px;">
+                                            ${log.trigger_reason}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `;
+                        }
+                        
+                        html += '</div>';
+                        document.getElementById('anchor-decision-logs').innerHTML = html;
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('anchor-decision-logs').innerHTML = `<div class="alert alert-danger">加载失败: ${err.message}</div>`;
+                });
+        }
+        
+        // 手动扫描锚点单机会
+        function scanAnchorOpportunities() {
+            if (!confirm('确认执行锚点单扫描？\n\n系统将：\n1. 获取当前逃顶信号\n2. 检查每个币种的锚点单状态\n3. 根据规则决定是否创建/补仓\n4. 记录详细决策日志')) {
+                return;
+            }
+            
+            document.getElementById('anchor-decision-logs').innerHTML = '<div class="loading">扫描中...</div>';
+            
+            fetch('/api/trading/anchor/auto-scan', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'}
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`✅ 扫描完成！\n\n${data.summary}`);
+                    // 刷新日志
+                    setTimeout(() => {
+                        loadAnchorDecisionLogs();
+                        loadAnchors();
+                    }, 1000);
+                } else {
+                    alert('❌ 扫描失败: ' + data.error);
+                    document.getElementById('anchor-decision-logs').innerHTML = `<div class="alert alert-danger">扫描失败: ${data.error}</div>`;
+                }
+            })
+            .catch(err => {
+                alert('❌ 扫描失败: ' + err.message);
+                document.getElementById('anchor-decision-logs').innerHTML = `<div class="alert alert-danger">扫描失败: ${err.message}</div>`;
+            });
+        }
+        
+        function loadPositions() {
+            // 显示加载指示器
+            document.getElementById('positions-content').innerHTML = '<div class="loading-indicator"><div class="loading-spinner"></div>加载中...</div>';
+            
+            // 只加载非锚点单的开仓记录（is_anchor=0），避免与锚点单标签页重复
+            fetch('/api/trading/positions/opens?limit=50&is_anchor=0')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.records.length === 0) {
+                            document.getElementById('positions-content').innerHTML = `
+                                <div class="empty-state">
+                                    <p style="font-size: 1.2em; margin-bottom: 10px;">暂无非锚点单的开仓记录</p>
+                                    <p style="color: #666; font-size: 0.9em;">锚点单请查看"⚓ 锚点单"标签页</p>
+                                </div>
+                            `;
+                            return;
+                        }
+                        
+                        const rows = data.records.map(r => `
+                            <tr>
+                                <td>${r.timestamp}</td>
+                                <td><strong>${r.inst_id}</strong></td>
+                                <td><span class="pos-side-${r.pos_side}">${r.pos_side === 'long' ? '做多' : '做空'}</span></td>
+                                <td>${r.open_price.toFixed(4)}</td>
+                                <td>${r.open_size.toFixed(2)} USDT</td>
+                                <td>${r.open_percent}%</td>
+                                <td>${r.granularity}%</td>
+                                <td>${r.total_positions}</td>
+                            </tr>
+                        `).join('');
+                        
+                        const html = `
+                            <div style="margin-bottom: 15px; padding: 10px; background: #e0f2fe; border-radius: 5px;">
+                                <p style="margin: 0; color: #0c4a6e; font-size: 0.9em;">
+                                    📊 共 <strong>${data.records.length}</strong> 条非锚点单开仓记录 | 
+                                    ⚓ 锚点单请查看"锚点单"标签页
+                                </p>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>时间</th>
+                                        <th>币种</th>
+                                        <th>方向</th>
+                                        <th>开仓价</th>
+                                        <th>开仓额</th>
+                                        <th>开仓%</th>
+                                        <th>颗粒度</th>
+                                        <th>仓位数</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${rows}</tbody>
+                            </table>
+                        `;
+                        
+                        document.getElementById('positions-content').innerHTML = html;
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('positions-content').innerHTML = `<div class="alert alert-danger">加载失败: ${err.message}</div>`;
+                });
+        }
+        
+        // 加载补仓记录
+        function loadAdds() {
+            // 显示加载指示器
+            document.getElementById('adds-content').innerHTML = '<div class="loading-indicator"><div class="loading-spinner"></div>加载中...</div>';
+            
+            fetch('/api/trading/positions/adds?limit=50')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.records.length === 0) {
+                            document.getElementById('adds-content').innerHTML = '<div class="empty-state">暂无补仓记录</div>';
+                            return;
+                        }
+                        
+                        const rows = data.records.map(r => `
+                            <tr>
+                                <td>${r.timestamp}</td>
+                                <td><strong>${r.inst_id}</strong></td>
+                                <td><span class="pos-side-${r.pos_side}">${r.pos_side === 'long' ? '做多' : '做空'}</span></td>
+                                <td>Level ${r.level}</td>
+                                <td><span class="profit-negative">${r.profit_rate_trigger}%</span></td>
+                                <td>${r.add_price.toFixed(4)}</td>
+                                <td>${r.add_size.toFixed(2)} USDT</td>
+                                <td>${r.add_percent}%</td>
+                                <td>${r.total_size_after.toFixed(2)} USDT</td>
+                            </tr>
+                        `).join('');
+                        
+                        const html = `
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>时间</th>
+                                        <th>币种</th>
+                                        <th>方向</th>
+                                        <th>级别</th>
+                                        <th>触发收益率</th>
+                                        <th>补仓价</th>
+                                        <th>补仓额</th>
+                                        <th>补仓%</th>
+                                        <th>补仓后总额</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${rows}</tbody>
+                            </table>
+                        `;
+                        
+                        document.getElementById('adds-content').innerHTML = html;
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('adds-content').innerHTML = `<div class="alert alert-danger">加载失败: ${err.message}</div>`;
+                });
+        }
+        
+        // 加载挂单记录
+        function loadOrders() {
+            // 显示加载指示器
+            document.getElementById('orders-content').innerHTML = '<div class="loading-indicator"><div class="loading-spinner"></div>加载中...</div>';
+            
+            fetch('/api/trading/orders/pending?status=pending')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.records.length === 0) {
+                            document.getElementById('orders-content').innerHTML = '<div class="empty-state">暂无挂单记录</div>';
+                            return;
+                        }
+                        
+                        const rows = data.records.map(r => `
+                            <tr>
+                                <td>${r.timestamp}</td>
+                                <td><strong>${r.inst_id}</strong></td>
+                                <td>${r.order_type === 'upper_4' ? '上方4%' : '上方10%'}</td>
+                                <td>${r.anchor_price.toFixed(4)}</td>
+                                <td>${r.target_price.toFixed(4)}</td>
+                                <td>+${r.price_diff_percent}%</td>
+                                <td>${r.order_size} USDT</td>
+                                <td><span class="status-badge ${r.status === 'pending' ? 'status-neutral' : 'status-enabled'}">${r.status === 'pending' ? '待触发' : '已触发'}</span></td>
+                            </tr>
+                        `).join('');
+                        
+                        const html = `
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>时间</th>
+                                        <th>币种</th>
+                                        <th>挂单类型</th>
+                                        <th>锚点价格</th>
+                                        <th>目标价格</th>
+                                        <th>价差</th>
+                                        <th>挂单额</th>
+                                        <th>状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${rows}</tbody>
+                            </table>
+                        `;
+                        
+                        document.getElementById('orders-content').innerHTML = html;
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('orders-content').innerHTML = `<div class="alert alert-danger">加载失败: ${err.message}</div>`;
+                });
+        }
+        
+        // 加载决策记录
+        
+        // ==================== 实时仓位相关函数 ====================
+        
+        function loadRealtimePositions() {
+            // 加载实时持仓
+            fetch('/api/trading/positions/opens?limit=100')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const positions = data.positions || [];
+                        
+                        if (positions.length === 0) {
+                            document.getElementById('realtime-positions-content').innerHTML = '<div class="empty-state">暂无持仓</div>';
+                            document.getElementById('positions-stats-content').innerHTML = '<div class="empty-state">暂无数据</div>';
+                            return;
+                        }
+                        
+                        // 分类持仓
+                        const anchorPositions = positions.filter(p => p.is_anchor === 1);
+                        const normalPositions = positions.filter(p => p.is_anchor !== 1);
+                        
+                        // 计算统计数据
+                        const totalMargin = positions.reduce((sum, p) => sum + parseFloat(p.margin || 0), 0);
+                        const totalPnL = positions.reduce((sum, p) => sum + parseFloat(p.upl || 0), 0);
+                        const avgProfitRate = positions.length > 0 ? 
+                            positions.reduce((sum, p) => sum + parseFloat(p.profit_rate || 0), 0) / positions.length : 0;
+                        
+                        // 渲染持仓表格
+                        let html = `
+                            <div style="margin-bottom: 20px;">
+                                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                                    <button class="filter-btn active" onclick="filterPositions('all')">全部 (${positions.length})</button>
+                                    <button class="filter-btn" onclick="filterPositions('anchor')">🔶 锚点单 (${anchorPositions.length})</button>
+                                    <button class="filter-btn" onclick="filterPositions('normal')">📊 模拟持仓 (${normalPositions.length})</button>
+                                </div>
+                            </div>
+                            
+                            <div style="overflow-x: auto;">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>合约</th>
+                                            <th>方向</th>
+                                            <th>数量</th>
+                                            <th>开仓均价</th>
+                                            <th>标记价格</th>
+                                            <th>保证金(USDT)</th>
+                                            <th>杠杆</th>
+                                            <th>未实现盈亏(USDT)</th>
+                                            <th>盈亏率</th>
+                                            <th>类型</th>
+                                            <th>更新时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="positions-table-body">
+                        `;
+                        
+                        positions.forEach(pos => {
+                            const posSideBadge = pos.pos_side === 'long' 
+                                ? '<span style="background:#3b82f6;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">做多</span>'
+                                : '<span style="background:#f59e0b;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">做空</span>';
+                            
+                            const profitRateColor = parseFloat(pos.profit_rate || 0) >= 0 ? '#10b981' : '#ef4444';
+                            const profitRateSign = parseFloat(pos.profit_rate || 0) >= 0 ? '+' : '';
+                            
+                            const uplColor = parseFloat(pos.upl || 0) >= 0 ? '#10b981' : '#ef4444';
+                            const uplSign = parseFloat(pos.upl || 0) >= 0 ? '+' : '';
+                            
+                            const typeBadge = pos.is_anchor === 1
+                                ? '<span style="background:#f59e0b;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">🔶 锚点单</span>'
+                                : '<span style="background:#3b82f6;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">📊 模拟</span>';
+                            
+                            const rowClass = pos.is_anchor === 1 ? 'class="anchor-row"' : 'class="normal-row"';
+                            
+                            html += `
+                                <tr ${rowClass} data-id="${pos.id || ''}">
+                                    <td><strong>${pos.inst_id}</strong></td>
+                                    <td>${posSideBadge}</td>
+                                    <td>${parseFloat(pos.open_size).toFixed(4)}</td>
+                                    <td>${parseFloat(pos.avg_price || 0).toFixed(4)}</td>
+                                    <td>${parseFloat(pos.mark_price || 0).toFixed(4)}</td>
+                                    <td><strong>${parseFloat(pos.margin || 0).toFixed(4)}</strong></td>
+                                    <td>${pos.lever || '-'}x</td>
+                                    <td style="color: ${uplColor}; font-weight: bold;">${uplSign}${parseFloat(pos.upl || 0).toFixed(4)}</td>
+                                    <td style="color: ${profitRateColor}; font-weight: bold;">${profitRateSign}${parseFloat(pos.profit_rate || 0).toFixed(2)}%</td>
+                                    <td>${typeBadge}</td>
+                                    <td>${pos.updated_time || '-'}</td>
+                                    <td>
+                                        ${pos.is_anchor === 1 ? `
+                                            <button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.85em;" 
+                                                    onclick="closeAnchorPosition(${pos.id || 0}, '${pos.inst_id}', 1.0)">
+                                                平仓保留1U
+                                            </button>
+                                        ` : '-'}
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        
+                        html += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
+                        
+                        document.getElementById('realtime-positions-content').innerHTML = html;
+                        
+                        // 渲染统计数据
+                        const statsHtml = `
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                                <div class="stat-card">
+                                    <div class="stat-label">总持仓数</div>
+                                    <div class="stat-value">${positions.length}</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-label">锚点单数量</div>
+                                    <div class="stat-value" style="color: #f59e0b;">${anchorPositions.length}</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-label">总保证金</div>
+                                    <div class="stat-value">${totalMargin.toFixed(2)} USDT</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-label">总未实现盈亏</div>
+                                    <div class="stat-value" style="color: ${totalPnL >= 0 ? '#10b981' : '#ef4444'};">
+                                        ${totalPnL >= 0 ? '+' : ''}${totalPnL.toFixed(2)} USDT
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-label">平均盈亏率</div>
+                                    <div class="stat-value" style="color: ${avgProfitRate >= 0 ? '#10b981' : '#ef4444'};">
+                                        ${avgProfitRate >= 0 ? '+' : ''}${avgProfitRate.toFixed(2)}%
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        document.getElementById('positions-stats-content').innerHTML = statsHtml;
+                    }
+                })
+                .catch(error => {
+                    console.error('加载实时持仓失败:', error);
+                    document.getElementById('realtime-positions-content').innerHTML = '<div class="error-state">加载失败，请稍后重试</div>';
+                });
+        }
+        
+        function filterPositions(type) {
+            // 更新按钮状态
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // 过滤显示
+            const allRows = document.querySelectorAll('#positions-table-body tr');
+            allRows.forEach(row => {
+                if (type === 'all') {
+                    row.style.display = '';
+                } else if (type === 'anchor') {
+                    row.style.display = row.classList.contains('anchor-row') ? '' : 'none';
+                } else if (type === 'normal') {
+                    row.style.display = row.classList.contains('normal-row') ? '' : 'none';
+                }
+            });
+        }
+        
+        // 页面加载时只加载配置页
+        window.onload = () => {
+            loadConfig();
+            window.configLoaded = true;  // 标记已加载
+            
+            // 🚀 启动锚点单数据自动刷新（每30秒，静默更新）
+            window.anchorAutoRefresh = setInterval(() => {
+                // 只在锚点单Tab激活时自动刷新
+                const anchorsTab = document.getElementById('anchors-tab');
+                if (anchorsTab && anchorsTab.classList.contains('active')) {
+                    loadAnchors(true);  // silent = true，静默更新
+                }
+            }, 30000); // 30秒刷新一次
+            
+            // 隐藏页面加载器
+            setTimeout(() => {
+                const loader = document.getElementById('page-loader');
+                if (loader) {
+                    loader.classList.add('hidden');
+                    setTimeout(() => loader.style.display = 'none', 300);
+                }
+            }, 500);
+        };
+        
+        // 页面卸载时清理定时器
+        window.onbeforeunload = () => {
+            if (window.anchorAutoRefresh) {
+                clearInterval(window.anchorAutoRefresh);
+            }
+        };
+        
+        // 🚀 数据缓存机制，避免频繁请求
+        window.dataCache = {
+            config: null,
+            anchors: null,
+            positions: null,
+            adds: null,
+            orders: null,
+            lastUpdate: {}
+        };
+        
+        // 检查缓存是否过期（30秒）
+        function isCacheExpired(key) {
+            if (!window.dataCache.lastUpdate[key]) return true;
+            const now = Date.now();
+            const elapsed = now - window.dataCache.lastUpdate[key];
+            return elapsed > 30000; // 30秒过期
+        }
+        
+        // 刷新按钮：强制刷新当前标签页数据
+        function refreshCurrentTab() {
+            const activeTab = document.querySelector('.tab.active');
+            if (!activeTab) return;
+            
+            const tabText = activeTab.textContent.trim();
+            
+            // 清除对应的缓存和加载标记
+            if (tabText.includes('锚点单')) {
+                window.anchorsLoaded = false;
+                window.dataCache.anchors = null;
+                loadAnchors();
+            } else if (tabText.includes('开仓记录')) {
+                window.positionsLoaded = false;
+                window.dataCache.positions = null;
+                loadPositions();
+            } else if (tabText.includes('补仓记录')) {
+                window.addsLoaded = false;
+                window.dataCache.adds = null;
+                loadAdds();
+            } else if (tabText.includes('挂单记录')) {
+                window.ordersLoaded = false;
+                window.dataCache.orders = null;
+                loadOrders();
+            } else if (tabText.includes('系统配置')) {
+                window.configLoaded = false;
+                window.dataCache.config = null;
+                loadConfig();
+            }
+        }
+        
+        // 🚀 优化：按需加载数据，避免一次性加载所有数据
+        function switchTabOptimized(tabName) {
+            switchTab(tabName);
+            
+            // 根据标签页按需加载数据（只加载一次）
+            if (tabName === 'config') {
+                if (!window.configLoaded) {
+                    loadConfig();
+                    window.configLoaded = true;
+                }
+            } else if (tabName === 'anchors') {
+                if (!window.anchorsLoaded) {
+                    loadAnchors();
+                    window.anchorsLoaded = true;
+                }
+            } else if (tabName === 'positions') {
+                if (!window.positionsLoaded) {
+                    loadPositions();
+                    window.positionsLoaded = true;
+                }
+            } else if (tabName === 'adds') {
+                if (!window.addsLoaded) {
+                    loadAdds();
+                    window.addsLoaded = true;
+                }
+            } else if (tabName === 'orders') {
+                if (!window.ordersLoaded) {
+                    loadOrders();
+                    window.ordersLoaded = true;
+                }
+            } else if (tabName === 'statistics') {
+                if (!window.statisticsLoaded) {
+                    loadStatistics();
+                    window.statisticsLoaded = true;
+                }
+            } else if (tabName === 'realtime-positions') {
+                if (!window.realtimeLoaded) {
+                    loadRealtimePositions();
+                    window.realtimeLoaded = true;
+                }
+            } else if (tabName === 'stop-profit-loss') {
+                if (!window.stopProfitLossLoaded) {
+                    loadStopProfitLossLogs();
+                    window.stopProfitLossLoaded = true;
+                }
+            }
+            // 其他标签页也可以添加类似逻辑
+        }
+        
+        
+        // ==================== 止盈止损相关函数 ====================
+        
+        function loadStopProfitLossLogs() {
+            fetch('/api/trading/stop-profit-loss/decision-logs?limit=20')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.logs.length === 0) {
+                            document.getElementById('stop-profit-loss-logs').innerHTML = '<div class="empty-state">暂无止盈止损日志</div>';
+                            return;
+                        }
+                        
+                        let html = '<div style="max-height: 600px; overflow-y: auto;">';
+                        
+                        for (const log of data.logs) {
+                            const typeBadge = log.decision_type === 'profit' ? 
+                                '<span style="background:#10b981;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">💰 止盈</span>' :
+                                '<span style="background:#ef4444;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">🛑 止损</span>';
+                            
+                            const posSideBadge = log.pos_side === 'long' ?
+                                '<span style="background:#3b82f6;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">做多</span>' :
+                                '<span style="background:#f59e0b;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">做空</span>';
+                            
+                            html += `
+                                <div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:15px;margin-bottom:15px;border-left:4px solid ${log.decision_type === 'profit' ? '#10b981' : '#ef4444'};">
+                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                                        <div>
+                                            <strong style="font-size:16px;">${log.inst_id}</strong>
+                                            ${posSideBadge}
+                                            ${typeBadge}
+                                        </div>
+                                        <div style="color:#666;font-size:13px;">${log.trigger_time}</div>
+                                    </div>
+                                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px;font-size:14px;">
+                                        <div>
+                                            <span style="color:#666;">当前价:</span>
+                                            <span style="font-weight:bold;">${log.current_price?.toFixed(4) || 'N/A'}</span>
+                                        </div>
+                                        <div>
+                                            <span style="color:#666;">盈亏率:</span>
+                                            <span style="font-weight:bold;color:${log.profit_rate >= 0 ? '#10b981' : '#ef4444'};">${log.profit_rate?.toFixed(2) || 'N/A'}%</span>
+                                        </div>
+                                        <div>
+                                            <span style="color:#666;">剩余仓位:</span>
+                                            <span style="font-weight:bold;">${log.remaining_position?.toFixed(2) || 'N/A'} USDT</span>
+                                        </div>
+                                        <div>
+                                            <span style="color:#666;">平仓金额:</span>
+                                            <span style="font-weight:bold;color:#ef4444;">${log.close_amount?.toFixed(2) || 'N/A'} USDT</span>
+                                        </div>
+                                    </div>
+                                    ${log.trigger_reason ? `
+                                        <div style="background:#f3f4f6;padding:10px;border-radius:5px;margin-top:10px;font-size:13px;">
+                                            <strong>触发原因:</strong> ${log.trigger_reason}
+                                        </div>
+                                    ` : ''}
+                                    ${log.decision_steps ? `
+                                        <div style="margin-top:10px;">
+                                            <strong style="font-size:13px;color:#666;">决策步骤:</strong>
+                                            <div style="margin-top:5px;">
+                                                ${log.decision_steps.map(step => `
+                                                    <div style="padding:5px 0;font-size:13px;border-left:2px solid #e5e7eb;padding-left:10px;margin-left:5px;">
+                                                        ${step}
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `;
+                        }
+                        
+                        html += '</div>';
+                        document.getElementById('stop-profit-loss-logs').innerHTML = html;
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('stop-profit-loss-logs').innerHTML = `<div class="alert alert-danger">加载失败: ${err.message}</div>`;
+                });
+        }
+        
+        function scanStopProfitLoss() {
+            if (!confirm('确认执行止盈止损扫描？\n\n系统将：\n1. 检查所有持仓的盈亏情况\n2. 根据规则判断是否触发止盈/止损\n3. 记录详细决策日志')) {
+                return;
+            }
+            
+            document.getElementById('stop-profit-loss-logs').innerHTML = '<div class="loading">扫描中...</div>';
+            
+            fetch('/api/trading/stop-profit-loss/scan', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'}
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`扫描完成！\n发现 ${data.count} 个触发机会`);
+                    loadStopProfitLossLogs();
+                } else {
+                    alert('扫描失败: ' + data.error);
+                }
+            })
+            .catch(err => {
+                alert('扫描失败: ' + err.message);
+            });
+        }
+        
+        // ==================== 开仓决策日志函数 ====================
+        
+        function loadOpenDecisionLogs() {
+            fetch('/api/trading/open/decision-logs?limit=20')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.logs.length === 0) {
+                            document.getElementById('open-decision-logs').innerHTML = '<div class="empty-state">暂无开仓决策日志</div>';
+                            return;
+                        }
+                        
+                        let html = '<div style="max-height: 600px; overflow-y: auto;">';
+                        
+                        for (const log of data.logs) {
+                            const resultBadge = log.result === 'can_open' ? 
+                                '<span style="background:#10b981;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">✅ 可开仓</span>' :
+                                '<span style="background:#9ca3af;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">⏭️ 跳过</span>';
+                            
+                            html += `
+                                <div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:15px;margin-bottom:15px;border-left:4px solid ${log.result === 'can_open' ? '#10b981' : '#9ca3af'};">
+                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                                        <div>
+                                            <strong style="font-size:16px;">${log.inst_id}</strong>
+                                            ${resultBadge}
+                                        </div>
+                                        <div style="color:#666;font-size:13px;">${log.decision_time}</div>
+                                    </div>
+                                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px;font-size:14px;">
+                                        ${log.pressure1 ? `<div>
+                                            <span style="color:#666;">压力线1:</span>
+                                            <span style="font-weight:bold;">${log.pressure1.toFixed(4)}</span>
+                                        </div>` : ''}
+                                        ${log.pressure2 ? `<div>
+                                            <span style="color:#666;">压力线2:</span>
+                                            <span style="font-weight:bold;">${log.pressure2.toFixed(4)}</span>
+                                        </div>` : ''}
+                                        ${log.position_48h ? `<div>
+                                            <span style="color:#666;">48h位置:</span>
+                                            <span style="font-weight:bold;">${log.position_48h.toFixed(2)}</span>
+                                        </div>` : ''}
+                                        ${log.position_7d ? `<div>
+                                            <span style="color:#666;">7d位置:</span>
+                                            <span style="font-weight:bold;">${log.position_7d.toFixed(2)}</span>
+                                        </div>` : ''}
+                                        ${log.open_amount ? `<div>
+                                            <span style="color:#666;">开仓金额:</span>
+                                            <span style="font-weight:bold;color:#10b981;">${log.open_amount.toFixed(2)} USDT</span>
+                                        </div>` : ''}
+                                    </div>
+                                    ${log.trigger_reason ? `
+                                        <div style="background:#f3f4f6;padding:10px;border-radius:5px;margin-bottom:10px;font-size:13px;">
+                                            <strong>原因:</strong> ${log.trigger_reason}
+                                        </div>
+                                    ` : ''}
+                                    ${log.decision_steps ? `
+                                        <div style="margin-top:10px;">
+                                            <strong style="font-size:13px;color:#666;">决策步骤:</strong>
+                                            <div style="margin-top:5px;">
+                                                ${log.decision_steps.map(step => `
+                                                    <div style="padding:5px 0;font-size:13px;border-left:2px solid #e5e7eb;padding-left:10px;margin-left:5px;">
+                                                        ${step}
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `;
+                        }
+                        
+                        html += '</div>';
+                        document.getElementById('open-decision-logs').innerHTML = html;
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('open-decision-logs').innerHTML = `<div class="alert alert-danger">加载失败: ${err.message}</div>`;
+                });
+        }
+        
+        // ==================== 补仓决策日志函数 ====================
+        
+        function loadAddDecisionLogs() {
+            fetch('/api/trading/add/decision-logs?limit=20')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.logs.length === 0) {
+                            document.getElementById('add-decision-logs').innerHTML = '<div class="empty-state">暂无补仓决策日志</div>';
+                            return;
+                        }
+                        
+                        let html = '<div style="max-height: 600px; overflow-y: auto;">';
+                        
+                        for (const log of data.logs) {
+                            const resultBadge = log.result === 'can_add' ? 
+                                '<span style="background:#10b981;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">✅ 可补仓</span>' :
+                                '<span style="background:#9ca3af;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">⏭️ 跳过</span>';
+                            
+                            const posSideBadge = log.pos_side === 'long' ?
+                                '<span style="background:#3b82f6;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">做多</span>' :
+                                '<span style="background:#f59e0b;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">做空</span>';
+                            
+                            html += `
+                                <div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:15px;margin-bottom:15px;border-left:4px solid ${log.result === 'can_add' ? '#10b981' : '#9ca3af'};">
+                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                                        <div>
+                                            <strong style="font-size:16px;">${log.inst_id}</strong>
+                                            ${posSideBadge}
+                                            ${resultBadge}
+                                        </div>
+                                        <div style="color:#666;font-size:13px;">${log.decision_time}</div>
+                                    </div>
+                                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px;font-size:14px;">
+                                        ${log.current_loss_rate ? `<div>
+                                            <span style="color:#666;">当前亏损率:</span>
+                                            <span style="font-weight:bold;color:#ef4444;">${log.current_loss_rate.toFixed(2)}%</span>
+                                        </div>` : ''}
+                                        ${log.add_level ? `<div>
+                                            <span style="color:#666;">补仓Level:</span>
+                                            <span style="font-weight:bold;">${log.add_level}</span>
+                                        </div>` : ''}
+                                        ${log.add_amount ? `<div>
+                                            <span style="color:#666;">补仓金额:</span>
+                                            <span style="font-weight:bold;color:#10b981;">${log.add_amount.toFixed(2)} USDT</span>
+                                        </div>` : ''}
+                                        ${log.current_position_value ? `<div>
+                                            <span style="color:#666;">当前仓位:</span>
+                                            <span style="font-weight:bold;">${log.current_position_value.toFixed(2)} USDT</span>
+                                        </div>` : ''}
+                                    </div>
+                                    ${log.stage_info ? `
+                                        <div style="background:#fef3c7;padding:10px;border-radius:5px;margin-bottom:10px;font-size:13px;">
+                                            <strong>阶段信息:</strong> Stage ${log.stage_info.stage} | 
+                                            触发阈值: ${log.stage_info.trigger_loss}% | 
+                                            补仓比例: ${log.stage_info.add_percent}%
+                                        </div>
+                                    ` : ''}
+                                    ${log.trigger_reason ? `
+                                        <div style="background:#f3f4f6;padding:10px;border-radius:5px;margin-bottom:10px;font-size:13px;">
+                                            <strong>原因:</strong> ${log.trigger_reason}
+                                        </div>
+                                    ` : ''}
+                                    ${log.decision_steps ? `
+                                        <div style="margin-top:10px;">
+                                            <strong style="font-size:13px;color:#666;">决策步骤:</strong>
+                                            <div style="margin-top:5px;">
+                                                ${log.decision_steps.map(step => `
+                                                    <div style="padding:5px 0;font-size:13px;border-left:2px solid #e5e7eb;padding-left:10px;margin-left:5px;">
+                                                        ${step}
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `;
+                        }
+                        
+                        html += '</div>';
+                        document.getElementById('add-decision-logs').innerHTML = html;
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('add-decision-logs').innerHTML = `<div class="alert alert-danger">加载失败: ${err.message}</div>`;
+                });
+        }
+        
+        // ==================== 保护挂单函数 ====================
+        
+        function loadProtectOrders() {
+            fetch('/api/trading/protect-orders/list?limit=50')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.orders.length === 0) {
+                            document.getElementById('orders-content').innerHTML = '<div class="empty-state">暂无保护挂单</div>';
+                            return;
+                        }
+                        
+                        const rows = data.orders.map(o => `
+                            <tr>
+                                <td>${o.created_time}</td>
+                                <td><strong>${o.inst_id}</strong></td>
+                                <td>${o.order_type === 'protect_1' ? '保护挂单1' : '保护挂单2'}</td>
+                                <td>${o.anchor_open_price.toFixed(4)}</td>
+                                <td>${o.trigger_price.toFixed(4)} (+${o.price_offset_percent}%)</td>
+                                <td>${o.leverage}x</td>
+                                <td>${o.close_percent}%</td>
+                                <td><span class="status-badge status-${o.status}">${o.status === 'pending' ? '⏳ 待触发' : o.status === 'triggered' ? '🔔 已触发' : '✅ 已执行'}</span></td>
+                            </tr>
+                        `).join('');
+                        
+                        const html = `
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>创建时间</th>
+                                        <th>币种</th>
+                                        <th>挂单类型</th>
+                                        <th>锚点价格</th>
+                                        <th>触发价格</th>
+                                        <th>杠杆</th>
+                                        <th>平仓比例</th>
+                                        <th>状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${rows}</tbody>
+                            </table>
+                        `;
+                        
+                        document.getElementById('orders-content').innerHTML = html;
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('orders-content').innerHTML = `<div class="alert alert-danger">加载失败: ${err.message}</div>`;
+                });
+            
+            // 同时加载决策日志
+            loadProtectOrderLogs();
+        }
+        
+        // ========== 锚点单维护功能 ==========
+        
+        // 扫描锚点单维护需求
+        function scanAnchorMaintenance() {
+            document.getElementById('anchor-maintenance-triggers').style.display = 'block';
+            document.getElementById('anchor-maintenance-triggers').innerHTML = '<div class="loading">扫描中...</div>';
+            
+            fetch('/api/trading/anchor-maintenance/scan', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'}
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    if (data.count === 0) {
+                        document.getElementById('anchor-maintenance-triggers').innerHTML = `
+                            <div style="background:#d1fae5;padding:20px;border-radius:8px;border-left:4px solid #10b981;">
+                                <strong style="color:#065f46;">✅ 暂无需要维护的锚点单</strong>
+                                <p style="color:#047857;margin-top:10px;margin-bottom:0;">
+                                    所有锚点单亏损都 < -10%，无需维护
+                                </p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    let html = `
+                        <div style="background:#fee2e2;padding:15px;border-radius:8px;margin-bottom:15px;border-left:4px solid #ef4444;">
+                            <strong style="color:#b91c1c;">⚠️  发现 ${data.count} 个需要维护的锚点单</strong>
+                        </div>
+                    `;
+                    
+                    for (const trigger of data.triggers) {
+                        const decision_log = trigger.decision_log;
+                        const plan = trigger.maintenance_plan;
+                        
+                        html += `
+                            <div style="background:white;border:1px solid #fecaca;border-radius:8px;padding:15px;margin-bottom:15px;border-left:4px solid #ef4444;">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                                    <div>
+                                        <strong style="font-size:16px;">${trigger.inst_id}</strong>
+                                        <span style="background:#dc2626;color:white;padding:3px 8px;border-radius:3px;font-size:12px;margin-left:8px;">
+                                            ${trigger.pos_side === 'short' ? '空单' : '多单'}
+                                        </span>
+                                        <span style="background:#991b1b;color:white;padding:3px 8px;border-radius:3px;font-size:12px;margin-left:4px;">
+                                            亏损 ${trigger.profit_rate.toFixed(2)}%
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div style="background:#fef2f2;padding:12px;border-radius:6px;margin-bottom:12px;">
+                                    <div style="font-size:14px;line-height:1.8;">
+                                        ${decision_log.step1}<br>
+                                        ${decision_log.step2}<br>
+                                        ${decision_log.step3}<br>
+                                        ${decision_log.step4}<br>
+                                        ${decision_log.step5}<br>
+                                        ${decision_log.step6}
+                                    </div>
+                                </div>
+                                
+                                <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px;font-size:13px;">
+                                    <div style="background:#f9fafb;padding:8px;border-radius:4px;">
+                                        <span style="color:#666;">原始仓位:</span>
+                                        <strong>${trigger.original_size.toFixed(4)} 张</strong>
+                                    </div>
+                                    <div style="background:#f9fafb;padding:8px;border-radius:4px;">
+                                        <span style="color:#666;">原始保证金:</span>
+                                        <strong>${trigger.original_margin.toFixed(2)} USDT</strong>
+                                    </div>
+                                    <div style="background:#fef3c7;padding:8px;border-radius:4px;">
+                                        <span style="color:#666;">买入10倍:</span>
+                                        <strong style="color:#b45309;">${plan.step1_buy.margin.toFixed(2)} USDT</strong>
+                                    </div>
+                                    <div style="background:#dcfce7;padding:8px;border-radius:4px;">
+                                        <span style="color:#666;">最终保留:</span>
+                                        <strong style="color:#15803d;">${plan.step3_remaining.margin.toFixed(2)} USDT</strong>
+                                    </div>
+                                </div>
+                                
+                                <div style="color:#7f1d1d;font-size:12px;background:#fee2e2;padding:8px;border-radius:4px;">
+                                    ⚠️  注意：这是模拟数据，实际执行需要对接交易所API
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    document.getElementById('anchor-maintenance-triggers').innerHTML = html;
+                } else {
+                    document.getElementById('anchor-maintenance-triggers').innerHTML = `
+                        <div class="alert alert-danger">扫描失败: ${data.error}</div>
+                    `;
+                }
+            })
+            .catch(err => {
+                document.getElementById('anchor-maintenance-triggers').innerHTML = `
+                    <div class="alert alert-danger">请求失败: ${err.message}</div>
+                `;
+            });
+        }
+        
+        // 加载锚点单维护日志
+        function loadAnchorMaintenanceLogs() {
+            // 更新最后检测时间
+            const now = new Date();
+            const timeStr = now.toLocaleString('zh-CN', { 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit',
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+            document.getElementById('maintenance-last-check').innerHTML = `⏰ 最后检测: ${timeStr}`;
+            
+            fetch('/api/trading/anchor-maintenance/logs?limit=10')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.count === 0) {
+                            document.getElementById('anchor-maintenance-logs').innerHTML = '<div class="empty-state">暂无维护日志</div>';
+                            return;
+                        }
+                        
+                        let html = '<div style="max-height: 600px; overflow-y: auto;">';
+                        
+                        for (const log of data.logs) {
+                            const stepBadge = log.step === 'buy' ? 
+                                '<span style="background:#f59e0b;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">🛒 买入</span>' :
+                                log.step === 'close' ? 
+                                '<span style="background:#10b981;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">💰 平仓</span>' :
+                                '<span style="background:#6b7280;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">完成</span>';
+                            
+                            const statusBadge = log.status === 'executed' ? 
+                                '<span style="background:#10b981;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">✅ 已执行</span>' :
+                                '<span style="background:#fbbf24;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">⏳ 待执行</span>';
+                            
+                            // decision_log 是普通字符串，不需要 JSON.parse
+                            const decision_log = log.decision_log || '';
+                            
+                            html += `
+                                <div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:15px;margin-bottom:15px;border-left:4px solid #ef4444;">
+                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                                        <div>
+                                            <strong style="font-size:16px;">${log.inst_id}</strong>
+                                            <span style="background:#dc2626;color:white;padding:3px 8px;border-radius:3px;font-size:12px;margin-left:8px;">
+                                                ${log.pos_side === 'short' ? '空单' : '多单'}
+                                            </span>
+                                            ${stepBadge}
+                                            ${statusBadge}
+                                        </div>
+                                        <div style="color:#666;font-size:13px;">
+                                            <div>📝 记录时间: ${log.created_at}</div>
+                                            <div>⏰ 执行时间: ${log.executed_at}</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;font-size:14px;">
+                                        <div>
+                                            <span style="color:#666;">亏损率:</span>
+                                            <span style="font-weight:bold;color:#dc2626;">${log.profit_rate.toFixed(2)}%</span>
+                                        </div>
+                                        <div>
+                                            <span style="color:#666;">交易数量:</span>
+                                            <span style="font-weight:bold;">${log.trade_size ? log.trade_size.toFixed(4) + ' 张' : 'N/A'}</span>
+                                        </div>
+                                        <div>
+                                            <span style="color:#666;">剩余保证金:</span>
+                                            <span style="font-weight:bold;color:#15803d;">${log.remaining_margin ? log.remaining_margin.toFixed(2) + ' USDT' : 'N/A'}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    ${decision_log ? `
+                                        <div style="background:#f9fafb;padding:10px;border-radius:5px;font-size:13px;line-height:1.6;">
+                                            ${decision_log}
+                                        </div>
+                                    ` : ''}
+                                    
+                                    ${log.trigger_reason ? `
+                                        <div style="color:#7f1d1d;font-size:12px;margin-top:8px;background:#fee2e2;padding:8px;border-radius:4px;">
+                                            ${log.trigger_reason}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `;
+                        }
+                        
+                        html += '</div>';
+                        document.getElementById('anchor-maintenance-logs').innerHTML = html;
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('anchor-maintenance-logs').innerHTML = `<div class="alert alert-danger">加载失败: ${err.message}</div>`;
+                });
+        }
+        
+        function loadProtectOrderLogs() {
+            fetch('/api/trading/protect-orders/decision-logs?limit=10')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.logs.length === 0) {
+                            document.getElementById('protect-order-logs').innerHTML = '<div class="empty-state">暂无决策日志</div>';
+                            return;
+                        }
+                        
+                        let html = '<div style="max-height: 600px; overflow-y: auto;">';
+                        
+                        for (const log of data.logs) {
+                            const resultBadge = log.result === 'success' ? 
+                                '<span style="background:#10b981;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">✅ 成功</span>' :
+                                '<span style="background:#ef4444;color:white;padding:3px 8px;border-radius:3px;font-size:12px;">❌ 失败</span>';
+                            
+                            html += `
+                                <div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:15px;margin-bottom:15px;border-left:4px solid ${log.result === 'success' ? '#10b981' : '#ef4444'};">
+                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                                        <div>
+                                            <strong style="font-size:16px;">${log.inst_id}</strong>
+                                            ${resultBadge}
+                                        </div>
+                                        <div style="color:#666;font-size:13px;">${log.decision_time}</div>
+                                    </div>
+                                    ${log.anchor_open_price ? `
+                                        <div style="margin-bottom:10px;font-size:14px;">
+                                            <span style="color:#666;">锚点开仓价:</span>
+                                            <span style="font-weight:bold;">${log.anchor_open_price.toFixed(4)}</span>
+                                        </div>
+                                    ` : ''}
+                                    ${log.trigger_reason ? `
+                                        <div style="background:#f3f4f6;padding:10px;border-radius:5px;margin-bottom:10px;font-size:13px;">
+                                            <strong>触发原因:</strong> ${log.trigger_reason}
+                                        </div>
+                                    ` : ''}
+                                    ${log.decision_steps ? `
+                                        <div style="margin-top:10px;">
+                                            <strong style="font-size:13px;color:#666;">决策步骤:</strong>
+                                            <div style="margin-top:5px;">
+                                                ${log.decision_steps.map(step => `
+                                                    <div style="padding:5px 0;font-size:13px;border-left:2px solid #e5e7eb;padding-left:10px;margin-left:5px;">
+                                                        ${step}
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `;
+                        }
+                        
+                        html += '</div>';
+                        document.getElementById('protect-order-logs').innerHTML = html;
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('protect-order-logs').innerHTML = `<div class="alert alert-danger">加载失败: ${err.message}</div>`;
+                });
+        }
+        
+        function scanProtectOrderTrigger() {
+            if (!confirm('确认检查保护挂单触发条件？')) {
+                return;
+            }
+            
+            fetch('/api/trading/protect-orders/scan-trigger', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'}
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`检查完成！\n发现 ${data.count} 个触发条件`);
+                    loadProtectOrders();
+                } else {
+                    alert('检查失败: ' + data.error);
+                }
+            })
+            .catch(err => {
+                alert('检查失败: ' + err.message);
+            });
+        }
+        
+        // 更新最后刷新时间
+        function updateLastRefreshTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-CN', { hour12: false });
+            document.getElementById('last-update-time').textContent = `最后更新: ${timeStr}`;
+        }
+        
+        // ==================== 条件单函数 ====================
+        
+        // 创建自动条件单
+        function createAutoConditionalOrders() {
+            if (!confirm('确认为所有锚点单创建条件单？\n\n将为每个锚点单创建2个条件单：\n- 价格上涨5% → 开仓5倍持仓\n- 价格上涨10% → 开仓10倍持仓')) {
+                return;
+            }
+            
+            document.getElementById('conditional-orders-content').innerHTML = '<div class="loading">创建中...</div>';
+            
+            fetch('/api/trading/orders/pending/create-auto', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`✅ ${data.message}\n\n锚点单数量: ${data.total_anchors}\n条件单数量: ${data.total_orders}`);
+                    loadConditionalOrders();
+                } else {
+                    alert(`❌ 创建失败: ${data.error}`);
+                    document.getElementById('conditional-orders-content').innerHTML = `<div class="alert alert-danger">创建失败: ${data.error}</div>`;
+                }
+            })
+            .catch(err => {
+                alert(`❌ 创建失败: ${err.message}`);
+                document.getElementById('conditional-orders-content').innerHTML = `<div class="alert alert-danger">创建失败: ${err.message}</div>`;
+            });
+        }
+        
+        // 加载条件单列表
+        function loadConditionalOrders() {
+            document.getElementById('conditional-orders-content').innerHTML = '<div class="loading">加载中...</div>';
+            
+            fetch('/api/trading/orders/pending?status=pending')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.records.length === 0) {
+                            document.getElementById('conditional-orders-content').innerHTML = '<div class="empty-state">暂无条件单<br><small>点击"⚡ 创建条件单"按钮创建</small></div>';
+                            return;
+                        }
+                        
+                        // 按币种分组
+                        const groupedOrders = {};
+                        data.records.forEach(order => {
+                            if (!groupedOrders[order.inst_id]) {
+                                groupedOrders[order.inst_id] = [];
+                            }
+                            groupedOrders[order.inst_id].push(order);
+                        });
+                        
+                        let html = `
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>币种</th>
+                                        <th>方向</th>
+                                        <th>锚点价格</th>
+                                        <th>5%触发价</th>
+                                        <th>5%挂单量</th>
+                                        <th>10%触发价</th>
+                                        <th>10%挂单量</th>
+                                        <th>创建时间</th>
+                                        <th>状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        `;
+                        
+                        Object.keys(groupedOrders).forEach(instId => {
+                            const orders = groupedOrders[instId];
+                            const order5 = orders.find(o => o.price_diff_percent === 5.0);
+                            const order10 = orders.find(o => o.price_diff_percent === 10.0);
+                            
+                            if (order5 && order10) {
+                                html += `
+                                    <tr>
+                                        <td><strong>${instId}</strong></td>
+                                        <td>${order5.pos_side === 'short' ? '🔻 做空' : '🔺 做多'}</td>
+                                        <td>${order5.anchor_price.toFixed(4)}</td>
+                                        <td class="profit-positive">${order5.target_price.toFixed(4)}</td>
+                                        <td>${order5.order_size} (5x)</td>
+                                        <td class="profit-positive">${order10.target_price.toFixed(4)}</td>
+                                        <td>${order10.order_size} (10x)</td>
+                                        <td>${order5.created_at}</td>
+                                        <td><span class="status-badge status-pending">⏳ 待触发</span></td>
+                                    </tr>
+                                `;
+                            }
+                        });
+                        
+                        html += '</tbody></table>';
+                        html += `<div style="margin-top: 15px; padding: 10px; background: #fef3c7; border-radius: 6px; font-size: 0.9em; color: #78350f;">
+                            <strong>💡 说明：</strong>
+                            <ul style="margin: 5px 0; padding-left: 20px;">
+                                <li>条件单不占用资金，触发时才执行</li>
+                                <li>5%触发：当价格上涨5%时，开仓5倍当前持仓</li>
+                                <li>10%触发：当价格上涨10%时，开仓10倍当前持仓</li>
+                                <li>所有条件单都是做空方向，防止价格继续上涨</li>
+                            </ul>
+                        </div>`;
+                        
+                        document.getElementById('conditional-orders-content').innerHTML = html;
+                    } else {
+                        document.getElementById('conditional-orders-content').innerHTML = `<div class="alert alert-danger">加载失败: ${data.error}</div>`;
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('conditional-orders-content').innerHTML = `<div class="alert alert-danger">加载失败: ${err.message}</div>`;
+                });
+        }
+        
+        // 手动刷新
+        function manualRefresh() {
+            const activeTab = document.querySelector('.tab-content.active').id.replace('-tab', '');
+            loadTabData(activeTab);
+            updateLastRefreshTime();
+            
+            // 显示刷新提示
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✅ 已刷新';
+            setTimeout(() => {
+                btn.textContent = originalText;
+            }, 1000);
+        }
+        
+        // 自动刷新（每30秒）
+        setInterval(() => {
+            const activeTab = document.querySelector('.tab-content.active').id.replace('-tab', '');
+            loadTabData(activeTab);
+            updateLastRefreshTime();
+        }, 30000);
+        
+        // 初始更新时间
+        updateLastRefreshTime();
+        
+        // ==================== 手动平仓锚点单 ====================
+        
+        function closeAnchorPosition(positionId, instId, keepAmount) {
+            if (!confirm(`确认平仓锚点单？\n\n币种: ${instId}\n保留保证金: ${keepAmount} USDT\n\n⚠️ 此操作将平掉大部分仓位，仅保留${keepAmount}U保证金。`)) {
+                return;
+            }
+            
+            fetch('/api/trading/anchor/close-position', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    id: positionId,
+                    keep_amount: keepAmount
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const message = data.is_full_close ? 
+                        `✅ 全部平仓成功！\n\n币种: ${data.inst_id}\n原因: 持仓过小(<10U)\n原始名义: ${data.original_nominal} USDT\n原始保证金: ${data.original_margin} USDT\n盈亏率: ${data.profit_rate}%\n实际盈亏: ${data.unrealized_pnl} USDT\n\n持仓已完全清除` :
+                        `✅ 平仓成功！\n\n币种: ${data.inst_id}\n原始保证金: ${data.original_margin} USDT\n平仓保证金: ${data.closed_margin} USDT\n保留保证金: ${data.keep_margin} USDT\n保留名义: ${data.keep_nominal} USDT\n盈亏率: ${data.profit_rate}%\n实际盈亏: ${data.unrealized_pnl} USDT`;
+                    
+                    alert(message);
+                    
+                    // 刷新数据
+                    loadAnchors();
+                    loadRealtimePositions();
+                } else {
+                    alert(`❌ 平仓失败: ${data.error}`);
+                }
+            })
+            .catch(err => {
+                alert(`❌ 请求失败: ${err.message}`);
+            });
+        }
+        
+        // ==================== 纠错系统函数 ====================
+        
+        /**
+         * 扫描极端盈利的锚点单
+         */
+        function scanExtremeAnchors() {
+            const statusEl = document.getElementById('scan-status');
+            statusEl.textContent = '扫描中...';
+            statusEl.style.color = '#f59e0b';
+            
+            fetch('/api/trading/anchor-correction/scan', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'}
+            })
+            .then(resp => resp.json())
+            .then(data => {
+                if (data.success) {
+                    statusEl.textContent = `✅ 扫描完成：找到 ${data.total} 个极端锚点单`;
+                    statusEl.style.color = '#10b981';
+                    
+                    // 显示结果
+                    displayExtremeAnchors(data.anchors);
+                } else {
+                    statusEl.textContent = `❌ 扫描失败: ${data.error}`;
+                    statusEl.style.color = '#ef4444';
+                }
+            })
+            .catch(err => {
+                statusEl.textContent = `❌ 请求失败: ${err.message}`;
+                statusEl.style.color = '#ef4444';
+            });
+        }
+        
+        /**
+         * 显示极端锚点单列表
+         */
+        function displayExtremeAnchors(anchors) {
+            const resultDiv = document.getElementById('extreme-anchors-result');
+            const listDiv = document.getElementById('extreme-anchors-list');
+            
+            if (!anchors || anchors.length === 0) {
+                resultDiv.style.display = 'none';
+                return;
+            }
+            
+            resultDiv.style.display = 'block';
+            
+            let html = '<table class="data-table"><thead><tr>';
+            html += '<th>币种</th><th>方向</th><th>开仓价</th><th>当前价</th><th>收益率</th>';
+            html += '<th>开仓天数</th><th>关联持仓</th><th>操作</th>';
+            html += '</tr></thead><tbody>';
+            
+            anchors.forEach(anchor => {
+                html += '<tr>';
+                html += `<td>${anchor.inst_id}</td>`;
+                html += `<td><span class="badge ${anchor.pos_side === 'long' ? 'badge-success' : 'badge-danger'}">${anchor.pos_side}</span></td>`;
+                html += `<td>${anchor.open_price.toFixed(4)}</td>`;
+                html += `<td>${anchor.current_price.toFixed(4)}</td>`;
+                html += `<td style="color: ${anchor.profit_rate > 0 ? '#10b981' : '#ef4444'}; font-weight: bold;">${anchor.profit_rate.toFixed(2)}%</td>`;
+                html += `<td>${anchor.days}天</td>`;
+                html += `<td>${anchor.related_positions_count}个</td>`;
+                html += `<td><button class="btn btn-sm btn-danger" onclick="correctSingleAnchor('${anchor.inst_id}')">🔧 纠错</button></td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            listDiv.innerHTML = html;
+        }
+        
+        /**
+         * 纠错单个锚点单
+         */
+        function correctSingleAnchor(instId) {
+            if (!confirm(`确认要纠错 ${instId} 吗？\n\n将执行以下操作：\n1. 删除旧锚点单\n2. 平掉所有相关持仓\n3. 重新创建新锚点单`)) {
+                return;
+            }
+            
+            const statusEl = document.getElementById('scan-status');
+            statusEl.textContent = `纠错中: ${instId}...`;
+            statusEl.style.color = '#f59e0b';
+            
+            fetch('/api/trading/anchor-correction/correct-single', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({inst_id: instId})
+            })
+            .then(resp => resp.json())
+            .then(data => {
+                if (data.success) {
+                    const result = data.result;
+                    statusEl.textContent = `✅ 纠错完成: ${result.inst_id}（关闭${result.closed_count}个持仓）`;
+                    statusEl.style.color = '#10b981';
+                    
+                    // 重新扫描
+                    setTimeout(() => scanExtremeAnchors(), 1000);
+                    
+                    // 刷新锚点单列表
+                    if (window.loadAnchors) loadAnchors();
+                } else {
+                    statusEl.textContent = `❌ 纠错失败: ${data.error}`;
+                    statusEl.style.color = '#ef4444';
+                    alert(`纠错失败: ${data.error}`);
+                }
+            })
+            .catch(err => {
+                statusEl.textContent = `❌ 请求失败: ${err.message}`;
+                statusEl.style.color = '#ef4444';
+                alert(`请求失败: ${err.message}`);
+            });
+        }
+        
+        /**
+         * 一键纠错全部极端锚点单
+         */
+        function correctAllAnchors() {
+            if (!confirm('确认要纠错所有极端盈利的锚点单吗？\n\n将批量执行纠错操作，包括：\n1. 删除所有旧锚点单\n2. 平掉所有相关持仓\n3. 重新创建新锚点单')) {
+                return;
+            }
+            
+            const statusEl = document.getElementById('scan-status');
+            statusEl.textContent = '批量纠错中...';
+            statusEl.style.color = '#f59e0b';
+            
+            fetch('/api/trading/anchor-correction/correct-all', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'}
+            })
+            .then(resp => resp.json())
+            .then(data => {
+                if (data.success) {
+                    const result = data.result;
+                    statusEl.textContent = `✅ 批量纠错完成: 成功${result.corrected}个，失败${result.failed}个`;
+                    statusEl.style.color = '#10b981';
+                    
+                    // 显示详细结果
+                    alert(`批量纠错完成！\n\n总计: ${result.total}个\n成功: ${result.corrected}个\n失败: ${result.failed}个`);
+                    
+                    // 重新扫描
+                    setTimeout(() => scanExtremeAnchors(), 1000);
+                    
+                    // 刷新锚点单列表
+                    if (window.loadAnchors) loadAnchors();
+                } else {
+                    statusEl.textContent = `❌ 批量纠错失败: ${data.error}`;
+                    statusEl.style.color = '#ef4444';
+                    alert(`批量纠错失败: ${data.error}`);
+                }
+            })
+            .catch(err => {
+                statusEl.textContent = `❌ 请求失败: ${err.message}`;
+                statusEl.style.color = '#ef4444';
+                alert(`请求失败: ${err.message}`);
+            });
+        }
+        
+        // ========== Trading Manager 预警监控函数 ==========
+        
+        // 刷新Trading Manager预警数据
+        function refreshTradingManagerWarnings() {
+            const listContainer = document.getElementById('tm-anchor-warnings-list');
+            
+            listContainer.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #718096;">
+                    <div style="font-size: 48px; margin-bottom: 10px;">⏳</div>
+                    <div>加载中...</div>
+                </div>
+            `;
+            
+            fetch('/api/trading/anchor-warning/active')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateTradingManagerWarningStats(data);
+                    renderTradingManagerWarningsList(data.warnings);
+                    loadTradingManagerWarningLogs();
+                } else {
+                    listContainer.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #ef4444;">
+                            <div style="font-size: 48px; margin-bottom: 10px;">❌</div>
+                            <div>加载失败: ${data.error || '未知错误'}</div>
+                        </div>
+                    `;
+                }
+            })
+            .catch(err => {
+                listContainer.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #ef4444;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">❌</div>
+                        <div>网络错误: ${err.message}</div>
+                    </div>
+                `;
+            });
+        }
+        
+        // 更新Trading Manager预警统计
+        function updateTradingManagerWarningStats(data) {
+            const warnings = data.warnings || [];
+            const criticalCount = warnings.filter(w => w.warning_level === 'critical').length;
+            const warningCount = warnings.filter(w => w.warning_level === 'warning').length;
+            const totalAnchors = data.total || 0;
+            
+            document.getElementById('tm-warning-total').textContent = totalAnchors;
+            document.getElementById('tm-warning-critical').textContent = criticalCount;
+            document.getElementById('tm-warning-normal').textContent = warningCount;
+            document.getElementById('tm-warning-safe').textContent = totalAnchors - warnings.length;
+        }
+        
+        // 渲染Trading Manager预警列表
+        function renderTradingManagerWarningsList(warnings) {
+            const container = document.getElementById('tm-anchor-warnings-list');
+            
+            if (!warnings || warnings.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #10b981;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">✅</div>
+                        <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">暂无预警</div>
+                        <div style="font-size: 14px; color: #718096;">所有锚点单状态正常</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = warnings.map(warning => {
+                const isCritical = warning.warning_level === 'critical';
+                const borderColor = isCritical ? '#ef4444' : '#f59e0b';
+                const bgGradient = isCritical 
+                    ? 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)' 
+                    : 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)';
+                const badgeColor = isCritical ? '#ef4444' : '#f59e0b';
+                const badgeText = isCritical ? '临界预警' : '普通预警';
+                const icon = isCritical ? '❗' : '⚠️';
+                
+                return `
+                    <div style="border: 2px solid ${borderColor}; border-radius: 12px; padding: 20px; margin-bottom: 15px; background: ${bgGradient}; transition: all 0.3s;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <div style="font-size: 18px; font-weight: bold; display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 32px;">${icon}</span>
+                                <span>${warning.inst_id}</span>
+                            </div>
+                            <span style="padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; background: ${badgeColor}; color: white;">
+                                ${badgeText}
+                            </span>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px;">
+                            <div>
+                                <div style="font-size: 12px; color: #718096; margin-bottom: 3px;">方向</div>
+                                <div style="font-size: 15px; font-weight: bold;">${warning.pos_side === 'long' ? '做多' : '做空'}</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: #718096; margin-bottom: 3px;">开仓价</div>
+                                <div style="font-size: 15px; font-weight: bold;">${parseFloat(warning.open_price).toFixed(4)} USDT</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: #718096; margin-bottom: 3px;">当前价</div>
+                                <div style="font-size: 15px; font-weight: bold;">${parseFloat(warning.current_price).toFixed(4)} USDT</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: #718096; margin-bottom: 3px;">收益率 (10x)</div>
+                                <div style="font-size: 15px; font-weight: bold; color: ${warning.profit_rate < 0 ? '#ef4444' : '#10b981'};">
+                                    ${parseFloat(warning.profit_rate).toFixed(2)}%
+                                </div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: #718096; margin-bottom: 3px;">持仓量</div>
+                                <div style="font-size: 15px; font-weight: bold;">${parseFloat(warning.open_size).toFixed(4)}</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: #718096; margin-bottom: 3px;">创建时间</div>
+                                <div style="font-size: 13px; font-weight: bold;">${warning.created_at}</div>
+                            </div>
+                        </div>
+
+                        <div style="background: rgba(255,255,255,0.6); padding: 12px; border-radius: 8px; border-left: 4px solid ${borderColor}; margin-bottom: 12px; font-size: 14px;">
+                            ${warning.alert_message}
+                        </div>
+
+                        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                            <button onclick="closeTradingManagerWarning(${warning.id}, '${warning.inst_id}')" 
+                                    style="padding: 8px 16px; background: #ef4444; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                                ✓ 手动关闭
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // 关闭Trading Manager预警
+        function closeTradingManagerWarning(warningId, instId) {
+            if (!confirm(`确定要关闭 ${instId} 的预警吗？`)) {
+                return;
+            }
+
+            const reason = prompt('请输入关闭原因（可选）:', '手动关闭') || '手动关闭';
+
+            fetch(`/api/trading/anchor-warning/close/${warningId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ reason })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ 预警已关闭');
+                    refreshTradingManagerWarnings();
+                } else {
+                    alert(`❌ 关闭失败: ${data.error || '未知错误'}`);
+                }
+            })
+            .catch(err => {
+                alert(`❌ 网络错误: ${err.message}`);
+            });
+        }
+        
+        // 加载Trading Manager预警日志
+        function loadTradingManagerWarningLogs() {
+            const container = document.getElementById('tm-warning-logs-list');
+            
+            fetch('/api/trading/anchor-warning/logs?limit=20')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.logs && data.logs.length > 0) {
+                    container.innerHTML = data.logs.map(log => {
+                        const actionColors = {
+                            'created': '#10b981',
+                            'updated': '#3b82f6',
+                            'closed': '#6b7280',
+                            'triggered': '#ef4444'
+                        };
+                        const actionColor = actionColors[log.action_type] || '#718096';
+                        
+                        return `
+                            <div style="border-bottom: 1px solid #e5e7eb; padding: 12px 0;">
+                                <div style="display: flex; justify-content: space-between; align-items: start;">
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 14px; font-weight: bold; color: #1f2937; margin-bottom: 5px;">
+                                            <span style="color: ${actionColor};">●</span>
+                                            ${log.inst_id} - ${log.action_type}
+                                        </div>
+                                        <div style="font-size: 12px; color: #6b7280;">
+                                            收益率: <span style="color: ${log.profit_rate < 0 ? '#ef4444' : '#10b981'};">${log.profit_rate ? parseFloat(log.profit_rate).toFixed(2) + '%' : '-'}</span>
+                                            ${log.price ? ' | 价格: ' + parseFloat(log.price).toFixed(4) + ' USDT' : ''}
+                                            ${log.note ? ' | 备注: ' + log.note : ''}
+                                        </div>
+                                    </div>
+                                    <div style="font-size: 11px; color: #9ca3af; white-space: nowrap; margin-left: 15px;">
+                                        ${log.created_at}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 20px; color: #9ca3af;">
+                            暂无操作日志
+                        </div>
+                    `;
+                }
+            })
+            .catch(err => {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #ef4444;">
+                        加载失败: ${err.message}
+                    </div>
+                `;
+            });
+        }
+        
+        // 在锚点单tab激活时自动加载预警数据
+        const originalSwitchTab = window.switchTabOptimized;
+        window.switchTabOptimized = function(tabName) {
+            originalSwitchTab(tabName);
+            if (tabName === 'anchors') {
+                // 延迟500ms加载预警数据，确保tab切换完成
+                setTimeout(() => {
+                    refreshTradingManagerWarnings();
+                }, 500);
+            }
+        };
+    </script>
+</body>
+</html>

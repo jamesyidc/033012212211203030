@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V1V2成交额监控系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .update-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            font-size: 0.95em;
+        }
+
+        .update-time {
+            color: #4ade80;
+            font-weight: 600;
+        }
+
+        .next-update {
+            color: #888;
+        }
+
+        .coins-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .coin-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .coin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        .coin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .coin-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #60a5fa;
+        }
+
+        .level-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85em;
+            text-transform: uppercase;
+        }
+
+        .level-v1 {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+        }
+
+        .level-v2 {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        .level-none {
+            background: rgba(255, 255, 255, 0.1);
+            color: #888;
+        }
+
+        .volume-display {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #4ade80;
+            margin: 15px 0;
+        }
+
+        .thresholds {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .threshold-item {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .threshold-label {
+            font-size: 0.75em;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .threshold-value {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .threshold-v1 .threshold-label {
+            color: #f5576c;
+        }
+
+        .threshold-v2 .threshold-label {
+            color: #4facfe;
+        }
+
+        .time-info {
+            margin-top: 12px;
+            font-size: 0.8em;
+            color: #888;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+            font-size: 1.2em;
+        }
+
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            margin: 20px;
+        }
+
+        .countdown {
+            font-weight: bold;
+            color: #4ade80;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 0.85em;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .stat-v1 { color: #f5576c; }
+        .stat-v2 { color: #4facfe; }
+        .stat-none { color: #888; }
+
+        /* 预警卡片样式 */
+        .alert-card {
+            background: rgba(255, 87, 108, 0.15);
+            border: 2px solid rgba(255, 87, 108, 0.4);
+            border-radius: 12px;
+            padding: 15px;
+            transition: all 0.3s ease;
+            animation: pulseAlert 2s ease-in-out infinite;
+        }
+
+        .alert-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 87, 108, 0.4);
+            border-color: #f5576c;
+        }
+
+        @keyframes pulseAlert {
+            0%, 100% { border-color: rgba(255, 87, 108, 0.4); }
+            50% { border-color: rgba(255, 87, 108, 0.8); }
+        }
+
+        .alert-symbol {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #f5576c;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .alert-stars {
+            font-size: 1.2em;
+            color: #ffd700;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .alert-count {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .alert-detail {
+            font-size: 0.85em;
+            color: #ccc;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .alert-signals {
+            font-size: 0.75em;
+            color: #888;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .alert-signal-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .nav-btn {
+            padding: 10px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95em;
+        }
+
+        .btn-home {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+
+        .btn-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-settings {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+        }
+
+        .btn-settings:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .coins-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .update-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .nav-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* 排序表格样式 */
+        .sortable-header {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            padding-right: 25px !important;
+            transition: background-color 0.2s ease;
+        }
+
+        .sortable-header:hover {
+            background-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .sort-indicator {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8em;
+            opacity: 0.5;
+        }
+
+        .sort-indicator.active {
+            opacity: 1;
+            color: #4ade80;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 V1V2成交额监控系统</h1>
+            <p>实时监控27个币种的5分钟成交额 | OKEx平台</p>
+            <div class="update-info">
+                <div class="update-time" id="updateTime">最后更新: 加载中...</div>
+                <div class="next-update">下次更新: <span class="countdown" id="countdown">30</span> 秒</div>
+            </div>
+            <div class="nav-buttons">
+                <a href="/" class="nav-btn btn-home">
+                    🏠 返回首页
+                </a>
+                <a href="/v1v2-settings" class="nav-btn btn-settings">
+                    ⚙️ V1V2设置
+                </a>
+            </div>
+        </div>
+
+        <div class="stats-bar" id="statsBar">
+            <div class="stat-card">
+                <div class="stat-label">V1级别</div>
+                <div class="stat-value stat-v1" id="v1Count">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">V2级别</div>
+                <div class="stat-value stat-v2" id="v2Count">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">未达标</div>
+                <div class="stat-value stat-none" id="noneCount">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">总币种</div>
+                <div class="stat-value" id="totalCount">27</div>
+            </div>
+        </div>
+
+        <!-- 计次预警区域已删除 -->
+
+        <!-- V1V2信号统计表格 -->
+        <div class="statistics-section" style="margin-bottom: 30px;">
+            <div style="background: rgba(255, 255, 255, 0.05); border-radius: 15px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                <h2 style="text-align: center; margin-bottom: 20px; color: #60a5fa;">📈 V1V2信号统计（每3分钟更新）</h2>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: rgba(102, 126, 234, 0.2);">
+                                <th class="sortable-header" data-column="symbol" style="padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1); color: #60a5fa;">
+                                    币种<span class="sort-indicator">↕️</span>
+                                </th>
+                                <th class="sortable-header" data-column="one_hour_v1" style="padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1); color: #f5576c;">
+                                    1hV1<span class="sort-indicator">↕️</span>
+                                </th>
+                                <th class="sortable-header" data-column="one_hour_v2" style="padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1); color: #4facfe;">
+                                    1hV2<span class="sort-indicator">↕️</span>
+                                </th>
+                                <th class="sortable-header" data-column="one_hour_total" style="padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                    1h合计<span class="sort-indicator">↕️</span>
+                                </th>
+                                <th class="sortable-header" data-column="three_hours_v1" style="padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1); color: #f5576c;">
+                                    3hV1<span class="sort-indicator">↕️</span>
+                                </th>
+                                <th class="sortable-header" data-column="three_hours_v2" style="padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1); color: #4facfe;">
+                                    3hV2<span class="sort-indicator">↕️</span>
+                                </th>
+                                <th class="sortable-header" data-column="three_hours_total" style="padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                    3h合计<span class="sort-indicator">↕️</span>
+                                </th>
+                                <th class="sortable-header" data-column="twelve_hours_v1" style="padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1); color: #f5576c;">
+                                    12hV1<span class="sort-indicator">↕️</span>
+                                </th>
+                                <th class="sortable-header" data-column="twelve_hours_v2" style="padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1); color: #4facfe;">
+                                    12hV2<span class="sort-indicator">↕️</span>
+                                </th>
+                                <th class="sortable-header" data-column="twelve_hours_total" style="padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                    12h合计<span class="sort-indicator">↕️</span>
+                                </th>
+                                <th class="sortable-header" data-column="today_v1" style="padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1); color: #f5576c;">
+                                    今日V1<span class="sort-indicator">↕️</span>
+                                </th>
+                                <th class="sortable-header" data-column="today_v2" style="padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1); color: #4facfe;">
+                                    今日V2<span class="sort-indicator">↕️</span>
+                                </th>
+                                <th class="sortable-header" data-column="today_total" style="padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                    今日合计<span class="sort-indicator">↕️</span>
+                                </th>
+                                <th class="sortable-header" data-column="three_v1" style="padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1); color: #f5576c;">
+                                    3日V1<span class="sort-indicator">↕️</span>
+                                </th>
+                                <th class="sortable-header" data-column="three_v2" style="padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1); color: #4facfe;">
+                                    3日V2<span class="sort-indicator">↕️</span>
+                                </th>
+                                <th class="sortable-header" data-column="three_total" style="padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                    3日合计<span class="sort-indicator">↕️</span>
+                                </th>
+                                <th class="sortable-header" data-column="seven_v1" style="padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1); color: #f5576c;">
+                                    7日V1<span class="sort-indicator">↕️</span>
+                                </th>
+                                <th class="sortable-header" data-column="seven_v2" style="padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1); color: #4facfe;">
+                                    7日V2<span class="sort-indicator">↕️</span>
+                                </th>
+                                <th class="sortable-header" data-column="seven_total" style="padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                    7日合计<span class="sort-indicator">↕️</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="statisticsTable">
+                            <tr><td colspan="19" style="padding: 20px; text-align: center; color: #888;">📊 正在加载统计数据...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="text-align: center; margin-top: 15px; color: #888; font-size: 0.9em;" id="statsUpdateTime">
+                    统计数据更新时间: 加载中...
+                </div>
+            </div>
+        </div>
+
+        <div class="coins-grid" id="coinsGrid">
+            <div class="loading">⏳ 加载数据中...</div>
+        </div>
+    </div>
+
+    <script>
+        let countdownSeconds = 30;
+        let countdownTimer = null;
+        let currentStatsData = []; // 保存当前统计数据
+        let sortColumn = null;
+        let sortDirection = 'asc'; // 'asc' 或 'desc'
+
+        // 格式化数字
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(2) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(2) + 'K';
+            }
+            return num.toFixed(2);
+        }
+
+        // 格式化USDT金额
+        function formatUSDT(num) {
+            return '$' + num.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        // 计算进度百分比
+        function calculateProgress(volume, v1, v2) {
+            if (volume >= v1) {
+                return 100;
+            } else if (volume >= v2) {
+                return 50 + (volume - v2) / (v1 - v2) * 50;
+            } else {
+                return (volume / v2) * 50;
+            }
+        }
+
+        // 加载统计数据
+        async function loadStatistics() {
+            try {
+                const response = await fetch('/api/v1v2/statistics');
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.message || '统计数据加载失败');
+                }
+
+                renderStatistics(data.data);
+                document.getElementById('statsUpdateTime').textContent = 
+                    `统计数据更新时间: ${data.data.update_time}`;
+            } catch (error) {
+                console.error('加载统计数据失败:', error);
+                document.getElementById('statisticsTable').innerHTML = 
+                    `<tr><td colspan="19" style="padding: 20px; text-align: center; color: #ff6b6b;">❌ ${error.message}</td></tr>`;
+            }
+        }
+
+        // 渲染统计表格
+        function renderStatistics(data) {
+            const stats = data.statistics || data; // 兼容两种数据格式
+            currentStatsData = stats; // 保存数据以便排序
+            const table = document.getElementById('statisticsTable');
+            
+            if (!stats || stats.length === 0) {
+                table.innerHTML = '<tr><td colspan="19" style="padding: 20px; text-align: center; color: #888;">暂无统计数据</td></tr>';
+                return;
+            }
+
+            table.innerHTML = stats.map(coin => `
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                    <td style="padding: 10px; border: 1px solid rgba(255, 255, 255, 0.1); font-weight: bold; color: #60a5fa;">${coin.symbol}</td>
+                    <td style="padding: 10px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; color: #f5576c;">${coin['1h'].v1}</td>
+                    <td style="padding: 10px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; color: #4facfe;">${coin['1h'].v2}</td>
+                    <td style="padding: 10px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; font-weight: bold;">${coin['1h'].total}</td>
+                    <td style="padding: 10px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; color: #f5576c;">${coin['3h'].v1}</td>
+                    <td style="padding: 10px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; color: #4facfe;">${coin['3h'].v2}</td>
+                    <td style="padding: 10px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; font-weight: bold;">${coin['3h'].total}</td>
+                    <td style="padding: 10px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; color: #f5576c;">${coin['12h'].v1}</td>
+                    <td style="padding: 10px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; color: #4facfe;">${coin['12h'].v2}</td>
+                    <td style="padding: 10px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; font-weight: bold;">${coin['12h'].total}</td>
+                    <td style="padding: 10px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; color: #f5576c;">${coin['1day'].v1}</td>
+                    <td style="padding: 10px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; color: #4facfe;">${coin['1day'].v2}</td>
+                    <td style="padding: 10px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; font-weight: bold;">${coin['1day'].total}</td>
+                    <td style="padding: 10px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; color: #f5576c;">${coin['3day'].v1}</td>
+                    <td style="padding: 10px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; color: #4facfe;">${coin['3day'].v2}</td>
+                    <td style="padding: 10px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; font-weight: bold;">${coin['3day'].total}</td>
+                    <td style="padding: 10px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; color: #f5576c;">${coin['7day'].v1}</td>
+                    <td style="padding: 10px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; color: #4facfe;">${coin['7day'].v2}</td>
+                    <td style="padding: 10px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center; font-weight: bold;">${coin['7day'].total}</td>
+                </tr>
+            `).join('');
+        }
+
+        // 排序函数
+        function sortStatistics(column) {
+            if (!currentStatsData || currentStatsData.length === 0) return;
+
+            // 如果点击同一列，切换排序方向
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'desc'; // 新列默认降序
+            }
+
+            // 获取排序值
+            const getValue = (coin, column) => {
+                switch(column) {
+                    case 'symbol': return coin.symbol;
+                    case 'one_hour_v1': return coin['1h'].v1;
+                    case 'one_hour_v2': return coin['1h'].v2;
+                    case 'one_hour_total': return coin['1h'].total;
+                    case 'three_hours_v1': return coin['3h'].v1;
+                    case 'three_hours_v2': return coin['3h'].v2;
+                    case 'three_hours_total': return coin['3h'].total;
+                    case 'twelve_hours_v1': return coin['12h'].v1;
+                    case 'twelve_hours_v2': return coin['12h'].v2;
+                    case 'twelve_hours_total': return coin['12h'].total;
+                    case 'today_v1': return coin['1day'].v1;
+                    case 'today_v2': return coin['1day'].v2;
+                    case 'today_total': return coin['1day'].total;
+                    case 'three_v1': return coin['3day'].v1;
+                    case 'three_v2': return coin['3day'].v2;
+                    case 'three_total': return coin['3day'].total;
+                    case 'seven_v1': return coin['7day'].v1;
+                    case 'seven_v2': return coin['7day'].v2;
+                    case 'seven_total': return coin['7day'].total;
+                    default: return 0;
+                }
+            };
+
+            // 执行排序
+            const sortedData = [...currentStatsData].sort((a, b) => {
+                const aVal = getValue(a, column);
+                const bVal = getValue(b, column);
+
+                if (column === 'symbol') {
+                    // 字符串排序
+                    return sortDirection === 'asc' 
+                        ? aVal.localeCompare(bVal) 
+                        : bVal.localeCompare(aVal);
+                } else {
+                    // 数字排序
+                    return sortDirection === 'asc' 
+                        ? aVal - bVal 
+                        : bVal - aVal;
+                }
+            });
+
+            // 更新排序指示器
+            document.querySelectorAll('.sort-indicator').forEach(el => {
+                el.classList.remove('active');
+                el.textContent = '↕️';
+            });
+
+            const activeHeader = document.querySelector(`[data-column="${column}"] .sort-indicator`);
+            if (activeHeader) {
+                activeHeader.classList.add('active');
+                activeHeader.textContent = sortDirection === 'asc' ? '↑' : '↓';
+            }
+
+            // 重新渲染
+            renderStatistics(sortedData);
+        }
+
+        // 初始化排序事件监听
+        function initializeSortHandlers() {
+            document.querySelectorAll('.sortable-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const column = this.getAttribute('data-column');
+                    sortStatistics(column);
+                });
+            });
+        }
+
+        // 加载数据
+        async function loadData() {
+            try {
+                const response = await fetch('/api/v1v2/latest');
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.message || '数据加载失败');
+                }
+
+                renderData(data.data);
+                updateStats(data.data);
+                
+                // 同时加载统计数据
+                loadStatistics();
+
+                // 更新时间
+                document.getElementById('updateTime').textContent = 
+                    `最后更新: ${data.update_time || '刚刚'}`;
+
+                // 重置倒计时
+                resetCountdown();
+
+            } catch (error) {
+                console.error('加载数据失败:', error);
+                showError('数据加载失败: ' + error.message);
+            }
+        }
+
+        // 渲染数据
+        function renderData(coins) {
+            const grid = document.getElementById('coinsGrid');
+            
+            if (!coins || coins.length === 0) {
+                grid.innerHTML = '<div class="error">暂无数据</div>';
+                return;
+            }
+
+            grid.innerHTML = coins.map(coin => {
+                const progress = calculateProgress(coin.volume, coin.v1, coin.v2);
+                const levelClass = `level-${coin.level.toLowerCase()}`;
+
+                return `
+                    <div class="coin-card">
+                        <div class="coin-header">
+                            <div class="coin-name">${coin.symbol}</div>
+                            <div class="level-badge ${levelClass}">${coin.level}</div>
+                        </div>
+                        
+                        <div class="volume-display">${formatUSDT(coin.volume)}</div>
+                        
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progress}%"></div>
+                        </div>
+                        
+                        <div class="thresholds">
+                            <div class="threshold-item threshold-v1">
+                                <div class="threshold-label">V1 阈值</div>
+                                <div class="threshold-value">${formatUSDT(coin.v1)}</div>
+                            </div>
+                            <div class="threshold-item threshold-v2">
+                                <div class="threshold-label">V2 阈值</div>
+                                <div class="threshold-value">${formatUSDT(coin.v2)}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="time-info">${coin.collect_time || ''}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 更新统计数据
+        function updateStats(coins) {
+            let v1Count = 0, v2Count = 0, noneCount = 0;
+
+            coins.forEach(coin => {
+                if (coin.level === 'V1') v1Count++;
+                else if (coin.level === 'V2') v2Count++;
+                else noneCount++;
+            });
+
+            document.getElementById('v1Count').textContent = v1Count;
+            document.getElementById('v2Count').textContent = v2Count;
+            document.getElementById('noneCount').textContent = noneCount;
+        }
+
+        // 显示错误
+        function showError(message) {
+            const grid = document.getElementById('coinsGrid');
+            grid.innerHTML = `<div class="error">${message}</div>`;
+        }
+
+        // 计次预警功能已删除
+
+        // 倒计时
+        function startCountdown() {
+            const countdownEl = document.getElementById('countdown');
+            
+            countdownTimer = setInterval(() => {
+                countdownSeconds--;
+                countdownEl.textContent = countdownSeconds;
+
+                if (countdownSeconds <= 0) {
+                    loadData();
+                }
+            }, 1000);
+        }
+
+        // 重置倒计时
+        function resetCountdown() {
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+            }
+            countdownSeconds = 30;
+            document.getElementById('countdown').textContent = countdownSeconds;
+            startCountdown();
+        }
+
+        // 初始化
+        loadData();
+        // loadCountAlerts(); // 计次预警功能已删除
+        initializeSortHandlers();
+    </script>
+</body>
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>统一采集监控 - 加密货币数据分析系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .refresh-time {
+            color: #999;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        /* 汇总统计卡片 */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .summary-card h3 {
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .summary-card .value {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .summary-card.total .value { color: #667eea; }
+        .summary-card.normal .value { color: #10b981; }
+        .summary-card.warning .value { color: #f59e0b; }
+        .summary-card.error .value { color: #ef4444; }
+
+        /* 采集器列表 */
+        .collectors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .collector-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-left: 5px solid #ccc;
+        }
+
+        .collector-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .collector-card.status-normal {
+            border-left-color: #10b981;
+        }
+
+        .collector-card.status-warning {
+            border-left-color: #f59e0b;
+        }
+
+        .collector-card.status-error,
+        .collector-card.status-stopped {
+            border-left-color: #ef4444;
+        }
+
+        .collector-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .collector-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.normal {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-badge.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-badge.error,
+        .status-badge.stopped {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .collector-info {
+            margin-top: 15px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .delay-indicator {
+            font-weight: bold;
+        }
+
+        .delay-normal { color: #10b981; }
+        .delay-warning { color: #f59e0b; }
+        .delay-error { color: #ef4444; }
+
+        /* 加载动画 */
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: white;
+            font-size: 18px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .summary-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .collectors-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 页面标题 -->
+        <div class="header">
+            <h1>
+                📊 统一采集监控面板
+            </h1>
+            <p>实时监控所有数据采集器的运行状态和性能指标</p>
+            <p class="refresh-time">最后更新: <span id="lastUpdate">加载中...</span></p>
+        </div>
+
+        <!-- 汇总统计 -->
+        <div class="summary-cards" id="summaryCards">
+            <div class="summary-card total">
+                <h3>总采集器</h3>
+                <div class="value" id="totalCount">-</div>
+            </div>
+            <div class="summary-card normal">
+                <h3>正常运行</h3>
+                <div class="value" id="normalCount">-</div>
+            </div>
+            <div class="summary-card warning">
+                <h3>警告状态</h3>
+                <div class="value" id="warningCount">-</div>
+            </div>
+            <div class="summary-card error">
+                <h3>错误/停止</h3>
+                <div class="value" id="errorCount">-</div>
+            </div>
+        </div>
+
+        <!-- 加载状态 -->
+        <div class="loading" id="loadingIndicator">
+            <div class="spinner"></div>
+            <p>正在加载采集器状态...</p>
+        </div>
+
+        <!-- 采集器卡片网格 -->
+        <div class="collectors-grid" id="collectorsGrid" style="display:none;">
+            <!-- 采集器卡片将通过JavaScript动态生成 -->
+        </div>
+    </div>
+
+    <script>
+        // 获取采集器状态
+        async function loadCollectorsStatus() {
+            try {
+                const response = await fetch('/api/collectors/status');
+                const data = await response.json();
+                
+                if (data.success) {
+                    // 更新汇总统计
+                    document.getElementById('totalCount').textContent = data.summary.total;
+                    document.getElementById('normalCount').textContent = data.summary.normal;
+                    document.getElementById('warningCount').textContent = data.summary.warning;
+                    document.getElementById('errorCount').textContent = data.summary.error;
+                    document.getElementById('lastUpdate').textContent = data.timestamp;
+                    
+                    // 渲染采集器卡片
+                    renderCollectors(data.collectors);
+                    
+                    // 隐藏加载动画，显示内容
+                    document.getElementById('loadingIndicator').style.display = 'none';
+                    document.getElementById('collectorsGrid').style.display = 'grid';
+                } else {
+                    showError('加载失败: ' + data.error);
+                }
+            } catch (error) {
+                showError('网络错误: ' + error.message);
+            }
+        }
+        
+        // 渲染采集器卡片
+        function renderCollectors(collectors) {
+            const grid = document.getElementById('collectorsGrid');
+            grid.innerHTML = '';
+            
+            collectors.forEach(collector => {
+                const card = createCollectorCard(collector);
+                grid.appendChild(card);
+            });
+        }
+        
+        // 创建采集器卡片
+        function createCollectorCard(collector) {
+            const card = document.createElement('div');
+            card.className = `collector-card status-${collector.status}`;
+            
+            // 状态中文映射
+            const statusText = {
+                'normal': '正常',
+                'warning': '警告',
+                'error': '错误',
+                'stopped': '停止',
+                'no_data': '无数据'
+            };
+            
+            // 延迟颜色判断
+            let delayClass = 'delay-normal';
+            const delay = parseFloat(collector.delay_minutes);
+            if (delay > 10) delayClass = 'delay-error';
+            else if (delay > 5) delayClass = 'delay-warning';
+            
+            card.innerHTML = `
+                <div class="collector-header">
+                    <div class="collector-name">${collector.name}</div>
+                    <span class="status-badge ${collector.status}">${statusText[collector.status] || collector.status}</span>
+                </div>
+                <div class="collector-info">
+                    <div class="info-row">
+                        <span class="info-label">进程状态</span>
+                        <span class="info-value">${collector.process_running ? '✅ 运行中' : '❌ 未运行'}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">日志文件</span>
+                        <span class="info-value">${collector.log_exists ? '✅ 存在' : '❌ 不存在'}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">最后更新</span>
+                        <span class="info-value">${collector.last_update || 'N/A'}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">数据延迟</span>
+                        <span class="info-value delay-indicator ${delayClass}">${collector.delay_minutes} 分钟</span>
+                    </div>
+                    ${collector.db_table ? `
+                    <div class="info-row">
+                        <span class="info-label">数据库表</span>
+                        <span class="info-value">${collector.db_table}</span>
+                    </div>
+                    ` : ''}
+                    ${collector.message ? `
+                    <div class="info-row">
+                        <span class="info-label">状态信息</span>
+                        <span class="info-value" style="font-size:12px;">${collector.message}</span>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        // 显示错误
+        function showError(message) {
+            const loadingDiv = document.getElementById('loadingIndicator');
+            loadingDiv.innerHTML = `
+                <div style="color: white;">
+                    <h2>⚠️ 加载失败</h2>
+                    <p>${message}</p>
+                    <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px; font-size:16px; cursor:pointer;">重新加载</button>
+                </div>
+            `;
+        }
+        
+        // 页面加载时执行
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCollectorsStatus();
+            
+            // 每30秒自动刷新
+            setInterval(loadCollectorsStatus, 30000);
+        });
+    </script>
+</body>
+</html>

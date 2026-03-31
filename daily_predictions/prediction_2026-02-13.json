@@ -1,0 +1,15 @@
+{
+  "date": "2026-02-13",
+  "timestamp": "2026-02-13 02:00:00",
+  "analysis_time": "02:00:00",
+  "color_counts": {
+    "green": 0,
+    "red": 6,
+    "yellow": 0,
+    "blank": 6,
+    "blank_ratio": 50.0
+  },
+  "signal": "做空",
+  "description": "🔴⚪ 红色+空白（空白占比50.0%>=25%），预判下跌行情，建议做空。操作提示：相对高点做空",
+  "is_temp": false
+}

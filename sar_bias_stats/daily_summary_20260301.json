@@ -1,0 +1,15 @@
+{
+  "date": "2026-03-01",
+  "total_bullish": 0,
+  "total_bearish": 3,
+  "total_points": 292,
+  "unique_bullish_symbols": [],
+  "unique_bearish_symbols": [
+    "BTC",
+    "LDO",
+    "LTC"
+  ],
+  "unique_bullish_count": 0,
+  "unique_bearish_count": 3,
+  "generated_at": "2026-03-02 00:05:41"
+}

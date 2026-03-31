@@ -1,0 +1,17 @@
+{
+  "date": "2026-02-22",
+  "total_bullish": 3,
+  "total_bearish": 26,
+  "total_points": 292,
+  "unique_bullish_symbols": [
+    "APT"
+  ],
+  "unique_bearish_symbols": [
+    "APT",
+    "SOL",
+    "XLM"
+  ],
+  "unique_bullish_count": 1,
+  "unique_bearish_count": 3,
+  "generated_at": "2026-02-28 22:15:29"
+}

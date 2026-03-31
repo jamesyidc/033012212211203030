@@ -1,0 +1,19 @@
+{
+  "date": "2026-03-04",
+  "total_bullish": 31,
+  "total_bearish": 0,
+  "total_points": 292,
+  "unique_bullish_symbols": [
+    "BTC",
+    "CRO",
+    "HBAR",
+    "STX",
+    "SUI",
+    "TAO",
+    "TON"
+  ],
+  "unique_bearish_symbols": [],
+  "unique_bullish_count": 7,
+  "unique_bearish_count": 0,
+  "generated_at": "2026-03-05 00:05:46"
+}

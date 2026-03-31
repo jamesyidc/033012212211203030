@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>{{ symbol }} K线图 - 技术指标分析 v6.0</title>
+    <!-- 强制刷新版本: 2025-12-11-22:00-CACHE-BUSTER -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: #0e1117;
+            color: #e0e0e0;
+        }
+        
+        .header {
+            background: #1a1d29;
+            padding: 20px;
+            border-bottom: 2px solid #2d3348;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #00d4aa;
+        }
+        
+        .header .nav {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .header .nav a {
+            color: #888;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .header .nav a:hover {
+            background: #2d3348;
+            color: #00d4aa;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 10px;
+            height: calc(100vh - 120px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 20px;
+            flex-shrink: 0;
+        }
+        
+        .timeframe-tabs {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .tab-btn {
+            padding: 12px 24px;
+            background: #1a1d29;
+            border: 2px solid #2d3348;
+            color: #888;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            background: #00d4aa;
+            color: #0e1117;
+            border-color: #00d4aa;
+        }
+        
+        .tab-btn:hover:not(.active) {
+            border-color: #00d4aa;
+            color: #00d4aa;
+        }
+        
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .page-btn {
+            padding: 10px 20px;
+            background: #1a1d29;
+            border: 2px solid #2d3348;
+            color: #00d4aa;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .page-btn:hover:not(:disabled) {
+            background: #00d4aa;
+            color: #0e1117;
+        }
+        
+        .page-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .page-info {
+            color: #888;
+            font-size: 14px;
+        }
+        
+        .chart-container {
+            background: #1a1d29;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #00d4aa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .date-range {
+            font-size: 14px;
+            color: #888;
+            font-weight: normal;
+        }
+        
+        .chart {
+            width: 100%;
+            height: 600px;
+            min-height: 600px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+        
+        .spinner {
+            border: 3px solid #2d3348;
+            border-top: 3px solid #00d4aa;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: #1a1d29;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #00d4aa;
+        }
+        
+        .stat-label {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+        
+        /* 隐藏统计和辅助图表，只显示主K线图 */
+        .stats-grid,
+        #rsi-container,
+        #indicators-container {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{ symbol }} - K线图技术分析</h1>
+        <div class="nav">
+            <a href="/">← 返回首页</a>
+            <a href="/kline-indicators">技术指标总览</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="controls">
+            <div class="timeframe-tabs">
+                <button class="tab-btn active" onclick="switchTimeframe('5m')">5分钟</button>
+                <button class="tab-btn" onclick="switchTimeframe('1h')">1小时</button>
+            </div>
+            
+            <div class="pagination">
+                <button class="page-btn" id="prev-btn" onclick="prevPage()">← 上一页</button>
+                <div class="page-info" id="page-info">第 1 页</div>
+                <button class="page-btn" id="next-btn" onclick="nextPage()">下一页 →</button>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">
+                <span>K线图 & 成交量</span>
+                <span style="color: #00d4aa; font-size: 12px; margin-left: 10px;">[v4.0-FINAL]</span>
+                <span class="date-range" id="date-range"></span>
+            </div>
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>加载数据中...</p>
+            </div>
+            <div id="kline-chart" class="chart" style="display:none; height: 600px;"></div>
+        </div>
+        
+        <div class="stats-grid" id="stats-grid" style="display:none;">
+            <div class="stat-card">
+                <div class="stat-label">当前价格</div>
+                <div class="stat-value" id="stat-price">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">RSI(14)</div>
+                <div class="stat-value" id="stat-rsi">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">SAR位置</div>
+                <div class="stat-value" id="stat-sar-position">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">SAR值</div>
+                <div class="stat-value" id="stat-sar-value">-</div>
+            </div>
+        </div>
+        
+        <div class="chart-container" style="display:none;" id="rsi-container">
+            <div class="chart-title">RSI 指标 (14)</div>
+            <div id="rsi-chart" class="chart" style="height:300px;"></div>
+        </div>
+        
+        <div class="chart-container" style="display:none;" id="indicators-container">
+            <div class="chart-title">SAR & 布林带指标</div>
+            <div id="indicators-chart" class="chart" style="height:400px;"></div>
+        </div>
+    </div>
+    
+    <script>
+        // ============================================
+        // 版本控制: v6.0 - 2025-12-11-22:00
+        // 强制清除所有旧版本缓存
+        // ============================================
+        const CURRENT_VERSION = 'v6.0';
+        const VERSION_KEY = 'kline_chart_version';
+        
+        // 检查版本并强制刷新
+        (function checkVersion() {
+            const savedVersion = localStorage.getItem(VERSION_KEY);
+            console.log(`%c[版本检查] 当前版本: ${CURRENT_VERSION}, 缓存版本: ${savedVersion}`, 'color: #00d4aa; font-size: 14px; font-weight: bold');
+            
+            if (savedVersion !== CURRENT_VERSION) {
+                console.log(`%c[版本更新] 检测到新版本！清除旧缓存...`, 'color: #ff4444; font-size: 14px; font-weight: bold');
+                localStorage.setItem(VERSION_KEY, CURRENT_VERSION);
+                
+                // 清除所有可能的缓存
+                if ('caches' in window) {
+                    caches.keys().then(names => {
+                        names.forEach(name => caches.delete(name));
+                    });
+                }
+            }
+            
+            console.log(`%c[${CURRENT_VERSION}] K线图表系统已加载`, 'color: #00d4aa; font-size: 16px; font-weight: bold');
+        })();
+        
+        const symbol = '{{ symbol }}';
+        let currentTimeframe = '5m';
+        let allKlineData = [];
+        let allIndicatorsData = [];
+        let currentPage = 0;
+        let klineChart, rsiChart, indicatorsChart;
+        
+        // 每页显示12小时的数据
+        const RECORDS_PER_PAGE = {
+            '5m': 144,   // 12小时 × 12根/小时 = 144根
+            '1h': 12     // 12小时 = 12根
+        };
+        
+        // 初始化图表
+        function initCharts() {
+            klineChart = echarts.init(document.getElementById('kline-chart'));
+            // rsiChart和indicatorsChart已隐藏，不需要初始化
+            
+            window.addEventListener('resize', () => {
+                klineChart.resize();
+            });
+        }
+        
+        // 加载数据
+        async function loadData(timeframe) {
+            currentTimeframe = timeframe;
+            currentPage = 0;
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('kline-chart').style.display = 'none';
+            document.getElementById('stats-grid').style.display = 'none';
+            document.getElementById('rsi-container').style.display = 'none';
+            document.getElementById('indicators-container').style.display = 'none';
+            
+            try {
+                console.log('开始加载数据...', { symbol, timeframe });
+                const [klineRes, indicatorsRes] = await Promise.all([
+                    fetch(`/api/symbol/${symbol}/kline?timeframe=${timeframe}`),
+                    fetch(`/api/symbol/${symbol}/indicators?timeframe=${timeframe}`)
+                ]);
+                
+                const klineData = await klineRes.json();
+                const indicatorsData = await indicatorsRes.json();
+                
+                console.log('数据加载完成:', {
+                    klineSuccess: klineData.success,
+                    klineCount: klineData.data?.length,
+                    indicatorsSuccess: indicatorsData.success,
+                    indicatorsCount: indicatorsData.data?.length
+                });
+                
+                if (klineData.success && indicatorsData.success) {
+                    allKlineData = klineData.data;
+                    allIndicatorsData = indicatorsData.data;
+                    console.log('开始渲染页面...');
+                    renderCurrentPage();
+                    console.log('页面渲染完成');
+                } else {
+                    console.error('数据加载失败:', { klineData, indicatorsData });
+                }
+            } catch (error) {
+                console.error('加载数据出错:', error);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+        
+        // 渲染当前页数据
+        function renderCurrentPage() {
+            const recordsPerPage = RECORDS_PER_PAGE[currentTimeframe];
+            const totalPages = Math.ceil(allKlineData.length / recordsPerPage);
+            
+            // 计算当前页数据范围（从最新数据开始）
+            const startIdx = Math.max(0, allKlineData.length - (currentPage + 1) * recordsPerPage);
+            const endIdx = allKlineData.length - currentPage * recordsPerPage;
+            
+            const pageKlineData = allKlineData.slice(startIdx, endIdx);
+            
+            // 🔥 关键修复：基于timestamp对齐指标数据，而不是使用相同索引
+            // 创建一个timestamp到指标的映射
+            const indicatorsByTimestamp = {};
+            allIndicatorsData.forEach(ind => {
+                indicatorsByTimestamp[ind.timestamp] = ind;
+            });
+            
+            // 为每个K线找到匹配的指标数据
+            const pageIndicatorsData = pageKlineData.map(kline => {
+                return indicatorsByTimestamp[kline.timestamp] || {
+                    timestamp: kline.timestamp,
+                    sar: null,
+                    bb_upper: null,
+                    bb_middle: null,
+                    bb_lower: null,
+                    rsi: null
+                };
+            });
+            
+            renderCharts(pageKlineData, pageIndicatorsData);
+            updatePagination(totalPages);
+            
+            if (pageIndicatorsData.length > 0 && pageIndicatorsData[pageIndicatorsData.length - 1].sar !== null) {
+                updateStats(pageIndicatorsData[pageIndicatorsData.length - 1]);
+            }
+        }
+        
+        // 更新分页按钮
+        function updatePagination(totalPages) {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const pageInfo = document.getElementById('page-info');
+            
+            prevBtn.disabled = currentPage >= totalPages - 1;
+            nextBtn.disabled = currentPage === 0;
+            
+            pageInfo.textContent = `第 ${currentPage + 1} / ${totalPages} 页`;
+        }
+        
+        // 上一页
+        function prevPage() {
+            currentPage++;
+            renderCurrentPage();
+        }
+        
+        // 下一页
+        function nextPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                renderCurrentPage();
+            }
+        }
+        
+        // 计算日期分割线
+        function getDateSeparators(times) {
+            const separators = [];
+            let lastDate = null;
+            
+            times.forEach((time, index) => {
+                const date = new Date(parseInt(time)).toLocaleDateString('zh-CN');
+                if (lastDate && date !== lastDate) {
+                    separators.push({
+                        xAxis: index,
+                        label: { formatter: date }
+                    });
+                }
+                lastDate = date;
+            });
+            
+            return separators;
+        }
+        
+        // 渲染图表
+        function renderCharts(klineData, indicatorsData) {
+            console.log('renderCharts 被调用:', {
+                klineDataLength: klineData.length,
+                indicatorsDataLength: indicatorsData.length,
+                klineChartExists: !!klineChart,
+                firstKline: klineData[0],
+                firstIndicator: indicatorsData[0]
+            });
+            
+            const times = klineData.map(item => {
+                const date = new Date(parseInt(item.timestamp));
+                return date.toLocaleString('zh-CN', { 
+                    timeZone: 'Asia/Shanghai',
+                    month: '2-digit', day: '2-digit', 
+                    hour: '2-digit', minute: '2-digit' 
+                });
+            });
+            
+            const ohlc = klineData.map(item => item.data);
+            const volumes = klineData.map(item => item.volume);
+            
+            // [v6.0] 调试数据结构
+            console.log('%c========================================', 'color: #ff4444; font-size: 14px; font-weight: bold');
+            console.log('%c[v6.0 数据验证] K线数据结构检查', 'color: #ff4444; font-size: 14px; font-weight: bold');
+            console.log('%c========================================', 'color: #ff4444; font-size: 14px; font-weight: bold');
+            console.log('[v6.0] First K-line raw data:', klineData[0]);
+            console.log('[v6.0] First OHLC array:', ohlc[0]);
+            console.log('%c[v6.0] OHLC格式: [开盘, 收盘, 最低, 最高]', 'color: #00d4aa; font-weight: bold');
+            console.log('[v6.0] 解析后的值:', {
+                开盘价: ohlc[0][0],
+                收盘价: ohlc[0][1],
+                最低价: ohlc[0][2],
+                最高价: ohlc[0][3],
+                成交量: volumes[0]
+            });
+            console.log('%c========================================', 'color: #ff4444; font-size: 14px; font-weight: bold');
+            
+            // 使用indicators API提供的真实数据（与K线timestamp对齐）
+            const rsi = indicatorsData.map(item => item.rsi);
+            const sar = indicatorsData.map(item => item.sar);
+            const bbUpper = indicatorsData.map(item => item.bb_upper);
+            const bbMiddle = indicatorsData.map(item => item.bb_middle);
+            const bbLower = indicatorsData.map(item => item.bb_lower);
+            
+            // 检查数据值范围
+            const ohlcValues = ohlc.flat().filter(v => v !== null);
+            const sarValues = sar.filter(v => v !== null && v !== undefined);
+            const bbValues = [...bbUpper, ...bbMiddle, ...bbLower].filter(v => v !== null && v !== undefined);
+            
+            console.log('数据数组:', {
+                times: times.length,
+                ohlc: ohlc.length,
+                volumes: volumes.length,
+                sar: sar.length,
+                bbUpper: bbUpper.length,
+                bbMiddle: bbMiddle.length,
+                bbLower: bbLower.length
+            });
+            
+            console.log('数据值范围:', {
+                ohlcRange: `${Math.min(...ohlcValues).toFixed(4)} - ${Math.max(...ohlcValues).toFixed(4)}`,
+                sarRange: sarValues.length > 0 ? `${Math.min(...sarValues).toFixed(4)} - ${Math.max(...sarValues).toFixed(4)}` : 'No values',
+                bbRange: bbValues.length > 0 ? `${Math.min(...bbValues).toFixed(4)} - ${Math.max(...bbValues).toFixed(4)}` : 'No values',
+                sarValidCount: sarValues.length,
+                bbValidCount: bbValues.length
+            });
+            
+            console.log('样本数据:', {
+                firstOhlc: ohlc[0],
+                firstSar: sar[0],
+                firstBbUpper: bbUpper[0],
+                firstBbMiddle: bbMiddle[0],
+                firstBbLower: bbLower[0],
+                lastOhlc: ohlc[ohlc.length-1],
+                lastSar: sar[sar.length-1],
+                lastBbUpper: bbUpper[bbUpper.length-1]
+            });
+            
+            // 日期分割线
+            const dateSeparators = getDateSeparators(klineData.map(item => item.timestamp));
+            
+            // 更新日期范围显示
+            if (klineData.length > 0) {
+                const startDate = new Date(parseInt(klineData[0].timestamp)).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
+                const endDate = new Date(parseInt(klineData[klineData.length - 1].timestamp)).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
+                document.getElementById('date-range').textContent = `${startDate} ~ ${endDate}`;
+            }
+            
+            // K线图配置
+            const klineOption = {
+                backgroundColor: 'transparent',
+                legend: {
+                    data: ['K线', '布林上轨', '布林中轨', '布林下轨', 'SAR', '成交量'],
+                    top: '1%',
+                    left: 'center',
+                    textStyle: {
+                        color: '#888',
+                        fontSize: 12
+                    },
+                    icon: 'roundRect',
+                    itemWidth: 12,
+                    itemHeight: 8,
+                    itemGap: 15
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'cross' },
+                    backgroundColor: 'rgba(26, 29, 41, 0.95)',
+                    borderColor: '#2d3348',
+                    textStyle: { color: '#e0e0e0' },
+                    formatter: function(params) {
+                        let result = `<span style="color:#ff4444;font-weight:bold">[v6.0]</span> ${params[0].axisValue}<br/>`;
+                        
+                        // 获取当前数据点的索引
+                        const dataIndex = params[0].dataIndex;
+                        
+                        params.forEach(item => {
+                            if (item.seriesName === 'K线') {
+                                const ohlcData = item.data;
+                                const open = parseFloat(ohlcData[0]);
+                                const close = parseFloat(ohlcData[1]);
+                                const low = parseFloat(ohlcData[2]);
+                                const high = parseFloat(ohlcData[3]);
+                                
+                                // [v6.0] 调试日志 - 验证数据正确性
+                                console.log('%c[v6.0 TOOLTIP] 鼠标悬停数据:', 'color: #ff4444; font-weight: bold', {
+                                    raw_array: ohlcData,
+                                    parsed: { open, close, low, high },
+                                    dataIndex: dataIndex,
+                                    timestamp: params[0].axisValue
+                                });
+                                
+                                // 计算涨跌幅: (收盘价 - 开盘价) / 开盘价 × 100%
+                                const changePct = ((close - open) / open * 100).toFixed(2);
+                                const changeColor = changePct >= 0 ? '#00d4aa' : '#ff4444';
+                                const changeSign = changePct >= 0 ? '+' : '';
+                                
+                                // 计算震荡幅度: (最高价 - 最低价) / 开盘价 × 100%
+                                const volatilityPct = ((high - low) / open * 100).toFixed(2);
+                                
+                                console.log(`%c[v6.0 计算结果] 涨跌幅=${changeSign}${changePct}% 震荡幅度=${volatilityPct}%`, 'color: #00d4aa; font-weight: bold');
+                                
+                                result += `开: ${open.toFixed(3)}<br/>`;
+                                result += `收: ${close.toFixed(3)}<br/>`;
+                                result += `低: ${low.toFixed(3)}<br/>`;
+                                result += `高: ${high.toFixed(3)}<br/>`;
+                                result += `<span style="color:${changeColor}">涨跌幅: ${changeSign}${changePct}%</span><br/>`;
+                                result += `震荡幅度: ${volatilityPct}%<br/>`;
+                                
+                                // 添加RSI指标（从rsi数组中获取对应索引的值）
+                                if (typeof rsi !== 'undefined' && rsi[dataIndex] !== null && rsi[dataIndex] !== undefined) {
+                                    const rsiValue = parseFloat(rsi[dataIndex]);
+                                    let rsiColor = '#888';
+                                    if (rsiValue >= 70) {
+                                        rsiColor = '#ff4444'; // 超买，红色
+                                    } else if (rsiValue <= 30) {
+                                        rsiColor = '#00d4aa'; // 超卖，绿色
+                                    }
+                                    result += `<span style="color:${rsiColor}">RSI: ${rsiValue.toFixed(2)}</span><br/>`;
+                                }
+                            } else if (item.seriesName === '成交量') {
+                                result += `<span style="color:${item.color}">● ${item.seriesName}: ${item.data}</span><br/>`;
+                            } else if (item.seriesName === 'SAR') {
+                                result += `<span style="color:${item.color}">● ${item.seriesName}: ${item.data ? item.data.toFixed(4) : '-'}</span><br/>`;
+                            } else if (item.seriesName.includes('布林')) {
+                                result += `<span style="color:${item.color}">━ ${item.seriesName}: ${item.data ? item.data.toFixed(4) : '-'}</span><br/>`;
+                            }
+                        });
+                        return result;
+                    }
+                },
+                grid: [
+                    { left: '3%', right: '2%', top: '8%', height: '65%' },
+                    { left: '3%', right: '2%', top: '77%', height: '18%' }
+                ],
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: times,
+                        gridIndex: 0,
+                        axisLine: { lineStyle: { color: '#2d3348' } },
+                        axisLabel: { 
+                            color: '#888',
+                            rotate: 0,
+                            fontSize: 10,
+                            interval: function(index, value) {
+                                // 显示每12个标签（5分钟周期每小时显示一次）
+                                return index % 12 === 0;
+                            }
+                        }
+                    },
+                    {
+                        type: 'category',
+                        data: times,
+                        gridIndex: 1,
+                        axisLine: { lineStyle: { color: '#2d3348' } },
+                        axisLabel: { show: false }
+                    }
+                ],
+                yAxis: [
+                    {
+                        scale: true,
+                        gridIndex: 0,
+                        splitLine: { lineStyle: { color: '#2d3348' } },
+                        axisLine: { lineStyle: { color: '#2d3348' } },
+                        axisLabel: { color: '#888' }
+                    },
+                    {
+                        scale: true,
+                        gridIndex: 1,
+                        splitLine: { show: false },
+                        axisLine: { lineStyle: { color: '#2d3348' } },
+                        axisLabel: { color: '#888' }
+                    }
+                ],
+                series: [
+                    {
+                        name: 'K线',
+                        type: 'candlestick',
+                        data: ohlc,
+                        xAxisIndex: 0,
+                        yAxisIndex: 0,
+                        itemStyle: {
+                            color: '#00d4aa',
+                            color0: '#ff4444',
+                            borderColor: '#00d4aa',
+                            borderColor0: '#ff4444'
+                        },
+                        markLine: {
+                            silent: true,
+                            symbol: 'none',
+                            lineStyle: {
+                                color: '#888',
+                                type: 'solid',
+                                width: 1
+                            },
+                            data: dateSeparators
+                        }
+                    },
+                    {
+                        name: '布林上轨',
+                        type: 'line',
+                        data: bbUpper,
+                        xAxisIndex: 0,
+                        yAxisIndex: 0,
+                        smooth: true,
+                        lineStyle: {
+                            color: '#f39c12',
+                            width: 1,
+                            type: 'dashed'
+                        },
+                        showSymbol: false,
+                        z: 1
+                    },
+                    {
+                        name: '布林中轨',
+                        type: 'line',
+                        data: bbMiddle,
+                        xAxisIndex: 0,
+                        yAxisIndex: 0,
+                        smooth: true,
+                        lineStyle: {
+                            color: '#3498db',
+                            width: 1.5
+                        },
+                        showSymbol: false,
+                        z: 1
+                    },
+                    {
+                        name: '布林下轨',
+                        type: 'line',
+                        data: bbLower,
+                        xAxisIndex: 0,
+                        yAxisIndex: 0,
+                        smooth: true,
+                        lineStyle: {
+                            color: '#f39c12',
+                            width: 1,
+                            type: 'dashed'
+                        },
+                        showSymbol: false,
+                        z: 1
+                    },
+                    {
+                        name: 'SAR',
+                        type: 'scatter',
+                        data: sar,
+                        xAxisIndex: 0,
+                        yAxisIndex: 0,
+                        symbol: 'circle',
+                        symbolSize: 4,
+                        itemStyle: {
+                            color: function(params) {
+                                // 根据SAR位置判断多空
+                                const sarValue = params.value;
+                                const ohlcValue = ohlc[params.dataIndex];
+                                if (sarValue && ohlcValue) {
+                                    const closePrice = ohlcValue[1]; // close price
+                                    // SAR在价格下方为多头（绿色），SAR在价格上方为空头（红色）
+                                    return sarValue < closePrice ? '#00d4aa' : '#ff4444';
+                                }
+                                return '#888';
+                            }
+                        },
+                        z: 2
+                    },
+                    {
+                        name: '成交量',
+                        type: 'bar',
+                        data: volumes,
+                        xAxisIndex: 1,
+                        yAxisIndex: 1,
+                        itemStyle: {
+                            color: function(params) {
+                                const idx = params.dataIndex;
+                                const isUp = ohlc[idx][1] >= ohlc[idx][0];
+                                return isUp ? 'rgba(0, 212, 170, 0.5)' : 'rgba(255, 68, 68, 0.5)';
+                            }
+                        }
+                    }
+                ]
+            };
+            
+            // 先显示图表容器
+            document.getElementById('kline-chart').style.display = 'block';
+            
+            // 设置图表配置
+            klineChart.setOption(klineOption, true);
+            
+            // 立即resize一次
+            klineChart.resize();
+            
+            // 再次延迟resize确保正确渲染
+            setTimeout(() => {
+                klineChart.resize();
+                console.log('图表已resize:', {
+                    width: document.getElementById('kline-chart').offsetWidth,
+                    height: document.getElementById('kline-chart').offsetHeight,
+                    seriesCount: klineOption.series.length
+                });
+            }, 100);
+            // 隐藏统计和辅助图表
+            // document.getElementById('stats-grid').style.display = 'grid';
+            // document.getElementById('rsi-container').style.display = 'block';
+            // document.getElementById('indicators-container').style.display = 'block';
+            
+            // RSI图
+            const rsiOption = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(26, 29, 41, 0.95)',
+                    borderColor: '#2d3348',
+                    textStyle: { color: '#e0e0e0' }
+                },
+                grid: { left: '5%', right: '3%', top: '10%', bottom: '10%' },
+                xAxis: {
+                    type: 'category',
+                    data: times,
+                    axisLine: { lineStyle: { color: '#2d3348' } },
+                    axisLabel: { show: false }
+                },
+                yAxis: {
+                    type: 'value',
+                    min: 0,
+                    max: 100,
+                    splitLine: { lineStyle: { color: '#2d3348' } },
+                    axisLine: { lineStyle: { color: '#2d3348' } },
+                    axisLabel: { color: '#888' }
+                },
+                visualMap: {
+                    show: false,
+                    pieces: [
+                        { gte: 70, color: '#ff4444' },
+                        { gte: 30, lte: 70, color: '#888' },
+                        { lte: 30, color: '#00d4aa' }
+                    ]
+                },
+                series: [{
+                    name: 'RSI',
+                    type: 'line',
+                    data: rsi,
+                    smooth: true,
+                    lineStyle: { width: 2 },
+                    markLine: {
+                        silent: true,
+                        symbol: 'none',
+                        data: [
+                            { yAxis: 70, lineStyle: { color: '#ff4444', type: 'dashed' } },
+                            { yAxis: 30, lineStyle: { color: '#00d4aa', type: 'dashed' } }
+                        ]
+                    }
+                }]
+            };
+            
+            // rsiChart已隐藏，不需要渲染
+            // rsiChart.setOption(rsiOption, true);
+            
+            // SAR & 布林带图
+            const indicatorsOption = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(26, 29, 41, 0.95)',
+                    borderColor: '#2d3348',
+                    textStyle: { color: '#e0e0e0' }
+                },
+                legend: {
+                    data: ['SAR', 'BB上轨', 'BB中轨', 'BB下轨'],
+                    textStyle: { color: '#888' },
+                    top: 0
+                },
+                grid: { left: '5%', right: '3%', top: '15%', bottom: '10%' },
+                xAxis: {
+                    type: 'category',
+                    data: times,
+                    axisLine: { lineStyle: { color: '#2d3348' } },
+                    axisLabel: { show: false }
+                },
+                yAxis: {
+                    type: 'value',
+                    scale: true,
+                    splitLine: { lineStyle: { color: '#2d3348' } },
+                    axisLine: { lineStyle: { color: '#2d3348' } },
+                    axisLabel: { color: '#888' }
+                },
+                series: [
+                    {
+                        name: 'SAR',
+                        type: 'scatter',
+                        data: sar,
+                        symbolSize: 4,
+                        itemStyle: { color: '#ffd700' }
+                    },
+                    {
+                        name: 'BB上轨',
+                        type: 'line',
+                        data: bbUpper,
+                        lineStyle: { color: '#ff4444', width: 1 },
+                        showSymbol: false
+                    },
+                    {
+                        name: 'BB中轨',
+                        type: 'line',
+                        data: bbMiddle,
+                        lineStyle: { color: '#888', width: 1 },
+                        showSymbol: false
+                    },
+                    {
+                        name: 'BB下轨',
+                        type: 'line',
+                        data: bbLower,
+                        lineStyle: { color: '#00d4aa', width: 1 },
+                        showSymbol: false
+                    }
+                ]
+            };
+            
+            // indicatorsChart已隐藏，不需要渲染
+            // indicatorsChart.setOption(indicatorsOption, true);
+        }
+        
+        // 更新统计数据
+        function updateStats(latestIndicator) {
+            document.getElementById('stat-price').textContent = '$' + latestIndicator.price.toFixed(4);
+            document.getElementById('stat-rsi').textContent = latestIndicator.rsi.toFixed(2);
+            document.getElementById('stat-sar-position').textContent = latestIndicator.sar_position || '-';
+            document.getElementById('stat-sar-value').textContent = latestIndicator.sar ? '$' + latestIndicator.sar.toFixed(4) : '-';
+        }
+        
+        // 切换时间周期
+        function switchTimeframe(timeframe) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            loadData(timeframe);
+        }
+        
+        // 页面加载时初始化
+        window.onload = function() {
+            console.log('window.onload 触发');
+            console.log('ECharts 是否加载:', typeof echarts !== 'undefined');
+            console.log('ECharts 版本:', typeof echarts !== 'undefined' ? echarts.version : 'N/A');
+            initCharts();
+            loadData('5m');
+        };
+    </script>
+</body>
+</html>

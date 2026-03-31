@@ -1,0 +1,78 @@
+{
+  "date": "20260201",
+  "data_points": 896,
+  "peaks_count": 3,
+  "false_breakout": null,
+  "peaks": [
+    {
+      "b_point": {
+        "index": 8,
+        "timestamp": "2026-02-01T09:20:00.265483+08:00",
+        "beijing_time": "2026-02-01 09:20:00",
+        "value": -54.02
+      },
+      "a_point": {
+        "index": 191,
+        "timestamp": "2026-02-01T12:13:00.286071+08:00",
+        "beijing_time": "2026-02-01 12:13:00",
+        "value": -18.33
+      },
+      "c_point": {
+        "index": 283,
+        "timestamp": "2026-02-01T13:45:00.333004+08:00",
+        "beijing_time": "2026-02-01 13:45:00",
+        "value": -40.08
+      },
+      "amplitude": 35.690000000000005,
+      "decline": 21.75,
+      "decline_ratio": 60.94144017932193
+    },
+    {
+      "b_point": {
+        "index": 378,
+        "timestamp": "2026-02-01T15:20:00.261193+08:00",
+        "beijing_time": "2026-02-01 15:20:00",
+        "value": -49.71
+      },
+      "a_point": {
+        "index": 463,
+        "timestamp": "2026-02-01T16:45:00.266207+08:00",
+        "beijing_time": "2026-02-01 16:45:00",
+        "value": -14.16
+      },
+      "c_point": {
+        "index": 498,
+        "timestamp": "2026-02-01T17:20:00.269088+08:00",
+        "beijing_time": "2026-02-01 17:20:00",
+        "value": -34.85
+      },
+      "amplitude": 35.55,
+      "decline": 20.69,
+      "decline_ratio": 58.19971870604783
+    },
+    {
+      "b_point": {
+        "index": 816,
+        "timestamp": "2026-02-01T22:40:00.262799+08:00",
+        "beijing_time": "2026-02-01 22:40:00",
+        "value": -98.24
+      },
+      "a_point": {
+        "index": 832,
+        "timestamp": "2026-02-01T22:56:00.268257+08:00",
+        "beijing_time": "2026-02-01 22:56:00",
+        "value": -57.85
+      },
+      "c_point": {
+        "index": 851,
+        "timestamp": "2026-02-01T23:15:00.248108+08:00",
+        "beijing_time": "2026-02-01 23:15:00",
+        "value": -93.43
+      },
+      "amplitude": 40.38999999999999,
+      "decline": 35.580000000000005,
+      "decline_ratio": 88.09111166130234
+    }
+  ],
+  "processed_at": "2026-02-18T09:45:43.895874"
+}

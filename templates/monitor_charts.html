@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>监控系统 - 三大核心图表</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+        .chart-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .page-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .nav-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .update-time {
+            color: #718096;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 py-8">
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">
+                        <i class="fas fa-chart-line text-purple-600"></i>
+                        监控系统 - 三大核心图表
+                    </h1>
+                    <p class="text-gray-600">实时追踪市场关键指标，助力交易决策</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="refreshAllCharts()" class="nav-button">
+                        <i class="fas fa-sync-alt"></i>
+                        刷新数据
+                    </button>
+                    <a href="/" class="nav-button">
+                        <i class="fas fa-home"></i>
+                        返回首页
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 图表1: 恐慌/洗盘柱状图 (本周12小时) -->
+        <div class="chart-container">
+            <div class="chart-title">
+                <i class="fas fa-chart-bar text-red-500"></i>
+                <span>恐慌/洗盘柱状图 (本周12小时)</span>
+            </div>
+            <div id="panicWashChart" style="width: 100%; height: 400px;"></div>
+            <div class="update-time" id="panicUpdateTime">最后更新: 加载中...</div>
+        </div>
+
+        <!-- 图表2: 1小时爆仓金额曲线 -->
+        <div class="chart-container">
+            <div class="chart-title">
+                <i class="fas fa-fire text-orange-500"></i>
+                <span>爆仓人数（万人）/持仓总量（亿美元）</span>
+                <span style="font-size: 12px; color: #fbbf24; font-weight: normal;">[恐慌指数]</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div class="text-sm text-gray-600">
+                    <span id="liqPageInfo">加载中...</span>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="loadLiquidationPreviousPage()" 
+                            class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                        <i class="fas fa-chevron-left mr-1"></i> 更早
+                    </button>
+                    <button onclick="loadLiquidationNextPage()" 
+                            class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                        更新 <i class="fas fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="liquidationChart" style="width: 100%; height: 400px; background: rgba(30, 27, 75, 0.95); border-radius: 15px;"></div>
+            <div class="text-center text-xs text-gray-500 mt-3">
+                数据采集频率: 每分钟一次 | 数据来源: OKX API | 单位: 万美元 | 每页显示12小时
+            </div>
+        </div>
+
+        <!-- 图表3: 多空单盈利统计 -->
+        <div class="chart-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div class="chart-title" style="margin-bottom: 0;">
+                    <i class="fas fa-balance-scale text-blue-500"></i>
+                    <span>多空单盈利统计</span>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="changeProfitStatsPage(-1)" 
+                            class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                        <i class="fas fa-chevron-left mr-1"></i> 前一天
+                    </button>
+                    <button onclick="changeProfitStatsPage(1)" 
+                            class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                        后一天 <i class="fas fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="profitStatsChart" style="width: 100%; height: 400px;"></div>
+            <div class="update-time" id="profitUpdateTime">最后更新: 加载中...</div>
+        </div>
+    </div>
+
+    <script>
+        let panicWashChart = null;
+        let liquidationChart = null;
+        let profitStatsChart = null;
+        let liqCurrentPage = 0;
+        let liqAllData = [];
+        let profitCurrentPage = 0;
+        let allProfitData = [];
+        const LIQ_HOURS_PER_PAGE = 12;
+        const LIQ_RECORDS_PER_HOUR = 60;
+        const LIQ_RECORDS_PER_PAGE = LIQ_HOURS_PER_PAGE * LIQ_RECORDS_PER_HOUR;
+
+        // 初始化所有图表
+        function initCharts() {
+            console.log('🔧 开始初始化图表...');
+            
+            // 初始化恐慌/洗盘图表
+            const panicContainer = document.getElementById('panicWashChart');
+            if (panicContainer) {
+                panicWashChart = echarts.init(panicContainer);
+                console.log('✅ panicWashChart初始化成功');
+            }
+            
+            // 初始化爆仓图表
+            const liqContainer = document.getElementById('liquidationChart');
+            if (liqContainer) {
+                liquidationChart = echarts.init(liqContainer);
+                console.log('✅ liquidationChart初始化成功');
+            }
+            
+            // 初始化多空盈利图表
+            const profitContainer = document.getElementById('profitStatsChart');
+            if (profitContainer) {
+                profitStatsChart = echarts.init(profitContainer);
+                console.log('✅ profitStatsChart初始化成功');
+            }
+        }
+
+        // 加载恐慌/洗盘数据
+        async function loadPanicWashData() {
+            try {
+                console.log('📊 加载恐慌/洗盘数据...');
+                const response = await fetch('/api/panic/recent?hours=12');
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    renderPanicWashChart(data.data);
+                    document.getElementById('panicUpdateTime').textContent = 
+                        `最后更新: ${new Date().toLocaleString('zh-CN')}`;
+                }
+            } catch (error) {
+                console.error('❌ 加载恐慌/洗盘数据失败:', error);
+            }
+        }
+
+        // 渲染恐慌/洗盘图表
+        function renderPanicWashChart(data) {
+            if (!panicWashChart || !data || data.length === 0) return;
+            
+            const times = data.map(d => {
+                const dt = new Date(d.datetime);
+                return `${dt.getMonth()+1}/${dt.getDate()} ${dt.getHours()}:${dt.getMinutes().toString().padStart(2,'0')}`;
+            });
+            
+            const panicValues = data.map(d => d.panic_count || 0);
+            const washValues = data.map(d => d.wash_count || 0);
+            
+            const option = {
+                title: {
+                    text: '恐慌/洗盘信号统计 (本周12小时)',
+                    left: 'center',
+                    textStyle: {
+                        color: '#2d3748',
+                        fontSize: 16
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                legend: {
+                    data: ['恐慌信号', '洗盘信号'],
+                    top: 30
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '10%',
+                    top: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: times,
+                    axisLabel: {
+                        rotate: 45,
+                        fontSize: 10
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '信号数量'
+                },
+                series: [
+                    {
+                        name: '恐慌信号',
+                        type: 'bar',
+                        data: panicValues,
+                        itemStyle: {
+                            color: '#ef4444'
+                        },
+                        barMaxWidth: 30
+                    },
+                    {
+                        name: '洗盘信号',
+                        type: 'bar',
+                        data: washValues,
+                        itemStyle: {
+                            color: '#10b981'
+                        },
+                        barMaxWidth: 30
+                    }
+                ]
+            };
+            
+            panicWashChart.setOption(option);
+        }
+
+        // 加载爆仓数据
+        async function loadLiquidationData() {
+            try {
+                console.log('📊 加载1小时爆仓金额全部数据...');
+                const response = await fetch('/api/liquidation-1h/history?limit=10000');
+                const result = await response.json();
+                
+                if (!result.success || !result.data || result.data.length === 0) {
+                    console.warn('⚠️ 暂无1小时爆仓金额数据');
+                    return;
+                }
+                
+                liqAllData = result.data;
+                console.log(`✅ 加载成功: ${liqAllData.length}条记录`);
+                
+                liqCurrentPage = 0;
+                updateLiquidationChart();
+                updateLiquidationPageInfo();
+            } catch (error) {
+                console.error('❌ 加载爆仓数据失败:', error);
+            }
+        }
+
+        // 更新爆仓图表
+        function updateLiquidationChart() {
+            if (!liquidationChart || !liqAllData || liqAllData.length === 0) return;
+            
+            const totalRecords = liqAllData.length;
+            const startIndex = Math.max(0, totalRecords - (liqCurrentPage + 1) * LIQ_RECORDS_PER_PAGE);
+            const endIndex = Math.max(0, totalRecords - liqCurrentPage * LIQ_RECORDS_PER_PAGE);
+            
+            const pageData = liqAllData.slice(startIndex, endIndex);
+            
+            const times = pageData.map(d => {
+                const dt = new Date(d.timestamp * 1000);
+                return `${dt.getMonth()+1}/${dt.getDate()} ${dt.getHours().toString().padStart(2, '0')}:${dt.getMinutes().toString().padStart(2, '0')}`;
+            });
+            
+            const amounts = pageData.map(d => d.hour_1_amount);
+            const avgAmount = (amounts.reduce((a, b) => a + b, 0) / amounts.length).toFixed(2);
+            const maxAmount = Math.max(...amounts);
+            const maxIndex = amounts.indexOf(maxAmount);
+            
+            const startTime = pageData[0].datetime.substring(5, 16);
+            const endTime = pageData[pageData.length - 1].datetime.substring(5, 16);
+            
+            const option = {
+                backgroundColor: 'rgba(30, 27, 75, 0.95)',
+                title: {
+                    text: `爆仓人数（万人）/持仓总量（亿美元） - ${startTime} ~ ${endTime}`,
+                    left: 'center',
+                    top: 10,
+                    textStyle: {
+                        color: 'rgba(255, 255, 255, 0.9)',
+                        fontSize: 14
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                    textStyle: {
+                        color: '#fff'
+                    },
+                    formatter: function(params) {
+                        const p = params[0];
+                        const dataItem = pageData[p.dataIndex];
+                        const amount = p.value;
+                        const isMax = p.dataIndex === maxIndex;
+                        
+                        // 获取恐慌指数数据
+                        const people = dataItem.hour_24_people || 0;
+                        const position = dataItem.total_position || 0;
+                        const panicIndex = dataItem.panic_index || 0;
+                        
+                        return `<div style="padding: 8px;">
+                            <div style="font-weight: 600; margin-bottom: 5px;">${p.name}</div>
+                            <div style="color: #f59e0b; font-size: 16px; font-weight: 600;">
+                                💥 1H爆仓: ${amount} 万美元${isMax ? ' 🔥' : ''}
+                            </div>
+                            <div style="font-size: 12px; margin-top: 8px;">
+                                <div style="color: #10b981; margin-bottom: 3px;">👥 爆仓人数: <span style="font-weight: 600;">${people}</span> 万人</div>
+                                <div style="color: #3b82f6; margin-bottom: 3px;">💰 持仓总量: <span style="font-weight: 600;">${position}</span> 亿美元</div>
+                                <div style="color: #ef4444; font-weight: 700;">🔥 恐慌指数: <span style="font-size: 14px;">${panicIndex}</span></div>
+                            </div>
+                            <div style="font-size: 11px; color: #9ca3af; margin-top: 5px;">
+                                平均值: ${avgAmount} 万美元
+                            </div>
+                            ${isMax ? '<div style="font-size: 12px; color: #ef4444; margin-top: 5px; font-weight: 700;">🔥 区间内最大值！</div>' : ''}
+                        </div>`;
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '10%',
+                    top: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: times,
+                    axisLabel: {
+                        color: 'rgba(255, 255, 255, 0.6)',
+                        fontSize: 10,
+                        rotate: 45,
+                        interval: Math.floor(times.length / 20)
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: 'rgba(255, 255, 255, 0.2)'
+                        }
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '万美元',
+                    nameTextStyle: {
+                        color: 'rgba(255, 255, 255, 0.6)',
+                        fontSize: 11
+                    },
+                    axisLabel: {
+                        color: 'rgba(255, 255, 255, 0.6)',
+                        fontSize: 11
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: 'rgba(255, 255, 255, 0.2)'
+                        }
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: 'rgba(255, 255, 255, 0.1)',
+                            type: 'dashed'
+                        }
+                    }
+                },
+                series: [
+                    {
+                        name: '恐慌指数',
+                        type: 'line',
+                        data: amounts,
+                        smooth: true,
+                        symbol: 'circle',
+                        symbolSize: 4,
+                        lineStyle: {
+                            color: '#f59e0b',
+                            width: 2
+                        },
+                        itemStyle: {
+                            color: '#f59e0b'
+                        },
+                        areaStyle: {
+                            color: {
+                                type: 'linear',
+                                x: 0, y: 0, x2: 0, y2: 1,
+                                colorStops: [
+                                    { offset: 0, color: 'rgba(245, 158, 11, 0.3)' },
+                                    { offset: 1, color: 'rgba(245, 158, 11, 0.05)' }
+                                ]
+                            }
+                        },
+                        markLine: {
+                            silent: true,
+                            symbol: 'none',
+                            label: {
+                                position: 'end',
+                                formatter: '平均: {c}万'
+                            },
+                            lineStyle: {
+                                color: 'rgba(255, 255, 255, 0.4)',
+                                type: 'dashed',
+                                width: 1
+                            },
+                            data: [{ yAxis: avgAmount }]
+                        },
+                        markPoint: {
+                            symbol: 'pin',
+                            symbolSize: 80,
+                            label: {
+                                show: true,
+                                formatter: function(params) {
+                                    return `🔥 ${params.value}万\n最高值`;
+                                },
+                                color: '#fff',
+                                fontSize: 18,
+                                fontWeight: 'bold',
+                                lineHeight: 22,
+                                backgroundColor: 'rgba(239, 68, 68, 0.9)',
+                                borderColor: '#fbbf24',
+                                borderWidth: 2,
+                                borderRadius: 8,
+                                padding: [8, 12],
+                                shadowColor: 'rgba(239, 68, 68, 0.6)',
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowOffsetY: 2
+                            },
+                            itemStyle: {
+                                color: '#ef4444',
+                                borderColor: '#fbbf24',
+                                borderWidth: 3,
+                                shadowColor: 'rgba(239, 68, 68, 0.8)',
+                                shadowBlur: 15
+                            },
+                            emphasis: {
+                                label: {
+                                    show: true,
+                                    fontSize: 20,
+                                    backgroundColor: 'rgba(239, 68, 68, 1.0)'
+                                },
+                                itemStyle: {
+                                    shadowBlur: 20
+                                }
+                            },
+                            data: [
+                                {
+                                    coord: [maxIndex, maxAmount],
+                                    value: maxAmount.toFixed(2),
+                                    name: '区间最大值'
+                                }
+                            ]
+                        }
+                    }
+                ]
+            };
+            
+            liquidationChart.setOption(option);
+        }
+
+        // 更新页码信息
+        function updateLiquidationPageInfo() {
+            const totalPages = Math.ceil(liqAllData.length / LIQ_RECORDS_PER_PAGE);
+            document.getElementById('liqPageInfo').textContent = 
+                `当前页: ${liqCurrentPage + 1}/${totalPages}`;
+        }
+
+        // 爆仓图表分页
+        function loadLiquidationPreviousPage() {
+            const totalPages = Math.ceil(liqAllData.length / LIQ_RECORDS_PER_PAGE);
+            if (liqCurrentPage < totalPages - 1) {
+                liqCurrentPage++;
+                updateLiquidationChart();
+                updateLiquidationPageInfo();
+            }
+        }
+
+        function loadLiquidationNextPage() {
+            if (liqCurrentPage > 0) {
+                liqCurrentPage--;
+                updateLiquidationChart();
+                updateLiquidationPageInfo();
+            }
+        }
+
+        // 加载多空盈利数据
+        async function loadProfitStatsData() {
+            try {
+                console.log('📊 加载多空盈利统计数据...');
+                const today = new Date().toISOString().split('T')[0];
+                const response = await fetch(`/api/anchor-profit/by-date?date=${today}&type=profit_stats`);
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    allProfitData = data.data;
+                    console.log(`✅ 加载成功: ${allProfitData.length}条记录`);
+                    renderProfitStatsChart(0);
+                    document.getElementById('profitUpdateTime').textContent = 
+                        `最后更新: ${new Date().toLocaleString('zh-CN')}`;
+                }
+            } catch (error) {
+                console.error('❌ 加载多空盈利数据失败:', error);
+            }
+        }
+
+        // UTC时间转北京时间
+        function utcToBeijing(utcDatetimeStr) {
+            const utcDate = new Date(utcDatetimeStr + ' UTC');
+            const beijingDate = new Date(utcDate.getTime() + 8 * 60 * 60 * 1000);
+            const year = beijingDate.getUTCFullYear();
+            const month = String(beijingDate.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(beijingDate.getUTCDate()).padStart(2, '0');
+            const hours = String(beijingDate.getUTCHours()).padStart(2, '0');
+            const minutes = String(beijingDate.getUTCMinutes()).padStart(2, '0');
+            const seconds = String(beijingDate.getUTCSeconds()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+
+        // 渲染多空盈利图表
+        function renderProfitStatsChart(pageOffset) {
+            if (!profitStatsChart || !allProfitData || allProfitData.length === 0) return;
+            
+            const now = new Date();
+            const targetDate = new Date(now);
+            targetDate.setDate(targetDate.getDate() + pageOffset);
+            
+            const year = targetDate.getFullYear();
+            const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+            const day = String(targetDate.getDate()).padStart(2, '0');
+            const datePrefix = `${year}-${month}-${day}`;
+            
+            const dataList = allProfitData.filter(d => {
+                if (!d.datetime) return false;
+                const beijingDatetime = utcToBeijing(d.datetime);
+                return beijingDatetime.startsWith(datePrefix);
+            });
+            
+            if (dataList.length === 0) {
+                profitStatsChart.setOption({
+                    title: {
+                        text: `⚠️ ${targetDate.toLocaleDateString()} 暂无数据`,
+                        left: 'center',
+                        top: 'middle',
+                        textStyle: {
+                            color: '#999',
+                            fontSize: 20
+                        }
+                    }
+                });
+                return;
+            }
+            
+            const times = dataList.map(d => {
+                const utcDate = new Date(d.datetime + ' UTC');
+                const beijingDate = new Date(utcDate.getTime() + 8 * 60 * 60 * 1000);
+                const hours = String(beijingDate.getUTCHours()).padStart(2, '0');
+                const minutes = String(beijingDate.getUTCMinutes()).padStart(2, '0');
+                return `${hours}:${minutes}`;
+            });
+            
+            const short_lte40Data = dataList.map(d => d.stats?.short?.lte_40 || d.stats?.lte_40 || 0);
+            const short_lossData = dataList.map(d => d.stats?.short?.loss || d.stats?.loss || 0);
+            const short_gte80Data = dataList.map(d => d.stats?.short?.gte_80 || d.stats?.gte_80 || 0);
+            const short_gte120Data = dataList.map(d => d.stats?.short?.gte_120 || d.stats?.gte_120 || 0);
+            const escape2hData = dataList.map(d => d.escape_signal_2h || 0);
+            
+            const dateStr = targetDate.toLocaleDateString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+            const dayLabel = pageOffset === 0 ? '今天' : 
+                           pageOffset === -1 ? '昨天' : 
+                           pageOffset === -2 ? '前天' : 
+                           `${Math.abs(pageOffset)}天前`;
+            
+            const option = {
+                title: {
+                    text: `多空单盈利分布趋势（${dateStr} ${dayLabel} - 北京时间 UTC+8）`,
+                    left: 'center',
+                    textStyle: {
+                        color: '#2d3748',
+                        fontSize: 16
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: [
+                        '🟢 空单盈利≤40%',
+                        '🟢 空单亏损',
+                        '🔴 空单盈利≥80%',
+                        '🔴 空单盈利≥120%',
+                        '⚡ 2h逃顶信号'
+                    ],
+                    top: 35,
+                    textStyle: {
+                        fontSize: 11
+                    }
+                },
+                grid: {
+                    left: '5%',
+                    right: '5%',
+                    bottom: '3%',
+                    top: 95,
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: times,
+                    axisLabel: {
+                        rotate: 45,
+                        fontSize: 10
+                    }
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '2h逃顶信号',
+                        position: 'left',
+                        minInterval: 1,
+                        axisLabel: {
+                            color: '#f97316'
+                        },
+                        axisLine: {
+                            show: true,
+                            lineStyle: {
+                                color: '#f97316'
+                            }
+                        }
+                    },
+                    {
+                        type: 'value',
+                        name: '空单数量',
+                        position: 'right',
+                        minInterval: 1,
+                        axisLine: {
+                            show: true,
+                            lineStyle: {
+                                color: '#4b5563'
+                            }
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: '⚡ 2h逃顶信号',
+                        type: 'line',
+                        yAxisIndex: 0,
+                        data: escape2hData,
+                        smooth: true,
+                        itemStyle: { color: '#f97316' },
+                        lineStyle: { width: 3, color: '#f97316' },
+                        symbol: 'diamond',
+                        symbolSize: 7
+                    },
+                    {
+                        name: '🟢 空单盈利≤40%',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        data: short_lte40Data,
+                        smooth: true,
+                        itemStyle: { color: '#10b981' },
+                        lineStyle: { width: 3, color: '#10b981' },
+                        symbol: 'circle',
+                        symbolSize: 6
+                    },
+                    {
+                        name: '🟢 空单亏损',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        data: short_lossData,
+                        smooth: true,
+                        itemStyle: { color: '#059669' },
+                        lineStyle: { width: 3, color: '#059669' },
+                        symbol: 'circle',
+                        symbolSize: 6
+                    },
+                    {
+                        name: '🔴 空单盈利≥80%',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        data: short_gte80Data,
+                        smooth: true,
+                        itemStyle: { color: '#ef4444' },
+                        lineStyle: { width: 3, color: '#ef4444' },
+                        symbol: 'circle',
+                        symbolSize: 6
+                    },
+                    {
+                        name: '🔴 空单盈利≥120%',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        data: short_gte120Data,
+                        smooth: true,
+                        itemStyle: { color: '#991b1b' },
+                        lineStyle: { width: 3, color: '#991b1b' },
+                        symbol: 'circle',
+                        symbolSize: 6
+                    }
+                ]
+            };
+            
+            profitStatsChart.setOption(option);
+        }
+
+        // 多空盈利图表分页
+        function changeProfitStatsPage(offset) {
+            profitCurrentPage += offset;
+            renderProfitStatsChart(profitCurrentPage);
+        }
+
+        // 刷新所有图表
+        async function refreshAllCharts() {
+            console.log('🔄 刷新所有图表...');
+            await Promise.all([
+                loadPanicWashData(),
+                loadLiquidationData(),
+                loadProfitStatsData()
+            ]);
+            console.log('✅ 所有图表刷新完成');
+        }
+
+        // 页面加载时初始化
+        window.addEventListener('DOMContentLoaded', async function() {
+            console.log('📱 页面加载完成，开始初始化...');
+            initCharts();
+            await refreshAllCharts();
+        });
+
+        // 窗口大小改变时调整图表
+        window.addEventListener('resize', function() {
+            if (panicWashChart) panicWashChart.resize();
+            if (liquidationChart) liquidationChart.resize();
+            if (profitStatsChart) profitStatsChart.resize();
+        });
+    </script>
+</body>
+</html>

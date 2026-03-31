@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>27币涨跌幅止盈配置 v2.0</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1a202c;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .current-data {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .data-item {
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .data-label {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 5px;
+        }
+        
+        .data-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a202c;
+        }
+        
+        .data-value.positive {
+            color: #10b981;
+        }
+        
+        .data-value.negative {
+            color: #ef4444;
+        }
+        
+        .account-selector {
+            margin-bottom: 20px;
+        }
+        
+        .account-selector label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #4a5568;
+        }
+        
+        .account-selector select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .account-selector select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .setting-group {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+        
+        .setting-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .setting-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e0;
+            transition: 0.3s;
+            border-radius: 30px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #10b981;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+        
+        .threshold-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .threshold-input label {
+            font-weight: 500;
+            color: #4a5568;
+            min-width: 100px;
+        }
+        
+        .threshold-input input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .threshold-input input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .threshold-input span {
+            font-weight: 600;
+            color: #718096;
+        }
+        
+        .description {
+            margin-top: 10px;
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #718096;
+            line-height: 1.6;
+        }
+        
+        .description.short {
+            border-left: 3px solid #ef4444;
+        }
+        
+        .description.long {
+            border-left: 3px solid #10b981;
+        }
+        
+        .btn {
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 100%;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status-section {
+            margin-top: 30px;
+        }
+        
+        .execution-list {
+            margin-top: 15px;
+        }
+        
+        .execution-item {
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .execution-item.success {
+            border-left-color: #10b981;
+        }
+        
+        .execution-item.failed {
+            border-left-color: #ef4444;
+        }
+        
+        .execution-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .execution-coin {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .execution-time {
+            font-size: 12px;
+            color: #a0aec0;
+        }
+        
+        .execution-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            font-size: 13px;
+            color: #4a5568;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .statistics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-card {
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 5px;
+        }
+        
+        /* 可折叠说明框样式 */
+        .collapsible-info {
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .collapsible-info details {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+        
+        .collapsible-info details[open] {
+            background: #fff;
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+        
+        .collapsible-info summary {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px;
+            list-style: none;
+            user-select: none;
+        }
+        
+        .collapsible-info summary::-webkit-details-marker {
+            display: none;
+        }
+        
+        .collapsible-info summary::before {
+            content: '▶';
+            display: inline-block;
+            transition: transform 0.3s;
+            color: #667eea;
+            font-size: 12px;
+        }
+        
+        .collapsible-info details[open] summary::before {
+            transform: rotate(90deg);
+        }
+        
+        .collapsible-info summary:hover {
+            color: #667eea;
+        }
+        
+        .info-content {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #e2e8f0;
+        }
+        
+        .info-section {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .info-section h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        
+        .info-section ul {
+            margin-left: 20px;
+            color: #4a5568;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        
+        .info-section p {
+            color: #4a5568;
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 8px;
+        }
+        
+        .info-section code {
+            background: #f7fafc;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #667eea;
+            font-size: 13px;
+        }
+        
+        .warning-box {
+            background: #fef3c7;
+            border-left-color: #f59e0b;
+            color: #92400e;
+        }
+        
+        .tip-box {
+            background: #dbeafe;
+            border-left-color: #3b82f6;
+            color: #1e40af;
+        }
+        
+        /* 脉冲动画 */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: translateX(-50%) scale(1);
+            }
+            50% {
+                opacity: 0.9;
+                transform: translateX(-50%) scale(1.02);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 27币涨跌幅止盈配置</h1>
+            <p>基于27个主流币种涨跌幅之和自动触发止盈</p>
+            <div style="margin-top: 10px; padding: 8px 16px; background: rgba(255,255,255,0.2); border-radius: 20px; display: inline-block; font-size: 13px; font-weight: 600;">
+                🔄 UI v2.0 - 2026-03-02 18:30
+            </div>
+            <!-- 缓存刷新提示 -->
+            <div style="margin-top: 15px; padding: 12px 20px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; border-radius: 12px; display: inline-block; box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3);">
+                <div style="font-size: 14px; font-weight: 700; color: #92400e; margin-bottom: 5px;">
+                    ⚠️ 如果页面显示不正常，请按 Ctrl+Shift+R 硬刷新！
+                </div>
+                <div style="font-size: 12px; color: #78350f;">
+                    Mac用户请按 Cmd+Shift+R
+                </div>
+            </div>
+        </div>
+        
+        <!-- 当前27币数据 -->
+        <div class="card">
+            <div class="card-title">
+                📈 当前27币涨跌幅数据
+            </div>
+            <div class="current-data">
+                <div class="data-item">
+                    <div class="data-label">涨跌幅之和</div>
+                    <div class="data-value" id="totalChange">--</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">上涨币种</div>
+                    <div class="data-value" id="upCoins">--</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">下跌币种</div>
+                    <div class="data-value" id="downCoins">--</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">更新时间</div>
+                    <div class="data-value" id="updateTime" style="font-size: 14px;">--</div>
+                </div>
+            </div>
+            
+            <!-- 止盈配置状态总览 - 清晰醒目样式 -->
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 3px solid #e2e8f0;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                    <span style="font-size: 20px;">⚙️</span>
+                    <span style="font-size: 20px; font-weight: 700; color: #1a202c;">当前止盈配置</span>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <!-- 做空止盈 -->
+                    <div style="padding: 24px; background: linear-gradient(135deg, #fff5f5 0%, #fee2e2 100%); border: 3px solid #dc2626; border-radius: 16px; box-shadow: 0 4px 6px rgba(220, 38, 38, 0.15);">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 18px;">
+                            <span style="font-size: 24px;">🩸</span>
+                            <span style="font-size: 20px; font-weight: 700; color: #dc2626;">做空止盈</span>
+                        </div>
+                        
+                        <div style="background: white; border-radius: 10px; padding: 14px; margin-bottom: 12px; border-left: 4px solid #dc2626;">
+                            <div style="font-size: 13px; color: #6b7280; margin-bottom: 6px; font-weight: 500;">📍 是否已开启</div>
+                            <div id="shortTpStatusText" style="font-size: 18px; font-weight: 700; color: #dc2626;">
+                                ⏳ 加载中...
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; border-radius: 10px; padding: 14px; border-left: 4px solid #dc2626;">
+                            <div style="font-size: 13px; color: #6b7280; margin-bottom: 6px; font-weight: 500;">🎯 止盈触发值</div>
+                            <div id="shortTpThresholdText" style="font-size: 26px; font-weight: 700; color: #dc2626; font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Courier New', monospace;">
+                                --
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 做多止盈 -->
+                    <div style="padding: 24px; background: linear-gradient(135deg, #f0fdf4 0%, #d1fae5 100%); border: 3px solid #10b981; border-radius: 16px; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.15);">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 18px;">
+                            <span style="font-size: 24px;">🚀</span>
+                            <span style="font-size: 20px; font-weight: 700; color: #10b981;">做多止盈</span>
+                        </div>
+                        
+                        <div style="background: white; border-radius: 10px; padding: 14px; margin-bottom: 12px; border-left: 4px solid #10b981;">
+                            <div style="font-size: 13px; color: #6b7280; margin-bottom: 6px; font-weight: 500;">📍 是否已开启</div>
+                            <div id="longTpStatusText" style="font-size: 18px; font-weight: 700; color: #10b981;">
+                                ⏳ 加载中...
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; border-radius: 10px; padding: 14px; border-left: 4px solid #10b981;">
+                            <div style="font-size: 13px; color: #6b7280; margin-bottom: 6px; font-weight: 500;">🎯 止盈触发值</div>
+                            <div id="longTpThresholdText" style="font-size: 26px; font-weight: 700; color: #10b981; font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Courier New', monospace;">
+                                --
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 配置卡片 -->
+        <div class="card">
+            <div class="card-title">
+                ⚙️ 止盈配置
+            </div>
+            
+            <div class="account-selector">
+                <label>选择交易账户</label>
+                <select id="accountSelect">
+                    <option value="account_main">主账户 (Main)</option>
+                    <option value="account_fangfang12">芳芳账户 (Fangfang12)</option>
+                    <option value="account_poit">POIT账户</option>
+                    <option value="account_poit_main">POIT主账户</option>
+                    <option value="account_anchor">锚点账户 (Anchor)</option>
+                </select>
+            </div>
+            
+            <div id="alertContainer"></div>
+            
+            <!-- 空单止盈设置 -->
+            <div class="setting-group">
+                <div class="setting-header">
+                    <div class="setting-title">🔴 空单止盈（跌破止盈）</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="shortTpEnabled">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="threshold-input">
+                    <label>跌破阈值</label>
+                    <input type="number" id="shortTpThreshold" value="10.0" step="0.1" min="0">
+                    <span>%</span>
+                </div>
+                
+                <div class="description short">
+                    <strong>触发条件：</strong>当27币涨跌幅之和 &lt; -阈值时，自动平掉所有空单<br>
+                    <strong>示例：</strong>设置阈值为 10%，当涨跌幅跌至 -10.5% 时，系统将自动平仓所有空单持仓
+                </div>
+            </div>
+            
+            <!-- 多单止盈设置 -->
+            <div class="setting-group">
+                <div class="setting-header">
+                    <div class="setting-title">🟢 多单止盈（突破止盈）</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="longTpEnabled">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="threshold-input">
+                    <label>突破阈值</label>
+                    <input type="number" id="longTpThreshold" value="10.0" step="0.1" min="0">
+                    <span>%</span>
+                </div>
+                
+                <div class="description long">
+                    <strong>触发条件：</strong>当27币涨跌幅之和 &gt; +阈值时，自动平掉所有多单<br>
+                    <strong>示例：</strong>设置阈值为 10%，当涨跌幅涨至 +10.5% 时，系统将自动平仓所有多单持仓
+                </div>
+            </div>
+            
+            <!-- 可折叠使用说明 -->
+            <div class="collapsible-info">
+                <details>
+                    <summary>📖 使用说明与注意事项</summary>
+                    <div class="info-content">
+                        <div class="info-section">
+                            <h4>🎯 功能说明</h4>
+                            <p>本系统基于27个主流币种的涨跌幅之和来触发自动止盈：</p>
+                            <ul>
+                                <li><strong>空单止盈</strong>：当27币涨跌幅之和跌破负阈值时，自动平掉所有空单持仓</li>
+                                <li><strong>多单止盈</strong>：当27币涨跌幅之和突破正阈值时，自动平掉所有多单持仓</li>
+                                <li>系统每<code>30秒</code>检查一次持仓和市场数据</li>
+                                <li>每个持仓只执行一次止盈，防止重复操作</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="info-section tip-box">
+                            <h4>💡 配置建议</h4>
+                            <ul>
+                                <li><strong>空单阈值</strong>：建议设置在 5-15% 之间，根据市场波动调整</li>
+                                <li><strong>多单阈值</strong>：建议设置在 10-20% 之间，根据市场波动调整</li>
+                                <li>阈值过小会导致频繁触发，阈值过大会错过最佳止盈点</li>
+                                <li>配置更新后约30秒内生效，无需重启服务</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="info-section warning-box">
+                            <h4>⚠️ 重要提示</h4>
+                            <ul>
+                                <li>监控服务需要保持运行状态（PM2自动管理）</li>
+                                <li>极端波动时可能有30-90秒的响应延迟</li>
+                                <li>空单和多单止盈可独立启用或禁用</li>
+                                <li>执行记录会永久保存，可在下方查看历史记录</li>
+                                <li>平仓成功后会自动发送Telegram通知</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="info-section">
+                            <h4>📊 触发逻辑</h4>
+                            <p><strong>空单止盈：</strong></p>
+                            <ul>
+                                <li>条件：<code>27币涨跌幅之和 &lt; -阈值</code></li>
+                                <li>例如：阈值设为10%，当涨跌幅为-11%时触发</li>
+                            </ul>
+                            <p><strong>多单止盈：</strong></p>
+                            <ul>
+                                <li>条件：<code>27币涨跌幅之和 &gt; +阈值</code></li>
+                                <li>例如：阈值设为15%，当涨跌幅为+16%时触发</li>
+                            </ul>
+                        </div>
+                    </div>
+                </details>
+            </div>
+            
+            <button class="btn btn-primary" id="saveBtn">
+                💾 保存配置
+            </button>
+        </div>
+        
+        <!-- 状态和执行记录 -->
+        <div class="card status-section">
+            <div class="card-title">
+                📋 执行记录与统计
+            </div>
+            
+            <div class="statistics" id="statistics">
+                <div class="stat-card">
+                    <div class="stat-value" id="statTotal">0</div>
+                    <div class="stat-label">总执行次数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statSuccess">0</div>
+                    <div class="stat-label">成功次数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statShort">0</div>
+                    <div class="stat-label">空单止盈</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statLong">0</div>
+                    <div class="stat-label">多单止盈</div>
+                </div>
+            </div>
+            
+            <div class="execution-list" id="executionList">
+                <!-- 执行记录将动态加载 -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = '/api/okx-trading';
+        let currentAccount = 'account_main';
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCoinChangeData();
+            loadSettings();
+            loadStatus();
+            
+            // 定时刷新币种数据
+            setInterval(loadCoinChangeData, 10000);
+            
+            // 定时刷新执行状态
+            setInterval(loadStatus, 30000);
+        });
+        
+        // 账户切换
+        document.getElementById('accountSelect').addEventListener('change', function() {
+            currentAccount = this.value;
+            loadSettings();
+            loadStatus();
+        });
+        
+        // 保存配置
+        document.getElementById('saveBtn').addEventListener('click', saveSettings);
+        
+        // 加载当前币种数据
+        async function loadCoinChangeData() {
+            try {
+                const response = await fetch(`${API_BASE}/coin-change-current`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const data = result.data;
+                    const totalChange = data.total_change;
+                    
+                    const totalChangeEl = document.getElementById('totalChange');
+                    totalChangeEl.textContent = `${totalChange >= 0 ? '+' : ''}${totalChange.toFixed(2)}%`;
+                    totalChangeEl.className = 'data-value ' + (totalChange >= 0 ? 'positive' : 'negative');
+                    
+                    document.getElementById('upCoins').textContent = data.up_coins;
+                    document.getElementById('downCoins').textContent = data.down_coins;
+                    document.getElementById('updateTime').textContent = data.beijing_time || '--';
+                }
+            } catch (error) {
+                console.error('加载币种数据失败:', error);
+            }
+        }
+        
+        // 加载配置
+        async function loadSettings() {
+            try {
+                console.log('[loadSettings] 开始加载配置，账户:', currentAccount);
+                
+                // 使用综合API获取配置和状态
+                const response = await fetch(`${API_BASE}/coin-change-tpsl-overview/${currentAccount}`);
+                const result = await response.json();
+                
+                console.log('[loadSettings] API返回结果:', result);
+                
+                // 检查是否有config字段（无论success是否为true）
+                if (result.config) {
+                    const config = result.config;
+                    
+                    console.log('[loadSettings] 配置内容:', config);
+                    
+                    // 更新配置表单
+                    document.getElementById('shortTpEnabled').checked = config.shortTakeProfitEnabled || false;
+                    document.getElementById('shortTpThreshold').value = config.shortTakeProfitThreshold || 10.0;
+                    document.getElementById('longTpEnabled').checked = config.longTakeProfitEnabled || false;
+                    document.getElementById('longTpThreshold').value = config.longTakeProfitThreshold || 10.0;
+                    
+                    // 更新状态总览
+                    updateStatusOverview(result);
+                    
+                    console.log('[loadSettings] 配置加载完成');
+                } else {
+                    console.error('[loadSettings] API返回数据中没有config字段:', result);
+                    showAlert('配置数据格式错误', 'error');
+                }
+            } catch (error) {
+                console.error('[loadSettings] 加载配置失败:', error);
+                showAlert('加载配置失败: ' + error.message, 'error');
+            }
+        }
+        
+        // 更新状态总览
+        function updateStatusOverview(result) {
+            console.log('[updateStatusOverview] 开始更新状态总览');
+            console.log('[updateStatusOverview] result:', result);
+            
+            const config = result.config;
+            const shortEnabled = config.shortTakeProfitEnabled;
+            const longEnabled = config.longTakeProfitEnabled;
+            const shortThreshold = config.shortTakeProfitThreshold;
+            const longThreshold = config.longTakeProfitThreshold;
+            
+            console.log('[updateStatusOverview] 空单启用:', shortEnabled, '阈值:', shortThreshold);
+            console.log('[updateStatusOverview] 多单启用:', longEnabled, '阈值:', longThreshold);
+            
+            // 更新空单止盈状态
+            const shortStatusText = document.getElementById('shortTpStatusText');
+            const shortThresholdText = document.getElementById('shortTpThresholdText');
+            
+            console.log('[updateStatusOverview] 找到元素 shortTpStatusText:', shortStatusText);
+            console.log('[updateStatusOverview] 找到元素 shortTpThresholdText:', shortThresholdText);
+            
+            if (shortStatusText && shortThresholdText) {
+                if (shortEnabled) {
+                    shortStatusText.innerHTML = '<span style="color: #10b981;">✅ 已启用</span>';
+                    // shortThreshold 本身就是负数，直接显示
+                    shortThresholdText.textContent = `${shortThreshold.toFixed(1)}%`;
+                } else {
+                    shortStatusText.innerHTML = '<span style="color: #9ca3af;">⭕ 未启用</span>';
+                    shortThresholdText.textContent = '--';
+                }
+                console.log('[updateStatusOverview] 空单状态已更新');
+            } else {
+                console.error('[updateStatusOverview] 找不到空单状态元素！');
+            }
+            
+            // 更新多单止盈状态
+            const longStatusText = document.getElementById('longTpStatusText');
+            const longThresholdText = document.getElementById('longTpThresholdText');
+            
+            console.log('[updateStatusOverview] 找到元素 longTpStatusText:', longStatusText);
+            console.log('[updateStatusOverview] 找到元素 longTpThresholdText:', longThresholdText);
+            
+            if (longStatusText && longThresholdText) {
+                if (longEnabled) {
+                    longStatusText.innerHTML = '<span style="color: #10b981;">✅ 已启用</span>';
+                    // longThreshold 是正数，加上+号
+                    longThresholdText.textContent = `+${longThreshold.toFixed(1)}%`;
+                } else {
+                    longStatusText.innerHTML = '<span style="color: #9ca3af;">⭕ 未启用</span>';
+                    longThresholdText.textContent = '--';
+                }
+                console.log('[updateStatusOverview] 多单状态已更新');
+            } else {
+                console.error('[updateStatusOverview] 找不到多单状态元素！');
+            }
+            
+            console.log('[updateStatusOverview] 状态总览更新完成');
+        }
+        
+        // 保存配置
+        async function saveSettings() {
+            const btn = document.getElementById('saveBtn');
+            btn.disabled = true;
+            btn.textContent = '保存中...';
+            
+            try {
+                const settings = {
+                    shortTakeProfitEnabled: document.getElementById('shortTpEnabled').checked,
+                    shortTakeProfitThreshold: parseFloat(document.getElementById('shortTpThreshold').value),
+                    longTakeProfitEnabled: document.getElementById('longTpEnabled').checked,
+                    longTakeProfitThreshold: parseFloat(document.getElementById('longTpThreshold').value)
+                };
+                
+                const response = await fetch(`${API_BASE}/coin-change-tpsl-settings/${currentAccount}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(settings)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('配置保存成功！', 'success');
+                    loadSettings();  // 重新加载配置和状态
+                    loadStatus();
+                } else {
+                    showAlert('保存失败: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('保存失败: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '💾 保存配置';
+            }
+        }
+        
+        // 加载状态和执行记录
+        async function loadStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/coin-change-tpsl-status/${currentAccount}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    // 更新统计
+                    const stats = result.statistics;
+                    document.getElementById('statTotal').textContent = stats.total || 0;
+                    document.getElementById('statSuccess').textContent = stats.successful || 0;
+                    document.getElementById('statShort').textContent = stats.short_take_profit || 0;
+                    document.getElementById('statLong').textContent = stats.long_take_profit || 0;
+                    
+                    // 更新执行记录
+                    const executions = result.executions || [];
+                    const listEl = document.getElementById('executionList');
+                    
+                    if (executions.length === 0) {
+                        listEl.innerHTML = '<div style="text-align: center; padding: 30px; color: #a0aec0;">暂无执行记录</div>';
+                    } else {
+                        listEl.innerHTML = executions.reverse().map(exec => `
+                            <div class="execution-item ${exec.success ? 'success' : 'failed'}">
+                                <div class="execution-header">
+                                    <div class="execution-coin">
+                                        ${exec.success ? '✅' : '❌'} ${exec.instId} 
+                                        <span style="color: ${exec.triggerType === 'short_take_profit' ? '#ef4444' : '#10b981'}">
+                                            ${exec.triggerType === 'short_take_profit' ? '空单止盈' : '多单止盈'}
+                                        </span>
+                                    </div>
+                                    <div class="execution-time">${new Date(exec.timestamp).toLocaleString('zh-CN')}</div>
+                                </div>
+                                <div class="execution-details">
+                                    <div>涨跌幅: ${exec.totalChange >= 0 ? '+' : ''}${exec.totalChange.toFixed(2)}%</div>
+                                    <div>阈值: ${exec.triggerType === 'short_take_profit' ? '-' : '+'}${Math.abs(exec.threshold).toFixed(2)}%</div>
+                                    <div>${exec.success ? exec.message : exec.error}</div>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('加载状态失败:', error);
+            }
+        }
+        
+        // 显示提示
+        function showAlert(message, type) {
+            const container = document.getElementById('alertContainer');
+            const alertClass = type === 'success' ? 'alert-success' : type === 'error' ? 'alert-error' : 'alert-warning';
+            
+            container.innerHTML = `<div class="alert ${alertClass}">${message}</div>`;
+            
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+        
+        // 缓存检测：检查关键元素是否存在
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('=== 缓存检测开始 ===');
+            
+            // 检查状态显示元素
+            const shortTpStatusText = document.getElementById('shortTpStatusText');
+            const longTpStatusText = document.getElementById('longTpStatusText');
+            
+            if (!shortTpStatusText || !longTpStatusText) {
+                console.error('❌ 缺少关键元素！您可能在使用缓存的旧版本！');
+                console.error('shortTpStatusText:', shortTpStatusText);
+                console.error('longTpStatusText:', longTpStatusText);
+                
+                // 创建醒目的警告提示
+                const warningDiv = document.createElement('div');
+                warningDiv.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    z-index: 9999;
+                    padding: 20px 30px;
+                    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+                    border: 3px solid #dc2626;
+                    border-radius: 12px;
+                    box-shadow: 0 10px 25px rgba(220, 38, 38, 0.5);
+                    font-size: 16px;
+                    font-weight: 700;
+                    color: #991b1b;
+                    text-align: center;
+                    animation: pulse 2s infinite;
+                `;
+                warningDiv.innerHTML = `
+                    <div style="font-size: 24px; margin-bottom: 10px;">⚠️ 检测到浏览器缓存！</div>
+                    <div style="font-size: 18px; margin-bottom: 10px;">页面未正确加载，请硬刷新：</div>
+                    <div style="font-size: 20px; font-weight: 900; color: #dc2626;">
+                        Windows: Ctrl+Shift+R<br>
+                        Mac: Cmd+Shift+R
+                    </div>
+                    <button onclick="location.reload(true)" style="margin-top: 15px; padding: 10px 20px; background: #dc2626; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer;">
+                        点击强制刷新
+                    </button>
+                `;
+                document.body.appendChild(warningDiv);
+                
+                alert('⚠️ 检测到浏览器缓存！\n\n请按以下快捷键硬刷新：\n\nWindows: Ctrl+Shift+R\nMac: Cmd+Shift+R\n\n否则页面将无法正常显示！');
+            } else {
+                console.log('✅ 关键元素检测通过');
+                console.log('shortTpStatusText:', shortTpStatusText);
+                console.log('longTpStatusText:', longTpStatusText);
+            }
+            
+            console.log('=== 缓存检测完成 ===');
+        });
+    </script>
+</body>
+</html>

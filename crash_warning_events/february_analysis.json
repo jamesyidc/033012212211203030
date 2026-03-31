@@ -1,0 +1,773 @@
+{
+  "analysis_time": "2026-02-24 15:57:09",
+  "month": "2026-02",
+  "summary": {
+    "total_days": 24,
+    "valid_days": 24,
+    "warning_days": 3,
+    "warning_rate": "12.5%"
+  },
+  "crash_warning_days": [
+    {
+      "date": "2026-02-05",
+      "warning": {
+        "signal_type": "crash_warning_a_descending",
+        "pattern_name": "A点递减（A1 > A2 > A3）",
+        "consecutive_peaks": 3,
+        "peak_indices": "1-2-3",
+        "warning_level": "critical",
+        "warning": "🚨 暴跌预警！波峰1-2-3 A点递减（A1 > A2 > A3），即将暴跌",
+        "operation_tip": "逢高做空",
+        "peaks": [
+          {
+            "b_point": {
+              "index": 145,
+              "timestamp": "2026-02-05T02:24:00.295785+08:00",
+              "beijing_time": "2026-02-05 02:24:00",
+              "value": -47.65
+            },
+            "a_point": {
+              "index": 238,
+              "timestamp": "2026-02-05T03:57:00.302056+08:00",
+              "beijing_time": "2026-02-05 03:57:00",
+              "value": 56.97
+            },
+            "c_point": {
+              "index": 325,
+              "timestamp": "2026-02-05T05:24:00.300630+08:00",
+              "beijing_time": "2026-02-05 05:24:00",
+              "value": 3.73
+            },
+            "amplitude": 104.62,
+            "decline": 53.24,
+            "decline_ratio": 50.888931370674825
+          },
+          {
+            "b_point": {
+              "index": 368,
+              "timestamp": "2026-02-05T06:07:00.319896+08:00",
+              "beijing_time": "2026-02-05 06:07:00",
+              "value": -43.79
+            },
+            "a_point": {
+              "index": 390,
+              "timestamp": "2026-02-05T06:29:00.330503+08:00",
+              "beijing_time": "2026-02-05 06:29:00",
+              "value": 34.51
+            },
+            "c_point": {
+              "index": 406,
+              "timestamp": "2026-02-05T06:45:00.329079+08:00",
+              "beijing_time": "2026-02-05 06:45:00",
+              "value": -9.93
+            },
+            "amplitude": 78.3,
+            "decline": 44.44,
+            "decline_ratio": 56.75606641123883
+          },
+          {
+            "b_point": {
+              "index": 424,
+              "timestamp": "2026-02-05T07:03:00.310920+08:00",
+              "beijing_time": "2026-02-05 07:03:00",
+              "value": -24.81
+            },
+            "a_point": {
+              "index": 461,
+              "timestamp": "2026-02-05T07:40:00.332510+08:00",
+              "beijing_time": "2026-02-05 07:40:00",
+              "value": 17.58
+            },
+            "c_point": {
+              "index": 495,
+              "timestamp": "2026-02-05T08:14:00.320516+08:00",
+              "beijing_time": "2026-02-05 08:14:00",
+              "value": -6.33
+            },
+            "amplitude": 42.39,
+            "decline": 23.909999999999997,
+            "decline_ratio": 56.40481245576786
+          }
+        ],
+        "pattern": {
+          "a_descending": true,
+          "description": "A点递减（A1 > A2 > A3），反弹高点逐渐降低，买盘力量衰竭"
+        },
+        "comparisons": {
+          "a_values": {
+            "a1": 56.97,
+            "a2": 34.51,
+            "a3": 17.58,
+            "a2_vs_a1": {
+              "decrease": true,
+              "diff": -22.46,
+              "diff_pct": -39.42425838160435
+            },
+            "a3_vs_a2": {
+              "decrease": true,
+              "diff": -16.93,
+              "diff_pct": -49.05824398725007
+            }
+          }
+        }
+      },
+      "peaks_count": 10
+    },
+    {
+      "date": "2026-02-06",
+      "warning": {
+        "signal_type": "crash_warning_a_descending",
+        "pattern_name": "A点递减（A1 > A2 > A3）",
+        "consecutive_peaks": 3,
+        "peak_indices": "1-2-3",
+        "warning_level": "critical",
+        "warning": "🚨 暴跌预警！波峰1-2-3 A点递减（A1 > A2 > A3），即将暴跌",
+        "operation_tip": "逢高做空",
+        "peaks": [
+          {
+            "b_point": {
+              "index": 10,
+              "timestamp": "2026-02-06T00:10:00.269360+08:00",
+              "beijing_time": "2026-02-06 00:10:00",
+              "value": -20.03
+            },
+            "a_point": {
+              "index": 30,
+              "timestamp": "2026-02-06T00:30:07.411160+08:00",
+              "beijing_time": "2026-02-06 00:30:07",
+              "value": 39.19
+            },
+            "c_point": {
+              "index": 46,
+              "timestamp": "2026-02-06T00:46:11.764684+08:00",
+              "beijing_time": "2026-02-06 00:46:11",
+              "value": -3.75
+            },
+            "amplitude": 59.22,
+            "decline": 42.94,
+            "decline_ratio": 72.50928740290442
+          },
+          {
+            "b_point": {
+              "index": 81,
+              "timestamp": "2026-02-06T01:21:00.287635+08:00",
+              "beijing_time": "2026-02-06 01:21:00",
+              "value": -60.99
+            },
+            "a_point": {
+              "index": 101,
+              "timestamp": "2026-02-06T01:41:00.296224+08:00",
+              "beijing_time": "2026-02-06 01:41:00",
+              "value": -8.74
+            },
+            "c_point": {
+              "index": 119,
+              "timestamp": "2026-02-06T01:59:00.300562+08:00",
+              "beijing_time": "2026-02-06 01:59:00",
+              "value": -44.94
+            },
+            "amplitude": 52.25,
+            "decline": 36.199999999999996,
+            "decline_ratio": 69.2822966507177
+          },
+          {
+            "b_point": {
+              "index": 153,
+              "timestamp": "2026-02-06T02:33:00.298584+08:00",
+              "beijing_time": "2026-02-06 02:33:00",
+              "value": -82.2
+            },
+            "a_point": {
+              "index": 179,
+              "timestamp": "2026-02-06T02:59:00.303237+08:00",
+              "beijing_time": "2026-02-06 02:59:00",
+              "value": -31.18
+            },
+            "c_point": {
+              "index": 201,
+              "timestamp": "2026-02-06T03:21:00.974029+08:00",
+              "beijing_time": "2026-02-06 03:21:00",
+              "value": -57.15
+            },
+            "amplitude": 51.02,
+            "decline": 25.97,
+            "decline_ratio": 50.901607212857705
+          }
+        ],
+        "pattern": {
+          "a_descending": true,
+          "description": "A点递减（A1 > A2 > A3），反弹高点逐渐降低，买盘力量衰竭"
+        },
+        "comparisons": {
+          "a_values": {
+            "a1": 39.19,
+            "a2": -8.74,
+            "a3": -31.18,
+            "a2_vs_a1": {
+              "decrease": true,
+              "diff": -47.93,
+              "diff_pct": -122.30160755294719
+            },
+            "a3_vs_a2": {
+              "decrease": true,
+              "diff": -22.439999999999998,
+              "diff_pct": -256.7505720823798
+            }
+          }
+        }
+      },
+      "peaks_count": 5
+    },
+    {
+      "date": "2026-02-09",
+      "warning": {
+        "signal_type": "crash_warning_a_descending",
+        "pattern_name": "A点递减（A2 > A3 > A4）",
+        "consecutive_peaks": 3,
+        "peak_indices": "2-3-4",
+        "warning_level": "critical",
+        "warning": "🚨 暴跌预警！波峰2-3-4 A点递减（A2 > A3 > A4），即将暴跌",
+        "operation_tip": "逢高做空",
+        "peaks": [
+          {
+            "b_point": {
+              "index": 352,
+              "timestamp": "2026-02-09T05:52:00.295639+08:00",
+              "beijing_time": "2026-02-09 05:52:00",
+              "value": -44.48
+            },
+            "a_point": {
+              "index": 428,
+              "timestamp": "2026-02-09T07:08:00.316650+08:00",
+              "beijing_time": "2026-02-09 07:08:00",
+              "value": 24.57
+            },
+            "c_point": {
+              "index": 445,
+              "timestamp": "2026-02-09T07:25:00.330245+08:00",
+              "beijing_time": "2026-02-09 07:25:00",
+              "value": -38.77
+            },
+            "amplitude": 69.05,
+            "decline": 63.34,
+            "decline_ratio": 91.73062997827662
+          },
+          {
+            "b_point": {
+              "index": 590,
+              "timestamp": "2026-02-09T09:50:00.489436+08:00",
+              "beijing_time": "2026-02-09 09:50:00",
+              "value": -51.08
+            },
+            "a_point": {
+              "index": 716,
+              "timestamp": "2026-02-09T11:56:00.336385+08:00",
+              "beijing_time": "2026-02-09 11:56:00",
+              "value": -1.58
+            },
+            "c_point": {
+              "index": 844,
+              "timestamp": "2026-02-09T14:04:00.542041+08:00",
+              "beijing_time": "2026-02-09 14:04:00",
+              "value": -29.94
+            },
+            "amplitude": 49.5,
+            "decline": 28.36,
+            "decline_ratio": 57.292929292929294
+          },
+          {
+            "b_point": {
+              "index": 1123,
+              "timestamp": "2026-02-09T18:43:06.778833+08:00",
+              "beijing_time": "2026-02-09 18:43:06",
+              "value": -129.39
+            },
+            "a_point": {
+              "index": 1273,
+              "timestamp": "2026-02-09T21:14:00.408353+08:00",
+              "beijing_time": "2026-02-09 21:14:00",
+              "value": -85.66
+            },
+            "c_point": {
+              "index": 1315,
+              "timestamp": "2026-02-09T21:56:00.402308+08:00",
+              "beijing_time": "2026-02-09 21:56:00",
+              "value": -108.85
+            },
+            "amplitude": 43.72999999999999,
+            "decline": 23.189999999999998,
+            "decline_ratio": 53.029956551566436
+          }
+        ],
+        "pattern": {
+          "a_descending": true,
+          "description": "A点递减（A2 > A3 > A4），反弹高点逐渐降低，买盘力量衰竭"
+        },
+        "comparisons": {
+          "a_values": {
+            "a2": 24.57,
+            "a3": -1.58,
+            "a4": -85.66,
+            "a3_vs_a2": {
+              "decrease": true,
+              "diff": -26.15,
+              "diff_pct": -106.43060643060642
+            },
+            "a4_vs_a3": {
+              "decrease": true,
+              "diff": -84.08,
+              "diff_pct": -5321.518987341772
+            }
+          }
+        }
+      },
+      "peaks_count": 5
+    }
+  ],
+  "all_results": [
+    {
+      "date": "2026-02-01",
+      "status": "ok",
+      "peaks_count": 3,
+      "crash_warning": null
+    },
+    {
+      "date": "2026-02-02",
+      "status": "ok",
+      "peaks_count": 6,
+      "crash_warning": null
+    },
+    {
+      "date": "2026-02-03",
+      "status": "ok",
+      "peaks_count": 2,
+      "crash_warning": null
+    },
+    {
+      "date": "2026-02-04",
+      "status": "ok",
+      "peaks_count": 3,
+      "crash_warning": null
+    },
+    {
+      "date": "2026-02-05",
+      "status": "ok",
+      "peaks_count": 10,
+      "crash_warning": {
+        "signal_type": "crash_warning_a_descending",
+        "pattern_name": "A点递减（A1 > A2 > A3）",
+        "consecutive_peaks": 3,
+        "peak_indices": "1-2-3",
+        "warning_level": "critical",
+        "warning": "🚨 暴跌预警！波峰1-2-3 A点递减（A1 > A2 > A3），即将暴跌",
+        "operation_tip": "逢高做空",
+        "peaks": [
+          {
+            "b_point": {
+              "index": 145,
+              "timestamp": "2026-02-05T02:24:00.295785+08:00",
+              "beijing_time": "2026-02-05 02:24:00",
+              "value": -47.65
+            },
+            "a_point": {
+              "index": 238,
+              "timestamp": "2026-02-05T03:57:00.302056+08:00",
+              "beijing_time": "2026-02-05 03:57:00",
+              "value": 56.97
+            },
+            "c_point": {
+              "index": 325,
+              "timestamp": "2026-02-05T05:24:00.300630+08:00",
+              "beijing_time": "2026-02-05 05:24:00",
+              "value": 3.73
+            },
+            "amplitude": 104.62,
+            "decline": 53.24,
+            "decline_ratio": 50.888931370674825
+          },
+          {
+            "b_point": {
+              "index": 368,
+              "timestamp": "2026-02-05T06:07:00.319896+08:00",
+              "beijing_time": "2026-02-05 06:07:00",
+              "value": -43.79
+            },
+            "a_point": {
+              "index": 390,
+              "timestamp": "2026-02-05T06:29:00.330503+08:00",
+              "beijing_time": "2026-02-05 06:29:00",
+              "value": 34.51
+            },
+            "c_point": {
+              "index": 406,
+              "timestamp": "2026-02-05T06:45:00.329079+08:00",
+              "beijing_time": "2026-02-05 06:45:00",
+              "value": -9.93
+            },
+            "amplitude": 78.3,
+            "decline": 44.44,
+            "decline_ratio": 56.75606641123883
+          },
+          {
+            "b_point": {
+              "index": 424,
+              "timestamp": "2026-02-05T07:03:00.310920+08:00",
+              "beijing_time": "2026-02-05 07:03:00",
+              "value": -24.81
+            },
+            "a_point": {
+              "index": 461,
+              "timestamp": "2026-02-05T07:40:00.332510+08:00",
+              "beijing_time": "2026-02-05 07:40:00",
+              "value": 17.58
+            },
+            "c_point": {
+              "index": 495,
+              "timestamp": "2026-02-05T08:14:00.320516+08:00",
+              "beijing_time": "2026-02-05 08:14:00",
+              "value": -6.33
+            },
+            "amplitude": 42.39,
+            "decline": 23.909999999999997,
+            "decline_ratio": 56.40481245576786
+          }
+        ],
+        "pattern": {
+          "a_descending": true,
+          "description": "A点递减（A1 > A2 > A3），反弹高点逐渐降低，买盘力量衰竭"
+        },
+        "comparisons": {
+          "a_values": {
+            "a1": 56.97,
+            "a2": 34.51,
+            "a3": 17.58,
+            "a2_vs_a1": {
+              "decrease": true,
+              "diff": -22.46,
+              "diff_pct": -39.42425838160435
+            },
+            "a3_vs_a2": {
+              "decrease": true,
+              "diff": -16.93,
+              "diff_pct": -49.05824398725007
+            }
+          }
+        }
+      }
+    },
+    {
+      "date": "2026-02-06",
+      "status": "ok",
+      "peaks_count": 5,
+      "crash_warning": {
+        "signal_type": "crash_warning_a_descending",
+        "pattern_name": "A点递减（A1 > A2 > A3）",
+        "consecutive_peaks": 3,
+        "peak_indices": "1-2-3",
+        "warning_level": "critical",
+        "warning": "🚨 暴跌预警！波峰1-2-3 A点递减（A1 > A2 > A3），即将暴跌",
+        "operation_tip": "逢高做空",
+        "peaks": [
+          {
+            "b_point": {
+              "index": 10,
+              "timestamp": "2026-02-06T00:10:00.269360+08:00",
+              "beijing_time": "2026-02-06 00:10:00",
+              "value": -20.03
+            },
+            "a_point": {
+              "index": 30,
+              "timestamp": "2026-02-06T00:30:07.411160+08:00",
+              "beijing_time": "2026-02-06 00:30:07",
+              "value": 39.19
+            },
+            "c_point": {
+              "index": 46,
+              "timestamp": "2026-02-06T00:46:11.764684+08:00",
+              "beijing_time": "2026-02-06 00:46:11",
+              "value": -3.75
+            },
+            "amplitude": 59.22,
+            "decline": 42.94,
+            "decline_ratio": 72.50928740290442
+          },
+          {
+            "b_point": {
+              "index": 81,
+              "timestamp": "2026-02-06T01:21:00.287635+08:00",
+              "beijing_time": "2026-02-06 01:21:00",
+              "value": -60.99
+            },
+            "a_point": {
+              "index": 101,
+              "timestamp": "2026-02-06T01:41:00.296224+08:00",
+              "beijing_time": "2026-02-06 01:41:00",
+              "value": -8.74
+            },
+            "c_point": {
+              "index": 119,
+              "timestamp": "2026-02-06T01:59:00.300562+08:00",
+              "beijing_time": "2026-02-06 01:59:00",
+              "value": -44.94
+            },
+            "amplitude": 52.25,
+            "decline": 36.199999999999996,
+            "decline_ratio": 69.2822966507177
+          },
+          {
+            "b_point": {
+              "index": 153,
+              "timestamp": "2026-02-06T02:33:00.298584+08:00",
+              "beijing_time": "2026-02-06 02:33:00",
+              "value": -82.2
+            },
+            "a_point": {
+              "index": 179,
+              "timestamp": "2026-02-06T02:59:00.303237+08:00",
+              "beijing_time": "2026-02-06 02:59:00",
+              "value": -31.18
+            },
+            "c_point": {
+              "index": 201,
+              "timestamp": "2026-02-06T03:21:00.974029+08:00",
+              "beijing_time": "2026-02-06 03:21:00",
+              "value": -57.15
+            },
+            "amplitude": 51.02,
+            "decline": 25.97,
+            "decline_ratio": 50.901607212857705
+          }
+        ],
+        "pattern": {
+          "a_descending": true,
+          "description": "A点递减（A1 > A2 > A3），反弹高点逐渐降低，买盘力量衰竭"
+        },
+        "comparisons": {
+          "a_values": {
+            "a1": 39.19,
+            "a2": -8.74,
+            "a3": -31.18,
+            "a2_vs_a1": {
+              "decrease": true,
+              "diff": -47.93,
+              "diff_pct": -122.30160755294719
+            },
+            "a3_vs_a2": {
+              "decrease": true,
+              "diff": -22.439999999999998,
+              "diff_pct": -256.7505720823798
+            }
+          }
+        }
+      }
+    },
+    {
+      "date": "2026-02-07",
+      "status": "ok",
+      "peaks_count": 6,
+      "crash_warning": null
+    },
+    {
+      "date": "2026-02-08",
+      "status": "ok",
+      "peaks_count": 4,
+      "crash_warning": null
+    },
+    {
+      "date": "2026-02-09",
+      "status": "ok",
+      "peaks_count": 5,
+      "crash_warning": {
+        "signal_type": "crash_warning_a_descending",
+        "pattern_name": "A点递减（A2 > A3 > A4）",
+        "consecutive_peaks": 3,
+        "peak_indices": "2-3-4",
+        "warning_level": "critical",
+        "warning": "🚨 暴跌预警！波峰2-3-4 A点递减（A2 > A3 > A4），即将暴跌",
+        "operation_tip": "逢高做空",
+        "peaks": [
+          {
+            "b_point": {
+              "index": 352,
+              "timestamp": "2026-02-09T05:52:00.295639+08:00",
+              "beijing_time": "2026-02-09 05:52:00",
+              "value": -44.48
+            },
+            "a_point": {
+              "index": 428,
+              "timestamp": "2026-02-09T07:08:00.316650+08:00",
+              "beijing_time": "2026-02-09 07:08:00",
+              "value": 24.57
+            },
+            "c_point": {
+              "index": 445,
+              "timestamp": "2026-02-09T07:25:00.330245+08:00",
+              "beijing_time": "2026-02-09 07:25:00",
+              "value": -38.77
+            },
+            "amplitude": 69.05,
+            "decline": 63.34,
+            "decline_ratio": 91.73062997827662
+          },
+          {
+            "b_point": {
+              "index": 590,
+              "timestamp": "2026-02-09T09:50:00.489436+08:00",
+              "beijing_time": "2026-02-09 09:50:00",
+              "value": -51.08
+            },
+            "a_point": {
+              "index": 716,
+              "timestamp": "2026-02-09T11:56:00.336385+08:00",
+              "beijing_time": "2026-02-09 11:56:00",
+              "value": -1.58
+            },
+            "c_point": {
+              "index": 844,
+              "timestamp": "2026-02-09T14:04:00.542041+08:00",
+              "beijing_time": "2026-02-09 14:04:00",
+              "value": -29.94
+            },
+            "amplitude": 49.5,
+            "decline": 28.36,
+            "decline_ratio": 57.292929292929294
+          },
+          {
+            "b_point": {
+              "index": 1123,
+              "timestamp": "2026-02-09T18:43:06.778833+08:00",
+              "beijing_time": "2026-02-09 18:43:06",
+              "value": -129.39
+            },
+            "a_point": {
+              "index": 1273,
+              "timestamp": "2026-02-09T21:14:00.408353+08:00",
+              "beijing_time": "2026-02-09 21:14:00",
+              "value": -85.66
+            },
+            "c_point": {
+              "index": 1315,
+              "timestamp": "2026-02-09T21:56:00.402308+08:00",
+              "beijing_time": "2026-02-09 21:56:00",
+              "value": -108.85
+            },
+            "amplitude": 43.72999999999999,
+            "decline": 23.189999999999998,
+            "decline_ratio": 53.029956551566436
+          }
+        ],
+        "pattern": {
+          "a_descending": true,
+          "description": "A点递减（A2 > A3 > A4），反弹高点逐渐降低，买盘力量衰竭"
+        },
+        "comparisons": {
+          "a_values": {
+            "a2": 24.57,
+            "a3": -1.58,
+            "a4": -85.66,
+            "a3_vs_a2": {
+              "decrease": true,
+              "diff": -26.15,
+              "diff_pct": -106.43060643060642
+            },
+            "a4_vs_a3": {
+              "decrease": true,
+              "diff": -84.08,
+              "diff_pct": -5321.518987341772
+            }
+          }
+        }
+      }
+    },
+    {
+      "date": "2026-02-10",
+      "status": "ok",
+      "peaks_count": 3,
+      "crash_warning": null
+    },
+    {
+      "date": "2026-02-11",
+      "status": "ok",
+      "peaks_count": 1,
+      "crash_warning": null
+    },
+    {
+      "date": "2026-02-12",
+      "status": "ok",
+      "peaks_count": 4,
+      "crash_warning": null
+    },
+    {
+      "date": "2026-02-13",
+      "status": "ok",
+      "peaks_count": 2,
+      "crash_warning": null
+    },
+    {
+      "date": "2026-02-14",
+      "status": "ok",
+      "peaks_count": 1,
+      "crash_warning": null
+    },
+    {
+      "date": "2026-02-15",
+      "status": "ok",
+      "peaks_count": 2,
+      "crash_warning": null
+    },
+    {
+      "date": "2026-02-16",
+      "status": "ok",
+      "peaks_count": 4,
+      "crash_warning": null
+    },
+    {
+      "date": "2026-02-17",
+      "status": "ok",
+      "peaks_count": 2,
+      "crash_warning": null
+    },
+    {
+      "date": "2026-02-18",
+      "status": "ok",
+      "peaks_count": 2,
+      "crash_warning": null
+    },
+    {
+      "date": "2026-02-19",
+      "status": "ok",
+      "peaks_count": 2,
+      "crash_warning": null
+    },
+    {
+      "date": "2026-02-20",
+      "status": "ok",
+      "peaks_count": 2,
+      "crash_warning": null
+    },
+    {
+      "date": "2026-02-21",
+      "status": "ok",
+      "peaks_count": 1,
+      "crash_warning": null
+    },
+    {
+      "date": "2026-02-22",
+      "status": "ok",
+      "peaks_count": 0,
+      "crash_warning": null
+    },
+    {
+      "date": "2026-02-23",
+      "status": "ok",
+      "peaks_count": 0,
+      "crash_warning": null
+    },
+    {
+      "date": "2026-02-24",
+      "status": "ok",
+      "peaks_count": 0,
+      "crash_warning": null
+    }
+  ]
+}

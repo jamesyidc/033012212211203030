@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAR斜率实时曲线图</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: #1e2139;
+            color: #fff;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            color: #00d4ff;
+        }
+        
+        .back-btn {
+            background: rgba(59, 125, 255, 0.2);
+            border: 1px solid rgba(59, 125, 255, 0.4);
+            color: #00d4ff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: rgba(59, 125, 255, 0.3);
+        }
+        
+        .controls {
+            background: rgba(42, 45, 71, 0.8);
+            border: 1px solid rgba(59, 125, 255, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .control-group label {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .control-group select,
+        .control-group input {
+            background: rgba(30, 33, 57, 0.8);
+            border: 1px solid rgba(59, 125, 255, 0.3);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .control-group button {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #10b981;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .control-group button:hover {
+            background: rgba(16, 185, 129, 0.3);
+        }
+        
+        .chart-container {
+            background: rgba(42, 45, 71, 0.8);
+            border: 1px solid rgba(59, 125, 255, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .chart-container canvas {
+            max-height: 500px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(42, 45, 71, 0.8);
+            border: 1px solid rgba(59, 125, 255, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #00d4ff;
+        }
+        
+        .stat-value.long {
+            color: #10b981;
+        }
+        
+        .stat-value.short {
+            color: #ef4444;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255,255,255,0.6);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 SAR斜率实时曲线图</h1>
+            <div style="display: flex; gap: 10px;">
+                <a href="/sar-slope" class="back-btn">← 返回列表</a>
+                <a href="/" class="back-btn">🏠 返回首页</a>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label>币种</label>
+                <select id="symbolSelect">
+                    <option value="BTC">BTC</option>
+                    <option value="ETH">ETH</option>
+                    <option value="XRP">XRP</option>
+                    <option value="SOL">SOL</option>
+                    <option value="BNB">BNB</option>
+                    <option value="DOGE">DOGE</option>
+                    <option value="LINK">LINK</option>
+                    <option value="DOT">DOT</option>
+                    <option value="LTC">LTC</option>
+                    <option value="UNI">UNI</option>
+                    <option value="NEAR">NEAR</option>
+                    <option value="FIL">FIL</option>
+                    <option value="ETC">ETC</option>
+                    <option value="APT">APT</option>
+                    <option value="HBAR">HBAR</option>
+                    <option value="CRV">CRV</option>
+                    <option value="LDO">LDO</option>
+                    <option value="STX">STX</option>
+                    <option value="CFX">CFX</option>
+                    <option value="CRO">CRO</option>
+                    <option value="BCH">BCH</option>
+                    <option value="SUI">SUI</option>
+                    <option value="TAO">TAO</option>
+                    <option value="TRX">TRX</option>
+                    <option value="TON">TON</option>
+                    <option value="XLM">XLM</option>
+                    <option value="AAVE">AAVE</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label>时间范围</label>
+                <select id="hoursSelect">
+                    <option value="1">最近1小时</option>
+                    <option value="2">最近2小时</option>
+                    <option value="4">最近4小时</option>
+                    <option value="8">最近8小时</option>
+                    <option value="12">最近12小时</option>
+                    <option value="24">最近24小时</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label>&nbsp;</label>
+                <button onclick="loadChart()">🔄 刷新数据</button>
+            </div>
+            
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="autoRefresh" checked> 自动刷新 (60秒)
+                </label>
+            </div>
+        </div>
+        
+        <div class="stats" id="stats" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-label">当前价格</div>
+                <div class="stat-value" id="currentPrice">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">当前SAR</div>
+                <div class="stat-value" id="currentSAR">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">当前仓位</div>
+                <div class="stat-value" id="currentPosition">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">数据点数</div>
+                <div class="stat-value" id="dataCount">-</div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="sarChart"></canvas>
+        </div>
+        
+        <div id="loading" class="loading">正在加载数据...</div>
+    </div>
+    
+    <script>
+        let chart = null;
+        let autoRefreshInterval = null;
+        
+        async function loadChart() {
+            const symbol = document.getElementById('symbolSelect').value;
+            const hours = document.getElementById('hoursSelect').value;
+            
+            try {
+                document.getElementById('loading').style.display = 'block';
+                
+                const response = await fetch(`/api/sar-slope/1min-data?symbol=${symbol}&hours=${hours}`);
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || '加载数据失败');
+                }
+                
+                document.getElementById('loading').style.display = 'none';
+                
+                if (result.count === 0) {
+                    alert('暂无数据，请稍后重试');
+                    return;
+                }
+                
+                // 更新统计信息
+                const latestData = result.data[result.data.length - 1];
+                document.getElementById('currentPrice').textContent = latestData.price.toFixed(4);
+                document.getElementById('currentSAR').textContent = latestData.sar.toFixed(4);
+                document.getElementById('currentPosition').textContent = latestData.position.toUpperCase();
+                document.getElementById('currentPosition').className = 'stat-value ' + latestData.position;
+                document.getElementById('dataCount').textContent = result.count;
+                document.getElementById('stats').style.display = 'grid';
+                
+                // 准备图表数据
+                const labels = result.data.map(d => {
+                    const time = new Date(d.collected_at);
+                    return time.toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'});
+                });
+                
+                const priceData = result.data.map(d => d.price);
+                const sarData = result.data.map(d => d.sar);
+                
+                // 创建或更新图表
+                const ctx = document.getElementById('sarChart').getContext('2d');
+                
+                if (chart) {
+                    chart.destroy();
+                }
+                
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: '价格',
+                                data: priceData,
+                                borderColor: '#00d4ff',
+                                backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.1,
+                                pointRadius: 2,
+                                pointHoverRadius: 5
+                            },
+                            {
+                                label: 'SAR',
+                                data: sarData,
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.1,
+                                pointRadius: 2,
+                                pointHoverRadius: 5
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        },
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: '#fff',
+                                    font: {
+                                        size: 14
+                                    }
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: `${symbol} - 价格与SAR对比 (${hours}小时)`,
+                                color: '#fff',
+                                font: {
+                                    size: 18
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(42, 45, 71, 0.95)',
+                                titleColor: '#00d4ff',
+                                bodyColor: '#fff',
+                                borderColor: 'rgba(59, 125, 255, 0.5)',
+                                borderWidth: 1
+                            }
+                        },
+                        scales: {
+                            y: {
+                                ticks: {
+                                    color: '#fff'
+                                },
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: '#fff',
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                },
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                }
+                            }
+                        }
+                    }
+                });
+                
+            } catch (error) {
+                console.error('加载失败:', error);
+                document.getElementById('loading').style.display = 'none';
+                alert('加载数据失败: ' + error.message);
+            }
+        }
+        
+        // 自动刷新
+        function setupAutoRefresh() {
+            const checkbox = document.getElementById('autoRefresh');
+            
+            if (checkbox.checked) {
+                autoRefreshInterval = setInterval(() => {
+                    console.log('自动刷新...');
+                    loadChart();
+                }, 60000); // 60秒
+            } else {
+                if (autoRefreshInterval) {
+                    clearInterval(autoRefreshInterval);
+                    autoRefreshInterval = null;
+                }
+            }
+        }
+        
+        document.getElementById('autoRefresh').addEventListener('change', setupAutoRefresh);
+        document.getElementById('symbolSelect').addEventListener('change', loadChart);
+        document.getElementById('hoursSelect').addEventListener('change', loadChart);
+        
+        // 初始加载
+        loadChart();
+        setupAutoRefresh();
+    </script>
+</body>
+</html>

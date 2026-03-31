@@ -1,0 +1,9 @@
+{
+  "enabled": false,
+  "triggerPrice": 66000,
+  "lastExecutedTime": null,
+  "executedCount": 0,
+  "lastUpdated": "2026-02-13 12:08:23",
+  "positionSize": 1.5,
+  "maxOrderSize": 5
+}

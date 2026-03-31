@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 逐步调试 - 找出84的来源</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #0f0;
+            padding: 20px;
+            font-size: 14px;
+        }
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        .header {
+            background: #1a1a1a;
+            padding: 20px;
+            border: 2px solid #0f0;
+            margin-bottom: 20px;
+        }
+        .step {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #666;
+        }
+        .step.running {
+            border-left-color: #ff0;
+            background: #2a2a00;
+        }
+        .step.success {
+            border-left-color: #0f0;
+            background: #002a00;
+        }
+        .step.error {
+            border-left-color: #f00;
+            background: #2a0000;
+        }
+        .step-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #0ff;
+        }
+        .data {
+            margin: 5px 0;
+            padding: 5px;
+            background: #000;
+        }
+        .highlight {
+            color: #ff0;
+            font-weight: bold;
+        }
+        .error {
+            color: #f00;
+            font-weight: bold;
+        }
+        .success {
+            color: #0f0;
+            font-weight: bold;
+        }
+        .button {
+            background: #0f0;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .button:hover {
+            background: #0ff;
+        }
+        .array-display {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin: 10px 0;
+        }
+        .array-item {
+            background: #333;
+            padding: 5px 10px;
+            border: 1px solid #666;
+        }
+        .array-item.highlight {
+            background: #ff0;
+            color: #000;
+            font-weight: bold;
+        }
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .comparison-box {
+            background: #000;
+            padding: 20px;
+            border: 3px solid #666;
+        }
+        .comparison-box.match {
+            border-color: #0f0;
+        }
+        .comparison-box.mismatch {
+            border-color: #f00;
+        }
+        .bignum {
+            font-size: 48px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        pre {
+            background: #000;
+            padding: 10px;
+            overflow-x: auto;
+            border: 1px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 逐步调试 Tooltip 问题 - 找出 84 的来源</h1>
+            <p>按步骤执行，查看每一步的数据状态</p>
+            <div style="margin-top: 10px;">
+                <button class="button" onclick="runAll()">▶ 全部运行</button>
+                <button class="button" onclick="runStep(currentStep + 1)">⏭ 下一步</button>
+                <button class="button" onclick="reset()">🔄 重置</button>
+            </div>
+        </div>
+
+        <div id="steps"></div>
+    </div>
+
+    <script>
+        let currentStep = 0;
+        let stepData = {};
+
+        const steps = [
+            {
+                name: "步骤 1: 获取当前日期",
+                run: async () => {
+                    const currentDate = new Date().toISOString().split('T')[0];
+                    const prevDateObj = new Date(currentDate + 'T00:00:00');
+                    prevDateObj.setDate(prevDateObj.getDate() - 1);
+                    const prevDate = prevDateObj.toISOString().split('T')[0];
+                    
+                    stepData.currentDate = currentDate;
+                    stepData.prevDate = prevDate;
+                    
+                    return `当前日期: ${currentDate}\n前一天: ${prevDate}`;
+                }
+            },
+            {
+                name: "步骤 2: 加载 API 数据",
+                run: async () => {
+                    const [chartDataResp, prevDataResp] = await Promise.all([
+                        fetch(`/api/signal-timeline/data?date=${stepData.currentDate}`),
+                        fetch(`/api/signal-timeline/data?date=${stepData.prevDate}`)
+                    ]);
+                    
+                    const chartData = await chartDataResp.json();
+                    const prevData = await prevDataResp.json();
+                    
+                    stepData.chartData = chartData;
+                    stepData.prevData = prevData;
+                    
+                    return `${stepData.currentDate}: ${chartData.data?.length || 0} 条数据\n${stepData.prevDate}: ${prevData.data?.length || 0} 条数据`;
+                }
+            },
+            {
+                name: "步骤 3: 合并并去重数据",
+                run: async () => {
+                    const combinedData = [...(stepData.prevData.data || []), ...(stepData.chartData.data || [])];
+                    const uniqueTimeMap = new Map();
+                    combinedData.forEach(item => {
+                        uniqueTimeMap.set(item.time, item);
+                    });
+                    const deduplicatedData = Array.from(uniqueTimeMap.values()).sort((a, b) => {
+                        return a.time < b.time ? -1 : 1;
+                    });
+                    
+                    stepData.allData = deduplicatedData;
+                    stepData.displayData = stepData.chartData.data || [];
+                    
+                    return `合并前: ${combinedData.length} 条\n去重后: ${deduplicatedData.length} 条\nallData: ${stepData.allData.length} 条\ndisplayData: ${stepData.displayData.length} 条`;
+                }
+            },
+            {
+                name: "步骤 4: 🔍 检查最后一个 displayData 点",
+                run: async () => {
+                    const lastDisplay = stepData.displayData[stepData.displayData.length - 1];
+                    stepData.lastDisplayPoint = lastDisplay;
+                    
+                    return `最后一个显示点:\ntime: ${lastDisplay.time}\ncoin: ${lastDisplay.coin}\nsignal_type: ${lastDisplay.signal_type}`;
+                }
+            },
+            {
+                name: "步骤 5: 🔍 计算最后一个点的 24h 窗口",
+                run: async () => {
+                    const lastDisplay = stepData.lastDisplayPoint;
+                    const currentTime = new Date(lastDisplay.time);
+                    const time24hAgo = new Date(currentTime - 24 * 60 * 60 * 1000);
+                    
+                    stepData.currentTime = currentTime;
+                    stepData.time24hAgo = time24hAgo;
+                    
+                    return `当前时间: ${currentTime.toISOString()}\n24h前: ${time24hAgo.toISOString()}\n时间差: ${(currentTime - time24hAgo) / (1000 * 60 * 60)} 小时`;
+                }
+            },
+            {
+                name: "步骤 6: 🔍 在 allData 中统计 24h sell 信号（方法1：从后向前遍历）",
+                run: async () => {
+                    const currentTime = stepData.currentTime;
+                    const time24hAgo = stepData.time24hAgo;
+                    
+                    let count24h = 0;
+                    let matchedCount = 0;
+                    let matchedItems = [];
+                    
+                    // 方法1：从后向前遍历（实际页面使用的方法）
+                    for (let i = stepData.allData.length - 1; i >= 0; i--) {
+                        const checkTime = new Date(stepData.allData[i].time);
+                        if (checkTime > currentTime) continue;
+                        if (checkTime < time24hAgo) break;
+                        matchedCount++;
+                        if (stepData.allData[i].signal_type === 'sell') {
+                            count24h++;
+                            matchedItems.push(stepData.allData[i]);
+                        }
+                    }
+                    
+                    stepData.count24h_method1 = count24h;
+                    stepData.matchedCount_method1 = matchedCount;
+                    stepData.matchedItems_method1 = matchedItems;
+                    
+                    return `方法1（从后向前）:\n匹配数据点: ${matchedCount} 个\nsell 信号: ${count24h} 次\n\n前5个 sell 信号:\n${matchedItems.slice(0, 5).map(item => `  ${item.time} ${item.coin} ${item.signal_type}`).join('\n')}`;
+                }
+            },
+            {
+                name: "步骤 7: 🔍 在 allData 中统计 24h sell 信号（方法2：filter）",
+                run: async () => {
+                    const currentTime = stepData.currentTime;
+                    const time24hAgo = stepData.time24hAgo;
+                    
+                    const currentTimeMs = currentTime.getTime();
+                    const time24hAgoMs = time24hAgo.getTime();
+                    
+                    const matchedItems = stepData.allData.filter(item => {
+                        const itemTime = new Date(item.time).getTime();
+                        return itemTime > time24hAgoMs && itemTime <= currentTimeMs && item.signal_type === 'sell';
+                    });
+                    
+                    const count24h = matchedItems.length;
+                    
+                    stepData.count24h_method2 = count24h;
+                    stepData.matchedItems_method2 = matchedItems;
+                    
+                    return `方法2（filter）:\nsell 信号: ${count24h} 次\n\n前5个 sell 信号:\n${matchedItems.slice(0, 5).map(item => `  ${item.time} ${item.coin} ${item.signal_type}`).join('\n')}`;
+                }
+            },
+            {
+                name: "步骤 8: ⚠️ 对比两种方法的结果",
+                run: async () => {
+                    const method1 = stepData.count24h_method1;
+                    const method2 = stepData.count24h_method2;
+                    const match = method1 === method2;
+                    
+                    return `方法1 结果: ${method1} 次\n方法2 结果: ${method2} 次\n结果${match ? '一致' : '不一致'} ${match ? '✅' : '❌'}`;
+                }
+            },
+            {
+                name: "步骤 9: 🔍 遍历所有 displayData，计算每个点的 24h 统计",
+                run: async () => {
+                    const sell24hData = [];
+                    
+                    stepData.displayData.forEach((displayPoint, displayIndex) => {
+                        const currentTime = new Date(displayPoint.time);
+                        const time24hAgo = new Date(currentTime - 24 * 60 * 60 * 1000);
+                        
+                        let count24h = 0;
+                        for (let i = stepData.allData.length - 1; i >= 0; i--) {
+                            const checkTime = new Date(stepData.allData[i].time);
+                            if (checkTime > currentTime) continue;
+                            if (checkTime < time24hAgo) break;
+                            if (stepData.allData[i].signal_type === 'sell') count24h++;
+                        }
+                        
+                        sell24hData.push(count24h);
+                    });
+                    
+                    stepData.sell24hData = sell24hData;
+                    
+                    return `生成 sell24hData 数组:\n长度: ${sell24hData.length}\n最后 10 个值: ${sell24hData.slice(-10).join(', ')}\n最后一个值: ${sell24hData[sell24hData.length - 1]}`;
+                }
+            },
+            {
+                name: "步骤 10: 🔧 创建 chartData24h（复制 sell24hData）",
+                run: async () => {
+                    const chartData24h = stepData.sell24hData.slice();
+                    
+                    stepData.chartData24h = chartData24h;
+                    
+                    const match = chartData24h[chartData24h.length - 1] === stepData.sell24hData[stepData.sell24hData.length - 1];
+                    
+                    return `chartData24h = sell24hData.slice();\n\nchartData24h 长度: ${chartData24h.length}\nchartData24h 最后一个值: ${chartData24h[chartData24h.length - 1]}\nsell24hData 最后一个值: ${stepData.sell24hData[stepData.sell24hData.length - 1]}\n\n值${match ? '一致' : '不一致'} ${match ? '✅' : '❌'}`;
+                }
+            },
+            {
+                name: "步骤 11: 🎯 模拟 Tooltip 获取值（最后一个点）",
+                run: async () => {
+                    const dataIndex = stepData.chartData24h.length - 1;
+                    const tooltipValue = stepData.chartData24h[dataIndex];
+                    const expectedValue = stepData.sell24hData[dataIndex];
+                    
+                    stepData.tooltipValue = tooltipValue;
+                    stepData.expectedValue = expectedValue;
+                    
+                    const match = tooltipValue === expectedValue;
+                    
+                    return `dataIndex: ${dataIndex}\ntooltip 获取的值: chartData24h[${dataIndex}] = ${tooltipValue}\n预期值: sell24hData[${dataIndex}] = ${expectedValue}\n\n结果${match ? '一致' : '不一致'} ${match ? '✅' : '❌'}`;
+                }
+            },
+            {
+                name: "步骤 12: 🔍 最终对比",
+                run: async () => {
+                    return `顶部统计显示: 186 次\ntooltip 应该显示: ${stepData.expectedValue} 次\ntooltip 实际显示: ${stepData.tooltipValue} 次\n\n${stepData.expectedValue === 186 ? '✅ 正确' : '❌ 错误'}`;
+                }
+            }
+        ];
+
+        function createStepElement(index) {
+            const step = steps[index];
+            const div = document.createElement('div');
+            div.id = `step${index}`;
+            div.className = 'step';
+            div.innerHTML = `
+                <div class="step-title">${step.name}</div>
+                <div id="step${index}-content">等待执行...</div>
+            `;
+            return div;
+        }
+
+        function initSteps() {
+            const container = document.getElementById('steps');
+            container.innerHTML = '';
+            steps.forEach((step, index) => {
+                container.appendChild(createStepElement(index));
+            });
+        }
+
+        async function runStep(index) {
+            if (index >= steps.length) {
+                displayFinalResult();
+                return;
+            }
+            
+            currentStep = index;
+            const stepEl = document.getElementById(`step${index}`);
+            const contentEl = document.getElementById(`step${index}-content`);
+            
+            stepEl.className = 'step running';
+            contentEl.innerHTML = '⏳ 执行中...';
+            
+            try {
+                const result = await steps[index].run();
+                contentEl.innerHTML = `<pre>${result}</pre>`;
+                stepEl.className = 'step success';
+                
+                // 滚动到当前步骤
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } catch (error) {
+                contentEl.innerHTML = `<span class="error">❌ 错误: ${error.message}</span>`;
+                stepEl.className = 'step error';
+            }
+        }
+
+        async function runAll() {
+            reset();
+            for (let i = 0; i < steps.length; i++) {
+                await runStep(i);
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+        }
+
+        function reset() {
+            currentStep = 0;
+            stepData = {};
+            initSteps();
+        }
+
+        function displayFinalResult() {
+            const container = document.getElementById('steps');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'step ' + (stepData.tooltipValue === stepData.expectedValue ? 'success' : 'error');
+            resultDiv.innerHTML = `
+                <div class="step-title">📊 最终结果</div>
+                <div class="comparison">
+                    <div class="comparison-box ${stepData.expectedValue === 186 ? 'match' : 'mismatch'}">
+                        <h3>预期值</h3>
+                        <div class="bignum ${stepData.expectedValue === 186 ? 'success' : 'error'}">${stepData.expectedValue}</div>
+                        <p>来源: sell24hData 计算结果</p>
+                    </div>
+                    <div class="comparison-box ${stepData.tooltipValue === 186 ? 'match' : 'mismatch'}">
+                        <h3>Tooltip 显示值</h3>
+                        <div class="bignum ${stepData.tooltipValue === 186 ? 'success' : 'error'}">${stepData.tooltipValue}</div>
+                        <p>来源: chartData24h[dataIndex]</p>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 20px; font-size: 18px;">
+                    ${stepData.tooltipValue === 186 ? 
+                        '<span class="success">✅ 正确！Tooltip 显示的值与预期一致</span>' : 
+                        `<span class="error">❌ 错误！预期 ${stepData.expectedValue}，但 Tooltip 显示 ${stepData.tooltipValue}</span>`
+                    }
+                </div>
+            `;
+            container.appendChild(resultDiv);
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // 初始化
+        initSteps();
+    </script>
+</body>
+</html>

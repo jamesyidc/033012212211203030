@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>仪表板历史快照</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <!-- 标题 -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">
+                <i class="fas fa-camera text-blue-600"></i>
+                仪表板历史快照
+            </h1>
+            <p class="text-gray-600">查看历史某一时刻的完整仪表板数据</p>
+        </div>
+
+        <!-- 日期和时间选择 -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- 日期选择 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-calendar"></i> 选择日期
+                    </label>
+                    <select id="dateSelect" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">加载中...</option>
+                    </select>
+                </div>
+
+                <!-- 时间选择 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-clock"></i> 选择时间
+                    </label>
+                    <select id="timeSelect" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">请先选择日期</option>
+                    </select>
+                </div>
+
+                <!-- 查看按钮 -->
+                <div class="flex items-end">
+                    <button id="viewButton" class="w-full px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
+                        <i class="fas fa-eye"></i> 查看快照
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 快照数据展示区 -->
+        <div id="snapshotContainer" class="hidden">
+            <!-- 基础信息 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-info-circle text-blue-600"></i> 快照信息
+                </h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <div class="text-sm text-gray-600">时间戳</div>
+                        <div id="snapshotTime" class="text-lg font-semibold text-gray-800">--</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-600">日期</div>
+                        <div id="snapshotDate" class="text-lg font-semibold text-gray-800">--</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-600">时刻</div>
+                        <div id="snapshotTimeOfDay" class="text-lg font-semibold text-gray-800">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 核心指标 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <!-- 27币涨跌幅之和 -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm text-gray-600">27币涨跌幅之和</span>
+                        <i class="fas fa-chart-line text-blue-600"></i>
+                    </div>
+                    <div id="coinChange" class="text-2xl font-bold">--</div>
+                    <div class="text-xs text-gray-500 mt-1">RSI: <span id="avgRsi">--</span></div>
+                </div>
+
+                <!-- 阿比值 -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm text-gray-600">阿比值</span>
+                        <i class="fas fa-balance-scale text-purple-600"></i>
+                    </div>
+                    <div id="abRatio" class="text-2xl font-bold text-gray-800">--</div>
+                </div>
+
+                <!-- 正负占比 -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm text-gray-600">正负占比</span>
+                        <i class="fas fa-chart-pie text-green-600"></i>
+                    </div>
+                    <div id="positiveRatio" class="text-2xl font-bold text-gray-800">--</div>
+                    <div class="text-xs text-gray-500 mt-1" id="positiveRatioPercent">--</div>
+                </div>
+
+                <!-- 上涨占比 -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm text-gray-600">上涨占比</span>
+                        <i class="fas fa-arrow-trend-up text-red-600"></i>
+                    </div>
+                    <div id="upRatio" class="text-2xl font-bold text-gray-800">--</div>
+                </div>
+            </div>
+
+            <!-- SAR统计和涨速 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <!-- SAR偏向统计 -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-chart-bar text-blue-600"></i> SAR偏向统计
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-sm text-gray-600">看涨</div>
+                            <div id="sarBullish" class="text-xl font-bold text-green-600">--</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-600">看跌</div>
+                            <div id="sarBearish" class="text-xl font-bold text-red-600">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5分钟涨速 -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-gauge-high text-orange-600"></i> 5分钟涨速统计
+                    </h3>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <div class="text-sm text-gray-600">最高</div>
+                            <div id="velocityMax" class="text-lg font-bold text-red-600">--</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-600">最低</div>
+                            <div id="velocityMin" class="text-lg font-bold text-green-600">--</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-600">平均</div>
+                            <div id="velocityAvg" class="text-lg font-bold text-blue-600">--</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 预测和BTC/ETH -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <!-- 日内预测 -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-crystal-ball text-purple-600"></i> 日内预测
+                    </h3>
+                    <div id="dailyPrediction" class="text-center py-4">
+                        <div class="text-3xl font-bold mb-2">--</div>
+                        <div class="text-sm text-gray-600">信号</div>
+                    </div>
+                </div>
+
+                <!-- BTC & ETH -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fab fa-bitcoin text-orange-600"></i> BTC & ETH
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-sm text-gray-600">BTC涨跌幅</div>
+                            <div id="btcChange" class="text-xl font-bold">--</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-600">ETH涨跌幅</div>
+                            <div id="ethChange" class="text-xl font-bold">--</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 单币涨跌幅 -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">
+                    <i class="fas fa-coins text-yellow-600"></i> 单币涨跌幅
+                </h3>
+                <div id="individualCoins" class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-9 gap-3">
+                    <!-- 动态填充 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 空状态 -->
+        <div id="emptyState" class="bg-white rounded-lg shadow-md p-12 text-center">
+            <i class="fas fa-camera text-gray-300 text-6xl mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-600 mb-2">请选择日期和时间</h3>
+            <p class="text-gray-500">选择一个历史时刻，查看当时的完整仪表板数据</p>
+        </div>
+    </div>
+
+    <script>
+        let availableDates = [];
+        let snapshotsCache = {};
+
+        // 加载可用日期列表
+        async function loadDates() {
+            try {
+                const response = await fetch('/api/dashboard-snapshot/dates');
+                const data = await response.json();
+                
+                if (data.success) {
+                    availableDates = data.dates;
+                    const dateSelect = document.getElementById('dateSelect');
+                    
+                    if (availableDates.length === 0) {
+                        dateSelect.innerHTML = '<option value="">暂无数据</option>';
+                        return;
+                    }
+                    
+                    dateSelect.innerHTML = '<option value="">请选择日期</option>';
+                    availableDates.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.date;
+                        option.textContent = item.date;
+                        dateSelect.appendChild(option);
+                    });
+                    
+                    console.log('✅ 加载日期列表成功:', availableDates.length);
+                }
+            } catch (error) {
+                console.error('❌ 加载日期列表失败:', error);
+            }
+        }
+
+        // 加载指定日期的所有快照
+        async function loadSnapshots(date) {
+            try {
+                if (snapshotsCache[date]) {
+                    return snapshotsCache[date];
+                }
+                
+                const response = await fetch(`/api/dashboard-snapshot/data?date=${date}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    snapshotsCache[date] = data.snapshots;
+                    return data.snapshots;
+                }
+                return [];
+            } catch (error) {
+                console.error('❌ 加载快照数据失败:', error);
+                return [];
+            }
+        }
+
+        // 日期选择变化
+        document.getElementById('dateSelect').addEventListener('change', async function() {
+            const date = this.value;
+            const timeSelect = document.getElementById('timeSelect');
+            
+            if (!date) {
+                timeSelect.innerHTML = '<option value="">请先选择日期</option>';
+                return;
+            }
+            
+            timeSelect.innerHTML = '<option value="">加载中...</option>';
+            
+            const snapshots = await loadSnapshots(date);
+            
+            if (snapshots.length === 0) {
+                timeSelect.innerHTML = '<option value="">该日期暂无数据</option>';
+                return;
+            }
+            
+            timeSelect.innerHTML = '<option value="">请选择时间</option>';
+            snapshots.forEach(snapshot => {
+                const option = document.createElement('option');
+                option.value = snapshot.time;
+                option.textContent = snapshot.time;
+                option.dataset.snapshot = JSON.stringify(snapshot);
+                timeSelect.appendChild(option);
+            });
+            
+            console.log('✅ 加载时间列表成功:', snapshots.length);
+        });
+
+        // 查看按钮点击
+        document.getElementById('viewButton').addEventListener('click', function() {
+            const timeSelect = document.getElementById('timeSelect');
+            const selectedOption = timeSelect.options[timeSelect.selectedIndex];
+            
+            if (!selectedOption || !selectedOption.dataset.snapshot) {
+                alert('请选择日期和时间');
+                return;
+            }
+            
+            const snapshot = JSON.parse(selectedOption.dataset.snapshot);
+            displaySnapshot(snapshot);
+        });
+
+        // 显示快照数据
+        function displaySnapshot(snapshot) {
+            console.log('📊 显示快照:', snapshot);
+            
+            // 显示容器，隐藏空状态
+            document.getElementById('snapshotContainer').classList.remove('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
+            
+            // 基础信息
+            document.getElementById('snapshotTime').textContent = snapshot.timestamp || '--';
+            document.getElementById('snapshotDate').textContent = snapshot.date || '--';
+            document.getElementById('snapshotTimeOfDay').textContent = snapshot.time || '--';
+            
+            // 27币涨跌幅之和
+            const coinChange = snapshot.coin_change;
+            if (coinChange && coinChange.cumulative_pct !== null) {
+                const pct = coinChange.cumulative_pct;
+                const color = pct >= 0 ? 'text-green-600' : 'text-red-600';
+                document.getElementById('coinChange').innerHTML = `<span class="${color}">${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%</span>`;
+                document.getElementById('avgRsi').textContent = coinChange.avg_rsi ? coinChange.avg_rsi.toFixed(2) : '--';
+            } else {
+                document.getElementById('coinChange').textContent = '--';
+                document.getElementById('avgRsi').textContent = '--';
+            }
+            
+            // 阿比值
+            document.getElementById('abRatio').textContent = snapshot.ab_ratio?.value || '--';
+            
+            // 正负占比
+            const positiveRatio = snapshot.positive_ratio;
+            if (positiveRatio) {
+                document.getElementById('positiveRatio').textContent = `${positiveRatio.positive_count || 0}/${positiveRatio.total_count || 0}`;
+                document.getElementById('positiveRatioPercent').textContent = `${(positiveRatio.ratio || 0).toFixed(1)}%`;
+            } else {
+                document.getElementById('positiveRatio').textContent = '--';
+                document.getElementById('positiveRatioPercent').textContent = '--';
+            }
+            
+            // 上涨占比
+            const upRatio = snapshot.up_ratio;
+            if (upRatio) {
+                document.getElementById('upRatio').innerHTML = `<span class="text-green-600">${upRatio.percentage.toFixed(1)}%</span>`;
+            } else {
+                document.getElementById('upRatio').textContent = '--';
+            }
+            
+            // SAR统计
+            const sarBias = snapshot.sar_bias;
+            if (sarBias) {
+                document.getElementById('sarBullish').textContent = sarBias.bullish_count || 0;
+                document.getElementById('sarBearish').textContent = sarBias.bearish_count || 0;
+            } else {
+                document.getElementById('sarBullish').textContent = '--';
+                document.getElementById('sarBearish').textContent = '--';
+            }
+            
+            // 5分钟涨速
+            const velocity = snapshot.velocity_stats;
+            if (velocity) {
+                const formatVel = (val) => val !== null && val !== undefined ? `${val >= 0 ? '+' : ''}${val.toFixed(2)}%` : '--';
+                document.getElementById('velocityMax').textContent = formatVel(velocity.max);
+                document.getElementById('velocityMin').textContent = formatVel(velocity.min);
+                document.getElementById('velocityAvg').textContent = formatVel(velocity.avg);
+            } else {
+                document.getElementById('velocityMax').textContent = '--';
+                document.getElementById('velocityMin').textContent = '--';
+                document.getElementById('velocityAvg').textContent = '--';
+            }
+            
+            // 日内预测
+            const prediction = snapshot.daily_prediction;
+            if (prediction && prediction.signal) {
+                document.getElementById('dailyPrediction').innerHTML = `
+                    <div class="text-3xl font-bold mb-2">${prediction.signal}</div>
+                    <div class="text-sm text-gray-600">信号</div>
+                `;
+            } else {
+                document.getElementById('dailyPrediction').innerHTML = '<div class="text-gray-400">暂无预测</div>';
+            }
+            
+            // BTC & ETH
+            const btc = snapshot.btc;
+            const eth = snapshot.eth;
+            if (btc && btc.change_pct !== null) {
+                const color = btc.change_pct >= 0 ? 'text-green-600' : 'text-red-600';
+                document.getElementById('btcChange').innerHTML = `<span class="${color}">${btc.change_pct >= 0 ? '+' : ''}${btc.change_pct.toFixed(2)}%</span>`;
+            } else {
+                document.getElementById('btcChange').textContent = '--';
+            }
+            if (eth && eth.change_pct !== null) {
+                const color = eth.change_pct >= 0 ? 'text-green-600' : 'text-red-600';
+                document.getElementById('ethChange').innerHTML = `<span class="${color}">${eth.change_pct >= 0 ? '+' : ''}${eth.change_pct.toFixed(2)}%</span>`;
+            } else {
+                document.getElementById('ethChange').textContent = '--';
+            }
+            
+            // 单币涨跌幅
+            const individualCoins = snapshot.individual_coins || [];
+            const coinsContainer = document.getElementById('individualCoins');
+            coinsContainer.innerHTML = '';
+            
+            individualCoins.forEach(coin => {
+                const pct = coin.change_pct;
+                const color = pct >= 0 ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50';
+                const div = document.createElement('div');
+                div.className = `${color} rounded-lg p-3 text-center`;
+                div.innerHTML = `
+                    <div class="text-xs font-medium text-gray-700 mb-1">${coin.symbol}</div>
+                    <div class="text-sm font-bold">${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%</div>
+                `;
+                coinsContainer.appendChild(div);
+            });
+        }
+
+        // 页面加载时初始化
+        loadDates();
+    </script>
+</body>
+</html>

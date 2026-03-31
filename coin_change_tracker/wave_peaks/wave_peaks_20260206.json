@@ -1,0 +1,199 @@
+{
+  "date": "20260206",
+  "data_points": 1439,
+  "peaks_count": 5,
+  "false_breakout": {
+    "consecutive_peaks": 3,
+    "reference_high": -31.18,
+    "peaks": [
+      {
+        "b_point": {
+          "index": 153,
+          "timestamp": "2026-02-06T02:33:00.298584+08:00",
+          "beijing_time": "2026-02-06 02:33:00",
+          "value": -82.2
+        },
+        "a_point": {
+          "index": 179,
+          "timestamp": "2026-02-06T02:59:00.303237+08:00",
+          "beijing_time": "2026-02-06 02:59:00",
+          "value": -31.18
+        },
+        "c_point": {
+          "index": 201,
+          "timestamp": "2026-02-06T03:21:00.974029+08:00",
+          "beijing_time": "2026-02-06 03:21:00",
+          "value": -57.15
+        },
+        "amplitude": 51.02,
+        "decline": 25.97,
+        "decline_ratio": 50.901607212857705
+      },
+      {
+        "b_point": {
+          "index": 266,
+          "timestamp": "2026-02-06T04:26:00.312436+08:00",
+          "beijing_time": "2026-02-06 04:26:00",
+          "value": -185.2
+        },
+        "a_point": {
+          "index": 282,
+          "timestamp": "2026-02-06T04:42:00.536257+08:00",
+          "beijing_time": "2026-02-06 04:42:00",
+          "value": -126.89
+        },
+        "c_point": {
+          "index": 298,
+          "timestamp": "2026-02-06T04:58:00.329493+08:00",
+          "beijing_time": "2026-02-06 04:58:00",
+          "value": -164.28
+        },
+        "amplitude": 58.30999999999999,
+        "decline": 37.39,
+        "decline_ratio": 64.12279197393245
+      },
+      {
+        "b_point": {
+          "index": 378,
+          "timestamp": "2026-02-06T06:18:00.335564+08:00",
+          "beijing_time": "2026-02-06 06:18:00",
+          "value": -200.37
+        },
+        "a_point": {
+          "index": 432,
+          "timestamp": "2026-02-06T07:12:00.347387+08:00",
+          "beijing_time": "2026-02-06 07:12:00",
+          "value": -102.25
+        },
+        "c_point": {
+          "index": 458,
+          "timestamp": "2026-02-06T07:38:00.567560+08:00",
+          "beijing_time": "2026-02-06 07:38:00",
+          "value": -154.24
+        },
+        "amplitude": 98.12,
+        "decline": 51.99000000000001,
+        "decline_ratio": 52.98613942111701
+      }
+    ],
+    "warning": "市场可能转跌，建议谨慎操作"
+  },
+  "peaks": [
+    {
+      "b_point": {
+        "index": 10,
+        "timestamp": "2026-02-06T00:10:00.269360+08:00",
+        "beijing_time": "2026-02-06 00:10:00",
+        "value": -20.03
+      },
+      "a_point": {
+        "index": 30,
+        "timestamp": "2026-02-06T00:30:07.411160+08:00",
+        "beijing_time": "2026-02-06 00:30:07",
+        "value": 39.19
+      },
+      "c_point": {
+        "index": 46,
+        "timestamp": "2026-02-06T00:46:11.764684+08:00",
+        "beijing_time": "2026-02-06 00:46:11",
+        "value": -3.75
+      },
+      "amplitude": 59.22,
+      "decline": 42.94,
+      "decline_ratio": 72.50928740290442
+    },
+    {
+      "b_point": {
+        "index": 81,
+        "timestamp": "2026-02-06T01:21:00.287635+08:00",
+        "beijing_time": "2026-02-06 01:21:00",
+        "value": -60.99
+      },
+      "a_point": {
+        "index": 101,
+        "timestamp": "2026-02-06T01:41:00.296224+08:00",
+        "beijing_time": "2026-02-06 01:41:00",
+        "value": -8.74
+      },
+      "c_point": {
+        "index": 119,
+        "timestamp": "2026-02-06T01:59:00.300562+08:00",
+        "beijing_time": "2026-02-06 01:59:00",
+        "value": -44.94
+      },
+      "amplitude": 52.25,
+      "decline": 36.199999999999996,
+      "decline_ratio": 69.2822966507177
+    },
+    {
+      "b_point": {
+        "index": 153,
+        "timestamp": "2026-02-06T02:33:00.298584+08:00",
+        "beijing_time": "2026-02-06 02:33:00",
+        "value": -82.2
+      },
+      "a_point": {
+        "index": 179,
+        "timestamp": "2026-02-06T02:59:00.303237+08:00",
+        "beijing_time": "2026-02-06 02:59:00",
+        "value": -31.18
+      },
+      "c_point": {
+        "index": 201,
+        "timestamp": "2026-02-06T03:21:00.974029+08:00",
+        "beijing_time": "2026-02-06 03:21:00",
+        "value": -57.15
+      },
+      "amplitude": 51.02,
+      "decline": 25.97,
+      "decline_ratio": 50.901607212857705
+    },
+    {
+      "b_point": {
+        "index": 266,
+        "timestamp": "2026-02-06T04:26:00.312436+08:00",
+        "beijing_time": "2026-02-06 04:26:00",
+        "value": -185.2
+      },
+      "a_point": {
+        "index": 282,
+        "timestamp": "2026-02-06T04:42:00.536257+08:00",
+        "beijing_time": "2026-02-06 04:42:00",
+        "value": -126.89
+      },
+      "c_point": {
+        "index": 298,
+        "timestamp": "2026-02-06T04:58:00.329493+08:00",
+        "beijing_time": "2026-02-06 04:58:00",
+        "value": -164.28
+      },
+      "amplitude": 58.30999999999999,
+      "decline": 37.39,
+      "decline_ratio": 64.12279197393245
+    },
+    {
+      "b_point": {
+        "index": 378,
+        "timestamp": "2026-02-06T06:18:00.335564+08:00",
+        "beijing_time": "2026-02-06 06:18:00",
+        "value": -200.37
+      },
+      "a_point": {
+        "index": 432,
+        "timestamp": "2026-02-06T07:12:00.347387+08:00",
+        "beijing_time": "2026-02-06 07:12:00",
+        "value": -102.25
+      },
+      "c_point": {
+        "index": 458,
+        "timestamp": "2026-02-06T07:38:00.567560+08:00",
+        "beijing_time": "2026-02-06 07:38:00",
+        "value": -154.24
+      },
+      "amplitude": 98.12,
+      "decline": 51.99000000000001,
+      "decline_ratio": 52.98613942111701
+    }
+  ],
+  "processed_at": "2026-02-18T09:45:44.268817"
+}

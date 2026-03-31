@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资金监控系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #1e2139 0%, #2a2d47 100%);
+            color: #fff;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2a2d47 0%, #3a3d5c 100%);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #00d4ff;
+        }
+        
+        .header-info {
+            display: flex;
+            gap: 30px;
+            font-size: 14px;
+            color: #8b92b8;
+            flex-wrap: wrap;
+        }
+        
+        .config-panel {
+            background: #2a2d47;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #3b7dff;
+        }
+        
+        .config-panel h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #00d4ff;
+        }
+        
+        .config-row {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .config-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .config-item label {
+            font-size: 14px;
+            color: #8b92b8;
+        }
+        
+        .config-item input {
+            background: #1e2139;
+            border: 1px solid #3b7dff;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            width: 100px;
+            font-size: 14px;
+        }
+        
+        .btn {
+            background: #3b7dff;
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #5a95ff;
+            transform: translateY(-2px);
+        }
+        
+        .stats-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #2a2d47 0%, #3a3d5c 100%);
+            padding: 15px 20px;
+            border-radius: 10px;
+            flex: 1;
+            min-width: 200px;
+            border-left: 4px solid #3b7dff;
+        }
+        
+        .stat-card.abnormal {
+            border-left-color: #ff4757;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: #8b92b8;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+        
+        .stat-card.abnormal .stat-value {
+            color: #ff4757;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            background: #2a2d47;
+            border: 1px solid #3b7dff;
+            color: #8b92b8;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .tab:hover {
+            background: #3a3d5c;
+            transform: translateY(-2px);
+        }
+        
+        .tab.active {
+            background: #3b7dff;
+            color: #fff;
+            font-weight: 600;
+        }
+        
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .coin-card {
+            background: #2a2d47;
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid #3b7dff;
+            transition: all 0.3s;
+        }
+        
+        .coin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(59, 125, 255, 0.3);
+        }
+        
+        .coin-card.abnormal {
+            border-color: #ff4757;
+            background: linear-gradient(135deg, #2a2d47 0%, #3d2d3a 100%);
+        }
+        
+        .coin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .coin-symbol {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+        
+        .abnormal-badge {
+            background: #ff4757;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .coin-data {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(59, 125, 255, 0.2);
+        }
+        
+        .data-label {
+            color: #8b92b8;
+        }
+        
+        .data-value {
+            color: #fff;
+            font-weight: 500;
+        }
+        
+        .data-value.positive {
+            color: #20c997;
+        }
+        
+        .data-value.negative {
+            color: #ff4757;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #8b92b8;
+            font-size: 16px;
+        }
+        
+        .error {
+            background: #ff4757;
+            color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .update-time {
+            text-align: center;
+            color: #8b92b8;
+            font-size: 13px;
+            margin-top: 20px;
+        }
+        
+        .filter-bar {
+            background: #2a2d47;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-item label {
+            font-size: 14px;
+            color: #8b92b8;
+        }
+        
+        .filter-item select {
+            background: #1e2139;
+            border: 1px solid #3b7dff;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 资金监控系统</h1>
+            <div class="header-info">
+                <span>📊 监控币种：27个</span>
+                <span>⏱️ 时间周期：15分钟 / 30分钟 / 60分钟</span>
+                <span>📈 对比基准：过去3天平均量能</span>
+                <span id="last-update">🕒 最后更新：--</span>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <a href="/" class="btn" style="text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+                <span>🏠</span> 返回首页
+            </a>
+            <a href="/fund-monitor-history" class="btn" style="text-decoration: none; display: inline-flex; align-items: center; gap: 5px; background: #444866;">
+                <span>📜</span> 异常历史查询
+            </a>
+        </div>
+
+        <div class="config-panel">
+            <h3>⚙️ 系统配置</h3>
+            <div class="config-row">
+                <div class="config-item">
+                    <label>异常阈值：</label>
+                    <input type="number" id="threshold" value="20" min="1" max="100" step="1">
+                    <span style="color: #8b92b8;">%</span>
+                </div>
+                <div class="config-item">
+                    <label>回看天数：</label>
+                    <input type="number" id="lookback-days" value="3" min="1" max="7" step="1">
+                    <span style="color: #8b92b8;">天</span>
+                </div>
+                <button class="btn" onclick="updateConfig()">保存配置</button>
+                <button class="btn" onclick="loadData()">刷新数据</button>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-label">总监控币种</div>
+                <div class="stat-value">27</div>
+            </div>
+            <div class="stat-card abnormal">
+                <div class="stat-label">15分钟异常</div>
+                <div class="stat-value" id="abnormal-15min">0</div>
+            </div>
+            <div class="stat-card abnormal">
+                <div class="stat-label">30分钟异常</div>
+                <div class="stat-value" id="abnormal-30min">0</div>
+            </div>
+            <div class="stat-card abnormal">
+                <div class="stat-label">60分钟异常</div>
+                <div class="stat-value" id="abnormal-60min">0</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-interval="15min" onclick="switchTab('15min')">
+                15分钟周期
+            </div>
+            <div class="tab" data-interval="30min" onclick="switchTab('30min')">
+                30分钟周期
+            </div>
+            <div class="tab" data-interval="60min" onclick="switchTab('60min')">
+                60分钟周期
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-item">
+                <label>显示筛选：</label>
+                <select id="filter-type" onchange="applyFilter()">
+                    <option value="all">全部显示</option>
+                    <option value="abnormal">仅异常</option>
+                    <option value="normal">仅正常</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>排序方式：</label>
+                <select id="sort-type" onchange="applyFilter()">
+                    <option value="symbol">按币种名称</option>
+                    <option value="deviation">按偏差百分比</option>
+                    <option value="volume">按成交量</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="data-container"></div>
+
+        <div class="update-time" id="update-time"></div>
+    </div>
+
+    <script>
+        let allData = {};
+        let currentInterval = '15min';
+
+        // 加载配置
+        async function loadConfig() {
+            try {
+                const response = await fetch('/api/fund-monitor/config');
+                const result = await response.json();
+                if (result.success) {
+                    document.getElementById('threshold').value = result.config.threshold_percentage;
+                    document.getElementById('lookback-days').value = result.config.lookback_days;
+                }
+            } catch (error) {
+                console.error('加载配置失败:', error);
+            }
+        }
+
+        // 更新配置
+        async function updateConfig() {
+            const threshold = parseFloat(document.getElementById('threshold').value);
+            const lookbackDays = parseInt(document.getElementById('lookback-days').value);
+
+            try {
+                const response = await fetch('/api/fund-monitor/config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        threshold_percentage: threshold,
+                        lookback_days: lookbackDays
+                    })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert('✅ 配置更新成功！');
+                    loadData();
+                } else {
+                    alert('❌ 配置更新失败：' + result.error);
+                }
+            } catch (error) {
+                alert('❌ 配置更新失败：' + error.message);
+            }
+        }
+
+        // 加载数据
+        async function loadData() {
+            const container = document.getElementById('data-container');
+            container.innerHTML = '<div class="loading">⏳ 正在加载数据...</div>';
+
+            try {
+                const response = await fetch('/api/fund-monitor/latest');
+                const result = await response.json();
+
+                if (result.success) {
+                    allData = result.data;
+                    updateStats();
+                    renderData();
+                    document.getElementById('last-update').textContent = '🕒 最后更新：' + result.update_time;
+                    document.getElementById('update-time').textContent = '最后更新时间：' + result.update_time;
+                } else {
+                    container.innerHTML = '<div class="error">❌ 加载失败：' + result.error + '</div>';
+                }
+            } catch (error) {
+                container.innerHTML = '<div class="error">❌ 网络错误：' + error.message + '</div>';
+            }
+        }
+
+        // 更新统计数据
+        function updateStats() {
+            let count15 = 0, count30 = 0, count60 = 0;
+            for (let symbol in allData) {
+                if (allData[symbol]['15min'] && allData[symbol]['15min'].is_abnormal) count15++;
+                if (allData[symbol]['30min'] && allData[symbol]['30min'].is_abnormal) count30++;
+                if (allData[symbol]['60min'] && allData[symbol]['60min'].is_abnormal) count60++;
+            }
+            document.getElementById('abnormal-15min').textContent = count15;
+            document.getElementById('abnormal-30min').textContent = count30;
+            document.getElementById('abnormal-60min').textContent = count60;
+        }
+
+        // 渲染数据
+        function renderData() {
+            const container = document.getElementById('data-container');
+            
+            // 转换为数组以便排序
+            let dataArray = [];
+            for (let symbol in allData) {
+                const data = allData[symbol][currentInterval];
+                if (data) {
+                    dataArray.push({ symbol, ...data });
+                }
+            }
+
+            // 应用筛选和排序
+            dataArray = filterAndSort(dataArray);
+
+            if (dataArray.length === 0) {
+                container.innerHTML = '<div class="loading">📭 暂无数据</div>';
+                return;
+            }
+
+            let html = '<div class="data-grid">';
+            dataArray.forEach(item => {
+                const isAbnormal = item.is_abnormal;
+                const deviationClass = item.deviation_percent > 0 ? 'positive' : 'negative';
+
+                html += `
+                    <div class="coin-card ${isAbnormal ? 'abnormal' : ''}">
+                        <div class="coin-header">
+                            <div class="coin-symbol">${item.symbol}</div>
+                            ${isAbnormal ? '<div class="abnormal-badge">⚠️ 异常</div>' : ''}
+                        </div>
+                        <div class="coin-data">
+                            <div class="data-row">
+                                <span class="data-label">当前成交量</span>
+                                <span class="data-value">${formatNumber(item.volume)} USDT</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">3日平均</span>
+                                <span class="data-value">${item.avg_3day !== null ? formatNumber(item.avg_3day) + ' USDT' : '--'}</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">偏差百分比</span>
+                                <span class="data-value ${item.deviation_percent !== null ? deviationClass : ''}">
+                                    ${item.deviation_percent !== null ? (item.deviation_percent > 0 ? '+' : '') + item.deviation_percent + '%' : '--'}
+                                </span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">更新时间</span>
+                                <span class="data-value" style="font-size: 11px;">${item.collect_time}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            container.innerHTML = html;
+        }
+
+        // 筛选和排序
+        function filterAndSort(data) {
+            const filterType = document.getElementById('filter-type').value;
+            const sortType = document.getElementById('sort-type').value;
+
+            // 筛选
+            if (filterType === 'abnormal') {
+                data = data.filter(item => item.is_abnormal);
+            } else if (filterType === 'normal') {
+                data = data.filter(item => !item.is_abnormal);
+            }
+
+            // 排序
+            if (sortType === 'symbol') {
+                data.sort((a, b) => a.symbol.localeCompare(b.symbol));
+            } else if (sortType === 'deviation') {
+                data.sort((a, b) => {
+                    const devA = Math.abs(a.deviation_percent || 0);
+                    const devB = Math.abs(b.deviation_percent || 0);
+                    return devB - devA;
+                });
+            } else if (sortType === 'volume') {
+                data.sort((a, b) => b.volume - a.volume);
+            }
+
+            return data;
+        }
+
+        // 切换时间周期
+        function switchTab(interval) {
+            currentInterval = interval;
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-interval="${interval}"]`).classList.add('active');
+            renderData();
+        }
+
+        // 应用筛选
+        function applyFilter() {
+            renderData();
+        }
+
+        // 格式化数字
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(2) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(2) + 'K';
+            }
+            return num.toFixed(2);
+        }
+
+        // 初始化
+        loadConfig();
+        loadData();
+
+        // 自动刷新（每30秒）
+        setInterval(loadData, 30000);
+    </script>
+</body>
+</html>

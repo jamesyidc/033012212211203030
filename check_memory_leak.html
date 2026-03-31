@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>内存泄漏检测工具</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 30px; font-size: 2.5em; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .status-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+        .stat-item.warning { border-left-color: #ff9800; }
+        .stat-item.danger { border-left-color: #f44336; }
+        .stat-label { font-size: 0.9em; opacity: 0.8; margin-bottom: 5px; }
+        .stat-value { font-size: 1.8em; font-weight: bold; }
+        .process-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .process-table th, .process-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .process-table th {
+            background: rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+        }
+        .process-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .refresh-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            display: block;
+            margin: 20px auto;
+            transition: all 0.3s;
+        }
+        .refresh-btn:hover { background: #45a049; transform: translateY(-2px); }
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .alert.danger { background: rgba(244, 67, 54, 0.3); border-left: 4px solid #f44336; }
+        .alert.warning { background: rgba(255, 152, 0, 0.3); border-left: 4px solid #ff9800; }
+        .alert.info { background: rgba(33, 150, 243, 0.3); border-left: 4px solid #2196F3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 系统内存泄漏检测</h1>
+        
+        <div id="alerts"></div>
+        
+        <div class="status-card">
+            <h2>📊 系统内存状态</h2>
+            <div class="status-grid">
+                <div class="stat-item" id="total-memory">
+                    <div class="stat-label">总内存</div>
+                    <div class="stat-value">-</div>
+                </div>
+                <div class="stat-item" id="used-memory">
+                    <div class="stat-label">已使用</div>
+                    <div class="stat-value">-</div>
+                </div>
+                <div class="stat-item" id="free-memory">
+                    <div class="stat-label">空闲</div>
+                    <div class="stat-value">-</div>
+                </div>
+                <div class="stat-item" id="memory-percent">
+                    <div class="stat-label">使用率</div>
+                    <div class="stat-value">-</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-card">
+            <h2>🔄 进程重启统计（可能的崩溃/泄漏信号）</h2>
+            <table class="process-table" id="restart-table">
+                <thead>
+                    <tr>
+                        <th>进程名</th>
+                        <th>重启次数</th>
+                        <th>内存占用</th>
+                        <th>运行时长</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="status-card">
+            <h2>💾 内存占用排行（TOP 10）</h2>
+            <table class="process-table" id="memory-table">
+                <thead>
+                    <tr>
+                        <th>进程名</th>
+                        <th>内存占用</th>
+                        <th>CPU占用</th>
+                        <th>PID</th>
+                        <th>运行时长</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <button class="refresh-btn" onclick="loadData()">🔄 刷新数据</button>
+        
+        <div class="status-card">
+            <h2>📝 检测说明</h2>
+            <ul style="line-height: 2; margin-left: 20px;">
+                <li><strong>重启次数过多</strong>：如果某个进程重启次数超过50次，可能存在内存泄漏或崩溃问题</li>
+                <li><strong>内存占用异常</strong>：Flask应用正常内存应在50-150MB，超过200MB需要关注</li>
+                <li><strong>内存增长趋势</strong>：定期刷新此页面，观察内存占用是否持续增长</li>
+                <li><strong>系统内存不足</strong>：当可用内存低于1GB时，系统可能会触发OOM Killer</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        async function loadData() {
+            try {
+                // 获取系统内存信息
+                const memResponse = await fetch('/api/system/memory');
+                const memData = await memResponse.json();
+                
+                // 更新内存显示
+                updateMemoryDisplay(memData);
+                
+                // 获取进程信息
+                const procResponse = await fetch('/api/system/processes');
+                const procData = await procResponse.json();
+                
+                // 更新表格
+                updateRestartTable(procData.restart_stats);
+                updateMemoryTable(procData.memory_stats);
+                
+                // 显示警告
+                showAlerts(memData, procData);
+                
+            } catch (error) {
+                console.error('加载数据失败:', error);
+            }
+        }
+
+        function updateMemoryDisplay(data) {
+            const totalMem = document.querySelector('#total-memory .stat-value');
+            const usedMem = document.querySelector('#used-memory .stat-value');
+            const freeMem = document.querySelector('#free-memory .stat-value');
+            const percentMem = document.querySelector('#memory-percent .stat-value');
+            
+            totalMem.textContent = data.total;
+            usedMem.textContent = data.used;
+            freeMem.textContent = data.free;
+            percentMem.textContent = data.percent + '%';
+            
+            // 根据使用率调整颜色
+            const usedItem = document.getElementById('used-memory');
+            const percentItem = document.getElementById('memory-percent');
+            if (data.percent > 80) {
+                usedItem.classList.add('danger');
+                percentItem.classList.add('danger');
+            } else if (data.percent > 60) {
+                usedItem.classList.add('warning');
+                percentItem.classList.add('warning');
+            }
+        }
+
+        function updateRestartTable(data) {
+            const tbody = document.querySelector('#restart-table tbody');
+            tbody.innerHTML = '';
+            
+            data.sort((a, b) => b.restarts - a.restarts).slice(0, 10).forEach(proc => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${proc.name}</td>
+                    <td style="color: ${proc.restarts > 50 ? '#f44336' : proc.restarts > 10 ? '#ff9800' : '#4CAF50'}">${proc.restarts}</td>
+                    <td>${proc.memory}</td>
+                    <td>${proc.uptime}</td>
+                    <td style="color: ${proc.status === 'online' ? '#4CAF50' : '#f44336'}">${proc.status}</td>
+                `;
+            });
+        }
+
+        function updateMemoryTable(data) {
+            const tbody = document.querySelector('#memory-table tbody');
+            tbody.innerHTML = '';
+            
+            data.sort((a, b) => parseFloat(b.memory) - parseFloat(a.memory)).slice(0, 10).forEach(proc => {
+                const row = tbody.insertRow();
+                const memValue = parseFloat(proc.memory);
+                row.innerHTML = `
+                    <td>${proc.name}</td>
+                    <td style="color: ${memValue > 150 ? '#f44336' : memValue > 100 ? '#ff9800' : '#4CAF50'}">${proc.memory}</td>
+                    <td>${proc.cpu}%</td>
+                    <td>${proc.pid}</td>
+                    <td>${proc.uptime}</td>
+                `;
+            });
+        }
+
+        function showAlerts(memData, procData) {
+            const alertsDiv = document.getElementById('alerts');
+            alertsDiv.innerHTML = '';
+            
+            // 检查内存使用率
+            if (memData.percent > 80) {
+                alertsDiv.innerHTML += `
+                    <div class="alert danger">
+                        🚨 <strong>严重警告</strong>：系统内存使用率达到 ${memData.percent}%，可能触发OOM Killer！
+                    </div>
+                `;
+            } else if (memData.percent > 60) {
+                alertsDiv.innerHTML += `
+                    <div class="alert warning">
+                        ⚠️ <strong>警告</strong>：系统内存使用率达到 ${memData.percent}%，需要关注。
+                    </div>
+                `;
+            }
+            
+            // 检查重启次数
+            const highRestarts = procData.restart_stats.filter(p => p.restarts > 50);
+            if (highRestarts.length > 0) {
+                alertsDiv.innerHTML += `
+                    <div class="alert warning">
+                        ⚠️ <strong>发现异常重启</strong>：以下进程重启次数过多，可能存在崩溃或泄漏问题：<br>
+                        ${highRestarts.map(p => `${p.name} (${p.restarts}次)`).join(', ')}
+                    </div>
+                `;
+            }
+            
+            // 检查高内存占用
+            const highMemory = procData.memory_stats.filter(p => parseFloat(p.memory) > 150);
+            if (highMemory.length > 0) {
+                alertsDiv.innerHTML += `
+                    <div class="alert info">
+                        ℹ️ <strong>高内存占用</strong>：以下进程内存占用较高：<br>
+                        ${highMemory.map(p => `${p.name} (${p.memory})`).join(', ')}
+                    </div>
+                `;
+            }
+        }
+
+        // 页面加载时自动获取数据
+        loadData();
+        
+        // 每30秒自动刷新
+        setInterval(loadData, 30000);
+    </script>
+</body>
+</html>

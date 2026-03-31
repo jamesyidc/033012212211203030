@@ -1,0 +1,62 @@
+{
+  "apps": [
+    {
+      "name": "flask-app",
+      "script": "/home/user/webapp/core_code/app.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "1G",
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "FLASK_APP": "app.py",
+        "FLASK_ENV": "production"
+      },
+      "out_file": "/home/user/webapp/logs/flask-app-out.log",
+      "error_file": "/home/user/webapp/logs/flask-app-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "signal-collector",
+      "script": "/home/user/webapp/source_code/signal_collector.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/signal-collector-out.log",
+      "error_file": "/home/user/webapp/logs/signal-collector-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "data-health-monitor",
+      "script": "/home/user/webapp/source_code/data_health_monitor.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/data-health-monitor-out.log",
+      "error_file": "/home/user/webapp/logs/data-health-monitor-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "system-health-monitor",
+      "script": "/home/user/webapp/source_code/system_health_monitor.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "500M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/system-health-monitor-out.log",
+      "error_file": "/home/user/webapp/logs/system-health-monitor-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    }
+  ]
+}

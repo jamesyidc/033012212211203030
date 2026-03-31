@@ -1,0 +1,6 @@
+{"timestamp": "2026-03-07 23:44:41", "action": "config_update", "enabled": true, "threshold": 40, "allow_once": true}
+{"timestamp": "2026-03-08 02:04:03", "action": "check", "trigger": false, "close_action": "none", "current_ratio": 63.0, "threshold": 40, "last_status": null, "current_status": "above", "reason": ""}
+{"timestamp": "2026-03-08 02:05:03", "action": "check", "trigger": false, "close_action": "none", "current_ratio": 62.38, "threshold": 40, "last_status": "above", "current_status": "above", "reason": ""}
+{"timestamp": "2026-03-08 02:06:32", "action": "check", "trigger": false, "close_action": "none", "current_ratio": 61.76, "threshold": 40, "last_status": "above", "current_status": "above", "reason": ""}
+{"timestamp": "2026-03-08 02:21:10", "action": "check", "trigger": false, "close_action": "none", "current_ratio": 55.26, "threshold": 40, "last_status": "above", "current_status": "above", "reason": ""}
+{"timestamp": "2026-03-08 03:17:50", "action": "check", "trigger": true, "close_action": "close_long", "current_ratio": 39.38, "threshold": 40, "last_status": "above", "current_status": "below", "reason": "正数占比从 ≥40% 下降至 <40%，平掉所有多单 (单次执行，已自动关闭策略)"}

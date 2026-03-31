@@ -1,0 +1,101 @@
+{
+  "date": "20260220",
+  "data_points": 1000,
+  "peaks_count": 4,
+  "false_breakout": null,
+  "peaks": [
+    {
+      "b_point": {
+        "index": 100,
+        "timestamp": 1771500000000,
+        "beijing_time": "2026-02-20 03:00:00",
+        "value": -60.5
+      },
+      "a_point": {
+        "index": 200,
+        "timestamp": 1771510000000,
+        "beijing_time": "2026-02-20 06:00:00",
+        "value": -23.5
+      },
+      "c_point": {
+        "index": 250,
+        "timestamp": 1771515000000,
+        "beijing_time": "2026-02-20 07:00:00",
+        "value": -40.2
+      },
+      "amplitude": 37.0,
+      "decline": 16.7,
+      "decline_ratio": 45.13
+    },
+    {
+      "b_point": {
+        "index": 250,
+        "timestamp": 1771515000000,
+        "beijing_time": "2026-02-20 07:00:00",
+        "value": -40.2
+      },
+      "a_point": {
+        "index": 350,
+        "timestamp": 1771525000000,
+        "beijing_time": "2026-02-20 10:00:00",
+        "value": -35.8
+      },
+      "c_point": {
+        "index": 400,
+        "timestamp": 1771530000000,
+        "beijing_time": "2026-02-20 11:00:00",
+        "value": -42.5
+      },
+      "amplitude": 4.4,
+      "decline": 6.7,
+      "decline_ratio": 18.72
+    },
+    {
+      "b_point": {
+        "index": 400,
+        "timestamp": 1771530000000,
+        "beijing_time": "2026-02-20 11:00:00",
+        "value": -42.5
+      },
+      "a_point": {
+        "index": 500,
+        "timestamp": 1771540000000,
+        "beijing_time": "2026-02-20 14:00:00",
+        "value": -48.3
+      },
+      "c_point": {
+        "index": 550,
+        "timestamp": 1771545000000,
+        "beijing_time": "2026-02-20 15:00:00",
+        "value": -55.1
+      },
+      "amplitude": -5.8,
+      "decline": 6.8,
+      "decline_ratio": 14.08
+    },
+    {
+      "b_point": {
+        "index": 550,
+        "timestamp": 1771545000000,
+        "beijing_time": "2026-02-20 15:00:00",
+        "value": -55.1
+      },
+      "a_point": {
+        "index": 650,
+        "timestamp": 1771555000000,
+        "beijing_time": "2026-02-20 18:00:00",
+        "value": -58.7
+      },
+      "c_point": {
+        "index": 700,
+        "timestamp": 1771560000000,
+        "beijing_time": "2026-02-20 19:00:00",
+        "value": -62.3
+      },
+      "amplitude": -3.6,
+      "decline": 3.6,
+      "decline_ratio": 6.13
+    }
+  ],
+  "processed_at": "2026-02-23T15:35:00.000000"
+}

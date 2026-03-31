@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据管理与备份系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .panels {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .panel {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        
+        .panel h2 {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .panel-icon {
+            font-size: 1.5em;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn.secondary {
+            background: #6c757d;
+        }
+        
+        .btn.danger {
+            background: #dc3545;
+        }
+        
+        .systems-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .system-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .system-item h3 {
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .system-info {
+            font-size: 0.9em;
+            color: #666;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .system-info span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .backup-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .backup-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .backup-info h4 {
+            font-size: 1em;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .backup-info p {
+            font-size: 0.85em;
+            color: #666;
+            margin: 3px 0;
+        }
+        
+        .backup-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.85em;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+        }
+        
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .system-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .system-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .system-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 8px;
+            font-size: 0.95em;
+            color: #555;
+        }
+        
+        .toggle-icon {
+            font-size: 1.2em;
+            color: #999;
+            transition: transform 0.3s;
+        }
+        
+        .system-details {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+        
+        .directory-section {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        
+        .daily-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .day-stat {
+            background: #fff;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .day-date {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 6px;
+            font-size: 0.95em;
+        }
+        
+        .day-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.85em;
+            color: #666;
+        }
+        
+        .file-list {
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: #fff;
+            transform: translateY(-2px);
+        }
+        
+        .tech-doc-panel {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        
+        .tech-doc-header {
+            cursor: pointer;
+            user-select: none;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .tech-doc-header:hover {
+            opacity: 0.95;
+        }
+        
+        .tech-doc-content {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        details {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        details summary {
+            padding: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        details[open] summary {
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 15px;
+        }
+        
+        code {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #764ba2;
+        }
+        
+        pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid #e0e0e0;
+            line-height: 1.5;
+        }
+        
+        .doc-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .doc-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .doc-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← 返回首页</a>
+        
+        <div class="header">
+            <h1>🗄️ 数据管理与备份系统</h1>
+            <p>统计、备份、恢复您的所有JSONL数据</p>
+        </div>
+        
+        <!-- 系统技术文档 -->
+        <div class="tech-doc-panel">
+            <div class="tech-doc-header" onclick="toggleTechDoc()">
+                <h2 style="margin: 0;">📚 系统技术文档</h2>
+                <span id="tech-doc-toggle">▼ 展开</span>
+            </div>
+            <div class="tech-doc-content" id="tech-doc-content">
+                
+                <!-- 系统运行逻辑 -->
+                <details open>
+                    <summary>🔄 系统运行逻辑</summary>
+                    <div style="padding: 15px; line-height: 1.8;">
+                        <p><strong>1. 数据统计层</strong></p>
+                        <ul style="margin-left: 20px; color: #666;">
+                            <li>扫描 <code>/home/user/webapp/data/</code> 目录下所有子目录</li>
+                            <li>统计每个目录的文件数量、JSONL记录数、文件大小</li>
+                            <li>计算总计数据（目录数、文件数、记录数、存储大小）</li>
+                            <li>通过API <code>/api/data-management/stats</code> 返回JSON数据</li>
+                        </ul>
+                        
+                        <p><strong>2. 备份管理层</strong></p>
+                        <ul style="margin-left: 20px; color: #666;">
+                            <li>创建备份：POST <code>/api/data-management/backup</code></li>
+                            <li>选择系统（支持多选），创建tar.gz压缩包</li>
+                            <li>备份文件保存到 <code>/home/user/webapp/backups/</code></li>
+                            <li>命名规则：<code>backup_YYYYMMDD_HHMMSS.tar.gz</code></li>
+                        </ul>
+                        
+                        <p><strong>3. 恢复管理层</strong></p>
+                        <ul style="margin-left: 20px; color: #666;">
+                            <li>解压备份文件到临时目录</li>
+                            <li>验证文件完整性</li>
+                            <li>恢复到原始目录（可选择覆盖或保留原文件）</li>
+                            <li>自动备份原文件（添加.backup后缀）</li>
+                        </ul>
+                        
+                        <p><strong>4. 前端展示层</strong></p>
+                        <ul style="margin-left: 20px; color: #666;">
+                            <li>实时统计卡片：显示总目录数、文件数、记录数、大小</li>
+                            <li>系统详情列表：每个系统的文件分布和最近7天数据</li>
+                            <li>备份列表：显示所有历史备份，支持下载和恢复</li>
+                            <li>自动刷新：页面每60秒自动更新数据</li>
+                        </ul>
+                    </div>
+                </details>
+                
+                <!-- 数据流程图 -->
+                <details>
+                    <summary>📊 数据流程图</summary>
+                    <pre style="font-family: monospace; color: #333;">
+┌─────────────────────────────────────────────────────────────────┐
+│                    各系统数据采集器 (PM2)                          │
+│  (price-position, signal, sar, panic, financial, etc.)         │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │ 每3-5分钟写入JSONL文件
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              数据存储层 (/home/user/webapp/data/)                │
+├─────────────────────────────────────────────────────────────────┤
+│  ├── new_high_low/           # 创新高低数据                      │
+│  ├── price_position/         # 价格位置数据                      │
+│  ├── price_comparison_jsonl/ # 支撑压力数据                      │
+│  ├── signal_stats/           # 信号统计数据                      │
+│  ├── sar_jsonl/              # SAR指标数据                       │
+│  ├── sar_bias_stats/         # SAR偏向统计                       │
+│  ├── panic_jsonl/            # 恐慌洗盘指数                      │
+│  ├── financial_indicators/   # 财经指标                          │
+│  ├── coin_change_tracker/    # 币种涨跌追踪                      │
+│  ├── price_speed_10m/        # 价格变化速度                      │
+│  └── (29+ 个数据目录)                                            │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │ API读取
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│           Flask API - 数据管理与备份系统                          │
+│              /api/data-management/*                             │
+├─────────────────────────────────────────────────────────────────┤
+│  GET  /stats        # 统计所有数据                               │
+│  POST /backup       # 创建备份                                  │
+│  GET  /backups      # 列出所有备份                               │
+│  POST /restore      # 恢复备份                                  │
+│  DELETE /backup     # 删除备份                                  │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │ HTTP JSON
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                  前端页面 (HTML + JavaScript)                     │
+│                /data-management                                 │
+├─────────────────────────────────────────────────────────────────┤
+│  [数据统计面板] 实时显示总计和分系统统计                          │
+│  [备份管理面板] 创建新备份，选择系统                              │
+│  [备份列表] 显示所有历史备份，操作(恢复/删除/下载)                │
+│  [系统详情] 折叠展开各系统数据详情                                │
+└─────────────────────────────────────────────────────────────────┘</pre>
+                </details>
+                
+                <!-- JSONL文件格式详解 -->
+                <details>
+                    <summary>📄 JSONL文件格式详解</summary>
+                    <div style="padding: 15px;">
+                        <p><strong>JSONL (JSON Lines) 格式说明：</strong></p>
+                        <p style="color: #666; margin-bottom: 15px;">每行一个完整的JSON对象，便于追加写入和流式读取。</p>
+                        
+                        <p><strong>1. 创新高低事件 (new_high_low_events_*.jsonl)</strong></p>
+                        <pre>{
+  "time": "2026-02-16 23:30:00",
+  "timestamp": 1771253400.0,
+  "symbol": "BTC",
+  "event_type": "new_high",
+  "price": 68900.5,
+  "previous_high": 68589.1,
+  "previous_time": "2026-02-16 22:22:26"
+}</pre>
+                        
+                        <p><strong>2. 支撑压力突破 (price_breakthrough_events.jsonl)</strong></p>
+                        <pre>{
+  "symbol": "SOL-USDT-SWAP",
+  "event_type": "new_low",
+  "price": 92.11,
+  "previous_extreme_price": 92.33,
+  "event_time": "2026-02-05 00:24:01"
+}</pre>
+                        
+                        <p><strong>3. SAR偏向统计 (bias_stats_*.jsonl)</strong></p>
+                        <pre>{
+  "beijing_time": "2026-02-16 23:00:00",
+  "symbols_above_80": ["BTC-USDT-SWAP", "ETH-USDT-SWAP"],
+  "bullish_ratio": 85.5,
+  "bearish_ratio": 14.5
+}</pre>
+                        
+                        <p><strong>4. 币种涨跌追踪 (coin_change_*.jsonl)</strong></p>
+                        <pre>{
+  "snapshot_time": "2026-02-16 23:00:00",
+  "BTC-USDT": {
+    "current_price": 68900.5,
+    "change_24h": 2.5,
+    "change_percent": 3.77
+  }
+}</pre>
+                    </div>
+                </details>
+                
+                <!-- 核心功能详解 -->
+                <details>
+                    <summary>⚙️ 核心功能详解</summary>
+                    <div style="padding: 15px; line-height: 1.8;">
+                        <p><strong>功能1: 数据统计</strong></p>
+                        <ul style="margin-left: 20px; color: #666;">
+                            <li><strong>实时扫描</strong>: 遍历data目录所有子目录</li>
+                            <li><strong>智能统计</strong>: 自动识别JSONL文件，逐行计数</li>
+                            <li><strong>性能优化</strong>: 仅统计元数据，不加载完整内容</li>
+                            <li><strong>分级展示</strong>: 总计→系统→目录→文件四级结构</li>
+                        </ul>
+                        
+                        <p><strong>功能2: 系统备份</strong></p>
+                        <ul style="margin-left: 20px; color: #666;">
+                            <li><strong>多选备份</strong>: 支持选择多个系统同时备份</li>
+                            <li><strong>压缩存储</strong>: 使用tar.gz格式，节省空间</li>
+                            <li><strong>完整性保证</strong>: 备份包含所有相关文件</li>
+                            <li><strong>命名规范</strong>: 时间戳命名，便于追溯</li>
+                        </ul>
+                        
+                        <p><strong>功能3: 数据恢复</strong></p>
+                        <ul style="margin-left: 20px; color: #666;">
+                            <li><strong>安全恢复</strong>: 恢复前自动备份原文件</li>
+                            <li><strong>选择性恢复</strong>: 可选择覆盖或跳过</li>
+                            <li><strong>验证机制</strong>: 解压后验证文件完整性</li>
+                            <li><strong>回滚支持</strong>: 保留.backup后缀文件</li>
+                        </ul>
+                        
+                        <p><strong>功能4: 最近7天数据</strong></p>
+                        <ul style="margin-left: 20px; color: #666;">
+                            <li><strong>按日统计</strong>: 显示每天的文件数和记录数</li>
+                            <li><strong>趋势分析</strong>: 快速了解数据增长情况</li>
+                            <li><strong>异常检测</strong>: 识别数据空缺或异常</li>
+                        </ul>
+                    </div>
+                </details>
+                
+                <!-- 系统依赖清单 -->
+                <details>
+                    <summary>🔧 系统依赖清单</summary>
+                    <div style="padding: 15px;">
+                        <p><strong>1. PM2守护进程 (22个)</strong></p>
+                        <table class="doc-table">
+                            <tr>
+                                <th>进程名称</th>
+                                <th>脚本</th>
+                                <th>功能</th>
+                            </tr>
+                            <tr>
+                                <td>price-position-collector</td>
+                                <td>price_position_collector.py</td>
+                                <td>价格位置数据采集（每5分钟）</td>
+                            </tr>
+                            <tr>
+                                <td>new-high-low-collector</td>
+                                <td>new_high_low_collector.py</td>
+                                <td>创新高低检测（每3分钟）</td>
+                            </tr>
+                            <tr>
+                                <td>signal-collector</td>
+                                <td>signal_collector.py</td>
+                                <td>信号数据采集</td>
+                            </tr>
+                            <tr>
+                                <td>sar-slope-collector</td>
+                                <td>sar_jsonl_collector.py</td>
+                                <td>SAR指标采集（每5分钟）</td>
+                            </tr>
+                            <tr>
+                                <td>sar-bias-stats-collector</td>
+                                <td>sar_bias_stats_collector.py</td>
+                                <td>SAR偏向统计（每5分钟）</td>
+                            </tr>
+                            <tr>
+                                <td>panic-wash-collector</td>
+                                <td>panic_wash_collector.py</td>
+                                <td>恐慌洗盘指数采集</td>
+                            </tr>
+                            <tr>
+                                <td>financial-indicators-collector</td>
+                                <td>financial_indicators_collector.py</td>
+                                <td>财经指标采集</td>
+                            </tr>
+                            <tr>
+                                <td>coin-change-tracker</td>
+                                <td>coin_change_tracker.py</td>
+                                <td>币种涨跌追踪（每5分钟）</td>
+                            </tr>
+                            <tr>
+                                <td>price-speed-collector</td>
+                                <td>price_speed_collector.py</td>
+                                <td>价格变化速度</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" style="text-align: center; color: #999;">...以及其他13个采集器</td>
+                            </tr>
+                        </table>
+                        
+                        <p><strong>2. Python依赖包</strong></p>
+                        <pre>flask>=2.0.0              # Web框架
+pytz                      # 时区处理
+requests                  # HTTP请求
+json, os, pathlib         # 标准库
+tarfile                   # 备份压缩
+shutil                    # 文件操作</pre>
+                        
+                        <p><strong>3. Flask API路由</strong></p>
+                        <table class="doc-table">
+                            <tr>
+                                <th>路由</th>
+                                <th>方法</th>
+                                <th>功能</th>
+                            </tr>
+                            <tr>
+                                <td>/data-management</td>
+                                <td>GET</td>
+                                <td>渲染管理页面</td>
+                            </tr>
+                            <tr>
+                                <td>/api/data-management/stats</td>
+                                <td>GET</td>
+                                <td>获取数据统计</td>
+                            </tr>
+                            <tr>
+                                <td>/api/data-management/backup</td>
+                                <td>POST</td>
+                                <td>创建备份</td>
+                            </tr>
+                            <tr>
+                                <td>/api/data-management/backups</td>
+                                <td>GET</td>
+                                <td>列出所有备份</td>
+                            </tr>
+                            <tr>
+                                <td>/api/data-management/restore</td>
+                                <td>POST</td>
+                                <td>恢复备份</td>
+                            </tr>
+                            <tr>
+                                <td>/api/data-management/backup/&lt;file&gt;</td>
+                                <td>DELETE</td>
+                                <td>删除备份</td>
+                            </tr>
+                        </table>
+                        
+                        <p><strong>4. 数据目录结构 (29+个系统)</strong></p>
+                        <pre>/home/user/webapp/
+├── data/                           # 数据根目录
+│   ├── new_high_low/              # 创新高低系统
+│   ├── price_position/            # 价格位置预警
+│   ├── price_comparison_jsonl/    # 支撑压力系统
+│   ├── signal_stats/              # 信号统计
+│   ├── sar_jsonl/                 # SAR指标（29个币种）
+│   ├── sar_bias_stats/            # SAR偏向统计
+│   ├── panic_jsonl/               # 恐慌洗盘指数
+│   ├── financial_indicators/      # 财经指标
+│   ├── coin_change_tracker/       # 币种涨跌追踪
+│   ├── price_speed_10m/           # 价格变化速度
+│   ├── liquidation_1h/            # 1小时爆仓数据
+│   ├── okx_trading_jsonl/         # OKX交易数据
+│   └── ... (20+ 更多系统)
+│
+├── backups/                        # 备份目录
+│   └── backup_*.tar.gz
+│
+└── templates/
+    └── data_management.html        # 管理页面</pre>
+                        
+                        <p><strong>5. 环境变量</strong></p>
+                        <pre>TZ=Asia/Shanghai          # 北京时区
+FLASK_ENV=production      # Flask环境
+FLASK_PORT=9002           # 服务端口</pre>
+                    </div>
+                </details>
+                
+                <!-- 维护指南 -->
+                <details>
+                    <summary>🔨 维护指南</summary>
+                    <div style="padding: 15px; line-height: 1.8;">
+                        <p><strong>查看数据统计</strong></p>
+                        <pre>curl http://127.0.0.1:9002/api/data-management/stats | jq</pre>
+                        
+                        <p><strong>创建完整备份</strong></p>
+                        <pre># 通过页面操作（推荐）：选择所有系统 → 点击"创建备份"
+# 或通过API：
+curl -X POST http://127.0.0.1:9002/api/data-management/backup \
+  -H "Content-Type: application/json" \
+  -d '{"systems": ["all"]}'</pre>
+                        
+                        <p><strong>恢复备份</strong></p>
+                        <pre># 通过页面：在备份列表中点击"恢复"按钮
+# 手动恢复：
+tar -xzf backups/backup_20260216_153000.tar.gz -C /tmp/
+cp -r /tmp/data/* data/
+pm2 restart all</pre>
+                        
+                        <p><strong>清理旧备份</strong></p>
+                        <pre># 删除30天前的备份
+find backups/ -name "backup_*.tar.gz" -mtime +30 -delete</pre>
+                        
+                        <p><strong>监控磁盘空间</strong></p>
+                        <pre># 查看data目录大小
+du -sh data/
+
+# 查看backups目录大小
+du -sh backups/
+
+# 查看磁盘使用情况
+df -h</pre>
+                        
+                        <p><strong>重启所有采集器</strong></p>
+                        <pre>pm2 restart all</pre>
+                    </div>
+                </details>
+                
+                <!-- Git提交记录 -->
+                <details>
+                    <summary>📝 Git提交记录</summary>
+                    <pre>20fd5cc - feat: Include support/resistance system data in backup
+57dcde7 - feat: Add data backup button and API endpoint
+4b54231 - feat: 添加完整的数据管理和备份恢复系统
+471dcdc - feat: Add sender and receiver address fields to backup</pre>
+                </details>
+                
+            </div>
+        </div>
+        
+        <div id="alertContainer"></div>
+        
+        <div class="panels">
+            <!-- 数据统计面板 -->
+            <div class="panel">
+                <h2><span class="panel-icon">📊</span> 数据统计概览</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>总目录数</h3>
+                        <div class="value" id="totalDirs">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>总文件数</h3>
+                        <div class="value" id="totalFiles">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>总记录数</h3>
+                        <div class="value" id="totalRecords">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>总大小 (MB)</h3>
+                        <div class="value" id="totalSize">-</div>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="scanData()">
+                    🔍 重新扫描数据
+                </button>
+            </div>
+            
+            <!-- 备份管理面板 -->
+            <div class="panel">
+                <h2><span class="panel-icon">💾</span> 备份管理</h2>
+                
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button class="btn" onclick="createBackup('full')">
+                        📦 创建完整备份
+                    </button>
+                    <button class="btn secondary" onclick="createBackup('incremental')">
+                        📥 创建增量备份
+                    </button>
+                </div>
+                
+                <!-- 发送方和接收方地址输入框 -->
+                <div style="margin-bottom: 20px;">
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; color: #555; font-weight: 500;">
+                            📤 发送方地址
+                        </label>
+                        <input type="text" 
+                               id="senderAddress" 
+                               placeholder="请输入发送方地址 (例如: user@example.com 或 服务器路径)"
+                               style="width: 100%; padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.95em; transition: border-color 0.3s;"
+                               onfocus="this.style.borderColor='#667eea'"
+                               onblur="this.style.borderColor='#e0e0e0'">
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; color: #555; font-weight: 500;">
+                            📥 接收方地址
+                        </label>
+                        <input type="text" 
+                               id="receiverAddress" 
+                               placeholder="请输入接收方地址 (例如: backup@server.com 或 /backup/path)"
+                               style="width: 100%; padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.95em; transition: border-color 0.3s;"
+                               onfocus="this.style.borderColor='#667eea'"
+                               onblur="this.style.borderColor='#e0e0e0'">
+                    </div>
+                </div>
+                
+                <div id="backupList" class="backup-list">
+                    <div class="loading">加载备份列表</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 各系统详细数据 -->
+        <div class="panel">
+            <h2><span class="panel-icon">📂</span> 各系统数据详情</h2>
+            
+            <div id="systemsList" class="systems-list">
+                <div class="loading">加载系统数据</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let statsData = null;
+        
+        // 技术文档折叠控制
+        function toggleTechDoc() {
+            const content = document.getElementById('tech-doc-content');
+            const toggle = document.getElementById('tech-doc-toggle');
+            
+            if (content.style.display === 'none' || content.style.display === '') {
+                content.style.display = 'block';
+                toggle.textContent = '▲ 收起';
+            } else {
+                content.style.display = 'none';
+                toggle.textContent = '▼ 展开';
+            }
+        }
+        
+        // 页面加载时获取统计数据
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadStatistics();
+            await loadBackupList();
+        });
+        
+        // 加载统计数据
+        async function loadStatistics() {
+            try {
+                const response = await fetch('/api/data-management/statistics');
+                const result = await response.json();
+                
+                if (result.success) {
+                    statsData = result.data;
+                    displayStatistics(statsData);
+                } else {
+                    // 如果没有统计数据，自动扫描
+                    showAlert('暂无统计数据，正在扫描...', 'info');
+                    await scanData();
+                }
+            } catch (error) {
+                console.error('加载统计数据失败:', error);
+                showAlert('加载统计数据失败: ' + error.message, 'error');
+            }
+        }
+        
+        // 显示统计数据
+        function displayStatistics(data) {
+            const summary = data.summary;
+            
+            document.getElementById('totalDirs').textContent = summary.total_directories;
+            document.getElementById('totalFiles').textContent = summary.total_files.toLocaleString();
+            document.getElementById('totalRecords').textContent = summary.total_records.toLocaleString();
+            document.getElementById('totalSize').textContent = summary.total_size_mb.toFixed(2);
+            
+            // 加载系统分组数据
+            loadSystemsGrouped();
+        }
+        
+        // 加载系统分组数据
+        async function loadSystemsGrouped() {
+            try {
+                const response = await fetch('/api/data-management/systems-grouped');
+                const result = await response.json();
+                
+                if (result.success) {
+                    displaySystemsGrouped(result.data);
+                } else {
+                    document.getElementById('systemsList').innerHTML = '<div style="padding: 20px; color: #999;">加载系统数据失败</div>';
+                }
+            } catch (error) {
+                console.error('加载系统数据失败:', error);
+                document.getElementById('systemsList').innerHTML = '<div style="padding: 20px; color: #999;">加载系统数据失败</div>';
+            }
+        }
+        
+        // JSONL目录说明映射
+        const dirDescriptions = {
+            // 价格位置预警系统
+            'price_position': '📊 实时价格位置数据（48小时/7天高低点、预警信号） | 用于：价格位置预警、重大事件监控',
+            'price_speed_jsonl': '⚡ 价格速度数据（1/5/15/60分钟涨跌速度） | 用于：价格位置预警、急涨急跌监控',
+            'price_speed_10m': '📈 10分钟价格速度统计（平均/最大/最小/波动率） | 用于：价格位置预警、波动率分析',
+            
+            // SAR趋势系统
+            'sar_jsonl': '🎯 SAR指标数据（抛物线转向、趋势状态） | 用于：SAR趋势、重大事件、OKX自动交易',
+            'sar_slope_jsonl': '📐 SAR斜率数据（趋势强度、变化速度） | 用于：SAR趋势、OKX自动交易入场判断',
+            'sar_1min': '⏱️ 1分钟粒度SAR数据（精细趋势判断） | 用于：SAR趋势精细分析、高频交易',
+            'sar_bias_stats': '📊 SAR乖离率统计（价格偏离SAR程度） | 用于：SAR趋势、极端乖离预警',
+            
+            // OKX全生态
+            'okx_trading_jsonl': '💹 24小时涨跌幅数据（价格/涨跌幅/成交量） | 用于：OKX全生态、日涨跌幅标记、重大事件',
+            'okx_trading_history': '📝 交易记录明细（开仓/平仓/止盈止损） | 用于：OKX全生态、实盘交易、利润分析',
+            'okx_trading_logs': '📋 交易系统日志（策略执行/风控/异常） | 用于：OKX全生态、系统调试监控',
+            'okx_angle_analysis': '📐 K线角度分析（趋势强度/支撑阻力） | 用于：OKX全生态、角度突破策略',
+            'okx_auto_strategy': '🤖 自动交易策略配置（杠杆/止盈止损/仓位） | 用于：OKX全生态、策略管理',
+            'okx_tpsl_settings': '🎚️ 止盈止损设置历史（参数变更记录） | 用于：OKX全生态、风控管理',
+            
+            // 恐慌监控
+            'panic_jsonl': '⚠️ 恐慌指数数据（爆仓量/持仓量/资金费率） | 用于：恐慌监控、重大事件、OKX交易',
+            'panic_daily': '📅 每日恐慌指数统计（每小时记录） | 用于：恐慌监控、市场情绪分析',
+            
+            // 11信号日线总
+            'signal_stats': '🔔 每日信号统计汇总（11个信号触发次数） | 用于：11信号日线、重大事件、每日回顾',
+            
+            // 27币涨跌幅追踪
+            'coin_change_tracker': '📉 实时涨跌幅追踪（基于日开盘价） | 用于：27币涨跌幅追踪、重大事件、市场热度',
+            
+            // 已归档
+            'support_resistance_jsonl': '🎯 支撑压力位数据（已停用 2026-02-07） | 替代：价格位置预警系统v2.0.5',
+            'support_resistance_daily': '🎯 每日支撑压力数据（已停用 2026-02-07） | 替代：价格位置预警系统v2.0.5',
+            'escape_signal_jsonl': '🚨 逃顶信号数据（已停用 2026-01-28） | 已合并到价格位置预警系统'
+        };
+        
+        // 显示系统分组数据
+        function displaySystemsGrouped(systemsData) {
+            const systemsList = document.getElementById('systemsList');
+            systemsList.innerHTML = '';
+            
+            // 按记录数排序
+            const sortedSystems = Object.entries(systemsData).sort((a, b) => b[1].total_records - a[1].total_records);
+            
+            sortedSystems.forEach(([systemName, system]) => {
+                const systemCard = document.createElement('div');
+                systemCard.className = 'system-card';
+                systemCard.style.borderLeft = `4px solid ${system.color}`;
+                
+                // 系统头部
+                let headerHTML = `
+                    <div class="system-header" style="cursor: pointer;" onclick="toggleSystem('${systemName}')">
+                        <div>
+                            <h3 style="font-size: 1.3em; margin-bottom: 8px;">
+                                ${system.icon} ${system.name}
+                            </h3>
+                            <div class="system-summary">
+                                <span>📄 ${system.total_files} 个文件</span>
+                                <span>📝 ${system.total_records.toLocaleString()} 条记录</span>
+                                <span>💾 ${(system.total_size / 1024 / 1024).toFixed(2)} MB</span>
+                                <span>📅 ${system.total_days} 天数据</span>
+                            </div>
+                            ${system.date_range.min ? `
+                                <div style="font-size: 0.9em; color: #666; margin-top: 4px;">
+                                    日期范围: ${system.date_range.min} ~ ${system.date_range.max}
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="toggle-icon" id="toggle-${systemName}">▼</div>
+                    </div>
+                `;
+                
+                // 系统详情（默认隐藏）
+                let detailsHTML = `<div class="system-details" id="details-${systemName}" style="display: none;">`;
+                
+                // 遍历每个子目录
+                Object.entries(system.directories).forEach(([dirName, dirInfo]) => {
+                    const description = dirDescriptions[dirName] || '';
+                    detailsHTML += `
+                        <div class="directory-section">
+                            <h4 style="font-size: 1.1em; margin-bottom: 10px; color: #555;">
+                                📁 ${dirName}
+                                <span style="font-size: 0.9em; color: #999; margin-left: 10px;">
+                                    (${dirInfo.files.length} 文件, ${dirInfo.total_records.toLocaleString()} 记录, ${(dirInfo.total_size / 1024 / 1024).toFixed(2)} MB)
+                                </span>
+                            </h4>
+                            ${description ? `
+                                <div style="font-size: 0.9em; color: #666; background: #f8f9fa; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px; border-left: 3px solid ${system.color};">
+                                    💡 ${description}
+                                </div>
+                            ` : ''}
+                    `;
+                    
+                    // 如果有每日统计，按日期显示
+                    if (Object.keys(dirInfo.daily_stats).length > 0) {
+                        const sortedDates = Object.keys(dirInfo.daily_stats).sort().reverse();
+                        
+                        detailsHTML += '<div class="daily-stats">';
+                        sortedDates.forEach(date => {
+                            const dayStats = dirInfo.daily_stats[date];
+                            detailsHTML += `
+                                <div class="day-stat">
+                                    <div class="day-date">${date}</div>
+                                    <div class="day-info">
+                                        <span>📄 ${dayStats.files.length} 文件</span>
+                                        <span>📝 ${dayStats.records.toLocaleString()} 条</span>
+                                        <span>💾 ${(dayStats.size / 1024).toFixed(2)} KB</span>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        detailsHTML += '</div>';
+                    } else {
+                        // 如果没有日期统计，列出所有文件
+                        detailsHTML += '<div class="file-list">';
+                        dirInfo.files.forEach(file => {
+                            detailsHTML += `
+                                <div style="padding: 5px 0; font-size: 0.9em; color: #666;">
+                                    📄 ${file.filename} - ${file.records.toLocaleString()} 条记录
+                                </div>
+                            `;
+                        });
+                        detailsHTML += '</div>';
+                    }
+                    
+                    detailsHTML += '</div>';
+                });
+                
+                detailsHTML += '</div>';
+                
+                systemCard.innerHTML = headerHTML + detailsHTML;
+                systemsList.appendChild(systemCard);
+            });
+        }
+        
+        // 切换系统详情显示
+        function toggleSystem(systemName) {
+            const details = document.getElementById(`details-${systemName}`);
+            const toggle = document.getElementById(`toggle-${systemName}`);
+            
+            if (details.style.display === 'none') {
+                details.style.display = 'block';
+                toggle.textContent = '▲';
+            } else {
+                details.style.display = 'none';
+                toggle.textContent = '▼';
+            }
+        }
+        
+        // 扫描数据
+        async function scanData() {
+            showAlert('正在扫描数据，请稍候...', 'info');
+            
+            try {
+                const response = await fetch('/api/data-management/scan', {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    statsData = result.data;
+                    displayStatistics(statsData);
+                    showAlert('✅ 数据扫描完成！', 'success');
+                } else {
+                    showAlert('❌ 扫描失败: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('❌ 扫描失败: ' + error.message, 'error');
+            }
+        }
+        
+        // 加载备份列表
+        async function loadBackupList() {
+            try {
+                const response = await fetch('/api/data-backup/list');
+                const result = await response.json();
+                
+                const backupList = document.getElementById('backupList');
+                
+                if (result.success) {
+                    if (result.output.includes('找到 0 个备份')) {
+                        backupList.innerHTML = '<div style="text-align: center; padding: 30px; color: #999;">暂无备份</div>';
+                    } else {
+                        // 解析输出显示备份列表
+                        backupList.innerHTML = `<pre style="font-size: 0.9em; white-space: pre-wrap;">${result.output}</pre>`;
+                    }
+                } else {
+                    backupList.innerHTML = '<div class="alert alert-error">加载备份列表失败</div>';
+                }
+            } catch (error) {
+                console.error('加载备份列表失败:', error);
+            }
+        }
+        
+        // 创建备份
+        async function createBackup(type) {
+            const typeName = type === 'full' ? '完整备份' : '增量备份';
+            
+            // 获取发送方和接收方地址
+            const senderAddress = document.getElementById('senderAddress').value.trim();
+            const receiverAddress = document.getElementById('receiverAddress').value.trim();
+            
+            // 验证地址是否填写（可选，根据需求决定是否必填）
+            if (senderAddress && !receiverAddress) {
+                showAlert('请填写接收方地址', 'error');
+                return;
+            }
+            
+            if (!senderAddress && receiverAddress) {
+                showAlert('请填写发送方地址', 'error');
+                return;
+            }
+            
+            let confirmMessage = `确认创建${typeName}？\n\n${type === 'full' ? '完整备份将打包所有数据，可能需要几分钟。' : '增量备份只备份修改过的文件，速度较快。'}`;
+            
+            if (senderAddress && receiverAddress) {
+                confirmMessage += `\n\n📤 发送方: ${senderAddress}\n📥 接收方: ${receiverAddress}`;
+            }
+            
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+            
+            showAlert(`正在创建${typeName}，请稍候...`, 'info');
+            
+            try {
+                const requestBody = { 
+                    type,
+                    sender_address: senderAddress || null,
+                    receiver_address: receiverAddress || null
+                };
+                
+                const response = await fetch('/api/data-backup/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    let successMessage = `✅ ${typeName}创建成功！`;
+                    if (result.backup_file) {
+                        successMessage += `\n文件: ${result.backup_file}`;
+                    }
+                    showAlert(successMessage, 'success');
+                    await loadBackupList();
+                } else {
+                    showAlert(`❌ 创建失败: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showAlert(`❌ 创建失败: ${error.message}`, 'error');
+            }
+        }
+        
+        // 显示提示
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type === 'success' ? 'success' : 'error'}`;
+            alert.textContent = message;
+            
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alert);
+            
+            // 3秒后自动消失
+            setTimeout(() => {
+                alert.classList.add('hidden');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

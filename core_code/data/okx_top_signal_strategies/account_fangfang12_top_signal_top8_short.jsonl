@@ -1,0 +1,1 @@
+{"timestamp": "2026-03-23T06:49:33.766987", "time": "2026-03-23 06:49:33", "account_id": "account_fangfang12", "strategy_type": "top8_short", "enabled": false, "rsi_threshold": 1800, "max_order_usdt": 5.0, "position_percent": 1.5, "leverage": 10, "description": "见顶信号+涨幅前8做空策略"}

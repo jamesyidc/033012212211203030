@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预警设置测试页面</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6">
+        <h1 class="text-2xl font-bold mb-6">预警设置加载测试</h1>
+        
+        <!-- API测试 -->
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold mb-4">1. API响应测试</h2>
+            <button onclick="testAPI()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                测试API
+            </button>
+            <pre id="apiResult" class="mt-4 p-4 bg-gray-100 rounded text-sm overflow-auto max-h-64"></pre>
+        </div>
+        
+        <!-- 输入框测试 -->
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold mb-4">2. 输入框显示测试</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">上限阈值</label>
+                    <input type="number" id="upThreshold" value="5" class="w-full border rounded px-3 py-2">
+                    <p class="text-sm text-gray-600 mt-1">当前值: <span id="upValue">5</span></p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">下限阈值</label>
+                    <input type="number" id="downThreshold" value="-5" class="w-full border rounded px-3 py-2">
+                    <p class="text-sm text-gray-600 mt-1">当前值: <span id="downValue">-5</span></p>
+                </div>
+            </div>
+            <button onclick="loadSettings()" class="mt-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                从API加载设置
+            </button>
+        </div>
+        
+        <!-- 控制台日志 -->
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold mb-4">3. 控制台日志</h2>
+            <div id="console" class="p-4 bg-gray-900 text-green-400 rounded font-mono text-sm max-h-96 overflow-auto"></div>
+        </div>
+        
+        <!-- 本地存储测试 -->
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold mb-4">4. localStorage测试</h2>
+            <button onclick="checkLocalStorage()" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+                查看localStorage
+            </button>
+            <button onclick="clearLocalStorage()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 ml-2">
+                清除localStorage
+            </button>
+            <pre id="localStorageResult" class="mt-4 p-4 bg-gray-100 rounded text-sm overflow-auto max-h-64"></pre>
+        </div>
+    </div>
+    
+    <script>
+        // 重写console.log
+        const originalLog = console.log;
+        const consoleDiv = document.getElementById('console');
+        
+        console.log = function(...args) {
+            originalLog(...args);
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            consoleDiv.innerHTML += `<div class="mb-1">[${new Date().toLocaleTimeString()}] ${message}</div>`;
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        };
+        
+        // 测试API
+        async function testAPI() {
+            console.log('🔍 开始测试API...');
+            try {
+                const response = await fetch('/api/coin-tracker/alert-settings');
+                console.log('📡 Response status:', response.status);
+                
+                const result = await response.json();
+                console.log('✅ API响应:', result);
+                
+                document.getElementById('apiResult').textContent = JSON.stringify(result, null, 2);
+            } catch (e) {
+                console.error('❌ API调用失败:', e);
+                document.getElementById('apiResult').textContent = 'Error: ' + e.message;
+            }
+        }
+        
+        // 加载设置
+        async function loadSettings() {
+            console.log('📥 开始加载设置...');
+            try {
+                const response = await fetch('/api/coin-tracker/alert-settings');
+                if (!response.ok) {
+                    throw new Error('API返回错误: ' + response.status);
+                }
+                
+                const result = await response.json();
+                console.log('✅ 获取到数据:', result);
+                
+                if (result.success && result.settings) {
+                    const settings = result.settings;
+                    
+                    // 更新输入框
+                    const upInput = document.getElementById('upThreshold');
+                    const downInput = document.getElementById('downThreshold');
+                    
+                    console.log('🔄 更新前 - 上限:', upInput.value, '下限:', downInput.value);
+                    
+                    upInput.value = settings.upperThreshold;
+                    downInput.value = settings.lowerThreshold;
+                    
+                    console.log('🔄 更新后 - 上限:', upInput.value, '下限:', downInput.value);
+                    
+                    // 更新显示
+                    document.getElementById('upValue').textContent = settings.upperThreshold;
+                    document.getElementById('downValue').textContent = settings.lowerThreshold;
+                    
+                    console.log('✅ 设置加载完成！');
+                } else {
+                    console.error('❌ 数据格式错误');
+                }
+            } catch (e) {
+                console.error('❌ 加载设置失败:', e);
+            }
+        }
+        
+        // 检查localStorage
+        function checkLocalStorage() {
+            console.log('💾 检查localStorage...');
+            const saved = localStorage.getItem('coinAlertSettings');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                console.log('✅ localStorage内容:', settings);
+                document.getElementById('localStorageResult').textContent = JSON.stringify(settings, null, 2);
+            } else {
+                console.log('⚠️  localStorage为空');
+                document.getElementById('localStorageResult').textContent = 'localStorage为空';
+            }
+        }
+        
+        // 清除localStorage
+        function clearLocalStorage() {
+            localStorage.removeItem('coinAlertSettings');
+            console.log('🗑️  localStorage已清除');
+            document.getElementById('localStorageResult').textContent = '已清除';
+        }
+        
+        // 页面加载时自动测试
+        window.onload = function() {
+            console.log('🚀 页面加载完成，开始自动测试...');
+            testAPI();
+            setTimeout(() => {
+                loadSettings();
+            }, 500);
+        };
+    </script>
+</body>
+</html>

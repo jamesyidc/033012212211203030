@@ -1,0 +1,18 @@
+{
+  "date": "2026-02-14",
+  "total_bullish": 15,
+  "total_bearish": 2,
+  "total_points": 270,
+  "unique_bullish_symbols": [
+    "CRO",
+    "HBAR",
+    "TRX"
+  ],
+  "unique_bearish_symbols": [
+    "CFX",
+    "LDO"
+  ],
+  "unique_bullish_count": 3,
+  "unique_bearish_count": 2,
+  "generated_at": "2026-02-28 22:15:29"
+}

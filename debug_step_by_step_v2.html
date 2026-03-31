@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>逐步调试 - 找出Tooltip问题</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #0f0f23;
+            color: #fff;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .steps {
+            display: grid;
+            gap: 20px;
+        }
+        .step {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s;
+        }
+        .step.active {
+            border-color: #52c41a;
+            background: rgba(82, 196, 26, 0.1);
+        }
+        .step.error {
+            border-color: #ff4d4f;
+            background: rgba(255, 77, 79, 0.1);
+        }
+        .step-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .step-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .step-number {
+            background: #1890ff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+        }
+        .step.active .step-number {
+            background: #52c41a;
+        }
+        .step.error .step-number {
+            background: #ff4d4f;
+        }
+        .step-status {
+            font-size: 2em;
+        }
+        .step-content {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        .data-display {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.8;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .data-row {
+            padding: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .data-row:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .key {
+            color: #ffd700;
+            font-weight: bold;
+        }
+        .value {
+            color: #52c41a;
+        }
+        .error-value {
+            color: #ff4d4f;
+            font-weight: bold;
+        }
+        .button {
+            background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 10px 5px;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(24, 144, 255, 0.4);
+        }
+        .button:disabled {
+            background: #444;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .chart-container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+        #debugChart {
+            width: 100%;
+            height: 500px;
+        }
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .comparison-box {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid;
+        }
+        .expected {
+            border-color: #52c41a;
+        }
+        .actual {
+            border-color: #ff4d4f;
+        }
+        .highlight {
+            background: rgba(255, 215, 0, 0.2);
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .code-block {
+            background: #1a1a2e;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .warning {
+            background: rgba(250, 173, 20, 0.2);
+            border: 2px solid #faad14;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .array-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 5px;
+            margin: 10px 0;
+        }
+        .array-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px;
+            border-radius: 5px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+        }
+        .array-item.highlight {
+            background: rgba(255, 215, 0, 0.3);
+            border: 2px solid #ffd700;
+        }
+        .progress {
+            width: 100%;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #52c41a 0%, #95de64 100%);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 逐步调试 Tooltip 问题</h1>
+            <p style="font-size: 1.2em; margin-top: 10px;">一步步加载数据，找出问题根源</p>
+        </div>
+
+        <div class="progress">
+            <div class="progress-bar" id="progress" style="width: 0%">0%</div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 30px;">
+            <button class="button" onclick="startDebug()">🚀 开始调试</button>
+            <button class="button" onclick="resetDebug()">🔄 重置</button>
+            <button class="button" onclick="runAll()">⚡ 全部运行</button>
+        </div>
+
+        <div class="steps">
+            <!-- Step 1: Load API Data -->
+            <div class="step" id="step1">
+                <div class="step-header">
+                    <div class="step-title">
+                        <div class="step-number">1</div>
+                        <span>加载 API 数据</span>
+                    </div>
+                    <div class="step-status" id="status1">⏸️</div>
+                </div>
+                <div class="step-content" id="content1">
+                    <p>从后端 API 获取原始数据...</p>
+                    <button class="button" onclick="runStep1()">运行步骤 1</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Parse and Deduplicate -->
+            <div class="step" id="step2">
+                <div class="step-header">
+                    <div class="step-title">
+                        <div class="step-number">2</div>
+                        <span>解析并去重</span>
+                    </div>
+                    <div class="step-status" id="status2">⏸️</div>
+                </div>
+                <div class="step-content" id="content2">
+                    <p>解析 API 数据并移除重复项...</p>
+                    <button class="button" onclick="runStep2()" disabled>运行步骤 2</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Calculate Statistics -->
+            <div class="step" id="step3">
+                <div class="step-header">
+                    <div class="step-title">
+                        <div class="step-number">3</div>
+                        <span>计算统计数据</span>
+                    </div>
+                    <div class="step-status" id="status3">⏸️</div>
+                </div>
+                <div class="step-content" id="content3">
+                    <p>计算 24h 和 2h 逃顶信号数...</p>
+                    <button class="button" onclick="runStep3()" disabled>运行步骤 3</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Prepare Chart Data -->
+            <div class="step" id="step4">
+                <div class="step-header">
+                    <div class="step-title">
+                        <div class="step-number">4</div>
+                        <span>准备图表数据</span>
+                    </div>
+                    <div class="step-status" id="status4">⏸️</div>
+                </div>
+                <div class="step-content" id="content4">
+                    <p>准备 sell24hData, sell2hData, fullTimes...</p>
+                    <button class="button" onclick="runStep4()" disabled>运行步骤 4</button>
+                </div>
+            </div>
+
+            <!-- Step 5: Create Tooltip Variables -->
+            <div class="step" id="step5">
+                <div class="step-header">
+                    <div class="step-title">
+                        <div class="step-number">5</div>
+                        <span>创建 Tooltip 变量</span>
+                    </div>
+                    <div class="step-status" id="status5">⏸️</div>
+                </div>
+                <div class="step-content" id="content5">
+                    <p>创建 chartData24h, chartData2h, chartFullTimes...</p>
+                    <button class="button" onclick="runStep5()" disabled>运行步骤 5</button>
+                </div>
+            </div>
+
+            <!-- Step 6: Render Chart -->
+            <div class="step" id="step6">
+                <div class="step-header">
+                    <div class="step-title">
+                        <div class="step-number">6</div>
+                        <span>渲染图表</span>
+                    </div>
+                    <div class="step-status" id="status6">⏸️</div>
+                </div>
+                <div class="step-content" id="content6">
+                    <p>使用 ECharts 渲染图表并配置 Tooltip...</p>
+                    <button class="button" onclick="runStep6()" disabled>运行步骤 6</button>
+                </div>
+            </div>
+
+            <!-- Step 7: Test Tooltip -->
+            <div class="step" id="step7">
+                <div class="step-header">
+                    <div class="step-title">
+                        <div class="step-number">7</div>
+                        <span>测试 Tooltip</span>
+                    </div>
+                    <div class="step-status" id="status7">⏸️</div>
+                </div>
+                <div class="step-content" id="content7">
+                    <p>模拟悬停在最右侧数据点，检查 Tooltip 显示...</p>
+                    <button class="button" onclick="runStep7()" disabled>运行步骤 7</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container" id="chartContainer" style="display: none;">
+            <h2>📊 调试图表</h2>
+            <div id="debugChart"></div>
+        </div>
+    </div>
+
+    <script>
+        let apiData = null;
+        let allData = [];
+        let displayData = [];
+        let sell24hData = [];
+        let sell2hData = [];
+        let fullTimes = [];
+        let chartData24h = [];
+        let chartData2h = [];
+        let chartFullTimes = [];
+        let chart = null;
+        let currentStep = 0;
+
+        function updateProgress(step) {
+            const percent = (step / 7) * 100;
+            document.getElementById('progress').style.width = percent + '%';
+            document.getElementById('progress').textContent = Math.round(percent) + '%';
+        }
+
+        function setStepStatus(step, status) {
+            const stepEl = document.getElementById('step' + step);
+            const statusEl = document.getElementById('status' + step);
+            
+            stepEl.classList.remove('active', 'error');
+            
+            if (status === 'running') {
+                stepEl.classList.add('active');
+                statusEl.textContent = '⏳';
+            } else if (status === 'success') {
+                stepEl.classList.add('active');
+                statusEl.textContent = '✅';
+            } else if (status === 'error') {
+                stepEl.classList.add('error');
+                statusEl.textContent = '❌';
+            }
+        }
+
+        function enableNextStep(step) {
+            if (step < 7) {
+                const nextBtn = document.querySelector(`#step${step + 1} button`);
+                if (nextBtn) nextBtn.disabled = false;
+            }
+        }
+
+        async function runStep1() {
+            setStepStatus(1, 'running');
+            const content = document.getElementById('content1');
+            
+            try {
+                content.innerHTML = '<p>正在请求 API...</p>';
+                
+                const response = await fetch('/api/price-position/list-detailed');
+                apiData = await response.json();
+                
+                content.innerHTML = `
+                    <div class="data-display">
+                        <div class="data-row"><span class="key">API 状态:</span> <span class="value">${response.status}</span></div>
+                        <div class="data-row"><span class="key">响应成功:</span> <span class="value">${apiData.success}</span></div>
+                        <div class="data-row"><span class="key">数据长度:</span> <span class="value">${apiData.data ? apiData.data.length : 0}</span></div>
+                        <div class="data-row"><span class="key">原始数据前 3 条:</span></div>
+                        <div class="code-block">${JSON.stringify(apiData.data.slice(0, 3), null, 2)}</div>
+                    </div>
+                `;
+                
+                setStepStatus(1, 'success');
+                enableNextStep(1);
+                currentStep = 1;
+                updateProgress(1);
+            } catch (error) {
+                content.innerHTML = `<div class="warning">❌ 错误: ${error.message}</div>`;
+                setStepStatus(1, 'error');
+            }
+        }
+
+        async function runStep2() {
+            setStepStatus(2, 'running');
+            const content = document.getElementById('content2');
+            
+            try {
+                content.innerHTML = '<p>正在解析和去重...</p>';
+                
+                allData = apiData.data.map(item => ({
+                    ...item,
+                    timestamp: new Date(item.timestamp).getTime()
+                }));
+                
+                // 去重
+                const seen = new Set();
+                const beforeCount = allData.length;
+                allData = allData.filter(item => {
+                    const key = `${item.timestamp}_${item.coin}`;
+                    if (seen.has(key)) return false;
+                    seen.add(key);
+                    return true;
+                });
+                const afterCount = allData.length;
+                const removed = beforeCount - afterCount;
+                
+                // 排序
+                allData.sort((a, b) => a.timestamp - b.timestamp);
+                
+                // 获取当前日期的数据
+                const today = new Date().toISOString().split('T')[0];
+                displayData = allData.filter(item => 
+                    item.timestamp_str.startsWith(today)
+                );
+                
+                content.innerHTML = `
+                    <div class="data-display">
+                        <div class="data-row"><span class="key">去重前:</span> <span class="value">${beforeCount} 条</span></div>
+                        <div class="data-row"><span class="key">去重后:</span> <span class="value">${afterCount} 条</span></div>
+                        <div class="data-row"><span class="key">移除重复:</span> <span class="error-value">${removed} 条</span></div>
+                        <div class="data-row"><span class="key">当前日期数据:</span> <span class="value">${displayData.length} 条</span></div>
+                        <div class="data-row"><span class="key">时间范围:</span></div>
+                        <div class="code-block">
+从: ${allData[0].timestamp_str}
+到: ${allData[allData.length - 1].timestamp_str}
+                        </div>
+                    </div>
+                `;
+                
+                setStepStatus(2, 'success');
+                enableNextStep(2);
+                currentStep = 2;
+                updateProgress(2);
+            } catch (error) {
+                content.innerHTML = `<div class="warning">❌ 错误: ${error.message}</div>`;
+                setStepStatus(2, 'error');
+            }
+        }
+
+        async function runStep3() {
+            setStepStatus(3, 'running');
+            const content = document.getElementById('content3');
+            
+            try {
+                content.innerHTML = '<p>正在计算统计数据...</p>';
+                
+                // 计算每个时间点的 24h 和 2h 统计
+                const stats = [];
+                
+                for (let i = 0; i < displayData.length; i++) {
+                    const currentTime = displayData[i].timestamp;
+                    const time24hAgo = currentTime - 24 * 60 * 60 * 1000;
+                    const time2hAgo = currentTime - 2 * 60 * 60 * 1000;
+                    
+                    // 计算 24h 内的卖出信号
+                    const count24h = allData.filter(item => 
+                        item.timestamp > time24hAgo && 
+                        item.timestamp <= currentTime && 
+                        item.signal_type === 'sell'
+                    ).length;
+                    
+                    // 计算 2h 内的卖出信号
+                    const count2h = allData.filter(item => 
+                        item.timestamp > time2hAgo && 
+                        item.timestamp <= currentTime && 
+                        item.signal_type === 'sell'
+                    ).length;
+                    
+                    stats.push({
+                        time: displayData[i].timestamp_str,
+                        sell24h: count24h,
+                        sell2h: count2h,
+                        index: i
+                    });
+                }
+                
+                // 最后一个数据点的统计
+                const lastStat = stats[stats.length - 1];
+                
+                content.innerHTML = `
+                    <div class="data-display">
+                        <div class="data-row"><span class="key">统计点数:</span> <span class="value">${stats.length} 个</span></div>
+                        <div class="data-row"><span class="key">最后一个点:</span></div>
+                        <div class="code-block">
+时间: ${lastStat.time}
+24h 逃顶: ${lastStat.sell24h} 次
+2h 逃顶: ${lastStat.sell2h} 次
+索引: ${lastStat.index}
+                        </div>
+                        <div class="data-row"><span class="key">最后 10 个点的 24h 统计:</span></div>
+                        <div class="array-display">
+                            ${stats.slice(-10).map((s, idx) => `
+                                <div class="array-item ${idx === 9 ? 'highlight' : ''}">
+                                    <div style="font-size: 0.8em;">[${s.index}]</div>
+                                    <div style="font-size: 1.2em; font-weight: bold;">${s.sell24h}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                
+                // 保存统计数据
+                window.debugStats = stats;
+                
+                setStepStatus(3, 'success');
+                enableNextStep(3);
+                currentStep = 3;
+                updateProgress(3);
+            } catch (error) {
+                content.innerHTML = `<div class="warning">❌ 错误: ${error.message}</div>`;
+                setStepStatus(3, 'error');
+            }
+        }
+
+        async function runStep4() {
+            setStepStatus(4, 'running');
+            const content = document.getElementById('content4');
+            
+            try {
+                content.innerHTML = '<p>正在准备图表数据...</p>';
+                
+                const stats = window.debugStats;
+                
+                // 构建数组
+                sell24hData = stats.map(s => s.sell24h);
+                sell2hData = stats.map(s => s.sell2h);
+                fullTimes = stats.map(s => s.time);
+                
+                content.innerHTML = `
+                    <div class="data-display">
+                        <div class="data-row"><span class="key">sell24hData 长度:</span> <span class="value">${sell24hData.length}</span></div>
+                        <div class="data-row"><span class="key">sell2hData 长度:</span> <span class="value">${sell2hData.length}</span></div>
+                        <div class="data-row"><span class="key">fullTimes 长度:</span> <span class="value">${fullTimes.length}</span></div>
+                        <div class="data-row"><span class="key">sell24hData 最后 5 个值:</span></div>
+                        <div class="code-block">${JSON.stringify(sell24hData.slice(-5))}</div>
+                        <div class="data-row"><span class="key">sell2hData 最后 5 个值:</span></div>
+                        <div class="code-block">${JSON.stringify(sell2hData.slice(-5))}</div>
+                        <div class="data-row"><span class="key">fullTimes 最后 3 个:</span></div>
+                        <div class="code-block">${JSON.stringify(fullTimes.slice(-3), null, 2)}</div>
+                        <div class="warning">
+                            <strong>⚠️ 关键检查点:</strong><br>
+                            sell24hData[${sell24hData.length - 1}] = <span class="highlight">${sell24hData[sell24hData.length - 1]}</span><br>
+                            这个值应该与页面顶部统计一致！
+                        </div>
+                    </div>
+                `;
+                
+                setStepStatus(4, 'success');
+                enableNextStep(4);
+                currentStep = 4;
+                updateProgress(4);
+            } catch (error) {
+                content.innerHTML = `<div class="warning">❌ 错误: ${error.message}</div>`;
+                setStepStatus(4, 'error');
+            }
+        }
+
+        async function runStep5() {
+            setStepStatus(5, 'running');
+            const content = document.getElementById('content5');
+            
+            try {
+                content.innerHTML = '<p>正在创建 Tooltip 变量...</p>';
+                
+                // 复制数组（这是关键！）
+                chartData24h = sell24hData.slice();
+                chartData2h = sell2hData.slice();
+                chartFullTimes = fullTimes.slice();
+                
+                // 检查是否相同
+                const isSame24h = JSON.stringify(chartData24h) === JSON.stringify(sell24hData);
+                const isSame2h = JSON.stringify(chartData2h) === JSON.stringify(sell2hData);
+                const isSameTimes = JSON.stringify(chartFullTimes) === JSON.stringify(fullTimes);
+                
+                content.innerHTML = `
+                    <div class="data-display">
+                        <div class="data-row"><span class="key">chartData24h 长度:</span> <span class="value">${chartData24h.length}</span></div>
+                        <div class="data-row"><span class="key">chartData2h 长度:</span> <span class="value">${chartData2h.length}</span></div>
+                        <div class="data-row"><span class="key">chartFullTimes 长度:</span> <span class="value">${chartFullTimes.length}</span></div>
+                        <div class="data-row"><span class="key">数据对齐检查:</span></div>
+                        <div class="code-block">
+chartData24h === sell24hData (引用): ${chartData24h === sell24hData ? '❌ 相同引用' : '✅ 不同引用'}
+chartData24h 内容 === sell24hData 内容: ${isSame24h ? '✅ 内容相同' : '❌ 内容不同'}
+chartData2h === sell2hData (引用): ${chartData2h === sell2hData ? '❌ 相同引用' : '✅ 不同引用'}
+chartData2h 内容 === sell2hData 内容: ${isSame2h ? '✅ 内容相同' : '❌ 内容不同'}
+                        </div>
+                        <div class="data-row"><span class="key">最后一个值对比:</span></div>
+                        <div class="comparison">
+                            <div class="comparison-box expected">
+                                <h3>sell24hData (series 数据)</h3>
+                                <div class="code-block">
+索引: ${sell24hData.length - 1}
+值: <span class="highlight">${sell24hData[sell24hData.length - 1]}</span>
+                                </div>
+                            </div>
+                            <div class="comparison-box ${chartData24h[chartData24h.length - 1] === sell24hData[sell24hData.length - 1] ? 'expected' : 'actual'}">
+                                <h3>chartData24h (tooltip 数据)</h3>
+                                <div class="code-block">
+索引: ${chartData24h.length - 1}
+值: <span class="highlight">${chartData24h[chartData24h.length - 1]}</span>
+                                </div>
+                            </div>
+                        </div>
+                        ${chartData24h[chartData24h.length - 1] !== sell24hData[sell24hData.length - 1] ? 
+                            '<div class="warning">❌ <strong>发现问题！</strong> chartData24h 和 sell24hData 的最后一个值不一致！</div>' : 
+                            '<div style="background: rgba(82, 196, 26, 0.2); padding: 15px; border-radius: 8px; margin-top: 15px;">✅ <strong>正确！</strong> chartData24h 和 sell24hData 的值一致。</div>'
+                        }
+                    </div>
+                `;
+                
+                setStepStatus(5, 'success');
+                enableNextStep(5);
+                currentStep = 5;
+                updateProgress(5);
+            } catch (error) {
+                content.innerHTML = `<div class="warning">❌ 错误: ${error.message}</div>`;
+                setStepStatus(5, 'error');
+            }
+        }
+
+        async function runStep6() {
+            setStepStatus(6, 'running');
+            const content = document.getElementById('content6');
+            
+            try {
+                content.innerHTML = '<p>正在渲染图表...</p>';
+                
+                // 显示图表容器
+                document.getElementById('chartContainer').style.display = 'block';
+                
+                // 初始化图表
+                if (!chart) {
+                    chart = echarts.init(document.getElementById('debugChart'));
+                }
+                
+                const option = {
+                    backgroundColor: 'transparent',
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: { type: 'cross' },
+                        formatter: function(params) {
+                            if (!params || params.length === 0) return '';
+                            const dataIndex = params[0].dataIndex;
+                            const fullTime = chartFullTimes[dataIndex];
+                            const actual24h = chartData24h[dataIndex];
+                            const actual2h = chartData2h[dataIndex];
+                            
+                            console.log('🎯 Tooltip 调试:');
+                            console.log('  dataIndex:', dataIndex);
+                            console.log('  fullTime:', fullTime);
+                            console.log('  actual24h:', actual24h);
+                            console.log('  actual2h:', actual2h);
+                            console.log('  chartData24h.length:', chartData24h.length);
+                            console.log('  sell24hData.length:', sell24hData.length);
+                            
+                            let result = `<div style="font-weight: bold; margin-bottom: 8px;">📅 ${fullTime}</div>`;
+                            result += `<div style="margin: 4px 0; color: #faad14;">
+                                🐛 调试: 索引${dataIndex}/${chartData24h.length - 1}
+                            </div>`;
+                            result += `<div style="margin: 4px 0;">
+                                <span style="display:inline-block;width:10px;height:10px;background:#ff4d4f;border-radius:50%;margin-right:5px;"></span>
+                                24h逃顶: <strong>${actual24h}</strong> 次
+                            </div>`;
+                            result += `<div style="margin: 4px 0;">
+                                <span style="display:inline-block;width:10px;height:10px;background:#faad14;border-radius:50%;margin-right:5px;"></span>
+                                2h逃顶: <strong>${actual2h}</strong> 次
+                            </div>`;
+                            return result;
+                        }
+                    },
+                    legend: {
+                        data: ['24h逃顶', '2h逃顶'],
+                        textStyle: { color: '#fff' },
+                        top: 10
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '10%',
+                        top: '15%',
+                        containLabel: true
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: fullTimes.map(t => t.split(' ')[1]),
+                        axisLabel: { 
+                            color: '#a0a0a0',
+                            rotate: 45
+                        },
+                        axisLine: { lineStyle: { color: '#444' } }
+                    },
+                    yAxis: {
+                        type: 'value',
+                        name: '信号数量',
+                        nameTextStyle: { color: '#a0a0a0' },
+                        axisLabel: { color: '#a0a0a0' },
+                        axisLine: { lineStyle: { color: '#444' } },
+                        splitLine: { lineStyle: { color: '#2d2d44' } }
+                    },
+                    series: [
+                        {
+                            name: '24h逃顶',
+                            type: 'line',
+                            data: sell24hData,
+                            itemStyle: { color: '#ff4d4f' },
+                            areaStyle: { color: 'rgba(255, 77, 79, 0.2)' },
+                            smooth: true
+                        },
+                        {
+                            name: '2h逃顶',
+                            type: 'line',
+                            data: sell2hData,
+                            itemStyle: { color: '#faad14' },
+                            areaStyle: { color: 'rgba(250, 173, 20, 0.2)' },
+                            smooth: true
+                        }
+                    ]
+                };
+                
+                chart.setOption(option);
+                
+                content.innerHTML = `
+                    <div class="data-display">
+                        <div class="data-row"><span class="key">图表渲染:</span> <span class="value">✅ 成功</span></div>
+                        <div class="data-row"><span class="key">Series 数据:</span></div>
+                        <div class="code-block">
+series[0].data = sell24hData (长度: ${sell24hData.length})
+series[1].data = sell2hData (长度: ${sell2hData.length})
+                        </div>
+                        <div class="data-row"><span class="key">Tooltip 数据:</span></div>
+                        <div class="code-block">
+tooltip 使用: chartData24h (长度: ${chartData24h.length})
+tooltip 使用: chartData2h (长度: ${chartData2h.length})
+                        </div>
+                        <div class="warning">
+                            <strong>🎯 关键检查:</strong><br>
+                            series 数据和 tooltip 数据的长度必须相同！<br>
+                            sell24hData.length (${sell24hData.length}) ${sell24hData.length === chartData24h.length ? '==' : '!='} chartData24h.length (${chartData24h.length})
+                        </div>
+                        <div style="background: rgba(24, 144, 255, 0.2); padding: 15px; border-radius: 8px; margin-top: 15px;">
+                            📍 <strong>现在请将鼠标悬停在图表的最右侧</strong>，查看 Console 输出！
+                        </div>
+                    </div>
+                `;
+                
+                setStepStatus(6, 'success');
+                enableNextStep(6);
+                currentStep = 6;
+                updateProgress(6);
+            } catch (error) {
+                content.innerHTML = `<div class="warning">❌ 错误: ${error.message}</div>`;
+                setStepStatus(6, 'error');
+            }
+        }
+
+        async function runStep7() {
+            setStepStatus(7, 'running');
+            const content = document.getElementById('content7');
+            
+            try {
+                content.innerHTML = '<p>正在测试 Tooltip...</p>';
+                
+                // 模拟获取最后一个点的 Tooltip 数据
+                const lastIndex = chartData24h.length - 1;
+                const expectedValue = sell24hData[lastIndex];
+                const tooltipValue = chartData24h[lastIndex];
+                const fullTime = chartFullTimes[lastIndex];
+                
+                const isCorrect = expectedValue === tooltipValue;
+                
+                content.innerHTML = `
+                    <div class="data-display">
+                        <div class="data-row"><span class="key">测试数据点:</span> <span class="value">最后一个（索引 ${lastIndex}）</span></div>
+                        <div class="data-row"><span class="key">时间:</span> <span class="value">${fullTime}</span></div>
+                        <div class="comparison">
+                            <div class="comparison-box expected">
+                                <h3>✅ 预期值 (sell24hData)</h3>
+                                <div class="code-block">
+索引: ${lastIndex}
+值: <span class="highlight" style="font-size: 2em;">${expectedValue}</span> 次
+                                </div>
+                                <p style="margin-top: 10px;">这是 series 数据中的值</p>
+                            </div>
+                            <div class="comparison-box ${isCorrect ? 'expected' : 'actual'}">
+                                <h3>${isCorrect ? '✅' : '❌'} 实际值 (chartData24h)</h3>
+                                <div class="code-block">
+索引: ${lastIndex}
+值: <span class="highlight" style="font-size: 2em;">${tooltipValue}</span> 次
+                                </div>
+                                <p style="margin-top: 10px;">这是 tooltip 将显示的值</p>
+                            </div>
+                        </div>
+                        ${!isCorrect ? `
+                            <div class="warning" style="margin-top: 20px;">
+                                <h3>❌ 发现问题！</h3>
+                                <p><strong>预期值:</strong> ${expectedValue} 次</p>
+                                <p><strong>实际值:</strong> ${tooltipValue} 次</p>
+                                <p><strong>差异:</strong> ${Math.abs(expectedValue - tooltipValue)} 次</p>
+                                <p style="margin-top: 15px;"><strong>可能原因:</strong></p>
+                                <ul style="margin-left: 20px; line-height: 2;">
+                                    <li>chartData24h 没有正确复制 sell24hData</li>
+                                    <li>数组长度不匹配</li>
+                                    <li>索引访问错误</li>
+                                    <li>数据在渲染后被修改</li>
+                                </ul>
+                            </div>
+                        ` : `
+                            <div style="background: rgba(82, 196, 26, 0.2); padding: 20px; border-radius: 8px; margin-top: 20px;">
+                                <h3 style="color: #52c41a;">✅ 测试通过！</h3>
+                                <p style="font-size: 1.2em; margin-top: 10px;">
+                                    Tooltip 将正确显示 <span class="highlight" style="font-size: 1.3em;">${tooltipValue} 次</span>
+                                </p>
+                                <p style="margin-top: 15px;">
+                                    现在请在上面的图表中悬停在最右侧，验证实际显示是否与此一致。
+                                </p>
+                            </div>
+                        `}
+                        <div style="margin-top: 20px; padding: 15px; background: rgba(24, 144, 255, 0.2); border-radius: 8px;">
+                            <h3>📝 调试总结</h3>
+                            <div style="line-height: 2; margin-top: 10px;">
+                                <div>• 数据点总数: ${chartData24h.length}</div>
+                                <div>• 最后索引: ${lastIndex}</div>
+                                <div>• sell24hData[${lastIndex}]: ${expectedValue}</div>
+                                <div>• chartData24h[${lastIndex}]: ${tooltipValue}</div>
+                                <div>• 数据一致性: ${isCorrect ? '✅ 一致' : '❌ 不一致'}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                setStepStatus(7, isCorrect ? 'success' : 'error');
+                currentStep = 7;
+                updateProgress(7);
+            } catch (error) {
+                content.innerHTML = `<div class="warning">❌ 错误: ${error.message}</div>`;
+                setStepStatus(7, 'error');
+            }
+        }
+
+        function startDebug() {
+            if (currentStep === 0) {
+                runStep1();
+            } else {
+                alert('调试已经开始。请点击"重置"重新开始。');
+            }
+        }
+
+        function resetDebug() {
+            // 重置所有状态
+            apiData = null;
+            allData = [];
+            displayData = [];
+            sell24hData = [];
+            sell2hData = [];
+            fullTimes = [];
+            chartData24h = [];
+            chartData2h = [];
+            chartFullTimes = [];
+            currentStep = 0;
+            
+            // 重置 UI
+            for (let i = 1; i <= 7; i++) {
+                document.getElementById('step' + i).classList.remove('active', 'error');
+                document.getElementById('status' + i).textContent = '⏸️';
+                document.getElementById('content' + i).innerHTML = 
+                    i === 1 ? '<p>从后端 API 获取原始数据...</p><button class="button" onclick="runStep1()">运行步骤 1</button>' :
+                    `<p>等待步骤 ${i - 1} 完成...</p><button class="button" onclick="runStep${i}()" disabled>运行步骤 ${i}</button>`;
+            }
+            
+            // 隐藏图表
+            document.getElementById('chartContainer').style.display = 'none';
+            if (chart) {
+                chart.dispose();
+                chart = null;
+            }
+            
+            updateProgress(0);
+        }
+
+        async function runAll() {
+            resetDebug();
+            for (let i = 1; i <= 7; i++) {
+                await window['runStep' + i]();
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+        }
+
+        // 初始化
+        updateProgress(0);
+    </script>
+</body>
+</html>

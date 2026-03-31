@@ -1,0 +1,32 @@
+{
+  "date": "20260218",
+  "data_points": 894,
+  "peaks_count": 1,
+  "false_breakout": null,
+  "peaks": [
+    {
+      "b_point": {
+        "index": 76,
+        "timestamp": 1771350358296,
+        "beijing_time": "2026-02-18 01:45:48",
+        "value": -19.24
+      },
+      "a_point": {
+        "index": 152,
+        "timestamp": 1771355691763,
+        "beijing_time": "2026-02-18 03:14:41",
+        "value": 34.96
+      },
+      "c_point": {
+        "index": 197,
+        "timestamp": 1771358877420,
+        "beijing_time": "2026-02-18 04:07:47",
+        "value": 6.56
+      },
+      "amplitude": 54.2,
+      "decline": 28.400000000000002,
+      "decline_ratio": 52.398523985239855
+    }
+  ],
+  "processed_at": "2026-02-18T09:45:45.030853"
+}

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统诊断页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .card {
+            background: white;
+            color: #333;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        .success { color: #10b981; font-weight: bold; }
+        .error { color: #ef4444; font-weight: bold; }
+        .info { color: #3b82f6; font-weight: bold; }
+        h1 { text-align: center; }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .test-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-btn:hover {
+            background: #5568d3;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Coin Price Tracker 系统诊断</h1>
+    
+    <div class="card">
+        <h2>1. 浏览器信息</h2>
+        <div id="browser-info">加载中...</div>
+    </div>
+    
+    <div class="card">
+        <h2>2. API连接测试</h2>
+        <button class="test-btn" onclick="testAPI()">测试API</button>
+        <div id="api-result">点击按钮测试</div>
+    </div>
+    
+    <div class="card">
+        <h2>3. 数据加载测试</h2>
+        <button class="test-btn" onclick="testDataLoad()">测试数据加载</button>
+        <div id="data-result">点击按钮测试</div>
+    </div>
+    
+    <div class="card">
+        <h2>4. ECharts库测试</h2>
+        <button class="test-btn" onclick="testECharts()">测试ECharts</button>
+        <div id="echarts-result">点击按钮测试</div>
+    </div>
+    
+    <div class="card">
+        <h2>5. 缓存状态</h2>
+        <button class="test-btn" onclick="clearAllCache()">清除所有缓存</button>
+        <div id="cache-result">点击按钮清除</div>
+    </div>
+    
+    <div class="card">
+        <h2>6. 快速操作</h2>
+        <button class="test-btn" onclick="goToMainPage()">前往主页面</button>
+        <button class="test-btn" onclick="goToV2Page()">前往V2页面</button>
+        <button class="test-btn" onclick="forceReload()">强制刷新</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script>
+        // 显示浏览器信息
+        document.getElementById('browser-info').innerHTML = `
+            <p><span class="info">浏览器:</span> ${navigator.userAgent}</p>
+            <p><span class="info">语言:</span> ${navigator.language}</p>
+            <p><span class="info">在线状态:</span> ${navigator.onLine ? '<span class="success">在线</span>' : '<span class="error">离线</span>'}</p>
+            <p><span class="info">Cookie启用:</span> ${navigator.cookieEnabled ? '<span class="success">是</span>' : '<span class="error">否</span>'}</p>
+            <p><span class="info">LocalStorage可用:</span> ${typeof(Storage) !== "undefined" ? '<span class="success">是</span>' : '<span class="error">否</span>'}</p>
+            <p><span class="info">当前时间:</span> ${new Date().toLocaleString('zh-CN', {timeZone: 'Asia/Shanghai'})}</p>
+        `;
+        
+        // 测试API
+        async function testAPI() {
+            const result = document.getElementById('api-result');
+            result.innerHTML = '<p class="info">测试中...</p>';
+            
+            try {
+                const timestamp = new Date().getTime();
+                const response = await fetch(`/api/coin-price-tracker/history?_t=${timestamp}&limit=1`);
+                const data = await response.json();
+                
+                result.innerHTML = `
+                    <p class="success">✅ API连接成功</p>
+                    <p>Success: ${data.success}</p>
+                    <p>Count: ${data.count}</p>
+                    <p>Has Data: ${data.data && data.data.length > 0 ? '是' : '否'}</p>
+                    ${data.data && data.data.length > 0 ? `<p>最新时间: ${data.data[0].collect_time}</p>` : ''}
+                    <pre>${JSON.stringify(data, null, 2).substring(0, 500)}</pre>
+                `;
+            } catch (error) {
+                result.innerHTML = `
+                    <p class="error">❌ API连接失败</p>
+                    <p>错误: ${error.message}</p>
+                `;
+            }
+        }
+        
+        // 测试数据加载
+        async function testDataLoad() {
+            const result = document.getElementById('data-result');
+            result.innerHTML = '<p class="info">测试中...</p>';
+            
+            try {
+                const timestamp = new Date().getTime();
+                const response = await fetch(`/api/coin-price-tracker/history?_t=${timestamp}`);
+                const data = await response.json();
+                
+                const data17 = data.data ? data.data.filter(r => r.collect_time.startsWith('2026-01-17')) : [];
+                
+                result.innerHTML = `
+                    <p class="success">✅ 数据加载成功</p>
+                    <p>总记录数: ${data.count}</p>
+                    <p>2026-01-17记录数: ${data17.length}</p>
+                    ${data17.length > 0 ? `
+                        <p>第一条时间: ${data17[0].collect_time}</p>
+                        <p>最后一条时间: ${data17[data17.length-1].collect_time}</p>
+                    ` : '<p class="error">没有2026-01-17的数据</p>'}
+                `;
+            } catch (error) {
+                result.innerHTML = `
+                    <p class="error">❌ 数据加载失败</p>
+                    <p>错误: ${error.message}</p>
+                `;
+            }
+        }
+        
+        // 测试ECharts
+        function testECharts() {
+            const result = document.getElementById('echarts-result');
+            
+            if (typeof echarts === 'undefined') {
+                result.innerHTML = '<p class="error">❌ ECharts库未加载</p>';
+                return;
+            }
+            
+            try {
+                const testDiv = document.createElement('div');
+                testDiv.style.width = '100px';
+                testDiv.style.height = '100px';
+                document.body.appendChild(testDiv);
+                
+                const chart = echarts.init(testDiv);
+                chart.setOption({
+                    series: [{
+                        type: 'line',
+                        data: [1, 2, 3]
+                    }]
+                });
+                
+                document.body.removeChild(testDiv);
+                
+                result.innerHTML = `
+                    <p class="success">✅ ECharts库正常</p>
+                    <p>版本: ${echarts.version || '未知'}</p>
+                `;
+            } catch (error) {
+                result.innerHTML = `
+                    <p class="error">❌ ECharts测试失败</p>
+                    <p>错误: ${error.message}</p>
+                `;
+            }
+        }
+        
+        // 清除所有缓存
+        function clearAllCache() {
+            const result = document.getElementById('cache-result');
+            let messages = [];
+            
+            try {
+                localStorage.clear();
+                messages.push('<p class="success">✅ localStorage已清除</p>');
+            } catch (e) {
+                messages.push('<p class="error">❌ localStorage清除失败: ' + e.message + '</p>');
+            }
+            
+            try {
+                sessionStorage.clear();
+                messages.push('<p class="success">✅ sessionStorage已清除</p>');
+            } catch (e) {
+                messages.push('<p class="error">❌ sessionStorage清除失败: ' + e.message + '</p>');
+            }
+            
+            result.innerHTML = messages.join('') + '<p class="info">建议清除浏览器缓存后刷新页面</p>';
+        }
+        
+        // 前往主页面
+        function goToMainPage() {
+            window.location.href = '/coin-price-tracker';
+        }
+        
+        // 前往V2页面
+        function goToV2Page() {
+            window.location.href = '/coin-tracker-v2';
+        }
+        
+        // 强制刷新
+        function forceReload() {
+            window.location.reload(true);
+        }
+        
+        // 自动运行所有测试
+        window.onload = function() {
+            console.log('诊断页面加载完成');
+            setTimeout(() => {
+                testAPI();
+                testDataLoad();
+                testECharts();
+            }, 1000);
+        };
+    </script>
+</body>
+</html>

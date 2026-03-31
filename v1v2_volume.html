@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V1V2成交量系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .update-time {
+            color: #888;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 0.85em;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .stat-value.green {
+            color: #4ade80;
+        }
+
+        .stat-value.blue {
+            color: #60a5fa;
+        }
+
+        .stat-value.purple {
+            color: #a78bfa;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .card-title {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title .icon {
+            font-size: 1.2em;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.05);
+            color: #888;
+            font-weight: 600;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .symbol {
+            font-weight: 600;
+            color: #60a5fa;
+        }
+
+        .volume {
+            font-weight: 600;
+            color: #4ade80;
+        }
+
+        .rank {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .rank.top1 {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #000;
+        }
+
+        .rank.top2 {
+            background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+            color: #000;
+        }
+
+        .rank.top3 {
+            background: linear-gradient(135deg, #cd7f32, #e8a87c);
+            color: #000;
+        }
+
+        .rank.other {
+            background: rgba(255, 255, 255, 0.1);
+            color: #888;
+        }
+
+        .chart-container {
+            height: 400px;
+            margin-top: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+            font-size: 1.1em;
+        }
+
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .stat-value {
+                font-size: 1.4em;
+            }
+
+            th, td {
+                padding: 8px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 V1V2成交量系统</h1>
+            <p>实时监控27个币种的成交量数据</p>
+            <div class="update-time" id="updateTime">加载中...</div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-label">总成交量</div>
+                <div class="stat-value green" id="totalVolume">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">币种数量</div>
+                <div class="stat-value blue" id="coinCount">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">最高成交</div>
+                <div class="stat-value purple" id="topVolume">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">平均成交</div>
+                <div class="stat-value" id="avgVolume">-</div>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">🏆</span>
+                    TOP 10 成交量排名
+                </div>
+                <div class="table-container">
+                    <table id="top10Table">
+                        <thead>
+                            <tr>
+                                <th>排名</th>
+                                <th>币种</th>
+                                <th>成交量 (万USDT)</th>
+                                <th>占比</th>
+                            </tr>
+                        </thead>
+                        <tbody id="top10Body">
+                            <tr><td colspan="4" class="loading">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">📈</span>
+                    成交量占比分布
+                </div>
+                <div class="chart-container">
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card full-width">
+                <div class="card-title">
+                    <span class="icon">📋</span>
+                    完整成交量列表 (27个币种)
+                </div>
+                <div class="table-container">
+                    <table id="fullTable">
+                        <thead>
+                            <tr>
+                                <th>排名</th>
+                                <th>币种</th>
+                                <th>成交量 (万USDT)</th>
+                                <th>占比</th>
+                                <th>可视化</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fullBody">
+                            <tr><td colspan="5" class="loading">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        const DATA_URL = 'https://5027-i6z1n4prnsqw4uzv0af9z-2e77fc33.sandbox.novita.ai/v1v2-data.js';
+        let chartInstance = null;
+
+        // 格式化数字
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(2) + 'M';
+            } else if (num >= 10000) {
+                return (num / 10000).toFixed(2) + '万';
+            }
+            return num.toFixed(2);
+        }
+
+        // 格式化百分比
+        function formatPercent(percent) {
+            return percent.toFixed(2) + '%';
+        }
+
+        // 获取排名样式
+        function getRankClass(rank) {
+            if (rank === 1) return 'top1';
+            if (rank === 2) return 'top2';
+            if (rank === 3) return 'top3';
+            return 'other';
+        }
+
+        // 加载数据
+        async function loadData() {
+            try {
+                const response = await fetch(DATA_URL);
+                const text = await response.text();
+                
+                // 从JS文件中提取数据
+                const jsonMatch = text.match(/var v1v2VolumeData = ({[\s\S]*?});/);
+                if (!jsonMatch) {
+                    throw new Error('无法解析数据');
+                }
+                
+                const data = JSON.parse(jsonMatch[1]);
+                
+                if (!data.success || !data.volumes) {
+                    throw new Error('数据格式错误');
+                }
+
+                renderData(data);
+            } catch (error) {
+                console.error('加载数据失败:', error);
+                showError('数据加载失败: ' + error.message);
+            }
+        }
+
+        // 渲染数据
+        function renderData(data) {
+            const volumes = data.volumes.sort((a, b) => b.volume - a.volume);
+            const totalVolume = volumes.reduce((sum, item) => sum + item.volume, 0);
+            
+            // 更新统计数据
+            document.getElementById('totalVolume').textContent = formatNumber(totalVolume);
+            document.getElementById('coinCount').textContent = data.count;
+            document.getElementById('topVolume').textContent = volumes[0].symbol.split('-')[0];
+            document.getElementById('avgVolume').textContent = formatNumber(totalVolume / data.count);
+            
+            // 更新时间
+            if (volumes[0].update_time) {
+                document.getElementById('updateTime').textContent = '更新时间: ' + volumes[0].update_time;
+            }
+
+            // 渲染TOP10表格
+            renderTop10Table(volumes.slice(0, 10), totalVolume);
+
+            // 渲染完整表格
+            renderFullTable(volumes, totalVolume);
+
+            // 渲染饼图
+            renderPieChart(volumes.slice(0, 10), totalVolume);
+        }
+
+        // 渲染TOP10表格
+        function renderTop10Table(volumes, totalVolume) {
+            const tbody = document.getElementById('top10Body');
+            tbody.innerHTML = volumes.map((item, index) => {
+                const symbol = item.symbol.split('-')[0];
+                const volumeWan = item.volume / 10000;
+                const percent = (item.volume / totalVolume) * 100;
+                const rankClass = getRankClass(index + 1);
+
+                return `
+                    <tr>
+                        <td><span class="rank ${rankClass}">${index + 1}</span></td>
+                        <td class="symbol">${symbol}</td>
+                        <td class="volume">${volumeWan.toFixed(2)}</td>
+                        <td>${formatPercent(percent)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 渲染完整表格
+        function renderFullTable(volumes, totalVolume) {
+            const tbody = document.getElementById('fullBody');
+            tbody.innerHTML = volumes.map((item, index) => {
+                const symbol = item.symbol.split('-')[0];
+                const volumeWan = item.volume / 10000;
+                const percent = (item.volume / totalVolume) * 100;
+                const rankClass = getRankClass(index + 1);
+
+                return `
+                    <tr>
+                        <td><span class="rank ${rankClass}">${index + 1}</span></td>
+                        <td class="symbol">${symbol}</td>
+                        <td class="volume">${volumeWan.toFixed(2)}</td>
+                        <td>${formatPercent(percent)}</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${percent}%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 渲染饼图
+        function renderPieChart(volumes, totalVolume) {
+            const ctx = document.getElementById('pieChart').getContext('2d');
+            
+            // 销毁旧图表
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            const labels = volumes.map(item => item.symbol.split('-')[0]);
+            const data = volumes.map(item => item.volume);
+            const percentages = volumes.map(item => ((item.volume / totalVolume) * 100).toFixed(2));
+
+            const colors = [
+                '#667eea', '#764ba2', '#f093fb', '#4facfe',
+                '#43e97b', '#fa709a', '#feca57', '#ff6b6b',
+                '#4ecdc4', '#95e1d3'
+            ];
+
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderWidth: 2,
+                        borderColor: '#1a1a2e'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#e0e0e0',
+                                padding: 15,
+                                font: {
+                                    size: 12
+                                },
+                                generateLabels: function(chart) {
+                                    const data = chart.data;
+                                    return data.labels.map((label, i) => ({
+                                        text: `${label} (${percentages[i]}%)`,
+                                        fillStyle: data.datasets[0].backgroundColor[i],
+                                        hidden: false,
+                                        index: i
+                                    }));
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = formatNumber(context.parsed);
+                                    const percent = percentages[context.dataIndex];
+                                    return `${label}: ${value} (${percent}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 显示错误
+        function showError(message) {
+            const errorHtml = `<tr><td colspan="5" class="error">${message}</td></tr>`;
+            document.getElementById('top10Body').innerHTML = errorHtml.replace('colspan="5"', 'colspan="4"');
+            document.getElementById('fullBody').innerHTML = errorHtml;
+        }
+
+        // 自动刷新
+        function startAutoRefresh() {
+            loadData();
+            setInterval(loadData, 60000); // 每分钟刷新一次
+        }
+
+        // 初始化
+        startAutoRefresh();
+    </script>
+</body>
+</html>

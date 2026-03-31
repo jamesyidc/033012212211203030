@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>支撑压力系统 v2.0 - 实时监控</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header .meta {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .header .meta span {
+            margin-right: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card .label {
+            color: #999;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .value {
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .stat-card .subvalue {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .coin-selector {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+
+        .coin-selector h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .coin-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .coin-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .coin-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .coin-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .data-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+
+        .data-panel h3 {
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .sr-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .sr-box {
+            padding: 20px;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+
+        .sr-box.resistance {
+            border-left: 4px solid #f56565;
+        }
+
+        .sr-box.support {
+            border-left: 4px solid #48bb78;
+        }
+
+        .sr-box .title {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 10px;
+        }
+
+        .sr-box .price {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .sr-box.resistance .price {
+            color: #f56565;
+        }
+
+        .sr-box.support .price {
+            color: #48bb78;
+        }
+
+        .sr-box .detail {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .trend-box {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .trend-box .label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .trend-box .value {
+            font-size: 22px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .chart-container {
+            height: 400px;
+            margin-top: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .refresh-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+            font-size: 24px;
+            transition: all 0.3s;
+        }
+
+        .refresh-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 24px rgba(102, 126, 234, 0.6);
+        }
+
+        .refresh-btn.spinning {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+
+        .badge.up {
+            background: #c6f6d5;
+            color: #2f855a;
+        }
+
+        .badge.down {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .badge.sideways {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 22px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .coin-buttons {
+                gap: 5px;
+            }
+            
+            .coin-btn {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>📊 支撑压力系统 v2.0 <span id="systemStatus" class="badge">加载中...</span></h1>
+            <div class="meta">
+                <span>🔄 自动刷新: 60秒</span>
+                <span>⏰ 更新时间: <span id="updateTime">--</span></span>
+                <span>📈 监控币种: <span id="symbolsCount">--</span></span>
+            </div>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">总记录数</div>
+                <div class="value" id="totalRecords">--</div>
+                <div class="subvalue">数据点</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">监控币种</div>
+                <div class="value" id="totalSymbols">--</div>
+                <div class="subvalue">活跃交易对</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">交易信号</div>
+                <div class="value" id="totalSignals">--</div>
+                <div class="subvalue">活跃信号</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">数据范围</div>
+                <div class="value" id="dataRange">--</div>
+                <div class="subvalue">时间跨度</div>
+            </div>
+        </div>
+
+        <!-- 币种选择器 -->
+        <div class="coin-selector">
+            <h3>🪙 选择币种</h3>
+            <div class="coin-buttons" id="coinButtons">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+
+        <!-- 数据面板 -->
+        <div class="data-panel">
+            <h3>📍 <span id="currentCoin">BTC</span>-USDT-SWAP 实时数据</h3>
+            
+            <!-- 加载中 -->
+            <div id="loadingDiv" class="loading">
+                <div>⏳ 正在加载数据...</div>
+            </div>
+
+            <!-- 错误提示 -->
+            <div id="errorDiv" class="error" style="display: none;">
+                <strong>❌ 加载失败</strong>
+                <div id="errorMessage"></div>
+            </div>
+
+            <!-- 数据内容 -->
+            <div id="dataContent" style="display: none;">
+                <!-- 趋势信息 -->
+                <div class="trend-box">
+                    <div class="label">当前趋势</div>
+                    <div class="value">
+                        <span id="trendDirection">--</span>
+                        <span id="trendBadge"></span>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 14px; color: #666;">
+                        强度: <span id="trendStrength">--</span> | 
+                        波动率: <span id="volatility">--</span> | 
+                        24h成交量: <span id="volume24h">--</span>
+                    </div>
+                </div>
+
+                <!-- 支撑压力位 -->
+                <div class="sr-info">
+                    <div class="sr-box resistance">
+                        <div class="title">🔴 压力位 (Resistance)</div>
+                        <div class="price" id="resistancePrice">--</div>
+                        <div class="detail">
+                            距离: <span id="resistanceDistance">--</span> | 
+                            触及次数: <span id="resistanceCount">--</span><br>
+                            置信度: <span id="resistanceConfidence">--</span>
+                        </div>
+                    </div>
+
+                    <div class="sr-box support">
+                        <div class="title">🟢 支撑位 (Support)</div>
+                        <div class="price" id="supportPrice">--</div>
+                        <div class="detail">
+                            距离: <span id="supportDistance">--</span> | 
+                            触及次数: <span id="supportCount">--</span><br>
+                            置信度: <span id="supportConfidence">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 价格图表 -->
+                <div class="chart-container" id="priceChart"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 刷新按钮 -->
+    <button class="refresh-btn" id="refreshBtn" onclick="loadData()">🔄</button>
+
+    <script>
+        // 全局变量
+        let currentSymbol = 'BTC-USDT-SWAP';
+        let priceChart = null;
+        let autoRefreshInterval = null;
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSystemStatus();
+            loadData();
+            startAutoRefresh();
+        });
+
+        // 加载系统状态
+        async function loadSystemStatus() {
+            try {
+                const response = await fetch('/api/sr-v2/status');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('systemStatus').textContent = '在线';
+                    document.getElementById('systemStatus').className = 'badge up';
+                    document.getElementById('symbolsCount').textContent = data.symbols_count;
+                    document.getElementById('totalSymbols').textContent = data.symbols_count;
+                    
+                    // 生成币种按钮
+                    const buttonsContainer = document.getElementById('coinButtons');
+                    buttonsContainer.innerHTML = '';
+                    data.symbols.forEach(symbol => {
+                        const coinName = symbol.replace('-USDT-SWAP', '');
+                        const btn = document.createElement('button');
+                        btn.className = 'coin-btn' + (symbol === currentSymbol ? ' active' : '');
+                        btn.textContent = coinName;
+                        btn.onclick = () => selectCoin(symbol, btn);
+                        buttonsContainer.appendChild(btn);
+                    });
+                } else {
+                    document.getElementById('systemStatus').textContent = '离线';
+                    document.getElementById('systemStatus').className = 'badge down';
+                }
+            } catch (error) {
+                console.error('加载系统状态失败:', error);
+                document.getElementById('systemStatus').textContent = '错误';
+                document.getElementById('systemStatus').className = 'badge down';
+            }
+        }
+
+        // 选择币种
+        function selectCoin(symbol, btn) {
+            currentSymbol = symbol;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.coin-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // 更新标题
+            const coinName = symbol.replace('-USDT-SWAP', '');
+            document.getElementById('currentCoin').textContent = coinName;
+            
+            // 加载数据
+            loadData();
+        }
+
+        // 加载数据
+        async function loadData() {
+            const loadingDiv = document.getElementById('loadingDiv');
+            const errorDiv = document.getElementById('errorDiv');
+            const dataContent = document.getElementById('dataContent');
+            const refreshBtn = document.getElementById('refreshBtn');
+            
+            // 显示加载状态
+            loadingDiv.style.display = 'block';
+            errorDiv.style.display = 'none';
+            dataContent.style.display = 'none';
+            refreshBtn.classList.add('spinning');
+            
+            try {
+                // 加载最新数据
+                const latestResponse = await fetch(`/api/sr-v2/latest?inst_id=${currentSymbol}&limit=1`);
+                const latestData = await latestResponse.json();
+                
+                if (!latestData.success || !latestData.data || latestData.data.length === 0) {
+                    throw new Error('暂无数据');
+                }
+                
+                const record = latestData.data[0];
+                
+                // 加载历史数据用于图表
+                const historyResponse = await fetch(`/api/sr-v2/history?inst_id=${currentSymbol}&hours=24`);
+                const historyData = await historyResponse.json();
+                
+                // 更新统计信息
+                document.getElementById('totalRecords').textContent = latestData.total || '--';
+                document.getElementById('updateTime').textContent = record.created_at || '--';
+                
+                // 更新趋势信息
+                const trendMap = {
+                    'up': '上涨趋势 📈',
+                    'down': '下跌趋势 📉',
+                    'sideways': '横盘整理 ➡️'
+                };
+                document.getElementById('trendDirection').textContent = trendMap[record.trend_direction] || '--';
+                
+                const trendBadgeClass = record.trend_direction === 'up' ? 'up' : 
+                                       record.trend_direction === 'down' ? 'down' : 'sideways';
+                document.getElementById('trendBadge').innerHTML = 
+                    `<span class="badge ${trendBadgeClass}">${record.trend_direction}</span>`;
+                
+                document.getElementById('trendStrength').textContent = 
+                    (record.trend_strength || 0).toFixed(2);
+                document.getElementById('volatility').textContent = 
+                    ((record.volatility || 0) * 100).toFixed(2) + '%';
+                document.getElementById('volume24h').textContent = 
+                    formatNumber(record.volume_24h || 0);
+                
+                // 更新压力位
+                document.getElementById('resistancePrice').textContent = 
+                    formatPrice(record.resistance_price);
+                document.getElementById('resistanceDistance').textContent = 
+                    ((record.resistance_distance || 0) * 100).toFixed(2) + '%';
+                document.getElementById('resistanceCount').textContent = 
+                    record.resistance_touch_count || 0;
+                document.getElementById('resistanceConfidence').textContent = 
+                    ((record.resistance_confidence || 0) * 100).toFixed(0) + '%';
+                
+                // 更新支撑位
+                document.getElementById('supportPrice').textContent = 
+                    formatPrice(record.support_price);
+                document.getElementById('supportDistance').textContent = 
+                    ((record.support_distance || 0) * 100).toFixed(2) + '%';
+                document.getElementById('supportCount').textContent = 
+                    record.support_touch_count || 0;
+                document.getElementById('supportConfidence').textContent = 
+                    ((record.support_confidence || 0) * 100).toFixed(0) + '%';
+                
+                // 绘制图表
+                drawChart(historyData.data || [], record);
+                
+                // 显示内容
+                loadingDiv.style.display = 'none';
+                dataContent.style.display = 'block';
+                
+            } catch (error) {
+                console.error('加载数据失败:', error);
+                loadingDiv.style.display = 'none';
+                errorDiv.style.display = 'block';
+                document.getElementById('errorMessage').textContent = error.message;
+            } finally {
+                refreshBtn.classList.remove('spinning');
+            }
+        }
+
+        // 绘制图表
+        function drawChart(historyData, currentData) {
+            if (!priceChart) {
+                priceChart = echarts.init(document.getElementById('priceChart'));
+            }
+            
+            // 准备数据
+            const times = historyData.map(d => d.snapshot_time);
+            const prices = historyData.map(d => d.current_price);
+            const resistances = historyData.map(d => d.resistance_price);
+            const supports = historyData.map(d => d.support_price);
+            
+            const option = {
+                title: {
+                    text: '价格走势与支撑压力位',
+                    left: 'center',
+                    textStyle: {
+                        color: '#333',
+                        fontSize: 16
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross'
+                    }
+                },
+                legend: {
+                    data: ['当前价格', '压力位', '支撑位'],
+                    top: 30
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: times,
+                    axisLabel: {
+                        formatter: function(value) {
+                            return value.substring(11, 16);
+                        }
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    scale: true
+                },
+                series: [
+                    {
+                        name: '当前价格',
+                        type: 'line',
+                        data: prices,
+                        smooth: true,
+                        lineStyle: {
+                            color: '#667eea',
+                            width: 2
+                        },
+                        itemStyle: {
+                            color: '#667eea'
+                        }
+                    },
+                    {
+                        name: '压力位',
+                        type: 'line',
+                        data: resistances,
+                        lineStyle: {
+                            color: '#f56565',
+                            width: 2,
+                            type: 'dashed'
+                        },
+                        itemStyle: {
+                            color: '#f56565'
+                        }
+                    },
+                    {
+                        name: '支撑位',
+                        type: 'line',
+                        data: supports,
+                        lineStyle: {
+                            color: '#48bb78',
+                            width: 2,
+                            type: 'dashed'
+                        },
+                        itemStyle: {
+                            color: '#48bb78'
+                        }
+                    }
+                ]
+            };
+            
+            priceChart.setOption(option);
+        }
+
+        // 自动刷新
+        function startAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+            autoRefreshInterval = setInterval(() => {
+                loadData();
+            }, 60000); // 60秒刷新一次
+        }
+
+        // 格式化价格
+        function formatPrice(price) {
+            if (!price) return '--';
+            return parseFloat(price).toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        // 格式化数字
+        function formatNumber(num) {
+            if (!num) return '--';
+            return parseFloat(num).toLocaleString('en-US', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            });
+        }
+
+        // 窗口大小改变时重绘图表
+        window.addEventListener('resize', function() {
+            if (priceChart) {
+                priceChart.resize();
+            }
+        });
+    </script>
+</body>
+</html>

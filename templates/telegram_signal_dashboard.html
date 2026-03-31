@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram信号推送系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        .header h1::before {
+            content: "📱";
+            margin-right: 10px;
+        }
+
+        .last-update-time {
+            font-size: 13px;
+            color: #6b7280;
+            padding-left: 34px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .home-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+        }
+
+        .home-btn:hover {
+            background: #2563eb;
+        }
+
+        .status-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-btn:hover {
+            background: #dc2626;
+        }
+
+        .status-btn.running {
+            background: #10b981;
+        }
+
+        .status-btn.running:hover {
+            background: #059669;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .signal-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title .badge {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+
+        .update-time {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .signals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .signal-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .signal-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .signal-card.buy {
+            border-left-color: #10b981;
+        }
+
+        .signal-card.sell {
+            border-left-color: #ef4444;
+        }
+
+        .signal-card.neutral {
+            border-left-color: #3b82f6;
+        }
+
+        .signal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .signal-type {
+            background: #667eea;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .signal-type.buy {
+            background: #10b981;
+        }
+
+        .signal-type.sell {
+            background: #ef4444;
+        }
+
+        .signal-type.alert {
+            background: #f59e0b;
+        }
+
+        .signal-type.neutral {
+            background: #3b82f6;
+        }
+
+        .signal-symbol {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .signal-details {
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+
+        .signal-details div {
+            margin: 5px 0;
+        }
+
+        .signal-time {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .no-signals {
+            text-align: center;
+            padding: 40px;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 14px;
+        }
+
+        .loading::before {
+            content: "⏳";
+            margin-right: 8px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .icon-support { color: #3b82f6; }
+        .icon-alert { color: #f59e0b; }
+        .icon-trade { color: #10b981; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <h1>Telegram信号推送系统</h1>
+                <div class="last-update-time" id="pageLastUpdate">最后更新: --</div>
+            </div>
+            <div class="header-right">
+                <a href="/" class="home-btn">
+                    🏠 返回首页
+                </a>
+                <button class="status-btn" id="statusBtn" onclick="toggleSystem()">
+                    ⚪ 未运行
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>📊 总发送数</h3>
+                <div class="value" id="totalSent">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>⏰ 最近1小时</h3>
+                <div class="value" id="lastHour">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>📅 今日发送</h3>
+                <div class="value" id="today">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>🕐 最后推送</h3>
+                <div class="value" id="lastTime" style="font-size: 14px; color: #6b7280;">--</div>
+            </div>
+        </div>
+
+        <!-- Main Signal Sections -->
+        <div class="main-grid">
+            <!-- 1. 支撑压力线系统 -->
+            <div class="signal-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <span class="icon-support">🎯</span>
+                        一、支撑压力线系统（抄底/逃顶）
+                        <span class="badge" id="supportCount">0</span>
+                    </div>
+                    <div class="update-time" id="supportUpdateTime">更新时间: --</div>
+                </div>
+                <div class="signals-grid" id="supportSignals">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+
+            <!-- 2. 计次预警系统 -->
+            <div class="signal-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <span class="icon-alert">⚠️</span>
+                        二、计次预警系统
+                        <span class="badge" id="alertCount">0</span>
+                    </div>
+                    <div class="update-time" id="alertUpdateTime">更新时间: --</div>
+                </div>
+                <div class="signals-grid" id="alertSignals">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+
+            <!-- 3. 交易信号系统 -->
+            <div class="signal-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <span class="icon-trade">💹</span>
+                        三、交易信号系统（买点1-4 + 卖点1 + 7日/48h高低点）
+                        <span class="badge" id="tradeCount">0</span>
+                    </div>
+                    <div class="update-time" id="tradeUpdateTime">更新时间: --</div>
+                </div>
+                <div class="signals-grid" id="tradeSignals">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let updateInterval;
+
+        // 更新页面最后更新时间
+        function updatePageLastUpdateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+            document.getElementById('pageLastUpdate').textContent = `最后更新: ${timeStr}`;
+        }
+
+        // 加载所有数据
+        async function loadAllData() {
+            await checkSystemStatus();
+            await Promise.all([
+                loadSupportResistanceSignals(),
+                loadCountAlerts(),
+                loadTradingSignals(),
+                loadStats()
+            ]);
+            updatePageLastUpdateTime();
+        }
+
+        // 1. 加载支撑压力线信号
+        async function loadSupportResistanceSignals() {
+            try {
+                const response = await fetch('/api/telegram/signals/support-resistance');
+                const data = await response.json();
+                
+                const container = document.getElementById('supportSignals');
+                const count = document.getElementById('supportCount');
+                const updateTime = document.getElementById('supportUpdateTime');
+                
+                if (data.success && data.signals.length > 0) {
+                    count.textContent = data.signals.length;
+                    updateTime.textContent = `更新时间: ${data.update_time}`;
+                    
+                    container.innerHTML = data.signals.map(signal => `
+                        <div class="signal-card ${signal.signal_type}">
+                            <div class="signal-header">
+                                <span class="signal-type ${signal.signal_type}">
+                                    ${signal.signal_type === 'buy' ? '🔵 抄底' : '🔴 逃顶'}
+                                </span>
+                                <span class="signal-symbol">${signal.symbol}</span>
+                            </div>
+                            <div class="signal-details">
+                                <div>💰 价格: $${signal.price.toFixed(4)}</div>
+                                <div>📍 类型: 支撑压力线 - ${signal.signal_type === 'buy' ? '抄底' : '逃顶'}</div>
+                            </div>
+                            <div class="signal-time">⏰ ${signal.signal_time}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    count.textContent = '0';
+                    container.innerHTML = '<div class="no-signals">暂无信号</div>';
+                }
+            } catch (error) {
+                console.error('加载支撑压力线信号失败:', error);
+                document.getElementById('supportSignals').innerHTML = 
+                    '<div class="no-signals">加载失败</div>';
+            }
+        }
+
+        // 2. 加载计次预警
+        async function loadCountAlerts() {
+            try {
+                const response = await fetch('/api/telegram/signals/count-alerts');
+                const data = await response.json();
+                
+                const container = document.getElementById('alertSignals');
+                const count = document.getElementById('alertCount');
+                const updateTime = document.getElementById('alertUpdateTime');
+                
+                if (data.success && data.alerts.length > 0) {
+                    count.textContent = data.alerts.length;
+                    updateTime.textContent = `更新时间: ${data.update_time}`;
+                    
+                    container.innerHTML = data.alerts.map(alert => {
+                        const fullData = JSON.parse(alert.full_data);
+                        return `
+                            <div class="signal-card">
+                                <div class="signal-header">
+                                    <span class="signal-type alert">⚠️ 计次预警</span>
+                                    <span class="signal-symbol">计次: ${alert.count_value}</span>
+                                </div>
+                                <div class="signal-details">
+                                    <div>📊 基准值: ${alert.threshold - 2}</div>
+                                    <div>🎯 阈值: ${alert.threshold}</div>
+                                    <div>📈 急涨: ${fullData['急涨']}</div>
+                                    <div>📉 急跌: ${fullData['急跌']}</div>
+                                    <div>📊 状态: ${fullData['状态']}</div>
+                                    <div>💫 计次得分: ${fullData['计次得分']}</div>
+                                </div>
+                                <div class="signal-time">⏰ ${alert.record_time}</div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    count.textContent = '0';
+                    container.innerHTML = '<div class="no-signals">暂无预警</div>';
+                }
+            } catch (error) {
+                console.error('加载计次预警失败:', error);
+                document.getElementById('alertSignals').innerHTML = 
+                    '<div class="no-signals">加载失败</div>';
+            }
+        }
+
+        // 3. 加载交易信号
+        async function loadTradingSignals() {
+            try {
+                const response = await fetch('/api/telegram/signals/trading');
+                const data = await response.json();
+                
+                const container = document.getElementById('tradeSignals');
+                const count = document.getElementById('tradeCount');
+                const updateTime = document.getElementById('tradeUpdateTime');
+                
+                if (data.success && data.signals.length > 0) {
+                    count.textContent = data.signals.length;
+                    updateTime.textContent = `更新时间: ${data.update_time}`;
+                    
+                    container.innerHTML = data.signals.map(signal => {
+                        const signalNames = {
+                            'buy_point_1': '买点1',
+                            'buy_point_2': '买点2',
+                            'buy_point_3': '买点3',
+                            'buy_point_4': '买点4',
+                            'sell_point_1': '卖点1',
+                            'day7_high': '7日最高点',
+                            'day7_low': '7日最低点',
+                            'h48_high': '48h最高点',
+                            'h48_low': '48h最低点'
+                        };
+                        
+                        const isBuy = signal.signal_type.startsWith('buy_') || 
+                                     signal.signal_type.includes('_low');
+                        const isHighLow = signal.signal_type.includes('day7') || 
+                                         signal.signal_type.includes('h48');
+                        
+                        const cardClass = isHighLow ? 'neutral' : (isBuy ? 'buy' : 'sell');
+                        const icon = isHighLow ? (signal.signal_type.includes('high') ? '📈' : '📉') : 
+                                    (isBuy ? '🟢' : '🔴');
+                        
+                        return `
+                            <div class="signal-card ${cardClass}">
+                                <div class="signal-header">
+                                    <span class="signal-type ${cardClass}">
+                                        ${icon} ${signalNames[signal.signal_type] || signal.signal_type}
+                                    </span>
+                                    <span class="signal-symbol">${signal.symbol}</span>
+                                </div>
+                                <div class="signal-details">
+                                    <div>💰 价格: $${signal.price.toFixed(4)}</div>
+                                    ${signal.rsi ? `<div>📊 RSI: ${signal.rsi.toFixed(2)}</div>` : ''}
+                                    <div>📍 来源: ${signal.signal_type.includes('4') || signal.signal_type.includes('sell') || isHighLow ? 'K线指标' : '交易信号'}</div>
+                                </div>
+                                <div class="signal-time">⏰ ${signal.signal_time}</div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    count.textContent = '0';
+                    container.innerHTML = '<div class="no-signals">暂无信号</div>';
+                }
+            } catch (error) {
+                console.error('加载交易信号失败:', error);
+                document.getElementById('tradeSignals').innerHTML = 
+                    '<div class="no-signals">加载失败</div>';
+            }
+        }
+
+        // 加载统计数据
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/telegram/signals/stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('totalSent').textContent = data.total;
+                    document.getElementById('lastHour').textContent = data.last_hour;
+                    document.getElementById('today').textContent = data.today;
+                    document.getElementById('lastTime').textContent = data.last_time || '--';
+                }
+            } catch (error) {
+                console.error('加载统计数据失败:', error);
+            }
+        }
+
+        // 检查系统状态
+        async function checkSystemStatus() {
+            try {
+                const response = await fetch('/api/telegram/system/status');
+                const data = await response.json();
+                
+                const btn = document.getElementById('statusBtn');
+                if (data.success && data.running) {
+                    btn.classList.add('running');
+                    btn.innerHTML = '🟢 运行中';
+                } else {
+                    btn.classList.remove('running');
+                    btn.innerHTML = '⚪ 未运行';
+                }
+            } catch (error) {
+                console.error('检查系统状态失败:', error);
+            }
+        }
+
+        // 切换系统状态
+        async function toggleSystem() {
+            const btn = document.getElementById('statusBtn');
+            const isRunning = btn.classList.contains('running');
+            
+            try {
+                const endpoint = isRunning ? '/api/telegram/stop' : '/api/telegram/start';
+                const response = await fetch(endpoint, { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    // 重新检查状态
+                    setTimeout(checkSystemStatus, 1000);
+                }
+            } catch (error) {
+                console.error('切换系统状态失败:', error);
+            }
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllData();
+            
+            // 每分钟刷新一次
+            updateInterval = setInterval(loadAllData, 60000);
+        });
+    </script>
+</body>
+</html>

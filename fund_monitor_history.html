@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>异常数据历史查询 - 资金监控系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #1e2139 0%, #2a2d47 100%);
+            color: #fff;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2a2d47 0%, #3a3d5c 100%);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #00d4ff;
+        }
+        
+        .header-info {
+            display: flex;
+            gap: 30px;
+            font-size: 14px;
+            color: #8b92b8;
+            flex-wrap: wrap;
+        }
+        
+        .nav-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .nav-btn {
+            background: #2a2d47;
+            border: 1px solid #3b7dff;
+            color: #00d4ff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .nav-btn:hover {
+            background: #3b7dff;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+        
+        .search-panel {
+            background: #2a2d47;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #3b7dff;
+        }
+        
+        .search-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .search-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .search-item label {
+            font-size: 13px;
+            color: #8b92b8;
+        }
+        
+        .search-item input, .search-item select {
+            background: #1e2139;
+            border: 1px solid #3b7dff;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .search-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .btn {
+            background: #3b7dff;
+            color: #fff;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #5a95ff;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #444866;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a5f8a;
+        }
+        
+        .stats-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #2a2d47 0%, #3a3d5c 100%);
+            padding: 15px 20px;
+            border-radius: 10px;
+            flex: 1;
+            min-width: 200px;
+            border-left: 4px solid #3b7dff;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: #8b92b8;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+        
+        .dates-list {
+            background: #2a2d47;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .dates-list h3 {
+            color: #00d4ff;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .date-card {
+            background: #1e2139;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #ff4757;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .date-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
+        }
+        
+        .date-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .date-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #00d4ff;
+        }
+        
+        .date-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+            color: #8b92b8;
+        }
+        
+        .timeline-container {
+            background: #2a2d47;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .timeline-header h3 {
+            color: #00d4ff;
+            font-size: 18px;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, #3b7dff 0%, #ff4757 100%);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding-left: 20px;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            left: -27px;
+            top: 0;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #ff4757;
+            border: 3px solid #2a2d47;
+            box-shadow: 0 0 0 4px rgba(255, 71, 87, 0.3);
+        }
+        
+        .timeline-dot.critical {
+            background: #ff0000;
+            animation: pulse-critical 2s infinite;
+        }
+        
+        .timeline-dot.high {
+            background: #ff4757;
+        }
+        
+        .timeline-dot.medium {
+            background: #ffa502;
+        }
+        
+        @keyframes pulse-critical {
+            0%, 100% { box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.3); }
+            50% { box-shadow: 0 0 0 8px rgba(255, 0, 0, 0.1); }
+        }
+        
+        .timeline-time {
+            font-size: 14px;
+            color: #8b92b8;
+            margin-bottom: 10px;
+        }
+        
+        .timeline-events {
+            display: grid;
+            gap: 10px;
+        }
+        
+        .event-card {
+            background: #1e2139;
+            padding: 12px 15px;
+            border-radius: 6px;
+            border-left: 3px solid #ff4757;
+        }
+        
+        .event-card.surge {
+            border-left-color: #20c997;
+        }
+        
+        .event-card.drop {
+            border-left-color: #ff4757;
+        }
+        
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .event-symbol {
+            font-size: 15px;
+            font-weight: 600;
+            color: #00d4ff;
+        }
+        
+        .event-badge {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+        }
+        
+        .event-badge.surge {
+            background: rgba(32, 201, 151, 0.2);
+            color: #20c997;
+        }
+        
+        .event-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 8px;
+            font-size: 12px;
+        }
+        
+        .event-detail {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .event-label {
+            color: #8b92b8;
+        }
+        
+        .event-value {
+            color: #fff;
+            font-weight: 500;
+        }
+        
+        .event-value.positive {
+            color: #20c997;
+        }
+        
+        .event-value.negative {
+            color: #ff4757;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #8b92b8;
+            font-size: 16px;
+        }
+        
+        .error {
+            background: #ff4757;
+            color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #8b92b8;
+            font-size: 16px;
+        }
+        
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 异常数据历史查询</h1>
+            <div class="header-info">
+                <span>🔍 按日期查询异常波动数据</span>
+                <span>📈 支持时间轴展示</span>
+                <span>🎯 多维度筛选</span>
+            </div>
+        </div>
+
+        <div class="nav-bar">
+            <a href="/fund-monitor" class="nav-btn">← 返回实时监控</a>
+            <a href="/" class="nav-btn">🏠 主页</a>
+        </div>
+
+        <div class="search-panel">
+            <div class="search-row">
+                <div class="search-item">
+                    <label>查询日期</label>
+                    <input type="date" id="query-date">
+                </div>
+                <div class="search-item">
+                    <label>开始日期</label>
+                    <input type="date" id="start-date">
+                </div>
+                <div class="search-item">
+                    <label>结束日期</label>
+                    <input type="date" id="end-date">
+                </div>
+                <div class="search-item">
+                    <label>币种</label>
+                    <select id="symbol-filter">
+                        <option value="">全部币种</option>
+                    </select>
+                </div>
+                <div class="search-item">
+                    <label>时间周期</label>
+                    <select id="interval-filter">
+                        <option value="">全部周期</option>
+                        <option value="15min">15分钟</option>
+                        <option value="30min">30分钟</option>
+                        <option value="60min">60分钟</option>
+                    </select>
+                </div>
+                <div class="search-item">
+                    <label>异常类型</label>
+                    <select id="type-filter">
+                        <option value="">全部类型</option>
+                        <option value="surge">量能激增</option>
+                        <option value="drop">量能骤降</option>
+                    </select>
+                </div>
+                <div class="search-item">
+                    <label>严重程度</label>
+                    <select id="severity-filter">
+                        <option value="">全部等级</option>
+                        <option value="critical">严重</option>
+                        <option value="high">高</option>
+                        <option value="medium">中等</option>
+                    </select>
+                </div>
+            </div>
+            <div class="search-actions">
+                <button class="btn btn-secondary" onclick="clearFilters()">清空筛选</button>
+                <button class="btn" onclick="searchHistory()">查询</button>
+                <button class="btn" onclick="loadDates()">查看日期列表</button>
+            </div>
+        </div>
+
+        <div class="stats-bar" id="stats-bar" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-label">查询结果</div>
+                <div class="stat-value" id="result-count">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">涉及币种</div>
+                <div class="stat-value" id="affected-coins">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">平均偏差</div>
+                <div class="stat-value" id="avg-deviation">0%</div>
+            </div>
+        </div>
+
+        <div id="content-container"></div>
+    </div>
+
+    <script>
+        // 币种列表
+        const COINS = [
+            'BTC', 'ETH', 'XRP', 'BNB', 'SOL', 'LTC', 'DOGE', 'SUI', 'TRX', 'TON',
+            'ETC', 'BCH', 'HBAR', 'XLM', 'FIL', 'LINK', 'CRO', 'DOT', 'AAVE', 'UNI',
+            'NEAR', 'APT', 'CFX', 'CRV', 'STX', 'LDO', 'TAO'
+        ];
+
+        // 初始化币种选择器
+        function initSymbolFilter() {
+            const select = document.getElementById('symbol-filter');
+            COINS.forEach(coin => {
+                const option = document.createElement('option');
+                option.value = coin;
+                option.textContent = coin;
+                select.appendChild(option);
+            });
+        }
+
+        // 加载有异常数据的日期列表
+        async function loadDates() {
+            const container = document.getElementById('content-container');
+            container.innerHTML = '<div class="loading">⏳ 正在加载日期列表...</div>';
+            document.getElementById('stats-bar').style.display = 'none';
+
+            try {
+                const response = await fetch('/api/fund-monitor/abnormal-dates');
+                const result = await response.json();
+
+                if (result.success && result.dates.length > 0) {
+                    let html = '<div class="dates-list"><h3>📅 有异常数据的日期</h3>';
+                    result.dates.forEach(date => {
+                        html += `
+                            <div class="date-card" onclick="loadTimeline('${date.date}')">
+                                <div class="date-card-header">
+                                    <div class="date-title">${date.date}</div>
+                                </div>
+                                <div class="date-stats">
+                                    <span>异常次数: ${date.count}</span>
+                                    <span>涉及币种: ${date.affected_coins}个</span>
+                                    <span>平均偏差: ${date.avg_deviation}%</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><div>暂无异常数据记录</div></div>';
+                }
+            } catch (error) {
+                container.innerHTML = '<div class="error">❌ 加载失败：' + error.message + '</div>';
+            }
+        }
+
+        // 加载指定日期的时间轴
+        async function loadTimeline(date) {
+            const container = document.getElementById('content-container');
+            container.innerHTML = '<div class="loading">⏳ 正在加载时间轴...</div>';
+
+            try {
+                const response = await fetch(`/api/fund-monitor/abnormal-timeline?date=${date}`);
+                const result = await response.json();
+
+                if (result.success && result.timeline.length > 0) {
+                    let html = `
+                        <div class="timeline-container">
+                            <div class="timeline-header">
+                                <h3>📅 ${date} 异常数据时间轴</h3>
+                                <button class="btn" onclick="loadDates()">返回日期列表</button>
+                            </div>
+                            <div class="timeline">
+                    `;
+
+                    result.timeline.forEach(item => {
+                        html += `
+                            <div class="timeline-item">
+                                <div class="timeline-dot ${item.events[0].severity}"></div>
+                                <div class="timeline-time">${item.hour} (${item.count}条异常)</div>
+                                <div class="timeline-events">
+                        `;
+
+                        item.events.forEach(event => {
+                            html += `
+                                <div class="event-card ${event.deviation_type}">
+                                    <div class="event-header">
+                                        <span class="event-symbol">${event.symbol} - ${event.interval_type}</span>
+                                        <span class="event-badge ${event.deviation_type}">
+                                            ${event.deviation_type === 'surge' ? '↗ 激增' : '↘ 骤降'} ${event.severity === 'critical' ? '严重' : event.severity === 'high' ? '高' : '中'}
+                                        </span>
+                                    </div>
+                                    <div class="event-details">
+                                        <div class="event-detail">
+                                            <span class="event-label">时间:</span>
+                                            <span class="event-value">${event.time.split(' ')[1]}</span>
+                                        </div>
+                                        <div class="event-detail">
+                                            <span class="event-label">当前量:</span>
+                                            <span class="event-value">${formatNumber(event.volume)}</span>
+                                        </div>
+                                        <div class="event-detail">
+                                            <span class="event-label">3日均:</span>
+                                            <span class="event-value">${formatNumber(event.avg_3day)}</span>
+                                        </div>
+                                        <div class="event-detail">
+                                            <span class="event-label">偏差:</span>
+                                            <span class="event-value ${event.deviation_percent > 0 ? 'positive' : 'negative'}">
+                                                ${event.deviation_percent > 0 ? '+' : ''}${event.deviation_percent}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+
+                        html += `
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    html += `
+                            </div>
+                        </div>
+                    `;
+
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><div>该日期暂无异常数据</div></div>';
+                }
+            } catch (error) {
+                container.innerHTML = '<div class="error">❌ 加载失败：' + error.message + '</div>';
+            }
+        }
+
+        // 搜索历史数据
+        async function searchHistory() {
+            const container = document.getElementById('content-container');
+            container.innerHTML = '<div class="loading">⏳ 正在查询...</div>';
+
+            // 构建查询参数
+            const params = new URLSearchParams();
+            const date = document.getElementById('query-date').value;
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const symbol = document.getElementById('symbol-filter').value;
+            const interval = document.getElementById('interval-filter').value;
+            const type = document.getElementById('type-filter').value;
+            const severity = document.getElementById('severity-filter').value;
+
+            if (date) params.append('date', date);
+            if (startDate) params.append('start_date', startDate);
+            if (endDate) params.append('end_date', endDate);
+            if (symbol) params.append('symbol', symbol);
+            if (interval) params.append('interval', interval);
+            if (type) params.append('type', type);
+            if (severity) params.append('severity', severity);
+
+            try {
+                const response = await fetch(`/api/fund-monitor/abnormal-history?${params}`);
+                const result = await response.json();
+
+                if (result.success && result.data.length > 0) {
+                    // 更新统计
+                    document.getElementById('result-count').textContent = result.total_count;
+                    const uniqueCoins = new Set(result.data.map(item => item.symbol)).size;
+                    document.getElementById('affected-coins').textContent = uniqueCoins;
+                    const avgDev = result.data.reduce((sum, item) => sum + Math.abs(item.deviation_percent), 0) / result.data.length;
+                    document.getElementById('avg-deviation').textContent = avgDev.toFixed(2) + '%';
+                    document.getElementById('stats-bar').style.display = 'flex';
+
+                    // 显示结果
+                    let html = '<div class="timeline-container"><h3>🔍 查询结果</h3><div class="timeline">';
+                    
+                    result.data.forEach(item => {
+                        html += `
+                            <div class="timeline-item">
+                                <div class="timeline-dot ${item.severity}"></div>
+                                <div class="timeline-time">${item.collect_time}</div>
+                                <div class="timeline-events">
+                                    <div class="event-card ${item.deviation_type}">
+                                        <div class="event-header">
+                                            <span class="event-symbol">${item.symbol} - ${item.interval_type}</span>
+                                            <span class="event-badge ${item.deviation_type}">
+                                                ${item.deviation_type === 'surge' ? '↗ 激增' : '↘ 骤降'} ${item.severity === 'critical' ? '严重' : item.severity === 'high' ? '高' : '中'}
+                                            </span>
+                                        </div>
+                                        <div class="event-details">
+                                            <div class="event-detail">
+                                                <span class="event-label">当前量:</span>
+                                                <span class="event-value">${formatNumber(item.volume)}</span>
+                                            </div>
+                                            <div class="event-detail">
+                                                <span class="event-label">3日均:</span>
+                                                <span class="event-value">${formatNumber(item.avg_3day)}</span>
+                                            </div>
+                                            <div class="event-detail">
+                                                <span class="event-label">偏差:</span>
+                                                <span class="event-value ${item.deviation_percent > 0 ? 'positive' : 'negative'}">
+                                                    ${item.deviation_percent > 0 ? '+' : ''}${item.deviation_percent}%
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    html += '</div></div>';
+                    container.innerHTML = html;
+                } else {
+                    document.getElementById('stats-bar').style.display = 'none';
+                    container.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><div>未找到符合条件的异常数据</div></div>';
+                }
+            } catch (error) {
+                container.innerHTML = '<div class="error">❌ 查询失败：' + error.message + '</div>';
+            }
+        }
+
+        // 清空筛选
+        function clearFilters() {
+            document.getElementById('query-date').value = '';
+            document.getElementById('start-date').value = '';
+            document.getElementById('end-date').value = '';
+            document.getElementById('symbol-filter').value = '';
+            document.getElementById('interval-filter').value = '';
+            document.getElementById('type-filter').value = '';
+            document.getElementById('severity-filter').value = '';
+        }
+
+        // 格式化数字
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(2) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(2) + 'K';
+            }
+            return num.toFixed(2);
+        }
+
+        // 初始化
+        initSymbolFilter();
+        loadDates();
+    </script>
+</body>
+</html>

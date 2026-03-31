@@ -1,0 +1,11 @@
+{
+  "date": "20260312",
+  "type": "positive_ratio_stats",
+  "generated_at": "2026-03-12T23:59:29.127046+08:00",
+  "data": {
+    "total_count": 1841,
+    "positive_count": 991,
+    "positive_ratio": 53.83,
+    "positive_duration": 991
+  }
+}

@@ -1,0 +1,2 @@
+{"timestamp": "2026-02-23T02:13:12.120266", "time": "2026-02-23 02:13:12", "account_id": "account_main", "pos_side": "long", "takeprofit_type": "rsi", "allowed": false, "reason": "用户已暂停所有策略", "rsi_value": 1857.53, "profit_value": null}
+{"timestamp": "2026-02-28T15:46:21.298463", "time": "2026-02-28 15:46:21", "account_id": "account_main", "pos_side": "long", "takeprofit_type": "rsi", "allowed": false, "reason": "关闭RSI多单止盈监控", "rsi_value": 1900, "profit_value": null}

@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Drive TXT监控</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: rgba(255,255,255,0.7);
+            font-size: 1.1rem;
+        }
+        
+        .beijing-time {
+            font-size: 0.95rem;
+            color: #00d4ff;
+            margin-top: 5px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(42, 45, 71, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #00d4ff;
+        }
+        
+        .stat-value.success {
+            color: #10b981;
+        }
+        
+        .stat-value.warning {
+            color: #f59e0b;
+        }
+        
+        .stat-value.error {
+            color: #ef4444;
+        }
+        
+        .files-container {
+            background: rgba(42, 45, 71, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .files-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .files-header h2 {
+            font-size: 1.5rem;
+        }
+        
+        .files-count {
+            font-size: 0.9rem;
+            color: #00d4ff;
+        }
+        
+        .files-content {
+            background: #1a1d2e;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            line-height: 1.8;
+            max-height: 300px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 8px;
+        }
+        
+        .file-item {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 5px;
+            padding: 8px 12px;
+            color: #00d4ff;
+            transition: all 0.3s;
+        }
+        
+        .file-item:hover {
+            background: rgba(0, 212, 255, 0.2);
+            transform: translateX(3px);
+        }
+        
+        .file-item.latest {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: #10b981;
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .log-container {
+            background: rgba(42, 45, 71, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .log-header h2 {
+            font-size: 1.5rem;
+        }
+        
+        .refresh-info {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+            margin-right: 15px;
+        }
+        
+        .refresh-btn {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.5);
+        }
+        
+        .log-content {
+            background: #1a1d2e;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            max-height: 500px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .log-content::-webkit-scrollbar,
+        .files-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .log-content::-webkit-scrollbar-track,
+        .files-content::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+        }
+        
+        .log-content::-webkit-scrollbar-thumb,
+        .files-content::-webkit-scrollbar-thumb {
+            background: rgba(0, 212, 255, 0.5);
+            border-radius: 4px;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #00d4ff;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            color: #fff;
+            transform: translateX(-5px);
+        }
+        
+        .indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        .indicator.success {
+            background: #10b981;
+        }
+        
+        .indicator.error {
+            background: #ef4444;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <a href="/" class="back-btn">← 返回首页</a>
+            <a href="/gdrive-config" class="back-btn">⚙️ 配置管理</a>
+        </div>
+        
+        <div class="header">
+            <h1>📡 Google Drive TXT监控</h1>
+            <p>实时监控TXT文件更新状态</p>
+            <div class="beijing-time">
+                📅 <span id="current-date-display" style="font-weight: 600; margin-right: 15px;">----年--月--日</span>
+                🕐 北京时间：<span id="beijing-time-display">--:--:--</span>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">检测器状态</div>
+                <div class="stat-value" id="detector-status">
+                    <span class="indicator"></span>
+                    <span id="status-text">检查中...</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">文件时间戳</div>
+                <div class="stat-value" id="file-timestamp">-</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">数据延迟</div>
+                <div class="stat-value" id="delay-value">-</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">检查次数</div>
+                <div class="stat-value" id="check-count">-</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">最后检查</div>
+                <div class="stat-value" id="last-check">-</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">1️⃣ 单数日期父文件夹</div>
+                <div class="stat-value" id="root-folder-odd" style="font-size: 0.9rem; word-break: break-all; color: #3b82f6;">-</div>
+                <div class="stat-description" id="odd-status" style="font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 5px;">1, 3, 5, 7, 9, 11, 13...</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">2️⃣ 双数日期父文件夹</div>
+                <div class="stat-value" id="root-folder-even" style="font-size: 0.9rem; word-break: break-all; color: #8b5cf6;">-</div>
+                <div class="stat-description" id="even-status" style="font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 5px;">2, 4, 6, 8, 10, 12, 14...</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">📁 子账号文件夹ID</div>
+                <div class="stat-value" id="folder-id" style="font-size: 1.0rem; word-break: break-all; color: #fbbf24;">-</div>
+                <div class="stat-description" style="font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 5px;">今日使用的文件夹</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">当前时间</div>
+                <div class="stat-value" id="current-time">-</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">🆕 最新文件</div>
+                <div class="stat-value success" id="latest-file" style="font-size: 1.3rem;">-</div>
+            </div>
+        </div>
+        
+        <div class="files-container">
+            <div class="files-header">
+                <h2>📂 今日TXT文件列表</h2>
+                <div class="files-count">共 <span id="files-total">0</span> 个文件</div>
+            </div>
+            <div class="files-content" id="files-content">加载中...</div>
+        </div>
+        
+        <div class="log-container">
+            <div class="log-header">
+                <div>
+                    <h2>📋 实时日志</h2>
+                    <span class="refresh-info">⏱️ 30秒自动刷新 | 0:10 重置文件夹</span>
+                </div>
+                <button class="refresh-btn" onclick="refreshLogs()">立即刷新</button>
+            </div>
+            <div class="log-content" id="log-content">加载中...</div>
+        </div>
+    </div>
+    
+    <script>
+        // 更新北京时间和日期
+        function updateBeijingTime() {
+            const now = new Date();
+            const beijingTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Shanghai' }));
+            
+            // 更新时间
+            const hours = String(beijingTime.getHours()).padStart(2, '0');
+            const minutes = String(beijingTime.getMinutes()).padStart(2, '0');
+            const seconds = String(beijingTime.getSeconds()).padStart(2, '0');
+            document.getElementById('beijing-time-display').textContent = `${hours}:${minutes}:${seconds}`;
+            
+            // 更新日期
+            const year = beijingTime.getFullYear();
+            const month = String(beijingTime.getMonth() + 1).padStart(2, '0');
+            const day = String(beijingTime.getDate()).padStart(2, '0');
+            const weekDays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            const weekDay = weekDays[beijingTime.getDay()];
+            document.getElementById('current-date-display').textContent = `${year}年${month}月${day}日 ${weekDay}`;
+        }
+        
+        function formatTime(timeString) {
+            if (!timeString) return '-';
+            const parts = timeString.split(' ');
+            if (parts.length >= 2) {
+                return parts[1].substring(0, 8);  // HH:MM:SS
+            }
+            return timeString;
+        }
+        
+        function loadTxtFiles() {
+            fetch('/api/gdrive-detector/txt-files')
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                    return res.json();
+                })
+                .then(response => {
+                    console.log('TXT Files API Response:', response);
+                    
+                    const filesContent = document.getElementById('files-content');
+                    const filesTotal = document.getElementById('files-total');
+                    const latestFileEl = document.getElementById('latest-file');
+                    
+                    if (response.success) {
+                        const files = response.files || [];
+                        filesTotal.textContent = files.length;
+                        
+                        if (files.length > 0) {
+                            // 更新最新文件名显示
+                            latestFileEl.textContent = files[0];
+                            latestFileEl.className = 'stat-value success';
+                            
+                            filesContent.innerHTML = files.map((file, index) => {
+                                const isLatest = index === 0;
+                                return `<div class="file-item ${isLatest ? 'latest' : ''}">${file}</div>`;
+                            }).join('');
+                        } else {
+                            latestFileEl.textContent = '无文件';
+                            latestFileEl.className = 'stat-value error';
+                            filesContent.innerHTML = '<div style="color: rgba(255,255,255,0.5);">暂无文件</div>';
+                        }
+                    } else {
+                        // API返回success=false
+                        console.error('API返回失败:', response);
+                        latestFileEl.textContent = 'API错误';
+                        latestFileEl.className = 'stat-value error';
+                        filesContent.innerHTML = `<div style="color: #ef4444;">API错误: ${response.error || '未知错误'}</div>`;
+                    }
+                })
+                .catch(err => {
+                    console.error('获取文件列表失败:', err);
+                    document.getElementById('files-content').innerHTML = '<div style="color: #ef4444;">网络错误: ' + err.message + '</div>';
+                    document.getElementById('latest-file').textContent = '网络错误';
+                    document.getElementById('latest-file').className = 'stat-value error';
+                });
+        }
+        
+        function loadStatus() {
+            fetch('/api/gdrive-detector/status')
+                .then(res => res.json())
+                .then(response => {
+                    if (response.success) {
+                        const data = response.data;
+                        
+                        // 检测器状态
+                        const statusEl = document.getElementById('status-text');
+                        const indicator = document.querySelector('.indicator');
+                        if (data.detector_running) {
+                            statusEl.textContent = '运行中';
+                            statusEl.className = 'stat-value success';
+                            indicator.className = 'indicator success';
+                        } else {
+                            statusEl.textContent = '已停止';
+                            statusEl.className = 'stat-value error';
+                            indicator.className = 'indicator error';
+                        }
+                        
+                        // 文件时间戳
+                        const timestampEl = document.getElementById('file-timestamp');
+                        if (data.file_timestamp) {
+                            timestampEl.textContent = formatTime(data.file_timestamp);
+                            timestampEl.className = 'stat-value';
+                        } else {
+                            timestampEl.textContent = '-';
+                            timestampEl.className = 'stat-value';
+                        }
+                        
+                        // 延迟
+                        const delayEl = document.getElementById('delay-value');
+                        if (data.delay_minutes !== null) {
+                            const delay = Math.round(data.delay_minutes);
+                            delayEl.textContent = delay + ' 分钟';
+                            
+                            if (delay < 15) {
+                                delayEl.className = 'stat-value success';
+                            } else if (delay < 30) {
+                                delayEl.className = 'stat-value warning';
+                            } else {
+                                delayEl.className = 'stat-value error';
+                            }
+                        } else {
+                            delayEl.textContent = '-';
+                            delayEl.className = 'stat-value';
+                        }
+                        
+                        // 检查次数
+                        const checkCountEl = document.getElementById('check-count');
+                        if (data.check_count) {
+                            checkCountEl.textContent = data.check_count;
+                        } else {
+                            checkCountEl.textContent = '0';
+                        }
+                        
+                        // 最后检查
+                        const lastCheckEl = document.getElementById('last-check');
+                        if (data.last_check_time) {
+                            lastCheckEl.textContent = formatTime(data.last_check_time);
+                        } else {
+                            lastCheckEl.textContent = '-';
+                        }
+                        
+                        // 判断今天是单数还是双数
+                        const today = new Date();
+                        const dayOfMonth = today.getDate();
+                        const isOddDay = dayOfMonth % 2 === 1;
+                        
+                        // 单数日期父文件夹ID
+                        const rootFolderOddEl = document.getElementById('root-folder-odd');
+                        const oddStatusEl = document.getElementById('odd-status');
+                        
+                        if (data.root_folder_odd && data.root_folder_odd !== 'N/A') {
+                            rootFolderOddEl.textContent = data.root_folder_odd;
+                            rootFolderOddEl.style.color = '#3b82f6';
+                            if (isOddDay) {
+                                oddStatusEl.textContent = '✅ 今天使用 (1, 3, 5, 7, 9, 11...)';
+                                oddStatusEl.style.color = '#10b981';
+                            } else {
+                                oddStatusEl.textContent = '📂 备用 (1, 3, 5, 7, 9, 11...)';
+                                oddStatusEl.style.color = 'rgba(255,255,255,0.4)';
+                            }
+                        } else {
+                            rootFolderOddEl.textContent = '🧹 已清理';
+                            rootFolderOddEl.style.color = 'rgba(255,255,255,0.3)';
+                            oddStatusEl.textContent = '已在00:10清理（今天不使用）';
+                            oddStatusEl.style.color = 'rgba(255,255,255,0.3)';
+                        }
+                        
+                        // 双数日期父文件夹ID
+                        const rootFolderEvenEl = document.getElementById('root-folder-even');
+                        const evenStatusEl = document.getElementById('even-status');
+                        
+                        if (data.root_folder_even && data.root_folder_even !== 'N/A') {
+                            rootFolderEvenEl.textContent = data.root_folder_even;
+                            rootFolderEvenEl.style.color = '#8b5cf6';
+                            if (isOddDay) {
+                                evenStatusEl.textContent = '📂 备用 (2, 4, 6, 8, 10, 12...)';
+                                evenStatusEl.style.color = 'rgba(255,255,255,0.4)';
+                            } else {
+                                evenStatusEl.textContent = '✅ 今天使用 (2, 4, 6, 8, 10, 12...)';
+                                evenStatusEl.style.color = '#10b981';
+                            }
+                        } else {
+                            rootFolderEvenEl.textContent = '🧹 已清理';
+                            rootFolderEvenEl.style.color = 'rgba(255,255,255,0.3)';
+                            evenStatusEl.textContent = '已在00:10清理（今天不使用）';
+                            evenStatusEl.style.color = 'rgba(255,255,255,0.3)';
+                        }
+                        
+                        // 子账号文件夹ID（今日文件夹）
+                        const folderIdEl = document.getElementById('folder-id');
+                        if (data.folder_id) {
+                            folderIdEl.textContent = data.folder_id;
+                            folderIdEl.className = 'stat-value';
+                            folderIdEl.style.fontSize = '1.0rem';
+                            folderIdEl.style.wordBreak = 'break-all';
+                            folderIdEl.style.color = '#fbbf24';
+                        } else {
+                            folderIdEl.textContent = '未找到';
+                            folderIdEl.className = 'stat-value error';
+                        }
+                        
+                        // 当前时间
+                        const currentTimeEl = document.getElementById('current-time');
+                        if (data.current_time) {
+                            currentTimeEl.textContent = formatTime(data.current_time);
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error('获取状态失败:', err);
+                });
+        }
+        
+        function loadLogs() {
+            fetch('/api/gdrive-detector/logs?lines=100')
+                .then(res => res.json())
+                .then(response => {
+                    if (response.success) {
+                        const logContent = document.getElementById('log-content');
+                        logContent.textContent = response.logs || '暂无日志';
+                        
+                        // 自动滚动到底部
+                        logContent.scrollTop = logContent.scrollHeight;
+                    }
+                })
+                .catch(err => {
+                    console.error('获取日志失败:', err);
+                    document.getElementById('log-content').textContent = '加载日志失败';
+                });
+        }
+        
+        function refreshLogs() {
+            loadStatus();
+            loadLogs();
+            loadTxtFiles();
+        }
+        
+        // 初始加载
+        updateBeijingTime();
+        loadStatus();
+        loadLogs();
+        loadTxtFiles();
+        
+        // 每秒更新北京时间
+        setInterval(updateBeijingTime, 1000);
+        
+        // 每60秒（1分钟）自动刷新数据
+        let autoRefreshInterval = setInterval(() => {
+            console.log('🔄 自动刷新数据...');
+            loadStatus();
+            loadLogs();
+            loadTxtFiles();
+        }, 60000);  // 改为60秒刷新
+        
+        console.log('✅ Google Drive监控已启动（1分钟自动刷新）');
+    </script>
+</body>
+</html>

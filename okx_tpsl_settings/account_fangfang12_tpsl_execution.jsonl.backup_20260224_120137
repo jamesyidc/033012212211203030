@@ -1,0 +1,2 @@
+{"timestamp": "2026-02-20T22:28:00.422352", "account_id": "account_fangfang12", "instId": "NEAR-USDT-SWAP", "posSide": "net", "triggerType": "stop_loss", "success": false, "message": "", "error": ""}
+{"timestamp": "2026-02-20T23:53:33.889018", "account_id": "account_fangfang12", "instId": "UNI-USDT-SWAP", "posSide": "net", "triggerType": "stop_loss", "success": false, "message": "", "error": ""}

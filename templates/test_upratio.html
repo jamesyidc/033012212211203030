@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>测试元素存在性</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <h1 class="text-2xl font-bold mb-4">DOM元素测试</h1>
+    
+    <!-- 测试卡片 -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-white rounded-lg shadow-lg p-6 border-l-4 border-blue-500">
+            <div class="text-gray-600 font-medium mb-2">平均</div>
+            <div id="upRatioAvgTop" class="text-3xl font-bold text-blue-600">--</div>
+            <div class="text-sm text-gray-500 mt-2">10分钟上涨占比平均值</div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 border-l-4 border-green-500">
+            <div class="text-gray-600 font-medium mb-2">最大</div>
+            <div id="upRatioMaxTop" class="text-3xl font-bold text-green-600">--</div>
+            <div class="text-sm text-gray-500 mt-2">10分钟上涨占比最大值</div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 border-l-4 border-red-500">
+            <div class="text-gray-600 font-medium mb-2">最小</div>
+            <div id="upRatioMinTop" class="text-3xl font-bold text-red-600">--</div>
+            <div class="text-sm text-gray-500 mt-2">10分钟上涨占比最小值</div>
+        </div>
+    </div>
+    
+    <button onclick="updateValues()" class="px-4 py-2 bg-blue-500 text-white rounded">更新数值</button>
+    
+    <div id="log" class="mt-4 p-4 bg-white rounded shadow"></div>
+    
+    <script>
+        function updateValues() {
+            const avgEl = document.getElementById('upRatioAvgTop');
+            const maxEl = document.getElementById('upRatioMaxTop');
+            const minEl = document.getElementById('upRatioMinTop');
+            
+            const log = document.getElementById('log');
+            log.innerHTML = `
+                <p><strong>元素存在性检查：</strong></p>
+                <p>avgEl: ${!!avgEl}</p>
+                <p>maxEl: ${!!maxEl}</p>
+                <p>minEl: ${!!minEl}</p>
+                <hr class="my-2">
+                <p><strong>更新数值：</strong></p>
+            `;
+            
+            if (avgEl) {
+                avgEl.textContent = '10.90%';
+                log.innerHTML += '<p>✅ 平均值已更新</p>';
+            } else {
+                log.innerHTML += '<p>❌ 平均值元素不存在</p>';
+            }
+            
+            if (maxEl) {
+                maxEl.textContent = '13.57%';
+                log.innerHTML += '<p>✅ 最大值已更新</p>';
+            } else {
+                log.innerHTML += '<p>❌ 最大值元素不存在</p>';
+            }
+            
+            if (minEl) {
+                minEl.textContent = '7.40%';
+                log.innerHTML += '<p>✅ 最小值已更新</p>';
+            } else {
+                log.innerHTML += '<p>❌ 最小值元素不存在</p>';
+            }
+        }
+        
+        // 页面加载后自动测试
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(updateValues, 1000);
+        });
+    </script>
+</body>
+</html>

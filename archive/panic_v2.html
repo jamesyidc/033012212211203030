@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>恐慌清洗指数 - 加密货币数据分析 v2.9-自定义标签</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #1e2139;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0;
+        }
+        
+        /* 顶部导航栏 */
+        .top-nav {
+            background: #2a2d47;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            justify-content: space-between;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .home-btn {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%);
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+        
+        .home-btn:hover {
+            background: linear-gradient(135deg, #0099ff 0%, #00d4ff 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.4);
+        }
+        
+        .nav-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: #fff;
+        }
+        
+        /* 当前数据统计栏 */
+        .stats-bar {
+            background: #2a2d47;
+            padding: 15px 20px;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #3a3d5c;
+            font-size: 13px;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .stat-label {
+            color: #8b92b8;
+            font-size: 12px;
+        }
+        
+        .stat-value {
+            color: #fff;
+            font-weight: 600;
+            font-size: 20px;
+        }
+        
+        .stat-value.green {
+            color: #10b981;
+        }
+        
+        .stat-value.yellow {
+            color: #fbbf24;
+        }
+        
+        .stat-value.red {
+            color: #ef4444;
+        }
+        
+        .stat-sublabel {
+            color: #6b7280;
+            font-size: 11px;
+        }
+        
+        /* 图表容器 */
+        .chart-container {
+            background: #2a2d47;
+            padding: 20px;
+            margin: 0;
+            border-bottom: 1px solid #3a3d5c;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .chart-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #fff;
+        }
+        
+        /* 分页控制器 */
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        .page-btn {
+            background: #3a3d5c;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .page-btn:hover:not(:disabled) {
+            background: #4a4d6c;
+            transform: translateY(-2px);
+        }
+        
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .page-info {
+            color: #00d4ff;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 12px;
+            background: #1e2139;
+            border-radius: 6px;
+            border: 1px solid #3a3d5c;
+        }
+        
+        #panicChart {
+            width: 100%;
+            height: 400px;
+        }
+        
+        /* 时间查询工具 */
+        .time-query-box {
+            background: #1e2139;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .time-query-label {
+            color: #8b92b8;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .time-input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .time-input {
+            background: #2a2d47;
+            border: 1px solid #3a3d5c;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+        
+        .time-input:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+        
+        .query-btn {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%);
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .query-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
+        }
+        
+        .reset-btn {
+            background: #3a3d5c;
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .reset-btn:hover {
+            background: #4a4d6c;
+        }
+        
+        .query-result {
+            color: #00d4ff;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        
+        /* 历史数据表格 */
+        .history-container {
+            background: #2a2d47;
+            padding: 20px;
+            border-bottom: 1px solid #3a3d5c;
+        }
+        
+        .history-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        
+        .history-table thead {
+            background: #1e2139;
+        }
+        
+        .history-table th {
+            padding: 10px;
+            text-align: left;
+            color: #8b92b8;
+            font-weight: 500;
+            border-bottom: 1px solid #3a3d5c;
+        }
+        
+        .history-table td {
+            padding: 10px;
+            border-bottom: 1px solid #3a3d5c;
+        }
+        
+        .history-table tbody tr:hover {
+            background: #1e2139;
+        }
+        
+        /* 加载状态 */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #8b92b8;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .stats-bar {
+                gap: 15px;
+            }
+            
+            .stat-value {
+                font-size: 16px;
+            }
+            
+            #panicChart {
+                height: 300px;
+            }
+        }
+        
+        /* 时间范围选择器 */
+        .time-range-select {
+            background: #1e2139;
+            color: #fff;
+            border: 1px solid #3a3d5c;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .time-range-select:hover {
+            border-color: #00d4ff;
+            background: #2a2d47;
+        }
+        
+        .time-range-select:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部导航 -->
+        <div class="top-nav">
+            <div class="nav-left">
+                <a href="/" class="home-btn">
+                    <span>🏠</span>
+                    <span>返回首页</span>
+                </a>
+                <div class="nav-title">⚡ 恐慌清洗指数</div>
+            </div>
+        </div>
+        
+        <!-- 当前数据统计栏 -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-label">恐慌清洗指数</div>
+                <div class="stat-value" id="currentIndex">--</div>
+                <div class="stat-sublabel" id="currentLevel">--</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">1小时爆仓金额</div>
+                <div class="stat-value" id="hour1Amount">--</div>
+                <div class="stat-sublabel">万美元</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">24小时爆仓金额</div>
+                <div class="stat-value" id="hour24Amount">--</div>
+                <div class="stat-sublabel">万美元</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">24小时爆仓人数</div>
+                <div class="stat-value" id="currentPeople">--</div>
+                <div class="stat-sublabel">万人</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">全网持仓量</div>
+                <div class="stat-value" id="currentPosition">--</div>
+                <div class="stat-sublabel">亿美元</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">最后更新</div>
+                <div class="stat-value" id="updateTime" style="font-size: 16px;">--</div>
+                <div class="stat-sublabel">每3分钟更新</div>
+            </div>
+        </div>
+        
+        <!-- 曲线图 -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <div class="chart-title">📈 恐慌清洗指数趋势 <span style="font-size: 12px; color: #00d4ff;">[v2.1]</span></div>
+                
+                <!-- 分页控制器（右上角） -->
+                <div class="pagination-controls">
+                    <button class="page-btn" id="prevPageBtn" onclick="loadPreviousPage()" title="查看更早的数据">
+                        <span>◀</span>
+                    </button>
+                    <div class="page-info" id="pageInfo">加载中...</div>
+                    <button class="page-btn" id="nextPageBtn" onclick="loadNextPage()" title="查看更新的数据">
+                        <span>▶</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="panicChart"></div>
+            <div id="debugInfo" style="font-size: 11px; color: #6b7280; margin-top: 10px; text-align: center;">
+                正在加载数据...
+            </div>
+        </div>
+        
+        <!-- 1小时爆仓金额曲线图 -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <div class="chart-title">💥 1小时爆仓金额曲线图 <span style="font-size: 12px; color: #fbbf24;">[实时追踪]</span></div>
+                
+                <!-- 分页控制器 -->
+                <div class="pagination-controls">
+                    <button class="page-btn" id="liqPrevPageBtn" onclick="loadLiquidationPreviousPage()" title="查看更早的数据">
+                        <span>◀</span>
+                    </button>
+                    <div class="page-info" id="liqPageInfo">加载中...</div>
+                    <button class="page-btn" id="liqNextPageBtn" onclick="loadLiquidationNextPage()" title="查看更新的数据">
+                        <span>▶</span>
+                    </button>
+                </div>
+            </div>
+            <div style="position: relative; width: 100%; height: 400px;">
+                <div id="liquidation1hChart" style="width: 100%; height: 100%;"></div>
+                <!-- 自定义爆仓金额标签 -->
+                <div id="customMarkPointLabel" style="
+                    position: absolute;
+                    display: none;
+                    background: #fbbf24;
+                    color: #000000;
+                    font-size: 20px;
+                    font-weight: bold;
+                    padding: 10px 15px;
+                    border-radius: 8px;
+                    border: 3px solid #000000;
+                    box-shadow: 3px 3px 10px rgba(0,0,0,0.4);
+                    z-index: 1000;
+                    pointer-events: none;
+                    white-space: nowrap;
+                "></div>
+            </div>
+            <div style="font-size: 11px; color: #6b7280; margin-top: 10px; text-align: center;">
+                数据采集频率: 每分钟一次 | 数据来源: OKX API | 单位: 万美元 | 每页显示12小时
+            </div>
+        </div>
+        
+        <!-- 恐惧贪婪指数历史图表 -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <div class="chart-title">📊 比特币恐惧&贪婪历史指数</div>
+            </div>
+            <div id="fearGreedChart" style="width: 100%; height: 350px;"></div>
+            <div style="font-size: 11px; color: #6b7280; margin-top: 10px; text-align: center;">
+                数据来源: history.btc123.fans | 每日更新
+            </div>
+        </div>
+        
+        <!-- 历史数据表格 -->
+        <div class="history-container">
+            <div class="history-title">📋 恐慌指数历史记录</div>
+            
+            <!-- 时间查询工具 -->
+            <div class="time-query-box">
+                <span class="time-query-label">🔍 时间查询：</span>
+                <div class="time-input-group">
+                    <input type="datetime-local" id="queryDateTime" class="time-input" placeholder="选择日期时间">
+                    <button onclick="queryHistoryByTime()" class="query-btn">查询</button>
+                    <button onclick="resetQuery()" class="reset-btn">重置</button>
+                    <span id="queryResult" class="query-result"></span>
+                </div>
+            </div>
+            
+            <div id="loadingHistory" class="loading">正在加载历史数据...</div>
+            <table class="history-table" id="historyTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>记录时间</th>
+                        <th>1h爆仓 (万$)</th>
+                        <th>24h爆仓 (亿$)</th>
+                        <th>恐慌指数</th>
+                        <th>等级</th>
+                        <th>爆仓人数 (万人)</th>
+                        <th>全网持仓 (亿$)</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 30日爆仓数据日历 -->
+        <div class="history-container">
+            <div class="history-title">📅 30日爆仓数据日历</div>
+            <div id="loading30Days" class="loading">正在加载30日爆仓数据...</div>
+            <table class="history-table" id="liquidation30Table" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>日期</th>
+                        <th>多单爆仓</th>
+                        <th>空单爆仓</th>
+                        <th>总爆仓</th>
+                    </tr>
+                </thead>
+                <tbody id="liquidation30Body">
+                </tbody>
+            </table>
+            <div class="stat-sublabel" id="liquidation30UpdateTime" style="margin-top: 10px; text-align: right;"></div>
+        </div>
+    </div>
+    
+    <script>
+        let chart = null;
+        let currentPage = 0;  // 当前页码（0=最新12小时）
+        let allData = [];     // 所有历史数据
+        const HOURS_PER_PAGE = 12;  // 每页显示12小时
+        const RECORDS_PER_HOUR = 20;  // 每小时约20条记录（3分钟一次）
+        const RECORDS_PER_PAGE = HOURS_PER_PAGE * RECORDS_PER_HOUR;  // 每页约240条记录
+        
+        // 初始化图表
+        function initChart() {
+            const chartDom = document.getElementById('panicChart');
+            chart = echarts.init(chartDom);
+            
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: '#2a2d47',
+                    borderColor: '#3a3d5c',
+                    textStyle: {
+                        color: '#fff'
+                    },
+                    formatter: function(params) {
+                        let html = params[0].axisValue + '<br/>';
+                        params.forEach(param => {
+                            if (param.seriesName === '恐慌清洗指数') {
+                                html += param.marker + param.seriesName + ': ' + param.value.toFixed(2) + '%<br/>';
+                            } else if (param.seriesName === '全网持仓量') {
+                                // 格式化为合理的亿单位显示（保留2位小数）
+                                let valueInYi = param.value;
+                                html += param.marker + param.seriesName + ': $' + valueInYi.toFixed(2) + '亿<br/>';
+                            }
+                        });
+                        return html;
+                    }
+                },
+                legend: {
+                    data: ['恐慌清洗指数', '全网持仓量'],
+                    top: 10,
+                    textStyle: {
+                        color: '#8b92b8'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '5%',
+                    bottom: '3%',
+                    top: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: [],
+                    axisLine: {
+                        lineStyle: {
+                            color: '#3a3d5c'
+                        }
+                    },
+                    axisLabel: {
+                        color: '#8b92b8',
+                        rotate: 45,
+                        fontSize: 10
+                    }
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '恐慌指数 (%)',
+                        position: 'left',
+                        min: 9,
+                        max: 13,
+                        interval: 1,
+                        nameTextStyle: {
+                            color: '#3b7dff'
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                color: '#3a3d5c'
+                            }
+                        },
+                        splitLine: {
+                            lineStyle: {
+                                color: '#3a3d5c'
+                            }
+                        },
+                        axisLabel: {
+                            color: '#3b7dff',
+                            formatter: '{value}%'
+                        }
+                    },
+                    {
+                        type: 'value',
+                        name: '全网持仓 (亿$)',
+                        position: 'right',
+                        min: 90,
+                        max: 100,
+                        interval: 2,
+                        nameTextStyle: {
+                            color: '#10b981'
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                color: '#3a3d5c'
+                            }
+                        },
+                        axisLabel: {
+                            color: '#10b981',
+                            formatter: '${value}亿'
+                        },
+                        splitLine: {
+                            show: false
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: '恐慌清洗指数',
+                        type: 'line',
+                        yAxisIndex: 0,
+                        smooth: true,
+                        symbol: 'circle',
+                        symbolSize: 6,
+                        data: [],
+                        lineStyle: {
+                            width: 2,
+                            color: '#3b7dff'
+                        },
+                        areaStyle: {
+                            color: {
+                                type: 'linear',
+                                x: 0,
+                                y: 0,
+                                x2: 0,
+                                y2: 1,
+                                colorStops: [
+                                    {
+                                        offset: 0,
+                                        color: 'rgba(59, 125, 255, 0.3)'
+                                    },
+                                    {
+                                        offset: 1,
+                                        color: 'rgba(59, 125, 255, 0.05)'
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        name: '全网持仓量',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        smooth: true,
+                        symbol: 'circle',
+                        symbolSize: 6,
+                        data: [],
+                        lineStyle: {
+                            width: 2,
+                            color: '#10b981'
+                        }
+                    }
+                ]
+            };
+            
+            chart.setOption(option);
+        }
+        
+        // 加载当前数据
+        async function loadCurrentData() {
+            try {
+                const response = await fetch('/api/panic/latest?_=' + Date.now());
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    const data = result.data;
+                    
+                    // 更新统计栏
+                    const indexEl = document.getElementById('currentIndex');
+                    indexEl.textContent = data.panic_index.toFixed(2) + '%';
+                    
+                    // 设置颜色
+                    indexEl.className = 'stat-value ' + (data.level_color || 'green');
+                    
+                    document.getElementById('currentLevel').textContent = data.panic_level || '--';
+                    // 1小时爆仓金额：万美元
+                    document.getElementById('hour1Amount').textContent = '$' + data.hour_1_amount.toFixed(2);
+                    // 24小时爆仓金额：万美元
+                    document.getElementById('hour24Amount').textContent = '$' + data.hour_24_amount.toFixed(2);
+                    // 24小时爆仓人数：万人
+                    document.getElementById('currentPeople').textContent = data.hour_24_people.toFixed(2);
+                    // 全网持仓量：亿美元
+                    document.getElementById('currentPosition').textContent = '$' + data.total_position.toFixed(2);
+                    document.getElementById('updateTime').textContent = data.record_time.split(' ')[1];
+                }
+            } catch (error) {
+                console.error('加载当前数据失败:', error);
+            }
+        }
+        
+        // 加载全部历史数据
+        async function loadAllHistoryData() {
+            try {
+                // 加载更多数据以支持分页（例如最近7天的数据）
+                const conn = await fetch('/api/panic/history?limit=3000&_=' + Date.now());
+                const result = await conn.json();
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    // 过滤掉包含0值的异常数据（但保留total_position为0的历史数据）
+                    allData = result.data.filter(item => {
+                        return item.hour_1_amount > 0 && 
+                               item.hour_24_amount > 0;
+                               // 移除total_position的检查，因为历史回填数据可能没有持仓数据
+                    }); // 保持API返回的顺序（最新的在前）
+                    
+                    const debugMsg = `数据过滤完成: 总数据${result.data.length}条, 有效数据${allData.length}条`;
+                    console.log(debugMsg);
+                    document.getElementById('debugInfo').textContent = debugMsg + ' | 页面版本: v2.1';
+                    document.getElementById('debugInfo').style.color = '#10b981';
+                    
+                    if (allData.length === 0) {
+                        document.getElementById('debugInfo').textContent = '⚠️ 警告: 过滤后无有效数据！请检查数据采集。';
+                        document.getElementById('debugInfo').style.color = '#ef4444';
+                        console.error('No valid data after filtering!');
+                        return;
+                    }
+                    
+                    updateChartForCurrentPage();
+                    updatePageInfo();
+                } else {
+                    document.getElementById('debugInfo').textContent = '❌ 数据加载失败或无数据';
+                    document.getElementById('debugInfo').style.color = '#ef4444';
+                }
+            } catch (error) {
+                console.error('加载历史数据失败:', error);
+                document.getElementById('debugInfo').textContent = '❌ 加载失败: ' + error.message;
+                document.getElementById('debugInfo').style.color = '#ef4444';
+            }
+        }
+        
+        // 更新图表显示当前页数据
+        function updateChartForCurrentPage() {
+            if (allData.length === 0) return;
+            
+            // allData现在是最新在前（DESC），需要反转用于图表显示（时间从左到右，旧到新）
+            const chartData = [...allData].reverse();
+            
+            // 计算当前页的数据范围
+            const totalRecords = chartData.length;
+            const startIndex = Math.max(0, totalRecords - (currentPage + 1) * RECORDS_PER_PAGE);
+            const endIndex = Math.max(0, totalRecords - currentPage * RECORDS_PER_PAGE);
+            
+            const pageData = chartData.slice(startIndex, endIndex);
+            
+            if (pageData.length === 0) return;
+            
+            // 提取图表数据
+            const times = pageData.map(item => {
+                const parts = item.record_time.split(' ');
+                return parts[1].substring(0, 5); // HH:MM
+            });
+            const panicValues = pageData.map(item => parseFloat(item.panic_index.toFixed(2)));
+            const positionValues = pageData.map(item => parseFloat(item.total_position.toFixed(2)));
+                    
+            // 识别日期边界（用于绘制竖线）
+            const dateBoundaries = [];
+            let lastDate = null;
+            pageData.forEach((item, index) => {
+                const currentDate = item.record_time.split(' ')[0]; // YYYY-MM-DD
+                if (lastDate && currentDate !== lastDate) {
+                    dateBoundaries.push({
+                        xAxis: index,
+                        label: {
+                            show: true,
+                            formatter: currentDate,
+                            color: '#fbbf24',
+                            fontSize: 12,
+                            fontWeight: 'bold'
+                        },
+                        lineStyle: {
+                            color: '#fbbf24',
+                            width: 2,
+                            type: 'solid'
+                        }
+                    });
+                }
+                lastDate = currentDate;
+            });
+            
+            // 动态计算恐慌指数Y轴范围：最低-1%，最高+1%
+            const panicNumbers = pageData.map(item => item.panic_index);
+            const panicMin = Math.min(...panicNumbers);
+            const panicMax = Math.max(...panicNumbers);
+                    
+            // 恐慌指数：最低-1%，最高+1%，保留小数
+            const yAxisMin = (Math.floor(panicMin * 10) / 10) - 1;
+            const yAxisMax = (Math.ceil(panicMax * 10) / 10) + 1;
+            const yAxisInterval = 0.5;  // 固定0.5%刻度间隔
+            
+            // Y轴标签格式化，保留2位小数
+            const yAxisFormatter = (value) => value.toFixed(2) + '%';
+            
+            // 动态计算全网持仓Y轴范围：最低-1亿，最高+1亿
+            const positionNumbers = pageData.map(item => item.total_position);
+            const positionMin = Math.min(...positionNumbers);
+            const positionMax = Math.max(...positionNumbers);
+                    
+            // 全网持仓：最低-1亿，最高+1亿，保留小数
+            const positionYMin = (Math.floor(positionMin * 10) / 10) - 1;
+            const positionYMax = (Math.ceil(positionMax * 10) / 10) + 1;
+            const positionYInterval = 0.5;  // 固定0.5亿刻度间隔
+            
+            // Y轴标签格式化，保留2位小数
+            const positionYFormatter = (value) => value.toFixed(2) + '亿';
+            
+            chart.setOption({
+                xAxis: {
+                    data: times
+                },
+                // 添加日期边界标记线
+                markLine: dateBoundaries.length > 0 ? {
+                    silent: true,
+                    data: dateBoundaries
+                } : undefined,
+                        yAxis: [
+                            {
+                                type: 'value',
+                                name: '恐慌指数 (%)',
+                                position: 'left',
+                                min: yAxisMin,
+                                max: yAxisMax,
+                                interval: yAxisInterval,
+                                nameTextStyle: {
+                                    color: '#3b7dff'
+                                },
+                                axisLine: {
+                                    lineStyle: {
+                                        color: '#3a3d5c'
+                                    }
+                                },
+                                splitLine: {
+                                    lineStyle: {
+                                        color: '#3a3d5c'
+                                    }
+                                },
+                                axisLabel: {
+                                    color: '#3b7dff',
+                                    formatter: function(value) {
+                                        return value.toFixed(2) + '%';
+                                    }
+                                }
+                            },
+                            {
+                                type: 'value',
+                                name: '全网持仓 (亿$)',
+                                position: 'right',
+                                min: positionYMin,
+                                max: positionYMax,
+                                interval: positionYInterval,
+                                nameTextStyle: {
+                                    color: '#10b981'
+                                },
+                                axisLine: {
+                                    lineStyle: {
+                                        color: '#3a3d5c'
+                                    }
+                                },
+                                axisLabel: {
+                                    color: '#10b981',
+                                    formatter: function(value) {
+                                        return '$' + value.toFixed(2) + '亿';
+                                    }
+                                },
+                                splitLine: {
+                                    show: false
+                                }
+                            }
+                        ],
+                series: [
+                    {
+                        name: '恐慌清洗指数',
+                        data: panicValues,
+                        markLine: dateBoundaries.length > 0 ? {
+                            silent: true,
+                            symbol: 'none',
+                            data: dateBoundaries
+                        } : undefined
+                    },
+                    {
+                        name: '全网持仓量',
+                        data: positionValues
+                    }
+                ]
+            });
+        }
+        
+        // 更新分页信息
+        function updatePageInfo() {
+            const totalPages = Math.ceil(allData.length / RECORDS_PER_PAGE);
+            
+            // 简洁显示：第X页/共Y页
+            document.getElementById('pageInfo').textContent = `第 ${currentPage + 1} 页 / 共 ${totalPages} 页`;
+            
+            // 更新按钮状态
+            document.getElementById('prevPageBtn').disabled = (currentPage >= totalPages - 1);
+            document.getElementById('nextPageBtn').disabled = (currentPage <= 0);
+        }
+        
+        // 加载上一页（更早的数据）
+        function loadPreviousPage() {
+            const totalPages = Math.ceil(allData.length / RECORDS_PER_PAGE);
+            if (currentPage < totalPages - 1) {
+                currentPage++;
+                updateChartForCurrentPage();
+                updatePageInfo();
+            }
+        }
+        
+        // 加载下一页（更新的数据）
+        function loadNextPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                updateChartForCurrentPage();
+                updatePageInfo();
+            }
+        }
+        
+        // 加载历史数据并更新图表（保留用于表格显示）
+        async function loadHistoryData() {
+            try {
+                const conn = await fetch('/api/panic/history?limit=50');
+                const result = await conn.json();
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    // API已按时间DESC排序，最新的在前，直接使用
+                    const data = result.data;
+                    
+                    // 更新表格
+                    const tbody = document.getElementById('historyTableBody');
+                    tbody.innerHTML = '';
+                    
+                    data.forEach(item => {
+                        const tr = document.createElement('tr');
+                        
+                        let levelColor = 'green';
+                        if (item.panic_index >= 5) levelColor = 'red';
+                        else if (item.panic_index >= 2) levelColor = 'yellow';
+                        
+                        let levelText = '低恐慌';
+                        if (item.panic_index >= 5) levelText = '高度恐慌';
+                        else if (item.panic_index >= 2) levelText = '中度恐慌';
+                        
+                        tr.innerHTML = `
+                            <td>${item.record_time}</td>
+                            <td>$${item.hour_1_amount.toFixed(2)}万</td>
+                            <td>$${item.hour_24_amount.toFixed(2)}万</td>
+                            <td><span class="${levelColor}" style="font-weight: 600;">${item.panic_index.toFixed(2)}%</span></td>
+                            <td><span class="${levelColor}">${levelText}</span></td>
+                            <td>${item.hour_24_people.toFixed(2)}万人</td>
+                            <td>${item.total_position.toFixed(2)}亿美元</td>
+                        `;
+                        
+                        tbody.appendChild(tr);
+                    });
+                    
+                    document.getElementById('loadingHistory').style.display = 'none';
+                    document.getElementById('historyTable').style.display = 'table';
+                }
+            } catch (error) {
+                console.error('加载历史数据失败:', error);
+                document.getElementById('loadingHistory').textContent = '❌ 加载失败: ' + error.message;
+            }
+        }
+        
+        // 时间查询功能
+        let allHistoryData = [];  // 存储所有历史数据
+        
+        async function queryHistoryByTime() {
+            const dateTimeInput = document.getElementById('queryDateTime');
+            const resultSpan = document.getElementById('queryResult');
+            
+            if (!dateTimeInput.value) {
+                resultSpan.textContent = '⚠️ 请选择查询时间';
+                resultSpan.style.color = '#fbbf24';
+                return;
+            }
+            
+            // 转换选择的时间为查询格式
+            const selectedDate = new Date(dateTimeInput.value);
+            const queryTime = selectedDate.toISOString().slice(0, 16).replace('T', ' ');
+            
+            try {
+                resultSpan.textContent = '🔍 查询中...';
+                resultSpan.style.color = '#00d4ff';
+                
+                // 查询指定时间附近的数据（前后10条）
+                const response = await fetch(`/api/panic/history?time=${encodeURIComponent(queryTime)}&limit=20`);
+                const result = await response.json();
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    // 找到最接近的记录
+                    let closestRecord = result.data[0];
+                    let minDiff = Math.abs(new Date(closestRecord.record_time) - selectedDate);
+                    
+                    result.data.forEach(item => {
+                        const diff = Math.abs(new Date(item.record_time) - selectedDate);
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            closestRecord = item;
+                        }
+                    });
+                    
+                    // 更新表格，高亮匹配的记录
+                    const tbody = document.getElementById('historyTableBody');
+                    tbody.innerHTML = '';
+                    
+                    result.data.forEach(item => {
+                        const tr = document.createElement('tr');
+                        const isMatch = item.record_time === closestRecord.record_time;
+                        
+                        let levelColor = 'green';
+                        if (item.panic_index >= 5) levelColor = 'red';
+                        else if (item.panic_index >= 2) levelColor = 'yellow';
+                        
+                        let levelText = '低恐慌';
+                        if (item.panic_index >= 5) levelText = '高度恐慌';
+                        else if (item.panic_index >= 2) levelText = '中度恐慌';
+                        
+                        tr.innerHTML = `
+                            <td${isMatch ? ' style="background: rgba(0, 212, 255, 0.2); font-weight: 600;"' : ''}>${item.record_time}</td>
+                            <td${isMatch ? ' style="background: rgba(0, 212, 255, 0.2);"' : ''}>$${item.hour_1_amount.toFixed(2)}万</td>
+                            <td${isMatch ? ' style="background: rgba(0, 212, 255, 0.2);"' : ''}>$${item.hour_24_amount.toFixed(2)}万</td>
+                            <td${isMatch ? ' style="background: rgba(0, 212, 255, 0.2);"' : ''}><span class="${levelColor}" style="font-weight: 600;">${item.panic_index.toFixed(2)}%</span></td>
+                            <td${isMatch ? ' style="background: rgba(0, 212, 255, 0.2);"' : ''}><span class="${levelColor}">${levelText}</span></td>
+                            <td${isMatch ? ' style="background: rgba(0, 212, 255, 0.2);"' : ''}>${item.hour_24_people.toFixed(2)}万人</td>
+                            <td${isMatch ? ' style="background: rgba(0, 212, 255, 0.2);"' : ''}>${item.total_position.toFixed(2)}亿美元</td>
+                        `;
+                        
+                        tbody.appendChild(tr);
+                    });
+                    
+                    // 显示查询结果
+                    const timeDiff = Math.abs(minDiff / 1000 / 60); // 转换为分钟
+                    if (timeDiff < 5) {
+                        resultSpan.textContent = `✅ 找到精确匹配: ${closestRecord.record_time}`;
+                        resultSpan.style.color = '#10b981';
+                    } else {
+                        resultSpan.textContent = `✅ 找到最近记录: ${closestRecord.record_time} (相差${timeDiff.toFixed(0)}分钟)`;
+                        resultSpan.style.color = '#fbbf24';
+                    }
+                    
+                    // 滚动到匹配的记录
+                    document.getElementById('historyTable').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    resultSpan.textContent = '❌ 未找到相关数据';
+                    resultSpan.style.color = '#ef4444';
+                }
+            } catch (error) {
+                console.error('查询失败:', error);
+                resultSpan.textContent = '❌ 查询失败: ' + error.message;
+                resultSpan.style.color = '#ef4444';
+            }
+        }
+        
+        // 重置查询
+        function resetQuery() {
+            document.getElementById('queryDateTime').value = '';
+            document.getElementById('queryResult').textContent = '';
+            loadHistoryData();  // 重新加载所有数据
+        }
+        
+        // 加载30日爆仓数据
+        async function load30DaysLiquidation() {
+            try {
+                const response = await fetch('/api/liquidation/30days');
+                const result = await response.json();
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    const tbody = document.getElementById('liquidation30Body');
+                    tbody.innerHTML = '';
+                    
+                    result.data.forEach(item => {
+                        const tr = document.createElement('tr');
+                        
+                        tr.innerHTML = `
+                            <td>${item.date}</td>
+                            <td style="color: #10b981;">$${item.long_amount}亿</td>
+                            <td style="color: #ef4444;">$${item.short_amount}亿</td>
+                            <td style="font-weight: 600;">$${item.total_amount}亿</td>
+                        `;
+                        
+                        tbody.appendChild(tr);
+                    });
+                    
+                    // 显示更新时间
+                    if (result.data[0].updated_at) {
+                        document.getElementById('liquidation30UpdateTime').textContent = 
+                            '最后更新: ' + result.data[0].updated_at + ' (每1小时更新)';
+                    }
+                    
+                    document.getElementById('loading30Days').style.display = 'none';
+                    document.getElementById('liquidation30Table').style.display = 'table';
+                } else {
+                    document.getElementById('loading30Days').textContent = '❌ 暂无30日爆仓数据';
+                }
+            } catch (error) {
+                console.error('加载30日爆仓数据失败:', error);
+                document.getElementById('loading30Days').textContent = '❌ 加载失败: ' + error.message;
+            }
+        }
+        
+        
+        // ============================================
+        // 恐惧贪婪指数历史图表
+        // ============================================
+        let fearGreedChart = null;
+        
+        function initFearGreedChart() {
+            const chartDom = document.getElementById('fearGreedChart');
+            fearGreedChart = echarts.init(chartDom);
+            
+            const option = {
+                backgroundColor: 'transparent',
+                title: {
+                    text: '比特币恐惧和贪婪历史指数',
+                    left: 'center',
+                    top: 10,
+                    textStyle: {
+                        color: '#089AFD',
+                        fontSize: 16
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: '#2a2d47',
+                    borderColor: '#3a3d5c',
+                    textStyle: {
+                        color: '#fff'
+                    },
+                    formatter: function(params) {
+                        let html = params[0].axisValue + '<br/>';
+                        params.forEach(param => {
+                            html += param.marker + param.seriesName + ': ' + param.value + '<br/>';
+                        });
+                        return html;
+                    }
+                },
+                legend: {
+                    data: ['指数', '情绪'],
+                    top: 40,
+                    textStyle: {
+                        color: '#8b92b8'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '5%',
+                    bottom: '3%',
+                    top: '20%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: [],
+                    axisLine: {
+                        lineStyle: {
+                            color: '#3a3d5c'
+                        }
+                    },
+                    axisLabel: {
+                        color: '#8b92b8',
+                        rotate: 45
+                    }
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '指数值',
+                        nameTextStyle: {
+                            color: '#8b92b8'
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                color: '#3a3d5c'
+                            }
+                        },
+                        axisLabel: {
+                            color: '#8b92b8'
+                        },
+                        splitLine: {
+                            lineStyle: {
+                                color: '#3a3d5c'
+                            }
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: '指数',
+                        type: 'line',
+                        smooth: true,
+                        data: [],
+                        areaStyle: {
+                            color: {
+                                type: 'linear',
+                                x: 0,
+                                y: 0,
+                                x2: 0,
+                                y2: 1,
+                                colorStops: [{
+                                    offset: 0, color: 'rgba(0, 212, 255, 0.3)'
+                                }, {
+                                    offset: 1, color: 'rgba(0, 212, 255, 0.05)'
+                                }]
+                            }
+                        },
+                        lineStyle: {
+                            color: '#00d4ff',
+                            width: 2
+                        },
+                        itemStyle: {
+                            color: '#00d4ff'
+                        }
+                    }
+                ]
+            };
+            
+            fearGreedChart.setOption(option);
+        }
+        
+        async function loadFearGreedHistory() {
+            try {
+                const response = await fetch('/api/fear-greed/history?limit=61');
+                const result = await response.json();
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    // 按日期正序排列
+                    const sortedData = result.data.sort((a, b) => {
+                        return a.datetime.localeCompare(b.datetime);
+                    });
+                    
+                    const dates = sortedData.map(item => item.datetime);
+                    const values = sortedData.map(item => item.value);
+                    const emotions = sortedData.map(item => item.result);
+                    
+                    fearGreedChart.setOption({
+                        xAxis: {
+                            data: dates
+                        },
+                        series: [
+                            {
+                                data: values
+                            }
+                        ]
+                    });
+                    
+                    console.log(`恐惧贪婪指数历史数据加载成功: ${sortedData.length} 条`);
+                } else {
+                    console.error('恐惧贪婪指数历史数据加载失败');
+                }
+            } catch (error) {
+                console.error('加载恐惧贪婪指数历史数据失败:', error);
+            }
+        }
+        
+        // 页面加载完成后执行
+        
+        // ==================== 1小时爆仓金额图表 ====================
+        let liquidation1hChart = null;
+        let liqCurrentPage = 0;  // 当前页码（0=最新12小时）
+        let liqAllData = [];     // 所有历史数据
+        const LIQ_HOURS_PER_PAGE = 12;  // 每页显示12小时
+        const LIQ_RECORDS_PER_HOUR = 60;  // 每小时60条记录（1分钟一次）
+        const LIQ_RECORDS_PER_PAGE = LIQ_HOURS_PER_PAGE * LIQ_RECORDS_PER_HOUR;  // 每页720条记录
+        
+        function initLiquidation1hChart() {
+            const chartDom = document.getElementById('liquidation1hChart');
+            liquidation1hChart = echarts.init(chartDom);
+            loadAllLiquidationData();
+        }
+        
+        // 加载所有数据
+        async function loadAllLiquidationData() {
+            try {
+                console.log('📊 加载1小时爆仓金额全部数据... [v2.9-自定义标签]');
+                
+                const response = await fetch('/api/liquidation-1h/history?limit=10000');
+                const result = await response.json();
+                
+                if (!result.success || !result.data || result.data.length === 0) {
+                    console.warn('⚠️ 暂无1小时爆仓金额数据');
+                    liquidation1hChart.setOption({
+                        title: {
+                            text: '⚠️ 暂无数据',
+                            left: 'center',
+                            top: 'middle',
+                            textStyle: {
+                                color: '#6b7280',
+                                fontSize: 16
+                            }
+                        }
+                    });
+                    return;
+                }
+                
+                liqAllData = result.data;
+                console.log(`✅ 加载成功: ${liqAllData.length}条记录`);
+                
+                // 显示最新一页
+                liqCurrentPage = 0;
+                updateLiquidationChartForCurrentPage();
+                updateLiquidationPageInfo();
+                
+            } catch (error) {
+                console.error('❌ 加载1小时爆仓金额数据失败:', error);
+            }
+        }
+        
+        // 更新当前页的图表
+        function updateLiquidationChartForCurrentPage() {
+            if (!liqAllData || liqAllData.length === 0) {
+                console.warn('⚠️ 没有数据可显示');
+                return;
+            }
+            
+            // 计算当前页的数据范围
+            const totalRecords = liqAllData.length;
+            const startIndex = Math.max(0, totalRecords - (liqCurrentPage + 1) * LIQ_RECORDS_PER_PAGE);
+            const endIndex = Math.max(0, totalRecords - liqCurrentPage * LIQ_RECORDS_PER_PAGE);
+            
+            const pageData = liqAllData.slice(startIndex, endIndex);
+            console.log(`📄 显示第${liqCurrentPage + 1}页: ${pageData.length}条数据 (${startIndex}-${endIndex})`);
+            
+            if (pageData.length === 0) {
+                console.warn('⚠️ 当前页无数据');
+                return;
+            }
+            
+            // 提取时间和金额（添加安全检查）
+            const times = pageData.map(d => {
+                if (!d.timestamp || d.timestamp === 0) {
+                    // 如果没有timestamp，尝试从record_time解析
+                    if (d.record_time) {
+                        const parts = d.record_time.split(' ');
+                        if (parts.length === 2) {
+                            const date = parts[0].split('-');
+                            const time = parts[1].split(':');
+                            return `${parseInt(date[1])}/${parseInt(date[2])} ${time[0]}:${time[1]}`;
+                        }
+                    }
+                    return 'N/A';
+                }
+                const dt = new Date(d.timestamp * 1000);
+                return `${dt.getMonth()+1}/${dt.getDate()} ${dt.getHours().toString().padStart(2, '0')}:${dt.getMinutes().toString().padStart(2, '0')}`;
+            });
+            
+            // 1小时爆仓金额数据
+            const amounts = pageData.map(d => d.hour_1_amount);
+            
+            // 计算1小时爆仓的平均值
+            const avgAmount = (amounts.reduce((a, b) => a + b, 0) / amounts.length).toFixed(2);
+            
+            // 在这一页数据中，找到1小时爆仓金额的最大值（用户需求）
+            const maxAmount = Math.max(...amounts);
+            const maxIndex = amounts.indexOf(maxAmount);
+            const maxTime = times[maxIndex];
+            
+            // 找出所有超过1.5亿（15000万美元）的点
+            const threshold = 15000; // 1.5亿美元 = 15000万美元
+            const highPoints = amounts.map((value, index) => ({
+                value: value,
+                index: index,
+                time: times[index]
+            })).filter(p => p.value >= threshold);
+            
+            // 找出超过1.5亿的最高点
+            const maxHighPoint = highPoints.length > 0 
+                ? highPoints.reduce((max, p) => p.value > max.value ? p : max, highPoints[0])
+                : null;
+            
+            console.log('📊 图表数据:', {
+                dataPoints: amounts.length,
+                '平均值': avgAmount,
+                '最大值': maxAmount,
+                '最大值索引': maxIndex,
+                '最大值时间': maxTime,
+                '超过1.5亿的点数': highPoints.length,
+                '超1.5亿最高点': maxHighPoint
+            });
+            
+            // 获取时间范围（添加安全检查）
+            const startTime = pageData[0]?.datetime ? pageData[0].datetime.substring(5, 16) : 'N/A';  // MM-DD HH:MM
+            const endTime = pageData[pageData.length - 1]?.datetime ? pageData[pageData.length - 1].datetime.substring(5, 16) : 'N/A';
+            
+            // 配置图表
+            const option = {
+                title: {
+                    text: `1小时爆仓金额走势（${startTime} ~ ${endTime}）`,
+                    left: 'center',
+                    top: 10,
+                    textStyle: {
+                        color: '#fff',
+                        fontSize: 14
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    borderColor: '#3a3d5c',
+                    textStyle: {
+                        color: '#fff'
+                    },
+                    formatter: function(params) {
+                        const p = params[0];
+                        const amount = p.value;
+                        const color = amount > avgAmount ? '#ef4444' : amount < avgAmount * 0.8 ? '#10b981' : '#fbbf24';
+                        const currentIndex = p.dataIndex;
+                        const isMax = currentIndex === maxIndex;
+                        const isAbove150M = amount >= 15000; // 1.5亿 = 15000万美元
+                        
+                        let highlightHtml = '';
+                        if (isAbove150M) {
+                            highlightHtml = '<div style="font-size: 14px; color: #ff0000; margin-top: 8px; font-weight: 900; background: linear-gradient(135deg, rgba(255, 0, 0, 0.3), rgba(239, 68, 68, 0.3)); padding: 6px 10px; border-radius: 4px; border: 2px solid #ff0000; text-align: center; animation: pulse 1s infinite;">💥💥 超过1.5亿！极端爆仓！💥💥</div>';
+                        } else if (isMax) {
+                            highlightHtml = '<div style="font-size: 12px; color: #ef4444; margin-top: 5px; font-weight: 700; background: rgba(239, 68, 68, 0.2); padding: 3px 6px; border-radius: 3px;">🔥 24小时内1H爆仓最大值！</div>';
+                        }
+                        
+                        return `<div style="padding: 8px;">
+                            <div style="font-weight: 600; margin-bottom: 5px;">${p.name}</div>
+                            <div style="color: ${isAbove150M ? '#ff0000' : color}; font-size: ${isAbove150M ? '18px' : '16px'}; font-weight: ${isAbove150M ? '900' : '600'};">
+                                💥 1H爆仓: ${amount} 万美元${isMax ? ' 🔥' : ''}${isAbove150M ? ' 💥' : ''}
+                            </div>
+                            <div style="font-size: 11px; color: #9ca3af; margin-top: 5px;">
+                                平均值: ${avgAmount} 万美元
+                            </div>
+                            ${isAbove150M ? '<div style="font-size: 11px; color: #ff6b6b; margin-top: 3px;">换算: ' + (amount / 10000).toFixed(2) + ' 亿美元</div>' : ''}
+                            ${highlightHtml}
+                        </div>`;
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '10%',
+                    top: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: times,
+                    axisLabel: {
+                        color: '#8b92b8',
+                        fontSize: 10,
+                        rotate: 45,
+                        interval: Math.floor(times.length / 20)  // 显示约20个标签
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: '#3a3d5c'
+                        }
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '万美元',
+                    nameTextStyle: {
+                        color: '#8b92b8',
+                        fontSize: 11
+                    },
+                    axisLabel: {
+                        color: '#8b92b8',
+                        fontSize: 11
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: '#3a3d5c'
+                        }
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: '#3a3d5c',
+                            type: 'dashed'
+                        }
+                    }
+                },
+                series: [
+                    {
+                        name: '1小时爆仓金额',
+                        type: 'line',
+                        data: amounts,
+                        smooth: true,
+                        symbol: 'circle',
+                        symbolSize: 4,
+                        lineStyle: {
+                            color: '#f59e0b',
+                            width: 2
+                        },
+                        itemStyle: {
+                            color: '#f59e0b'
+                        },
+                        areaStyle: {
+                            color: {
+                                type: 'linear',
+                                x: 0,
+                                y: 0,
+                                x2: 0,
+                                y2: 1,
+                                colorStops: [
+                                    { offset: 0, color: 'rgba(245, 158, 11, 0.3)' },
+                                    { offset: 1, color: 'rgba(245, 158, 11, 0.05)' }
+                                ]
+                            }
+                        },
+                        markLine: {
+                            silent: true,
+                            symbol: 'none',
+                            label: {
+                                position: 'end',
+                                fontSize: 11,
+                                color: '#fff',
+                                backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                                padding: [4, 8],
+                                borderRadius: 3
+                            },
+                            lineStyle: {
+                                type: 'dashed',
+                                width: 2
+                            },
+                            data: [
+                                { 
+                                    yAxis: avgAmount,
+                                    label: {
+                                        formatter: '平均: {c}万'
+                                    },
+                                    lineStyle: {
+                                        color: '#6b7280',
+                                        width: 1
+                                    }
+                                },
+                                { 
+                                    yAxis: 5000,
+                                    label: {
+                                        formatter: '⚠️ 5000万',
+                                        color: '#fbbf24'
+                                    },
+                                    lineStyle: {
+                                        color: '#fbbf24',
+                                        width: 2
+                                    }
+                                },
+                                { 
+                                    yAxis: 10000,
+                                    label: {
+                                        formatter: '🔥 1亿',
+                                        color: '#f97316'
+                                    },
+                                    lineStyle: {
+                                        color: '#f97316',
+                                        width: 2
+                                    }
+                                },
+                                { 
+                                    yAxis: 15000,
+                                    label: {
+                                        formatter: '💥 1.5亿',
+                                        color: '#ef4444'
+                                    },
+                                    lineStyle: {
+                                        color: '#ef4444',
+                                        width: 2
+                                    }
+                                }
+                            ]
+                        },
+                        markPoint: {
+                            symbol: 'pin',
+                            symbolSize: function(val, params) {
+                                // 如果超过1.5亿，使用超大符号（150），普通最大值也要够大（100）
+                                return params.value >= 15000 ? 150 : 100;
+                            },
+                            label: {
+                                show: true,
+                                position: 'top',  // 标签位置在顶部
+                                distance: 20,  // 距离数据点的距离
+                                formatter: function(params) {
+                                    const amount = parseFloat(params.value);  // 确保是数值
+                                    // 直接返回格式化的文本，不使用rich
+                                    if (amount >= 15000) {
+                                        return `💥 ${amount.toFixed(2)}万\n超1.5亿!!`;
+                                    } else {
+                                        return `🔥 ${amount.toFixed(2)}万`;
+                                    }
+                                },
+                                fontSize: 24,
+                                fontWeight: 'bold',
+                                color: '#000000',  // 黑色文字
+                                backgroundColor: '#fbbf24',  // 黄色背景
+                                padding: [12, 16, 12, 16],
+                                borderRadius: 6,
+                                borderColor: '#000000',  // 黑色边框
+                                borderWidth: 3
+                            },
+                            itemStyle: {
+                                color: function(params) {
+                                    // 超过1.5亿使用更鲜艳的红色，并添加脉冲效果
+                                    return params.value >= 15000 ? '#ff0000' : '#ef4444';
+                                },
+                                borderColor: function(params) {
+                                    return params.value >= 15000 ? '#ffffff' : 'transparent';
+                                },
+                                borderWidth: function(params) {
+                                    return params.value >= 15000 ? 3 : 0;
+                                },
+                                shadowBlur: function(params) {
+                                    // 超过1.5亿添加阴影效果
+                                    return params.value >= 15000 ? 20 : 10;
+                                },
+                                shadowColor: function(params) {
+                                    return params.value >= 15000 ? 'rgba(255, 0, 0, 0.8)' : 'rgba(239, 68, 68, 0.5)';
+                                }
+                            },
+                            data: (function() {
+                                // 如果有超过1.5亿的最高点，优先标记它
+                                if (maxHighPoint && maxHighPoint.value >= 15000) {
+                                    return [
+                                        {
+                                            coord: [maxHighPoint.index, maxHighPoint.value],
+                                            value: maxHighPoint.value,  // 保持数值类型
+                                            name: '💥 超1.5亿最高点!'
+                                        }
+                                    ];
+                                }
+                                // 否则标记普通最大值
+                                return [
+                                    {
+                                        coord: [maxIndex, maxAmount],
+                                        value: maxAmount,  // 保持数值类型，不要toString
+                                        name: '24小时内1H爆仓最大值'
+                                    }
+                                ];
+                            })()
+                        }
+                    }
+                ]
+            };
+            
+            liquidation1hChart.setOption(option);
+            
+            // 调试：输出markPoint配置
+            const markPointConfig = option.series[0].markPoint;
+            if (markPointConfig && markPointConfig.data && markPointConfig.data.length > 0) {
+                console.log('🎯 markPoint数据:', markPointConfig.data[0]);
+                console.log('🎨 markPoint label完整配置:', markPointConfig.label);
+                console.log('📍 label.show:', markPointConfig.label.show);
+                console.log('📍 label.fontSize:', markPointConfig.label.fontSize);
+                console.log('📍 label.color:', markPointConfig.label.color);
+                console.log('📍 label.backgroundColor:', markPointConfig.label.backgroundColor);
+            }
+            
+            // 强制resize确保markPoint正确显示
+            setTimeout(() => {
+                liquidation1hChart.resize();
+                console.log('📍 图表markPoint配置:', {
+                    maxAmount: maxAmount.toFixed(2),
+                    maxIndex: maxIndex,
+                    maxHighPoint: maxHighPoint,
+                    hasMarkPoint: option.series[0].markPoint ? true : false
+                });
+                
+                // 显示自定义标签
+                const labelDiv = document.getElementById('customMarkPointLabel');
+                if (labelDiv && maxAmount > 0) {
+                    // 计算标签位置
+                    const chartDom = document.getElementById('liquidation1hChart');
+                    const chartWidth = chartDom.clientWidth;
+                    const chartHeight = chartDom.clientHeight;
+                    
+                    // 使用ECharts的convertToPixel方法获取坐标点的像素位置
+                    const pixelPoint = liquidation1hChart.convertToPixel('grid', [maxIndex, maxAmount]);
+                    
+                    if (pixelPoint && pixelPoint.length === 2) {
+                        // 设置标签内容
+                        const labelText = maxAmount >= 15000 
+                            ? `💥 ${maxAmount.toFixed(2)}万 超1.5亿!!` 
+                            : `🔥 ${maxAmount.toFixed(2)}万 最大值`;
+                        labelDiv.textContent = labelText;
+                        
+                        // 设置标签位置
+                        // pixelPoint[1]是Y轴像素位置，但这是相对于grid的，需要加上图表的padding
+                        // 一般图表顶部有padding，标签应该在数据点上方
+                        const labelLeft = Math.max(0, pixelPoint[0] - 80);  // 向左偏移80px居中，但不能小于0
+                        const labelTop = Math.max(10, pixelPoint[1] - 50);   // 数据点上方50px，但至少离顶部10px
+                        
+                        labelDiv.style.left = labelLeft + 'px';
+                        labelDiv.style.top = labelTop + 'px';
+                        labelDiv.style.display = 'block';
+                        
+                        console.log('✨ 自定义标签已显示:', {
+                            text: labelText,
+                            dataPoint: `(${maxIndex}, ${maxAmount})`,
+                            pixelPoint: `(${pixelPoint[0].toFixed(1)}, ${pixelPoint[1].toFixed(1)})`,
+                            labelPos: `left: ${labelLeft}px, top: ${labelTop}px`
+                        });
+                    }
+                }
+            }, 100);
+        }
+        
+        // 更新页码信息
+        function updateLiquidationPageInfo() {
+            const totalPages = Math.ceil(liqAllData.length / LIQ_RECORDS_PER_PAGE);
+            
+            // 更新页码文本
+            document.getElementById('liqPageInfo').textContent = `第 ${liqCurrentPage + 1} 页 / 共 ${totalPages} 页`;
+            
+            // 更新按钮状态
+            document.getElementById('liqPrevPageBtn').disabled = (liqCurrentPage >= totalPages - 1);
+            document.getElementById('liqNextPageBtn').disabled = (liqCurrentPage <= 0);
+        }
+        
+        // 加载上一页（更早的数据）
+        function loadLiquidationPreviousPage() {
+            const totalPages = Math.ceil(liqAllData.length / LIQ_RECORDS_PER_PAGE);
+            if (liqCurrentPage < totalPages - 1) {
+                liqCurrentPage++;
+                updateLiquidationChartForCurrentPage();
+                updateLiquidationPageInfo();
+            }
+        }
+        
+        // 加载下一页（更新的数据）
+        function loadLiquidationNextPage() {
+            if (liqCurrentPage > 0) {
+                liqCurrentPage--;
+                updateLiquidationChartForCurrentPage();
+                updateLiquidationPageInfo();
+            }
+        }
+        
+        window.onload = function() {
+            initChart();
+            initFearGreedChart();  // 初始化恐惧贪婪指数图表
+            initLiquidation1hChart();  // 初始化1小时爆仓金额图表
+            loadCurrentData();
+            loadAllHistoryData();  // 加载全部数据用于图表分页
+            loadHistoryData();      // 加载最近50条用于表格
+            loadFearGreedHistory(); // 加载恐惧贪婪指数历史数据
+            load30DaysLiquidation();
+            
+            // 每30秒刷新当前数据
+            setInterval(loadCurrentData, 30000);
+            
+            // 每3分钟刷新图表数据
+            setInterval(() => {
+                loadAllHistoryData();
+                loadHistoryData();
+                loadAllLiquidationData();  // 刷新1小时爆仓金额数据
+            }, 180000);
+            
+            // 响应窗口大小变化
+            window.addEventListener('resize', () => {
+                if (chart) chart.resize();
+                if (liquidation1hChart) liquidation1hChart.resize();
+            });
+        };
+    </script>
+</body>
+</html>

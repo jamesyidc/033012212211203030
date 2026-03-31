@@ -1,0 +1,98 @@
+[
+  {
+    "time": "2026-03-08 00:00:46",
+    "type": "turn_bearish",
+    "from_ratio": 76.97,
+    "to_ratio": 0.0,
+    "from_status": "bullish",
+    "to_status": "bearish",
+    "threshold": 40.0,
+    "data": {
+      "ratio": 0.0,
+      "positive_count": 0,
+      "total_count": 1,
+      "date": "20260308",
+      "positive_duration": 0.0
+    }
+  },
+  {
+    "time": "2026-03-08 00:14:51",
+    "type": "turn_bullish",
+    "from_ratio": 36.36,
+    "to_ratio": 41.67,
+    "from_status": "bearish",
+    "to_status": "bullish",
+    "threshold": 40.0,
+    "data": {
+      "ratio": 41.67,
+      "positive_count": 5,
+      "total_count": 12,
+      "date": "20260308",
+      "positive_duration": 6.2
+    }
+  },
+  {
+    "time": "2026-03-08 00:19:51",
+    "type": "turn_bearish",
+    "from_ratio": 40.0,
+    "to_ratio": 37.5,
+    "from_status": "bullish",
+    "to_status": "bearish",
+    "threshold": 40.0,
+    "data": {
+      "ratio": 37.5,
+      "positive_count": 6,
+      "total_count": 16,
+      "date": "20260308",
+      "positive_duration": 7.5
+    }
+  },
+  {
+    "time": "2026-03-08 01:14:03",
+    "type": "turn_bullish",
+    "from_ratio": 38.98,
+    "to_ratio": 40.0,
+    "from_status": "bearish",
+    "to_status": "bullish",
+    "threshold": 40.0,
+    "data": {
+      "ratio": 40.0,
+      "positive_count": 24,
+      "total_count": 60,
+      "date": "20260308",
+      "positive_duration": 30.0
+    }
+  },
+  {
+    "time": "2026-03-08 03:15:11",
+    "type": "turn_bearish",
+    "from_ratio": 40.13,
+    "to_ratio": 39.87,
+    "from_status": "bullish",
+    "to_status": "bearish",
+    "threshold": 40.0,
+    "data": {
+      "ratio": 39.87,
+      "positive_count": 63,
+      "total_count": 158,
+      "date": "20260308",
+      "positive_duration": 78.8
+    }
+  },
+  {
+    "time": "2026-03-09 04:41:32",
+    "type": "turn_bullish",
+    "from_ratio": 39.73,
+    "to_ratio": 40.0,
+    "from_status": "bearish",
+    "to_status": "bullish",
+    "threshold": 40.0,
+    "data": {
+      "ratio": 40.0,
+      "positive_count": 90,
+      "total_count": 225,
+      "date": "20260309",
+      "positive_duration": 112.5
+    }
+  }
+]

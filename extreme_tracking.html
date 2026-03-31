@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>极值追踪系统 - 加密货币数据分析</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #1e2139;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0;
+        }
+        
+        /* 顶部导航栏 */
+        .top-nav {
+            background: #2a2d47;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            justify-content: space-between;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .home-btn {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%);
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+        
+        .home-btn:hover {
+            background: linear-gradient(135deg, #0099ff 0%, #00d4ff 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.4);
+        }
+        
+        .nav-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: #fff;
+        }
+        
+        /* 统计卡片区 */
+        .stats-section {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-card {
+            background: #2a2d47;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .stat-card h3 {
+            font-size: 14px;
+            color: #8b92b8;
+            margin-bottom: 12px;
+        }
+        
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        
+        .stat-card .sub-value {
+            font-size: 14px;
+            color: #8b92b8;
+        }
+        
+        /* 触发类型统计 */
+        .trigger-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+        
+        .trigger-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .trigger-item .label {
+            font-size: 12px;
+            color: #8b92b8;
+            margin-bottom: 4px;
+        }
+        
+        .trigger-item .count {
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        /* 快照列表 */
+        .snapshots-section {
+            padding: 20px;
+        }
+        
+        .snapshots-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .snapshots-header h2 {
+            font-size: 20px;
+            color: #fff;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .filter-btn {
+            background: #3a3d5c;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn.active {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        }
+        
+        .filter-btn:hover {
+            background: #4a4d6c;
+        }
+        
+        /* 快照卡片 */
+        .snapshot-card {
+            background: #2a2d47;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .snapshot-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+        }
+        
+        .snapshot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #3a3d5c;
+        }
+        
+        .snapshot-id {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .snapshot-time {
+            font-size: 13px;
+            color: #8b92b8;
+        }
+        
+        .snapshot-status {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border: 1px solid #fbbf24;
+        }
+        
+        .status-completed {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid #10b981;
+        }
+        
+        .triggers {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .trigger-tag {
+            background: rgba(220, 38, 38, 0.2);
+            color: #dc2626;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid rgba(220, 38, 38, 0.4);
+        }
+        
+        .snapshot-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .detail-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #8b92b8;
+            margin-bottom: 4px;
+        }
+        
+        .detail-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        /* 价格追踪表 */
+        .tracking-table {
+            width: 100%;
+            margin-top: 15px;
+            border-collapse: collapse;
+        }
+        
+        .tracking-table th,
+        .tracking-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #3a3d5c;
+        }
+        
+        .tracking-table th {
+            font-size: 12px;
+            color: #8b92b8;
+            font-weight: 500;
+        }
+        
+        .tracking-table td {
+            font-size: 13px;
+            color: #fff;
+        }
+        
+        .positive {
+            color: #10b981;
+        }
+        
+        .negative {
+            color: #ef4444;
+        }
+        
+        /* 加载动画 */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #8b92b8;
+            font-size: 14px;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #8b92b8;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部导航栏 -->
+        <div class="top-nav">
+            <div class="nav-left">
+                <a href="/" class="home-btn">
+                    <span>🏠</span>
+                    <span>返回首页</span>
+                </a>
+                <div class="nav-title">⚠️ 极值追踪系统 v1.1</div>
+            </div>
+        </div>
+        
+        <!-- 统计卡片区 -->
+        <div class="stats-section">
+            <div class="stat-card">
+                <h3>快照总数</h3>
+                <div class="value" id="total-snapshots">-</div>
+                <div class="sub-value">总计捕获极值事件</div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>活跃快照</h3>
+                <div class="value" id="active-snapshots" style="color: #fbbf24;">-</div>
+                <div class="sub-value">正在追踪价格变化</div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>已完成快照</h3>
+                <div class="value" id="completed-snapshots" style="color: #10b981;">-</div>
+                <div class="sub-value">已完成24小时追踪</div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>触发类型统计</h3>
+                <div class="trigger-stats" id="trigger-stats-container">
+                    <!-- 动态加载 -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- 快照列表 -->
+        <div class="snapshots-section">
+            <div class="snapshots-header">
+                <h2>快照列表</h2>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-status="all">全部</button>
+                    <button class="filter-btn" data-status="active">活跃中</button>
+                    <button class="filter-btn" data-status="completed">已完成</button>
+                </div>
+            </div>
+            
+            <div id="snapshots-container">
+                <div class="loading">正在加载快照数据...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentFilter = 'all';
+        
+        // 格式化触发类型名称
+        function formatTriggerType(type) {
+            const typeNames = {
+                '2h_peak': '2小时峰值',
+                '27coins_high': '27币涨幅>100%',
+                '27coins_low': '27币跌幅<-80%',
+                '24h_peak': '24小时峰值',
+                '1h_liquidation_high': '1h爆仓>3000万'
+            };
+            return typeNames[type] || type;
+        }
+        
+        // 加载统计数据
+        function loadStats() {
+            fetch('/api/extreme-tracking/stats')
+                .then(res => res.json())
+                .then(response => {
+                    if (response.success && response.stats) {
+                        const stats = response.stats;
+                        
+                        // 更新统计卡片
+                        document.getElementById('total-snapshots').textContent = stats.total_snapshots || 0;
+                        document.getElementById('active-snapshots').textContent = stats.active_snapshots || 0;
+                        document.getElementById('completed-snapshots').textContent = stats.completed_snapshots || 0;
+                        
+                        // 更新触发类型统计
+                        const triggerStatsContainer = document.getElementById('trigger-stats-container');
+                        triggerStatsContainer.innerHTML = '';
+                        
+                        if (stats.trigger_types && Object.keys(stats.trigger_types).length > 0) {
+                            Object.entries(stats.trigger_types).forEach(([type, count]) => {
+                                const item = document.createElement('div');
+                                item.className = 'trigger-item';
+                                item.innerHTML = `
+                                    <div class="label">${formatTriggerType(type)}</div>
+                                    <div class="count">${count}</div>
+                                `;
+                                triggerStatsContainer.appendChild(item);
+                            });
+                        } else {
+                            triggerStatsContainer.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #8b92b8;">暂无触发事件</div>';
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error('获取统计数据失败:', err);
+                });
+        }
+        
+        // 加载快照列表
+        function loadSnapshots(status = 'all') {
+            const container = document.getElementById('snapshots-container');
+            container.innerHTML = '<div class="loading">正在加载快照数据...</div>';
+            
+            let url = '/api/extreme-tracking/snapshots?limit=50';
+            if (status !== 'all') {
+                url += `&status=${status}`;
+            }
+            
+            fetch(url)
+                .then(res => res.json())
+                .then(response => {
+                    console.log('API Response:', response);
+                    console.log('Response success:', response.success);
+                    console.log('Response data length:', response.data ? response.data.length : 0);
+                    
+                    if (response.success) {
+                        const snapshots = response.data || [];
+                        console.log('Snapshots array:', snapshots);
+                        
+                        if (snapshots.length === 0) {
+                            console.log('No snapshots found');
+                            container.innerHTML = '<div class="no-data">暂无快照数据</div>';
+                            return;
+                        }
+                        
+                        container.innerHTML = '';
+                        console.log('Creating', snapshots.length, 'snapshot cards');
+                        
+                        snapshots.forEach((snapshot, index) => {
+                            console.log('Processing snapshot', index, ':', snapshot.snapshot_id);
+                            const card = createSnapshotCard(snapshot);
+                            container.appendChild(card);
+                        });
+                        console.log('All snapshot cards created');
+                    } else {
+                        console.log('Response success is false');
+                        container.innerHTML = '<div class="no-data">加载失败：' + (response.error || '未知错误') + '</div>';
+                    }
+                })
+                .catch(err => {
+                    console.error('获取快照列表失败:', err);
+                    container.innerHTML = '<div class="no-data">加载失败，请刷新重试</div>';
+                });
+        }
+        
+        // 创建快照卡片
+        function createSnapshotCard(snapshot) {
+            const card = document.createElement('div');
+            card.className = 'snapshot-card';
+            
+            const statusClass = snapshot.status === 'active' ? 'status-active' : 'status-completed';
+            const statusText = snapshot.status === 'active' ? '追踪中' : '已完成';
+            
+            // 触发类型标签
+            const triggerTags = (snapshot.triggers || []).map(trigger => 
+                `<span class="trigger-tag">${formatTriggerType(trigger.type)}</span>`
+            ).join('');
+            
+            // 快照信息
+            const totalChange = snapshot.coins_snapshot?.total_change || 0;
+            const totalChangeClass = totalChange >= 0 ? 'positive' : 'negative';
+            
+            // 爆仓数据
+            const liquidationInfo = snapshot.liquidation_snapshot ? `
+                <div class="detail-item">
+                    <div class="detail-label">1h爆仓金额</div>
+                    <div class="detail-value">${(snapshot.liquidation_snapshot.hour_1_amount_wan || 0).toFixed(2)} 万$</div>
+                </div>
+            ` : '';
+            
+            // 追踪数据
+            let trackingHTML = '';
+            if (snapshot.tracking && Object.keys(snapshot.tracking).length > 0) {
+                trackingHTML = `
+                    <table class="tracking-table">
+                        <thead>
+                            <tr>
+                                <th>追踪时段</th>
+                                <th>总涨跌幅</th>
+                                <th>追踪时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${Object.entries(snapshot.tracking).map(([period, data]) => {
+                                if (!data) return '';
+                                const change = data.total_change || 0;
+                                const changeClass = change >= 0 ? 'positive' : 'negative';
+                                const datetime = data.datetime || '-';
+                                const hasCoinsData = data.coins_snapshot && data.coins_snapshot.length > 0;
+                                
+                                // 生成币种详情HTML
+                                let coinsDetailHTML = '';
+                                if (hasCoinsData) {
+                                    coinsDetailHTML = `
+                                        <tr class="coins-detail-row" id="coins-${snapshot.snapshot_id}-${period}" style="display: none;">
+                                            <td colspan="4" style="padding: 15px; background: rgba(0,0,0,0.3);">
+                                                <div style="max-height: 400px; overflow-y: auto;">
+                                                    <table class="tracking-table" style="margin: 0;">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>币种</th>
+                                                                <th>触发时价格</th>
+                                                                <th>当前价格</th>
+                                                                <th>价格变化</th>
+                                                                <th>触发时日涨跌</th>
+                                                                <th>当前日涨跌</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            ${data.coins_snapshot.map(coin => {
+                                                                const priceChange = coin.price_change_from_trigger || 0;
+                                                                const priceChangeClass = priceChange >= 0 ? 'positive' : 'negative';
+                                                                const currentDayChange = coin.current_day_change || 0;
+                                                                const currentDayChangeClass = currentDayChange >= 0 ? 'positive' : 'negative';
+                                                                const triggerDayChange = coin.trigger_day_change || 0;
+                                                                const triggerDayChangeClass = triggerDayChange >= 0 ? 'positive' : 'negative';
+                                                                
+                                                                return `
+                                                                    <tr>
+                                                                        <td style="font-weight: 600;">${coin.symbol}</td>
+                                                                        <td>$${(coin.trigger_price || 0).toFixed(coin.trigger_price < 1 ? 6 : 2)}</td>
+                                                                        <td>$${(coin.current_price || 0).toFixed(coin.current_price < 1 ? 6 : 2)}</td>
+                                                                        <td class="${priceChangeClass}">${priceChange >= 0 ? '+' : ''}${priceChange.toFixed(2)}%</td>
+                                                                        <td class="${triggerDayChangeClass}">${triggerDayChange >= 0 ? '+' : ''}${triggerDayChange.toFixed(2)}%</td>
+                                                                        <td class="${currentDayChangeClass}">${currentDayChange >= 0 ? '+' : ''}${currentDayChange.toFixed(2)}%</td>
+                                                                    </tr>
+                                                                `;
+                                                            }).join('')}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }
+                                
+                                return `
+                                    <tr>
+                                        <td><strong>${period}</strong></td>
+                                        <td class="${changeClass}">${change >= 0 ? '+' : ''}${change.toFixed(2)}%</td>
+                                        <td>${datetime}</td>
+                                        <td>
+                                            ${hasCoinsData ? `
+                                                <button onclick="toggleCoinsDetail('${snapshot.snapshot_id}', '${period}')" 
+                                                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                                                               color: white; border: none; padding: 5px 12px; 
+                                                               border-radius: 6px; cursor: pointer; font-size: 12px; 
+                                                               font-weight: 600;">
+                                                    查看27币详情
+                                                </button>
+                                            ` : '<span style="color: #888;">无数据</span>'}
+                                        </td>
+                                    </tr>
+                                    ${coinsDetailHTML}
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                `;
+            }
+            
+            // 27个币的详细信息
+            let coinsHTML = '';
+            if (snapshot.coins_snapshot && snapshot.coins_snapshot.coins && snapshot.coins_snapshot.coins.length > 0) {
+                coinsHTML = `
+                    <div style="margin-top: 20px;">
+                        <h4 style="color: #fff; font-size: 14px; margin-bottom: 10px;">27个币种快照（触发时刻: ${snapshot.coins_snapshot.datetime}）</h4>
+                        <table class="tracking-table">
+                            <thead>
+                                <tr>
+                                    <th>币种</th>
+                                    <th>当前价格</th>
+                                    <th>基准价格</th>
+                                    <th>涨跌幅</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${snapshot.coins_snapshot.coins.map(coin => {
+                                    const changeClass = coin.day_change_percent >= 0 ? 'positive' : 'negative';
+                                    const hasPrice = coin.current_price !== undefined && coin.current_price > 0;
+                                    return `
+                                        <tr>
+                                            <td style="font-weight: 600;">${coin.symbol}</td>
+                                            <td>${hasPrice ? '$' + coin.current_price.toFixed(coin.current_price < 1 ? 6 : 2) : '-'}</td>
+                                            <td>${hasPrice && coin.base_price ? '$' + coin.base_price.toFixed(coin.base_price < 1 ? 6 : 2) : '-'}</td>
+                                            <td class="${changeClass}">${coin.day_change_percent >= 0 ? '+' : ''}${coin.day_change_percent.toFixed(2)}%</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+            
+            card.innerHTML = `
+                <div class="snapshot-header">
+                    <div>
+                        <div class="snapshot-id">${snapshot.snapshot_id}</div>
+                        <div class="snapshot-time">触发时间: ${snapshot.trigger_datetime}</div>
+                    </div>
+                    <span class="snapshot-status ${statusClass}">${statusText}</span>
+                </div>
+                
+                <div class="triggers">
+                    ${triggerTags}
+                </div>
+                
+                <div class="snapshot-details">
+                    <div class="detail-item">
+                        <div class="detail-label">27币总涨跌幅</div>
+                        <div class="detail-value ${totalChangeClass}">${totalChange >= 0 ? '+' : ''}${totalChange.toFixed(2)}%</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">2h逃顶信号</div>
+                        <div class="detail-value">${snapshot.escape_snapshot?.signal_2h_count || 0}</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">24h逃顶信号</div>
+                        <div class="detail-value">${snapshot.escape_snapshot?.signal_24h_count || 0}</div>
+                    </div>
+                    
+                    ${liquidationInfo}
+                </div>
+                
+                ${trackingHTML}
+                ${coinsHTML}
+            `;
+            
+            return card;
+        }
+        
+        // 筛选按钮事件
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const status = btn.dataset.status;
+                currentFilter = status;
+                loadSnapshots(status === 'all' ? undefined : status);
+            });
+        });
+        
+        // 切换币种详情显示/隐藏
+        function toggleCoinsDetail(snapshotId, period) {
+            const detailRow = document.getElementById(`coins-${snapshotId}-${period}`);
+            if (detailRow) {
+                if (detailRow.style.display === 'none') {
+                    detailRow.style.display = 'table-row';
+                } else {
+                    detailRow.style.display = 'none';
+                }
+            }
+        }
+        
+        // 初始加载
+        loadStats();
+        loadSnapshots();
+        
+        // 定时刷新（每30秒）
+        setInterval(() => {
+            loadStats();
+            loadSnapshots(currentFilter === 'all' ? undefined : currentFilter);
+        }, 30000);
+    </script>
+</body>
+</html>

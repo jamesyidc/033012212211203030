@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>27币种历史数据 - 1月3日至1月16日</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .date-selector {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .date-selector label {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .date-selector select {
+            padding: 8px 15px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .date-selector button {
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .date-selector button:hover {
+            opacity: 0.9;
+        }
+
+        .chart-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 500px;
+        }
+
+        .data-table-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table thead {
+            background: #f8f9fa;
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table th {
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .positive {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .negative {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 18px;
+        }
+
+        .table-wrapper {
+            max-height: 600px;
+            overflow-y: auto;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .info-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            margin-left: 10px;
+        }
+
+        .base-price-info {
+            background: rgba(102, 126, 234, 0.05);
+            border-left: 4px solid #667eea;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+
+        .coin-label {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #667eea;
+            color: white;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .export-btn {
+            padding: 8px 20px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .export-btn:hover {
+            background: #059669;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                📊 27币种历史数据查询
+                <span class="info-badge">1月3日-1月16日 · 30分钟粒度</span>
+            </h1>
+            
+            <div class="date-selector">
+                <label>📅 选择日期:</label>
+                <select id="dateSelect">
+                    <option value="">正在加载...</option>
+                </select>
+                
+                <button onclick="loadDateData()">🔍 查询</button>
+                <button class="export-btn" onclick="exportToCSV()">📥 导出CSV</button>
+            </div>
+
+            <div class="base-price-info" id="basePriceInfo">
+                💡 基准价格：选择日期后显示当天00:00的27个币种价格
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-title">
+                📈 当日涨跌趋势图（30分钟粒度，48个数据点）
+            </div>
+            <div id="trendChart" class="chart-container"></div>
+        </div>
+
+        <div class="data-table-card">
+            <div class="chart-title">
+                📋 详细数据表（基准价格、当前价格、涨跌幅）
+            </div>
+            <div class="table-wrapper">
+                <table class="data-table" id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>币种</th>
+                            <th>基准价格（00:00）</th>
+                            <th>当前价格</th>
+                            <th>涨跌幅</th>
+                            <th>27币相加的和</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 40px;">
+                                请选择日期并点击查询按钮
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let trendChart = null;
+        let currentData = [];
+
+        // 初始化图表
+        function initChart() {
+            const chartDom = document.getElementById('trendChart');
+            trendChart = echarts.init(chartDom);
+        }
+
+        // 初始化日期选择器
+        async function initDateSelector() {
+            const select = document.getElementById('dateSelect');
+            select.innerHTML = '';
+            
+            // 生成1月3日到1月16日的日期选项
+            const startDate = new Date(2026, 0, 3);  // 1月3日
+            const endDate = new Date(2026, 0, 16);   // 1月16日
+            
+            for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                const dateStr = d.toISOString().substring(0, 10);
+                const option = document.createElement('option');
+                option.value = dateStr;
+                option.textContent = `${dateStr} (${['日','一','二','三','四','五','六'][d.getDay()]})`;
+                select.appendChild(option);
+            }
+            
+            // 默认选择今天或最后一天
+            select.value = '2026-01-16';
+        }
+
+        // 加载指定日期的数据
+        async function loadDateData() {
+            const dateSelect = document.getElementById('dateSelect');
+            const selectedDate = dateSelect.value;
+            
+            if (!selectedDate) {
+                alert('请选择日期');
+                return;
+            }
+
+            console.log('📅 查询日期:', selectedDate);
+            
+            try {
+                // 查询这一天的数据（从00:00到23:30）
+                const startTime = `${selectedDate} 00:00:00`;
+                const endTime = `${selectedDate} 23:30:00`;
+                
+                const response = await fetch(`/api/coin-price-tracker/history?start_time=${encodeURIComponent(startTime)}&end_time=${encodeURIComponent(endTime)}`);
+                const result = await response.json();
+                
+                console.log('📦 API响应:', result);
+                
+                if (!result.success || !result.data || result.data.length === 0) {
+                    alert('该日期暂无数据，请等待历史数据回填完成');
+                    return;
+                }
+
+                currentData = result.data;
+                
+                // 更新基准价格信息
+                updateBasePriceInfo(result.data[0]);
+                
+                // 更新图表
+                updateTrendChart(result.data);
+                
+                // 更新数据表
+                updateDataTable(result.data);
+                
+                console.log('✅ 数据加载完成');
+            } catch (error) {
+                console.error('❌ 加载数据出错:', error);
+                alert('数据加载失败，请稍后重试');
+            }
+        }
+
+        // 更新基准价格信息
+        function updateBasePriceInfo(firstRecord) {
+            const info = document.getElementById('basePriceInfo');
+            const coins = firstRecord.coins;
+            
+            let html = `💡 <strong>基准价格（${firstRecord.base_date} 00:00）</strong>：<br/><div style="margin-top: 10px; line-height: 1.8;">`;
+            
+            const symbols = Object.keys(coins).sort();
+            symbols.forEach(symbol => {
+                const basePrice = coins[symbol].base_price;
+                if (basePrice > 0) {
+                    html += `<span class="coin-label">${symbol}</span> $${basePrice.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 8
+                    })} &nbsp;&nbsp; `;
+                }
+            });
+            
+            html += '</div>';
+            info.innerHTML = html;
+        }
+
+        // 更新趋势图
+        function updateTrendChart(dataArray) {
+            const times = [];
+            const seriesData = {};
+            
+            // 初始化系列数据
+            const symbols = Object.keys(dataArray[0].coins);
+            symbols.forEach(symbol => {
+                seriesData[symbol] = [];
+            });
+            
+            // 填充数据
+            dataArray.forEach(record => {
+                const time = record.collect_time.substring(11, 16); // HH:MM
+                times.push(time);
+                
+                symbols.forEach(symbol => {
+                    const change = record.coins[symbol]?.change_pct || 0;
+                    seriesData[symbol].push(change);
+                });
+            });
+            
+            // 选择几个主要币种展示
+            const mainCoins = ['BTC', 'ETH', 'XRP', 'BNB', 'SOL', 'DOGE'];
+            const colors = ['#f59e0b', '#8b5cf6', '#3b82f6', '#f97316', '#10b981', '#ef4444'];
+            
+            const series = mainCoins.map((symbol, index) => ({
+                name: symbol,
+                type: 'line',
+                smooth: true,
+                data: seriesData[symbol],
+                lineStyle: {
+                    width: 2
+                },
+                itemStyle: {
+                    color: colors[index]
+                }
+            }));
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderColor: '#ddd',
+                    borderWidth: 1,
+                    formatter: function(params) {
+                        let html = `<div style="padding: 5px;"><strong>${params[0].axisValue}</strong><br/>`;
+                        params.forEach(param => {
+                            const value = param.value;
+                            const color = value >= 0 ? '#10b981' : '#ef4444';
+                            html += `<span style="color: ${param.color};">●</span> ${param.seriesName}: <span style="color: ${color}; font-weight: 600;">${value >= 0 ? '+' : ''}${value.toFixed(2)}%</span><br/>`;
+                        });
+                        html += '</div>';
+                        return html;
+                    }
+                },
+                legend: {
+                    data: mainCoins,
+                    top: 10
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    top: '12%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: times,
+                    axisLabel: {
+                        rotate: 45,
+                        fontSize: 11
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '涨跌幅 (%)',
+                    axisLabel: {
+                        formatter: '{value}%'
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            type: 'dashed'
+                        }
+                    }
+                },
+                series: series
+            };
+            
+            trendChart.setOption(option, true);
+        }
+
+        // 更新数据表
+        function updateDataTable(dataArray) {
+            const tbody = document.getElementById('tableBody');
+            let html = '';
+            
+            dataArray.forEach(record => {
+                const time = record.collect_time;
+                const coins = record.coins;
+                
+                // 计算27币相加的和
+                let totalSum = 0;
+                Object.values(coins).forEach(data => {
+                    totalSum += data.change_pct;
+                });
+                
+                // 按涨跌幅排序
+                const sortedCoins = Object.entries(coins).sort((a, b) => b[1].change_pct - a[1].change_pct);
+                
+                sortedCoins.forEach(([symbol, data], index) => {
+                    const changePct = data.change_pct;
+                    const changeClass = changePct >= 0 ? 'positive' : 'negative';
+                    const changeSymbol = changePct >= 0 ? '+' : '';
+                    
+                    // 第一行显示时间和27币相加的和，后续行不显示
+                    const timeCell = index === 0 ? `<td rowspan="${sortedCoins.length}" style="vertical-align: middle; font-weight: 600;">${time}</td>` : '';
+                    const sumClass = totalSum >= 0 ? 'positive' : 'negative';
+                    const sumSymbol = totalSum >= 0 ? '+' : '';
+                    const sumCell = index === 0 ? `<td rowspan="${sortedCoins.length}" style="vertical-align: middle; font-weight: 600; background: ${totalSum >= 0 ? '#f0fdf4' : '#fef2f2'};" class="${sumClass}"><strong>${sumSymbol}${totalSum.toFixed(2)}%</strong></td>` : '';
+                    
+                    html += `
+                        <tr>
+                            ${timeCell}
+                            <td><span class="coin-label">${symbol}</span></td>
+                            <td>$${data.base_price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 8})}</td>
+                            <td>$${data.current_price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 8})}</td>
+                            <td class="${changeClass}">${changeSymbol}${changePct.toFixed(2)}%</td>
+                            ${sumCell}
+                        </tr>
+                    `;
+                });
+            });
+            
+            tbody.innerHTML = html;
+        }
+
+        // 导出CSV
+        function exportToCSV() {
+            if (currentData.length === 0) {
+                alert('没有数据可导出');
+                return;
+            }
+
+            let csv = '时间,币种,基准价格,当前价格,涨跌幅,27币相加的和\n';
+            
+            currentData.forEach(record => {
+                const time = record.collect_time;
+                
+                // 计算27币相加的和
+                let totalSum = 0;
+                Object.values(record.coins).forEach(data => {
+                    totalSum += data.change_pct;
+                });
+                
+                Object.entries(record.coins).forEach(([symbol, data], index) => {
+                    // 只在第一行显示totalSum，其他行留空
+                    const sumValue = index === 0 ? totalSum.toFixed(2) : '';
+                    csv += `${time},${symbol},${data.base_price},${data.current_price},${data.change_pct},${sumValue}\n`;
+                });
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `coin_prices_${document.getElementById('dateSelect').value}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 页面加载完成后初始化
+        window.onload = function() {
+            console.log('🚀 页面加载完成，初始化...');
+            initChart();
+            initDateSelector();
+            // 自动加载今天的数据
+            setTimeout(loadDateData, 500);
+        };
+
+        // 窗口大小改变时重新调整图表
+        window.onresize = function() {
+            if (trendChart) {
+                trendChart.resize();
+            }
+        };
+    </script>
+</body>
+</html>

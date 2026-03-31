@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <!-- Cache Buster: 1765947943 -->
+    <title>决策-K线指标系统 | OKEx永续</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        h1 {
+            color: #764ba2;
+            margin-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+        
+        .stat-card h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #764ba2;
+        }
+        
+        .stat-card .value.running {
+            color: #10b981;
+        }
+        
+        .stat-card .value.stopped {
+            color: #ef4444;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filters select, .filters button {
+            padding: 10px 15px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filters select {
+            background: white;
+            color: #333;
+        }
+        
+        .filters button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-weight: 500;
+        }
+        
+        .filters button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .legend {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .legend h3 {
+            color: #764ba2;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+        }
+        
+        .legend-item {
+            font-size: 13px;
+            color: #555;
+            padding: 5px 0;
+        }
+        
+        .legend-item strong {
+            color: #764ba2;
+            font-weight: 600;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .data-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .data-table th {
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .data-table td {
+            padding: 12px 10px;
+            text-align: center;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 13px;
+        }
+        
+        .data-table tbody tr:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge.bullish {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge.bearish {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .badge.quadrant-1 {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .badge.quadrant-2 {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge.quadrant-3 {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge.quadrant-4 {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 16px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        /* 信号框样式 */
+        .signals-panel {
+            background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
+        }
+        
+        .signals-panel h2 {
+            color: #764ba2;
+            margin-bottom: 20px;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .signals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        
+        .signal-box {
+            background: white;
+            border-left: 4px solid #667eea;
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .signal-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .signal-box.buy-signal {
+            border-left-color: #10b981;
+            background: linear-gradient(135deg, #f0fdf4 0%, #fff 100%);
+        }
+        
+        .signal-box.sell-signal {
+            border-left-color: #ef4444;
+            background: linear-gradient(135deg, #fef2f2 0%, #fff 100%);
+        }
+        
+        .signal-box.high-point {
+            border-left-color: #f59e0b;
+            background: linear-gradient(135deg, #fffbeb 0%, #fff 100%);
+        }
+        
+        .signal-box.low-point {
+            border-left-color: #3b82f6;
+            background: linear-gradient(135deg, #eff6ff 0%, #fff 100%);
+        }
+        
+        .signal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .signal-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .signal-symbol {
+            font-size: 20px;
+            font-weight: bold;
+            color: #764ba2;
+        }
+        
+        .signal-details {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .signal-price {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .signal-time {
+            font-size: 11px;
+            color: #999;
+        }
+        
+        .signal-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #667eea;
+            color: white;
+        }
+        
+        .signal-badge.buy {
+            background: #10b981;
+        }
+        
+        .signal-badge.sell {
+            background: #ef4444;
+        }
+        
+        .signal-badge.high {
+            background: #f59e0b;
+        }
+        
+        .signal-badge.low {
+            background: #3b82f6;
+        }
+        
+        .no-signals {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .signal-count {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        
+        .symbol-cell {
+            font-weight: 600;
+            color: #764ba2;
+        }
+        
+        .price-cell {
+            font-family: 'Courier New', monospace;
+            font-weight: 500;
+        }
+        
+        .positive {
+            color: #10b981;
+        }
+        
+        .negative {
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-button">← 返回首页</a>
+        
+        <h1>🎯 决策-K线指标系统</h1>
+        <p class="subtitle">基于OKEx永续合约的技术指标采集系统 - 实时监控27个币种的5分钟/1小时指标</p>
+        
+        <div class="stats-summary">
+            <div class="stat-card">
+                <h3>采集器状态</h3>
+                <div class="value" id="collectorStatus">加载中...</div>
+            </div>
+            <div class="stat-card">
+                <h3>最后采集时间</h3>
+                <div class="value" id="lastCollection" style="font-size: 16px;">--</div>
+            </div>
+            <div class="stat-card">
+                <h3>5分钟K线数</h3>
+                <div class="value" id="count5m">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>1小时K线数</h3>
+                <div class="value" id="count1h">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>指标数据条数</h3>
+                <div class="value" id="countIndicators">0</div>
+            </div>
+        </div>
+        
+        <!-- 信号面板 -->
+        <div class="signals-panel">
+            <h2>
+                🎯 实时交易信号（2小时内）
+                <span class="signal-count" id="totalSignals">0</span>
+            </h2>
+            <div id="signalsContainer" class="signals-grid">
+                <div class="loading">加载信号中...</div>
+            </div>
+        </div>
+        
+        <div class="filters">
+            <select id="timeframeFilter">
+                <option value="">全部周期</option>
+                <option value="5m">5分钟</option>
+                <option value="1H">1小时</option>
+            </select>
+            
+            <select id="symbolFilter">
+                <option value="">全部币种</option>
+                <option value="BTC-USDT-SWAP">BTC</option>
+                <option value="ETH-USDT-SWAP">ETH</option>
+                <option value="XRP-USDT-SWAP">XRP</option>
+                <option value="SOL-USDT-SWAP">SOL</option>
+                <option value="DOGE-USDT-SWAP">DOGE</option>
+            </select>
+            
+            <button onclick="loadData()">🔄 刷新数据</button>
+        </div>
+        
+        <div class="legend">
+            <h3>📖 指标说明</h3>
+            <div class="legend-grid">
+                <div class="legend-item">
+                    <strong>RSI (14):</strong> 相对强弱指数，范围0-100，< 30超卖，> 70超买
+                </div>
+                <div class="legend-item">
+                    <strong>SAR:</strong> 抛物线转向指标，用于判断趋势反转点
+                </div>
+                <div class="legend-item">
+                    <strong>SAR多空:</strong> <span class="badge bullish">多头</span> = K线在SAR上方，<span class="badge bearish">空头</span> = K线在SAR下方
+                </div>
+                <div class="legend-item">
+                    <strong>SAR象限:</strong> 相对布林带位置 - 1(SAR>UB), 2(UB>SAR>BOLL), 3(BOLL>SAR>LB), 4(SAR<LB)
+                </div>
+                <div class="legend-item">
+                    <strong>多转空/空转多:</strong> 如"空头02"表示从多头转为空头后的第2个周期，"多头01"表示从空头转为多头后的第1个周期
+                </div>
+                <div class="legend-item">
+                    <strong>布林带 (UB/BOLL/LB):</strong> 上轨、中轨、下轨，价格突破上轨为超买，跌破下轨为超卖
+                </div>
+                <div class="legend-item">
+                    <strong>5分钟振幅:</strong> (最高价-最低价)/最低价 × 100%
+                </div>
+                <div class="legend-item">
+                    <strong>5分钟涨跌幅:</strong> (收盘价-开盘价)/开盘价 × 100%
+                </div>
+            </div>
+        </div>
+        
+        <div id="dataContainer">
+            <div class="loading">正在加载数据...</div>
+        </div>
+    </div>
+    
+    <script>
+        // 全局变量
+        let allData = [];
+        let chartBaseUrl = 'https://5000-iz6uddj6rs3xe48ilsyqq-2e1b9533.sandbox.novita.ai';
+        
+        // 页面加载时初始化
+        window.onload = function() {
+            loadChartConfig();
+            loadStatus();
+            loadData();
+            loadSignals();
+            
+            // 每30秒自动刷新
+            setInterval(() => {
+                loadStatus();
+                loadData();
+                loadSignals();
+            }, 30000);
+        };
+        
+        // 加载K线图配置
+        function loadChartConfig() {
+            fetch('/api/chart-config')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.chart_base_url) {
+                        chartBaseUrl = data.chart_base_url;
+                    }
+                })
+                .catch(error => {
+                    console.error('加载K线配置失败:', error);
+                });
+        }
+        
+        // 加载采集器状态
+        function loadStatus() {
+            fetch(`/api/kline-indicators/collector-status?_t=${Date.now()}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const statusEl = document.getElementById('collectorStatus');
+                        const lastCollectionEl = document.getElementById('lastCollection');
+                        
+                        // 更新状态
+                        if (data.status === 'running') {
+                            statusEl.textContent = '运行中';
+                            statusEl.className = 'value running';
+                        } else if (data.status === 'stopped') {
+                            statusEl.textContent = '已停止';
+                            statusEl.className = 'value stopped';
+                        } else {
+                            statusEl.textContent = '未启动';
+                            statusEl.className = 'value';
+                        }
+                        
+                        // 更新时间
+                        if (data.last_collection_time) {
+                            const minutes = data.minutes_since_last;
+                            lastCollectionEl.textContent = `${data.last_collection_time} (${minutes}分钟前)`;
+                        } else {
+                            lastCollectionEl.textContent = '暂无数据';
+                        }
+                        
+                        // 更新数据统计
+                        document.getElementById('count5m').textContent = data.data_counts.kline_5m.toLocaleString();
+                        document.getElementById('count1h').textContent = data.data_counts.kline_1h.toLocaleString();
+                        document.getElementById('countIndicators').textContent = data.data_counts.indicators.toLocaleString();
+                    }
+                })
+                .catch(error => {
+                    console.error('加载状态失败:', error);
+                });
+        }
+        
+        // 加载数据
+        function loadData() {
+            const timeframe = document.getElementById('timeframeFilter').value;
+            const symbol = document.getElementById('symbolFilter').value;
+            
+            let url = '/api/kline-indicators/latest?';
+            if (timeframe) url += `timeframe=${timeframe}&`;
+            if (symbol) url += `symbol=${symbol}&`;
+            url += `_t=${Date.now()}`;
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('📊 API响应:', data);
+                    if (data.success) {
+                        allData = data.data;
+                        console.log('✅ 接收到数据:', allData.length, '条');
+                        renderTable(allData);
+                    } else {
+                        document.getElementById('dataContainer').innerHTML = 
+                            `<div class="no-data">❌ 加载失败: ${data.error}</div>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('加载数据失败:', error);
+                    document.getElementById('dataContainer').innerHTML = 
+                        '<div class="no-data">❌ 网络错误，请稍后重试</div>';
+                });
+        }
+        
+        // 指定的币种顺序
+        const SYMBOL_ORDER = [
+            'BTC', 'ETH', 'XRP', 'BNB', 'SOL', 'LTC', 'DOGE', 'SUI', 'TRX', 
+            'TON', 'ETC', 'BCH', 'HBAR', 'XLM', 'FIL', 'LINK', 'CRO', 'DOT', 
+            'AAVE', 'UNI', 'NEAR', 'APT', 'CFX', 'CRV', 'STX', 'LDO', 'TAO'
+        ];
+        
+        // 渲染表格
+        function renderTable(data) {
+            console.log('📋 renderTable调用, 数据:', data ? data.length : 0, '条');
+            if (!data || data.length === 0) {
+                document.getElementById('dataContainer').innerHTML = 
+                    '<div class="no-data">暂无指标数据</div>';
+                return;
+            }
+            
+            // 按周期分组数据
+            const data5m = {};
+            const data1h = {};
+            
+            data.forEach(item => {
+                const symbolShort = item.symbol.replace('-USDT-SWAP', '');
+                if (item.timeframe === '5m') {
+                    data5m[symbolShort] = item;
+                } else if (item.timeframe === '1H') {
+                    data1h[symbolShort] = item;
+                }
+            });
+            
+            console.log('📦 数据分组完成:');
+            console.log('  5m数据:', Object.keys(data5m).length, '个币种', Object.keys(data5m));
+            console.log('  1H数据:', Object.keys(data1h).length, '个币种', Object.keys(data1h));
+            
+            // 生成表格HTML
+            let html = '<div style="margin-bottom: 40px;">';
+            
+            // 5分钟表格
+            html += '<h2 style="color: #764ba2; margin-bottom: 20px; font-size: 24px;">📊 5分钟周期指标</h2>';
+            html += renderTimeframeTable(data5m, '5m');
+            
+            html += '</div><div>';
+            
+            // 1小时表格
+            html += '<h2 style="color: #764ba2; margin-bottom: 20px; margin-top: 40px; font-size: 24px;">📊 1小时周期指标</h2>';
+            html += renderTimeframeTable(data1h, '1H');
+            
+            html += '</div>';
+            
+            console.log('📄 生成的HTML长度:', html.length, '字符');
+            console.log('📄 HTML预览:', html.substring(0, 500));
+            document.getElementById('dataContainer').innerHTML = html;
+            console.log('✅ HTML已插入到DOM');
+        }
+        
+        // 渲染单个周期的表格
+        function renderTimeframeTable(dataMap, timeframe) {
+            console.log(`🔧 renderTimeframeTable(${timeframe}): 收到${Object.keys(dataMap).length}个币种`);
+            let html = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>币种</th>
+                            <th>周期</th>
+                            <th>当前价</th>
+                            <th>RSI (14)</th>
+                            <th>SAR</th>
+                            <th>SAR多空</th>
+                            <th>SAR象限</th>
+                            <th>多空计数</th>
+                            <th>布林带上轨</th>
+                            <th>布林带中轨</th>
+                            <th>布林带下轨</th>
+                            ${timeframe === '5m' ? '<th>振幅</th><th>涨跌幅</th>' : ''}
+                            <th>更新时间</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            // 按指定顺序遍历币种
+            SYMBOL_ORDER.forEach(symbolShort => {
+                const item = dataMap[symbolShort];
+                const symbolFull = `${symbolShort}-USDT-SWAP`;
+                console.log(`  检查 ${symbolShort}:`, item ? '有数据' : '无数据');
+                if (!item) {
+                    // 如果没有数据，显示占位行
+                    html += `
+                        <tr style="opacity: 0.5;">
+                            <td class="symbol-cell"><a href="${chartBaseUrl}/chart/${symbolFull}" style="color: #999; text-decoration: none;" title="查看${symbolShort}详细K线图">${symbolShort}</a></td>
+                            <td>${timeframe}</td>
+                            <td colspan="${timeframe === '5m' ? 11 : 9}" style="text-align: center; color: #999;">暂无数据</td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                const sarPositionBadge = item.sar_position === 'bullish' 
+                    ? '<span class="badge bullish">多头</span>' 
+                    : '<span class="badge bearish">空头</span>';
+                const sarQuadrantBadge = `<span class="badge quadrant-${item.sar_quadrant}">象限${item.sar_quadrant}</span>`;
+                
+                const amplitudeClass = item.amplitude && item.amplitude > 0 ? 'positive' : '';
+                const changePctClass = item.change_pct && item.change_pct > 0 ? 'positive' : (item.change_pct < 0 ? 'negative' : '');
+                
+                html += `
+                    <tr>
+                        <td class="symbol-cell"><a href="${chartBaseUrl}/chart/${symbolFull}" style="color: #667eea; text-decoration: none; font-weight: 600;" title="查看${symbolShort}详细K线图">${symbolShort}</a></td>
+                        <td>${timeframe}</td>
+                        <td class="price-cell">${item.current_price ? item.current_price.toFixed(6) : '--'}</td>
+                        <td>${item.rsi_14 ? item.rsi_14.toFixed(2) : '--'}</td>
+                        <td class="price-cell">${item.sar ? item.sar.toFixed(6) : '--'}</td>
+                        <td>${item.sar_position ? sarPositionBadge : '--'}</td>
+                        <td>${item.sar_quadrant ? sarQuadrantBadge : '--'}</td>
+                        <td style="font-weight: 600;">${item.sar_count_label || '--'}</td>
+                        <td class="price-cell">${item.bb_upper ? item.bb_upper.toFixed(6) : '--'}</td>
+                        <td class="price-cell">${item.bb_middle ? item.bb_middle.toFixed(6) : '--'}</td>
+                        <td class="price-cell">${item.bb_lower ? item.bb_lower.toFixed(6) : '--'}</td>
+                        ${timeframe === '5m' ? `
+                            <td class="${amplitudeClass}">${item.amplitude ? item.amplitude.toFixed(2) + '%' : '--'}</td>
+                            <td class="${changePctClass}">${item.change_pct ? (item.change_pct > 0 ? '+' : '') + item.change_pct.toFixed(2) + '%' : '--'}</td>
+                        ` : ''}
+                        <td style="font-size: 11px;">${item.record_time}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                    </tbody>
+                </table>
+            `;
+            
+            console.log(`✅ renderTimeframeTable(${timeframe}) 返回HTML:`, html.length, '字符');
+            return html;
+        }
+        
+        // 加载交易信号
+        function loadSignals() {
+            fetch(`/api/kline-indicators/signals?_t=${Date.now()}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        renderSignals(data.data);
+                    } else {
+                        document.getElementById('signalsContainer').innerHTML = 
+                            '<div class="no-signals">❌ 加载失败: ' + data.error + '</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('加载信号失败:', error);
+                    document.getElementById('signalsContainer').innerHTML = 
+                        '<div class="no-signals">❌ 网络错误，请稍后重试</div>';
+                });
+        }
+        
+        // 渲染信号
+        function renderSignals(data) {
+            const container = document.getElementById('signalsContainer');
+            const signals = data.signals;
+            const counts = data.counts;
+            
+            // 更新总信号数
+            const totalCount = Object.values(counts).reduce((a, b) => a + b, 0);
+            document.getElementById('totalSignals').textContent = totalCount;
+            
+            if (totalCount === 0) {
+                container.innerHTML = '<div class="no-signals">暂无符合条件的信号</div>';
+                return;
+            }
+            
+            let html = '';
+            
+            // 渲染买点4（2小时内有效）
+            if (signals.buy_point_4 && signals.buy_point_4.length > 0) {
+                signals.buy_point_4.forEach(signal => {
+                    const rsiText = signal.confirm_rsi ? `RSI: ${signal.confirm_rsi.toFixed(2)}` : 'RSI: N/A';
+                    const confirmTime = signal.confirm_time || signal.time;
+                    html += `
+                        <div class="signal-box buy-signal">
+                            <div class="signal-header">
+                                <span class="signal-badge buy">🎯 买点4</span>
+                                <span class="signal-symbol">${signal.symbol}</span>
+                            </div>
+                            <div class="signal-details">
+                                <div class="signal-price">$${signal.current_price ? signal.current_price.toFixed(4) : signal.price.toFixed(4)}</div>
+                                <div>7天低点: $${signal.low_7d.toFixed(4)}</div>
+                                <div>距离低点: +${signal.distance.toFixed(2)}%</div>
+                                <div style="color: #00aa00; font-weight: bold;">${rsiText} (< 20)</div>
+                                <div class="signal-time">确认: ${confirmTime}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            // 渲染卖点1（2小时内有效）
+            if (signals.sell_point_1 && signals.sell_point_1.length > 0) {
+                signals.sell_point_1.forEach(signal => {
+                    const rsiText = signal.mark_rsi ? `RSI: ${signal.mark_rsi.toFixed(2)}` : 'RSI: N/A';
+                    const signalTime = signal.mark_time || signal.time || 'N/A';
+                    const currentPrice = signal.current_price || signal.mark_price || signal.price;
+                    const highPrice = signal.high_price || signal.high_7d || signal.price;
+                    html += `
+                        <div class="signal-box sell-signal">
+                            <div class="signal-header">
+                                <span class="signal-badge sell">📈 卖点1</span>
+                                <span class="signal-symbol">${signal.symbol}</span>
+                            </div>
+                            <div class="signal-details">
+                                <div class="signal-price">$${currentPrice.toFixed(4)}</div>
+                                <div>7天高点: $${highPrice.toFixed(4)}</div>
+                                <div>距离高点: -${signal.distance.toFixed(2)}%</div>
+                                <div style="color: #00ff00; font-weight: bold;">${rsiText} (≥ 60)</div>
+                                <div class="signal-time">时间: ${signalTime}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            // 渲染7天高点
+            if (signals.day7_high && signals.day7_high.length > 0) {
+                signals.day7_high.forEach(signal => {
+                    html += `
+                        <div class="signal-box high-point">
+                            <div class="signal-header">
+                                <span class="signal-badge high">📊 7天高点</span>
+                                <span class="signal-symbol">${signal.symbol}</span>
+                            </div>
+                            <div class="signal-details">
+                                <div class="signal-price">$${signal.price.toFixed(4)}</div>
+                                <div>高点: $${signal.high_7d.toFixed(4)}</div>
+                                <div class="signal-time">${signal.time}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            // 渲染7天低点
+            if (signals.day7_low && signals.day7_low.length > 0) {
+                signals.day7_low.forEach(signal => {
+                    html += `
+                        <div class="signal-box low-point">
+                            <div class="signal-header">
+                                <span class="signal-badge low">📉 7天低点</span>
+                                <span class="signal-symbol">${signal.symbol}</span>
+                            </div>
+                            <div class="signal-details">
+                                <div class="signal-price">$${signal.price.toFixed(4)}</div>
+                                <div>低点: $${signal.low_7d.toFixed(4)}</div>
+                                <div class="signal-time">${signal.time}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            // 渲染48小时高点
+            if (signals.h48_high && signals.h48_high.length > 0) {
+                signals.h48_high.forEach(signal => {
+                    html += `
+                        <div class="signal-box high-point">
+                            <div class="signal-header">
+                                <span class="signal-badge high">⏱️ 48H高点</span>
+                                <span class="signal-symbol">${signal.symbol}</span>
+                            </div>
+                            <div class="signal-details">
+                                <div class="signal-price">$${signal.price.toFixed(4)}</div>
+                                <div>高点: $${signal.high_48h.toFixed(4)}</div>
+                                <div class="signal-time">${signal.time}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            // 渲染48小时低点
+            if (signals.h48_low && signals.h48_low.length > 0) {
+                signals.h48_low.forEach(signal => {
+                    html += `
+                        <div class="signal-box low-point">
+                            <div class="signal-header">
+                                <span class="signal-badge low">⏱️ 48H低点</span>
+                                <span class="signal-symbol">${signal.symbol}</span>
+                            </div>
+                            <div class="signal-details">
+                                <div class="signal-price">$${signal.price.toFixed(4)}</div>
+                                <div>低点: $${signal.low_48h.toFixed(4)}</div>
+                                <div class="signal-time">${signal.time}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            container.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

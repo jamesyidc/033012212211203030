@@ -1,0 +1,43 @@
+{
+  "date": "2026-02-02",
+  "total_bullish": 135,
+  "total_bearish": 5161,
+  "total_points": 547,
+  "unique_bullish_symbols": [
+    "BCH",
+    "CRV",
+    "TRX"
+  ],
+  "unique_bearish_symbols": [
+    "AAVE",
+    "APT",
+    "BCH",
+    "BNB",
+    "BTC",
+    "CFX",
+    "CRO",
+    "CRV",
+    "DOGE",
+    "DOT",
+    "ETC",
+    "ETH",
+    "FIL",
+    "HBAR",
+    "LDO",
+    "LINK",
+    "LTC",
+    "NEAR",
+    "SOL",
+    "STX",
+    "SUI",
+    "TAO",
+    "TON",
+    "TRX",
+    "UNI",
+    "XLM",
+    "XRP"
+  ],
+  "unique_bullish_count": 3,
+  "unique_bearish_count": 27,
+  "generated_at": "2026-02-28 22:15:29"
+}

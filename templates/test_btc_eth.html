@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTC & ETH 数据测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 40px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(0,0,0,0.3);
+            padding: 30px;
+            border-radius: 15px;
+        }
+        h1 { text-align: center; margin-bottom: 30px; }
+        .coin-box {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        .btc-box { border-color: #ffc107; }
+        .eth-box { border-color: #637dff; }
+        .data-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .data-item {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .label { font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 5px; }
+        .value { font-size: 24px; font-weight: bold; }
+        .btc-value { color: #ffc107; }
+        .eth-value { color: #637dff; }
+        #status {
+            text-align: center;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            background: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+        }
+        .error { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 BTC & ETH 市场情绪坐标测试</h1>
+        
+        <div id="status">正在加载数据...</div>
+        
+        <div class="coin-box btc-box">
+            <h2 style="text-align: center; color: #ffc107;">🟡 BTC (比特币)</h2>
+            <div class="data-grid">
+                <div class="data-item">
+                    <div class="label">4小时位置</div>
+                    <div class="value btc-value" id="btc_4h">--</div>
+                </div>
+                <div class="data-item">
+                    <div class="label">12小时位置</div>
+                    <div class="value btc-value" id="btc_12h">--</div>
+                </div>
+                <div class="data-item">
+                    <div class="label">24小时位置</div>
+                    <div class="value btc-value" id="btc_24h">--</div>
+                </div>
+                <div class="data-item">
+                    <div class="label">48小时位置</div>
+                    <div class="value btc-value" id="btc_48h">--</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="coin-box eth-box">
+            <h2 style="text-align: center; color: #637dff;">🔵 ETH (以太坊)</h2>
+            <div class="data-grid">
+                <div class="data-item">
+                    <div class="label">4小时位置</div>
+                    <div class="value eth-value" id="eth_4h">--</div>
+                </div>
+                <div class="data-item">
+                    <div class="label">12小时位置</div>
+                    <div class="value eth-value" id="eth_12h">--</div>
+                </div>
+                <div class="data-item">
+                    <div class="label">24小时位置</div>
+                    <div class="value eth-value" id="eth_24h">--</div>
+                </div>
+                <div class="data-item">
+                    <div class="label">48小时位置</div>
+                    <div class="value eth-value" id="eth_48h">--</div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="/position-system" style="display: inline-block; padding: 15px 30px; background: #4ade80; color: black; text-decoration: none; border-radius: 8px; font-weight: bold;">
+                返回位置系统
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function updateData() {
+            fetch('/api/position/latest')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const btcData = data.data.find(coin => coin.symbol.includes('BTC'));
+                        const ethData = data.data.find(coin => coin.symbol.includes('ETH'));
+                        
+                        if (btcData) {
+                            document.getElementById('btc_4h').textContent = btcData.position_4h !== null ? btcData.position_4h.toFixed(1) + '%' : '--';
+                            document.getElementById('btc_12h').textContent = btcData.position_12h !== null ? btcData.position_12h.toFixed(1) + '%' : '--';
+                            document.getElementById('btc_24h').textContent = btcData.position_24h !== null ? btcData.position_24h.toFixed(1) + '%' : '--';
+                            document.getElementById('btc_48h').textContent = btcData.position_48h !== null ? btcData.position_48h.toFixed(1) + '%' : '--';
+                            
+                            document.getElementById('status').textContent = '✅ 数据加载成功！BTC和ETH数据已显示';
+                            document.getElementById('status').className = '';
+                        }
+                        
+                        if (ethData) {
+                            document.getElementById('eth_4h').textContent = ethData.position_4h !== null ? ethData.position_4h.toFixed(1) + '%' : '--';
+                            document.getElementById('eth_12h').textContent = ethData.position_12h !== null ? ethData.position_12h.toFixed(1) + '%' : '--';
+                            document.getElementById('eth_24h').textContent = ethData.position_24h !== null ? ethData.position_24h.toFixed(1) + '%' : '--';
+                            document.getElementById('eth_48h').textContent = ethData.position_48h !== null ? ethData.position_48h.toFixed(1) + '%' : '--';
+                        }
+                        
+                        if (!btcData && !ethData) {
+                            document.getElementById('status').textContent = '⚠️ 未找到BTC或ETH数据';
+                            document.getElementById('status').className = 'error';
+                        }
+                    } else {
+                        document.getElementById('status').textContent = '❌ 数据加载失败';
+                        document.getElementById('status').className = 'error';
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('status').textContent = '❌ 错误: ' + err.message;
+                    document.getElementById('status').className = 'error';
+                });
+        }
+        
+        // 页面加载时获取数据
+        updateData();
+        
+        // 每30秒自动刷新
+        setInterval(updateData, 30000);
+    </script>
+</body>
+</html>

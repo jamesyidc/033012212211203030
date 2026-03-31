@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{symbol}} - SAR 持续时间段统计</title>
+    
+    <!-- ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: #1e2139;
+            color: #fff;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(59, 125, 255, 0.3);
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            color: #00d4ff;
+        }
+        
+        .back-btn {
+            background: rgba(59, 125, 255, 0.2);
+            border: 1px solid rgba(59, 125, 255, 0.4);
+            color: #00d4ff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .back-btn:hover {
+            background: rgba(59, 125, 255, 0.3);
+        }
+        
+        .status-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: rgba(42, 45, 71, 0.6);
+            border-radius: 8px;
+        }
+        
+        .status-item {
+            text-align: center;
+        }
+        
+        .status-label {
+            font-size: 12px;
+            color: #8b92b8;
+            margin-bottom: 5px;
+        }
+        
+        .status-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+        
+        /* 偏多偏空图表区域 */
+        .bias-chart-container {
+            background: rgba(42, 45, 71, 0.6);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .bias-chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #00d4ff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .bias-chart-subtitle {
+            font-size: 13px;
+            color: #8b92b8;
+            margin-top: -10px;
+            margin-bottom: 15px;
+        }
+        
+        #biasChart {
+            width: 100%;
+            height: 400px;
+        }
+        
+        .data-table {
+            width: 100%;
+            background: rgba(42, 45, 71, 0.6);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .table-header {
+            display: grid;
+            grid-template-columns: 60px 80px 90px 100px 100px 100px 100px 110px 90px 100px 110px 90px 100px 110px 100px 110px;
+            gap: 8px;
+            padding: 15px;
+            background: rgba(59, 125, 255, 0.2);
+            font-weight: bold;
+            font-size: 12px;
+            color: #00d4ff;
+            border-bottom: 1px solid rgba(59, 125, 255, 0.3);
+        }
+        
+        .table-row {
+            display: grid;
+            grid-template-columns: 60px 80px 90px 100px 100px 100px 100px 110px 90px 100px 110px 90px 100px 110px 100px 110px;
+            gap: 8px;
+            padding: 12px 15px;
+            font-size: 12px;
+            border-bottom: 1px solid rgba(139, 146, 184, 0.1);
+            transition: background 0.2s;
+        }
+        
+        .table-row:hover {
+            background: rgba(59, 125, 255, 0.1);
+        }
+        
+        .table-cell {
+            color: #d0d4e8;
+        }
+        
+        .position-long {
+            color: #00ff00;
+            font-weight: bold;
+        }
+        
+        .position-short {
+            color: #ff4444;
+            font-weight: bold;
+        }
+        
+        .trend-increase {
+            color: #ff4444;
+        }
+        
+        .trend-decrease {
+            color: #00ff00;
+        }
+        
+        .bias-bullish {
+            color: #00ff00;
+            font-weight: bold;
+        }
+        
+        .bias-bearish {
+            color: #ff4444;
+            font-weight: bold;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+            color: #8b92b8;
+        }
+        
+        .error {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            border-radius: 8px;
+            color: #ff4444;
+        }
+        
+        /* 计算逻辑说明卡片 */
+        .info-card {
+            background: rgba(42, 45, 71, 0.8);
+            border: 1px solid rgba(139, 69, 255, 0.4);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .info-card.show {
+            display: block;
+        }
+        
+        .info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            padding: 5px 0;
+        }
+        
+        .info-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #8b45ff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .toggle-icon {
+            font-size: 18px;
+            transition: transform 0.3s;
+            color: #8b45ff;
+        }
+        
+        .toggle-icon.expanded {
+            transform: rotate(180deg);
+        }
+        
+        .info-content {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(139, 69, 255, 0.2);
+            display: none;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .info-content.show {
+            display: block;
+            max-height: 2000px;
+        }
+        
+        .info-section {
+            margin-bottom: 15px;
+        }
+        
+        .info-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffd700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .info-text {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #b8c1ec;
+            margin-bottom: 8px;
+        }
+        
+        .info-formula {
+            background: rgba(0, 0, 0, 0.4);
+            border-left: 3px solid #00d4ff;
+            padding: 10px 12px;
+            margin: 8px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #26ff82;
+            border-radius: 4px;
+        }
+        
+        .info-example {
+            background: rgba(139, 69, 255, 0.1);
+            border: 1px solid rgba(139, 69, 255, 0.3);
+            border-radius: 6px;
+            padding: 10px;
+            margin: 8px 0;
+        }
+        
+        .info-example-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #8b45ff;
+            margin-bottom: 6px;
+        }
+        
+        .info-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 5px 0;
+        }
+        
+        .info-list li {
+            padding: 4px 0;
+            padding-left: 18px;
+            position: relative;
+            font-size: 12px;
+            color: #b8c1ec;
+        }
+        
+        .info-list li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #00d4ff;
+        }
+        
+        .highlight-green {
+            color: #26ff82;
+            font-weight: 600;
+        }
+        
+        .highlight-red {
+            color: #ff4444;
+            font-weight: 600;
+        }
+        
+        .highlight-blue {
+            color: #00d4ff;
+            font-weight: 600;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 10px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 id="pageTitle">加载中...</h1>
+            <div class="nav-buttons">
+                <a href="/" class="back-btn">← 返回首页</a>
+                <a href="/sar-slope" class="back-btn">← 返回列表</a>
+            </div>
+        </div>
+        
+        <div id="statusBar" class="status-bar" style="display: none;"></div>
+        
+        <!-- 偏多偏空图表 -->
+        <div class="bias-chart-container" id="biasChartContainer" style="display: none;">
+            <div class="bias-chart-title">
+                <span>📊</span>
+                <span>偏多偏空分析</span>
+            </div>
+            <div class="bias-chart-subtitle">基于昨天+今天的SAR数据统计（5分钟周期）</div>
+            <div id="biasChart"></div>
+        </div>
+        
+        <!-- 计算逻辑说明卡片 -->
+        <div id="infoCard" class="info-card">
+            <div class="info-header" onclick="toggleInfo()">
+                <div class="info-title">
+                    <span>📚</span>
+                    <span>SAR多空序号计算逻辑说明</span>
+                </div>
+                <span class="toggle-icon" id="toggleIcon">▼</span>
+            </div>
+            <div class="info-content" id="infoContent">
+                <div class="info-grid">
+                    <div class="info-section">
+                        <div class="info-section-title">🎯 SAR多空定义</div>
+                        <div class="info-text">
+                            根据SAR点与K线的相对位置判断：
+                        </div>
+                        <ul class="info-list">
+                            <li><span class="highlight-green">SAR多头</span>：SAR点在K线<strong>下方</strong>（看涨）</li>
+                            <li><span class="highlight-red">SAR空头</span>：SAR点在K线<strong>上方</strong>（看跌）</li>
+                        </ul>
+                        <div class="info-formula">
+                            多头: close > sar (支撑位)<br>
+                            空头: close < sar (压力位)
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-section-title">🔢 序号计算方法</div>
+                        <div class="info-text">
+                            从最近一次多空转换点开始计数：
+                        </div>
+                        <ul class="info-list">
+                            <li>步骤1：获取最新K线的SAR状态</li>
+                            <li>步骤2：往前找最近一次转换点</li>
+                            <li>步骤3：从转换点开始计数(01, 02...)</li>
+                        </ul>
+                        <div class="info-formula">
+                            序号 = 从转换点到当前的数据点数量
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <div class="info-section-title">📊 数据来源</div>
+                    <div class="info-text">
+                        所有数据严格来自<span class="highlight-blue">OKX永续合约市场</span>：
+                    </div>
+                    <ul class="info-list">
+                        <li>K线数据：OKX永续合约5分钟K线（开高低收）</li>
+                        <li>更新频率：每5分钟采集一次</li>
+                        <li>币种范围：29个主流币种</li>
+                        <li>SAR参数：AF_START=0.02, AF_MAX=0.2</li>
+                    </ul>
+                </div>
+                
+                <div class="info-section">
+                    <div class="info-section-title">📈 序号示例</div>
+                    <div class="info-example">
+                        <div class="info-example-title">案例：从空头转多头</div>
+                        <div class="info-formula" style="border-color: #26ff82;">
+20:05 空头 ← 上个周期<br>
+20:10 <span class="highlight-green">多头</span> ← 转换点（序列01）<br>
+20:15 <span class="highlight-green">多头</span> ← 序列02<br>
+20:20 <span class="highlight-green">多头</span> ← 序列03（当前）<br>
+<br>
+显示：<span class="highlight-green">多头03</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-grid">
+                    <div class="info-section">
+                        <div class="info-section-title">📊 序号统计计算方法</div>
+                        <div class="info-text">
+                            统计最近24小时内，每个序号的SAR差值并判断偏向：
+                        </div>
+                        <div class="info-formula">
+                            差值 = SAR值 - 价格
+                        </div>
+                        <ul class="info-list">
+                            <li><strong>多头序号</strong>（SAR在下方）：
+                                <ul style="margin-top: 8px;">
+                                    <li>差值越大（更正）→ <span class="highlight-red">偏空</span>（SAR离价格远，趋势弱）</li>
+                                    <li>差值越小（更负）→ <span class="highlight-green">偏多</span>（SAR紧贴价格，趋势强）</li>
+                                </ul>
+                            </li>
+                            <li style="margin-top: 8px;"><strong>空头序号</strong>（SAR在上方）：
+                                <ul style="margin-top: 8px;">
+                                    <li>差值越大（更正）→ <span class="highlight-green">偏多</span>（SAR离价格远，反转可能大）</li>
+                                    <li>差值越小（更负）→ <span class="highlight-red">偏空</span>（SAR紧贴价格，下跌强劲）</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class="info-example" style="margin-top: 12px;">
+                            <div class="info-example-title">示例：DOT多头02统计</div>
+                            <div class="info-formula" style="border-color: #26ff82; font-size: 12px;">
+统计最近24小时内所有"多头02"的差值：<br>
+- 第1次多头02: 差值=-0.0045（SAR紧贴）<br>
+- 第2次多头02: 差值=-0.0051（SAR紧贴）<br>
+- 第3次多头02: 差值=-0.0042（SAR紧贴）<br>
+<br>
+平均差值: -0.0046 → 判断: <span class="highlight-green">偏多</span>✓
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-section-title">⏰ 2小时多空占比计算</div>
+                        <div class="info-text">
+                            基于1天序号统计，分析最近2小时的多空偏向分布：
+                        </div>
+                        <div class="info-formula" style="background: rgba(38, 255, 130, 0.1); padding: 12px; border-radius: 8px; margin-top: 10px;">
+                            <strong>计算步骤：</strong><br>
+                            1️⃣ 获取1天序号统计作为基准<br>
+                            2️⃣ 读取最近2小时数据点（约24个）<br>
+                            3️⃣ 识别每个点的序号<br>
+                            4️⃣ 查找序号的偏向（偏多/偏空/中性）<br>
+                            5️⃣ 统计并计算占比
+                        </div>
+                        <div class="info-example" style="margin-top: 12px;">
+                            <div class="info-example-title">示例：DOT最近2小时</div>
+                            <div class="info-formula" style="border-color: #26ff82; font-size: 12px;">
+20:05 多头01 → 查1天统计 → <span class="highlight-green">偏多</span> ✓<br>
+20:10 多头02 → 查1天统计 → <span class="highlight-green">偏多</span> ✓<br>
+20:15 空头01 → 查1天统计 → <span class="highlight-green">偏多</span> ✓<br>
+20:20 空头02 → 查1天统计 → <span class="highlight-green">偏多</span> ✓<br>
+20:25 空头03 → 查1天统计 → 中性<br>
+...<br>
+<br>
+统计结果:<br>
+• 偏多: 22个 (95.7%)<br>
+• 偏空: 0个 (0.0%)<br>
+• 中性: 1个 (4.3%)<br>
+<br>
+主导偏向: <span class="highlight-green">偏多</span> → 近2小时趋势偏多
+                            </div>
+                        </div>
+                        <div class="info-text" style="margin-top: 12px; font-size: 12px; color: #8b92b8;">
+                            <strong>应用场景</strong>：判断短期市场趋势，配合序号统计做交易决策
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-section-title">💡 偏多偏空计算逻辑（v2.2最终版）</div>
+                        <div class="info-text">
+                            <strong style="color: #ffd700;">核心原理：</strong><br>
+                            不是简单统计多空状态的次数，而是比较<strong>当前序号的SAR差值</strong>与<strong>该序号的历史平均差值</strong>。
+                        </div>
+                        <div class="info-formula" style="background: rgba(0, 212, 255, 0.1); padding: 12px; border-radius: 8px; margin-top: 10px;">
+                            <strong>计算步骤：</strong><br>
+                            1️⃣ 统计历史数据（昨天+今天，约500条）<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;• 多头01的所有差值 → 计算平均值<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;• 多头02的所有差值 → 计算平均值<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;• 空头01的所有差值 → 计算平均值<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;• 空头02的所有差值 → 计算平均值<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;• ...<br>
+                            <br>
+                            2️⃣ 分析最近2小时的数据（24个点）<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;• 如果当前是<span class="highlight-green">多头02</span>，比较当前差值 vs <strong>历史多头02的平均</strong><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;• 如果当前是<span class="highlight-red">空头05</span>，比较当前差值 vs <strong>历史空头05的平均</strong><br>
+                            <br>
+                            3️⃣ 统计偏多/偏空的数量和比例<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;• 偏多比例 = 偏多次数 / 总分析次数 × 100%<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;• 偏空比例 = 偏空次数 / 总分析次数 × 100%
+                        </div>
+                        <div class="info-formula" style="background: rgba(255, 215, 0, 0.1); padding: 12px; border-radius: 8px; margin-top: 10px;">
+                            <strong>判断规则：</strong><br>
+                            📈 <strong>多头状态</strong>（价格 > SAR）：<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;• 当前差值 &lt; 历史平均 → <span class="highlight-green">偏多</span>（价格接近支撑位，可能反弹）<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;• 当前差值 &gt; 历史平均 → <span class="highlight-red">偏空</span>（价格离支撑位远，可能回调）<br>
+                            <br>
+                            📉 <strong>空头状态</strong>（价格 &lt; SAR）：<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;• 当前差值 &lt; 历史平均 → <span class="highlight-red">偏空</span>（空头强势，继续下跌）<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;• 当前差值 &gt; 历史平均 → <span class="highlight-green">偏多</span>（快速下跌后，可能反弹）
+                        </div>
+                        <div class="info-example" style="margin-top: 12px;">
+                            <div class="info-example-title">示例说明</div>
+                            <div class="info-formula" style="border-color: #26ff82; font-size: 12px;">
+假设历史数据统计：<br>
+&nbsp;&nbsp;&nbsp;&nbsp;• 多头02的平均差值 = 0.0095<br>
+&nbsp;&nbsp;&nbsp;&nbsp;• 空头05的平均差值 = 0.0094<br>
+<br>
+当前数据点：<br>
+&nbsp;&nbsp;&nbsp;&nbsp;• 时刻1: 多头02, 当前差值=0.007 &lt; 0.0095 → <span class="highlight-green">偏多</span> ✓<br>
+&nbsp;&nbsp;&nbsp;&nbsp;• 时刻2: 多头02, 当前差值=0.012 &gt; 0.0095 → <span class="highlight-red">偏空</span> ✗<br>
+&nbsp;&nbsp;&nbsp;&nbsp;• 时刻3: 空头05, 当前差值=0.012 &gt; 0.0094 → <span class="highlight-green">偏多</span> ✓
+                            </div>
+                        </div>
+                        <div class="info-formula" style="background: rgba(38, 255, 130, 0.1); padding: 12px; border-radius: 8px; margin-top: 10px;">
+                            <strong>✨ 关键优势：</strong><br>
+                            ✅ 每个序号有独立的历史基准<br>
+                            ✅ 考虑了周期内的位置特征<br>
+                            ✅ 更精准地反映市场偏向<br>
+                            ✅ 科学性强，符合技术分析原理
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-section-title">🔌 API接口</div>
+                        <div class="info-text">系统提供以下API端点：</div>
+                        <ul class="info-list" style="font-family: monospace; font-size: 11px;">
+                            <li><strong>当前序号查询</strong>：<br>GET /api/sar-slope/current-sequence<br><span style="color: #8b92b8;">返回所有币种的当前序号和状态</span></li>
+                            <li><strong>完整周期数据</strong>：<br>GET /api/sar-slope/current-cycle/&lt;symbol&gt;<br><span style="color: #8b92b8;">返回当前周期的所有序列数据</span></li>
+                            <li><strong>序号统计数据</strong>：<br>GET /api/sar-slope/sequence-statistics?hours=24<br><span style="color: #8b92b8;">返回各序号的平均差值和偏向判断</span></li>
+                            <li><strong>2小时多空占比</strong>：<br>GET /api/sar-slope/bias-ratio-2h<br><span style="color: #8b92b8;">返回最近2小时的多空占比分析</span></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <div class="info-section-title">⚙️ 系统架构</div>
+                    <div class="info-grid" style="grid-template-columns: 1fr 1fr;">
+                        <div>
+                            <div class="info-text"><strong>PM2进程管理</strong></div>
+                            <ul class="info-list" style="font-size: 11px;">
+                                <li><code>sar-jsonl-collector</code><br>SAR数据采集器（每5分钟）</li>
+                                <li><code>flask-app</code><br>Flask API服务器（端口5000）</li>
+                                <li><code>coin-change-tracker</code><br>币种涨跌幅监控</li>
+                                <li><code>panic-collector</code><br>恐慌指标采集</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <div class="info-text"><strong>核心模块</strong></div>
+                            <ul class="info-list" style="font-size: 11px;">
+                                <li><code>sar_api_jsonl.py</code><br>SAR数据API逻辑</li>
+                                <li><code>app.py</code><br>Flask应用主文件</li>
+                                <li><code>sar_slope_detail.html</code><br>详情页前端模板</li>
+                                <li><code>DOT.jsonl</code><br>SAR数据存储（JSONL格式）</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <div class="info-section-title">🛣️ 路由列表</div>
+                    <div class="info-grid" style="grid-template-columns: 1fr 1fr;">
+                        <div>
+                            <div class="info-text"><strong>页面路由</strong></div>
+                            <ul class="info-list" style="font-family: monospace; font-size: 11px;">
+                                <li>/sar-slope<br><span style="color: #8b92b8;">币种列表页</span></li>
+                                <li>/sar-slope/&lt;symbol&gt;<br><span style="color: #8b92b8;">币种详情页（本页）</span></li>
+                                <li>/sar-slope/chart<br><span style="color: #8b92b8;">实时曲线图</span></li>
+                                <li>/sar-bias-trend<br><span style="color: #8b92b8;">偏向趋势图</span></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <div class="info-text"><strong>数据路由</strong></div>
+                            <ul class="info-list" style="font-family: monospace; font-size: 11px;">
+                                <li>/api/sar-slope/status<br><span style="color: #8b92b8;">全局状态</span></li>
+                                <li>/api/sar-slope/bias-ratios<br><span style="color: #8b92b8;">多空比例</span></li>
+                                <li>/api/data-health-monitor/status<br><span style="color: #8b92b8;">健康监控</span></li>
+                                <li>/api/okx-trading/*<br><span style="color: #8b92b8;">OKX交易接口</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <div class="info-section-title">💾 数据存储</div>
+                    <ul class="info-list">
+                        <li><strong>存储格式</strong>：JSONL（每行一个JSON对象）</li>
+                        <li><strong>存储路径</strong>：/home/user/webapp/data/sar_jsonl/</li>
+                        <li><strong>文件命名</strong>：{币种}.jsonl（如DOT.jsonl）</li>
+                        <li><strong>保留时长</strong>：持续累积，定期归档</li>
+                        <li><strong>数据字段</strong>：timestamp, beijing_time, symbol, close, sar, position, duration_minutes, slope_value等</li>
+                    </ul>
+                </div>
+                
+                <div class="info-section">
+                    <div class="info-section-title">🔄 数据流程</div>
+                    <div class="info-formula" style="background: rgba(139, 69, 255, 0.1); padding: 15px; border-radius: 8px;">
+                        <strong style="color: #8b45ff;">完整数据链路：</strong><br><br>
+                        1️⃣ OKX API → 获取5分钟K线数据（开高低收）<br>
+                        2️⃣ SAR采集器 → 计算SAR指标（AF_START=0.02, AF_MAX=0.2）<br>
+                        3️⃣ 判断多空 → close与sar比较，确定position状态<br>
+                        4️⃣ 写入JSONL → 追加到币种对应的.jsonl文件<br>
+                        5️⃣ API读取 → Flask从JSONL读取最新数据<br>
+                        6️⃣ 计算序号 → 向前扫描找转换点，从01开始计数<br>
+                        7️⃣ 前端展示 → 本页面显示完整周期序列（最新在前）<br>
+                        8️⃣ 序号统计 → 统计24小时内各序号的差值和偏向
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <div class="info-section-title">📚 技术文档</div>
+                    <ul class="info-list">
+                        <li><strong>详细说明</strong>：/home/user/webapp/SAR_CALCULATION_LOGIC.md</li>
+                        <li><strong>序号系统</strong>：/home/user/webapp/SAR_SEQUENCE_SYSTEM.md</li>
+                        <li><strong>更新指南</strong>：/home/user/webapp/SAR_LOGIC_UPDATE_GUIDE.md</li>
+                        <li><strong>Git仓库</strong>：所有变更已提交到main分支</li>
+                    </ul>
+                </div>
+                
+                <div class="info-section">
+                    <div class="info-section-title">⚠️ 重要说明</div>
+                    <ul class="info-list">
+                        <li><strong>序号01-03</strong>：趋势刚确立，需要观察确认</li>
+                        <li><strong>序号04-08</strong>：趋势延续中，可以跟随</li>
+                        <li><strong>序号09+</strong>：趋势成熟，注意反转风险</li>
+                        <li>数据每5分钟更新一次，序号会自动递增</li>
+                        <li>转换发生时，序号重新从01开始计数</li>
+                    </ul>
+                </div>
+                
+                <div class="info-text" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(139, 69, 255, 0.2); text-align: center; color: #8b92b8; font-size: 12px;">
+                    ⚠️ 注意：如后期逻辑有改动，此说明也会同步更新
+                </div>
+            </div>
+        </div>
+        
+        <div id="loading" class="loading">正在加载数据...</div>
+        <div id="error" class="error" style="display: none;"></div>
+        
+        <div id="dataTable" style="display: none;">
+            <div class="data-table">
+                <div class="table-header">
+                    <div>序列</div>
+                    <div>时间</div>
+                    <div>币价</div>
+                    <div>SAR值</div>
+                    <div>SAR差值</div>
+                    <div>变化率%</div>
+                    <div>1天差值比%</div>
+                    <div>1天平均</div>
+                    <div>1天偏向</div>
+                    <div>3天变化%</div>
+                    <div>3天平均</div>
+                    <div>3天偏向</div>
+                    <div>7天变化%</div>
+                    <div>7天平均</div>
+                    <div>15天变化%</div>
+                    <div>15天平均</div>
+                </div>
+                <div id="tableBody"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const symbol = window.location.pathname.split('/').pop();
+        
+        // 折叠/展开计算逻辑说明
+        function toggleInfo() {
+            const content = document.getElementById('infoContent');
+            const icon = document.getElementById('toggleIcon');
+            const isExpanded = content.classList.contains('show');
+            
+            if (isExpanded) {
+                content.classList.remove('show');
+                icon.classList.remove('expanded');
+            } else {
+                content.classList.add('show');
+                icon.classList.add('expanded');
+            }
+        }
+        
+        async function loadData(retryCount = 0) {
+            try {
+                // 添加时间戳参数防止缓存（特别是外部代理缓存）
+                const cacheBuster = Date.now() + Math.random();
+                // limit=500 表示最近500条数据（约42小时），包含历史周期
+                const url = `/api/sar-slope/current-cycle/${symbol}?include_history=true&limit=500&_t=${cacheBuster}`;
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                
+                // 检查响应类型，如果不是JSON则抛出错误
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    // 如果返回的是HTML（500错误页面），尝试重试
+                    if (retryCount < 2) {
+                        console.warn(`返回非JSON响应，${2-retryCount}秒后重试 (${retryCount + 1}/3)...`);
+                        document.getElementById('loading').textContent = `加载中... (重试 ${retryCount + 1}/3)`;
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        return loadData(retryCount + 1);
+                    }
+                    throw new Error('服务器返回错误格式，请刷新页面重试');
+                }
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || '加载失败');
+                }
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('pageTitle').textContent = `${symbol} - ${data.current_status.position_cn}完整周期 (${data.current_status.cycle_info})`;
+                
+                renderStatusBar(data);
+                renderBiasChart(data.bias_statistics);
+                renderDataTable(data);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                const errorMsg = error.message || 'The operation was aborted';
+                document.getElementById('error').textContent = '加载失败: ' + errorMsg + (retryCount > 0 ? ` (已重试${retryCount}次)` : '');
+                
+                // 添加重试按钮
+                const retryBtn = document.createElement('button');
+                retryBtn.textContent = '点击重试';
+                retryBtn.style.cssText = 'margin-top: 10px; padding: 8px 16px; background: #3b7dff; border: none; border-radius: 4px; color: white; cursor: pointer;';
+                retryBtn.onclick = () => {
+                    document.getElementById('error').style.display = 'none';
+                    document.getElementById('loading').style.display = 'block';
+                    document.getElementById('loading').textContent = '加载中...';
+                    loadData(0);
+                };
+                if (!document.getElementById('error').querySelector('button')) {
+                    document.getElementById('error').appendChild(retryBtn);
+                }
+            }
+        }
+        
+        function renderBiasChart(biasStats) {
+            if (!biasStats) return;
+            
+            const container = document.getElementById('biasChartContainer');
+            container.style.display = 'block';
+            
+            const chartDom = document.getElementById('biasChart');
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                backgroundColor: 'transparent',
+                title: {
+                    text: `偏多: ${biasStats.bullish_ratio}%  |  偏空: ${biasStats.bearish_ratio}%`,
+                    left: 'center',
+                    top: 10,
+                    textStyle: {
+                        color: '#00d4ff',
+                        fontSize: 16,
+                        fontWeight: 'normal'
+                    }
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}: {c} 次 ({d}%)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    borderColor: '#00d4ff',
+                    borderWidth: 1,
+                    textStyle: {
+                        color: '#fff'
+                    }
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left',
+                    top: 'middle',
+                    textStyle: {
+                        color: '#d0d4e8',
+                        fontSize: 14
+                    },
+                    itemWidth: 20,
+                    itemHeight: 14
+                },
+                series: [
+                    {
+                        name: '多空分布',
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        center: ['60%', '50%'],
+                        avoidLabelOverlap: true,
+                        itemStyle: {
+                            borderRadius: 10,
+                            borderColor: '#1e2139',
+                            borderWidth: 2
+                        },
+                        label: {
+                            show: true,
+                            formatter: '{b}\n{d}%',
+                            color: '#d0d4e8',
+                            fontSize: 13
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: 16,
+                                fontWeight: 'bold'
+                            },
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        },
+                        labelLine: {
+                            show: true,
+                            lineStyle: {
+                                color: '#8b92b8'
+                            }
+                        },
+                        data: [
+                            {
+                                value: biasStats.bullish_count,
+                                name: '偏多 (Bullish)',
+                                itemStyle: {
+                                    color: {
+                                        type: 'linear',
+                                        x: 0, y: 0, x2: 0, y2: 1,
+                                        colorStops: [
+                                            { offset: 0, color: '#00ff88' },
+                                            { offset: 1, color: '#00aa55' }
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                value: biasStats.bearish_count,
+                                name: '偏空 (Bearish)',
+                                itemStyle: {
+                                    color: {
+                                        type: 'linear',
+                                        x: 0, y: 0, x2: 0, y2: 1,
+                                        colorStops: [
+                                            { offset: 0, color: '#ff5555' },
+                                            { offset: 1, color: '#cc3333' }
+                                        ]
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            // 响应式调整
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+        
+        function renderStatusBar(data) {
+            const statusBar = document.getElementById('statusBar');
+            const status = data.current_status;
+            const biasStats = data.bias_statistics;
+            
+            let html = `
+                <div class="status-item">
+                    <div class="status-label">当前状态</div>
+                    <div class="status-value ${status.position === 'long' ? 'position-long' : 'position-short'}">
+                        ${status.position_cn}
+                    </div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">当前序列</div>
+                    <div class="status-value">${status.current_sequence}</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">周期范围</div>
+                    <div class="status-value">${status.cycle_info}</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">序列总数</div>
+                    <div class="status-value">${data.total_sequences}</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">最后更新</div>
+                    <div class="status-value">${status.last_update}</div>
+                </div>
+            `;
+            
+            // 添加2小时偏向统计（如果有数据）
+            if (biasStats && biasStats.total_records > 0) {
+                html += `
+                    <div class="status-item" style="grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-top: 10px;">
+                        <div class="status-label">最近2小时偏向统计 (${biasStats.total_records}条数据)</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">偏多次数</div>
+                        <div class="status-value bias-bullish">${biasStats.bullish_count} (${biasStats.bullish_ratio}%)</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">偏空次数</div>
+                        <div class="status-value bias-bearish">${biasStats.bearish_count} (${biasStats.bearish_ratio}%)</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">中性次数</div>
+                        <div class="status-value">${biasStats.neutral_count}</div>
+                    </div>
+                `;
+            }
+            
+            statusBar.innerHTML = html;
+            statusBar.style.display = 'grid';
+            
+            // 显示计算逻辑说明卡片
+            document.getElementById('infoCard').classList.add('show');
+        }
+        
+        function renderDataTable(data) {
+            const tableBody = document.getElementById('tableBody');
+            const sequences = data.sequences;
+            
+            let html = '';
+            
+            // 反转数组，让最新的数据显示在前面
+            const reversedSequences = sequences.slice().reverse();
+            
+            reversedSequences.forEach(seq => {
+                const hasChange = seq.sequence_change_percent !== undefined && seq.sar_diff_abs !== undefined;
+                // 使用每行数据自己的position，而不是全局的currentPosition
+                const rowPosition = seq.position;
+                const positionClass = rowPosition === 'bullish' ? 'position-long' : 'position-short';
+                const positionCn = rowPosition === 'bullish' ? '多头' : '空头';
+                
+                // 1天偏向 - 直接使用API返回的 bias_1day 字段
+                const bias1day = seq.bias_1day || '-';
+                const bias1dayClass = bias1day === '偏多' ? 'bias-bullish' : (bias1day === '偏空' ? 'bias-bearish' : '');
+                
+                // 3天偏向（基于3天变化%的正负，且绝对值>30%才显示）
+                let bias3day = '-';
+                let bias3dayClass = '';
+                if (seq.change_3day_percent !== undefined) {
+                    const abs3day = Math.abs(seq.change_3day_percent);
+                    if (abs3day > 30) {  // 只有偏离值大于30%才显示
+                        if (rowPosition === 'bullish') {
+                            bias3day = seq.change_3day_percent < 0 ? '偏多' : '偏空';
+                        } else {
+                            bias3day = seq.change_3day_percent < 0 ? '偏空' : '偏多';
+                        }
+                        bias3dayClass = bias3day === '偏多' ? 'bias-bullish' : 'bias-bearish';
+                    }
+                }
+                
+                const sarDiffClass = hasChange && seq.sar_diff_abs >= 0 ? 'trend-increase' : 'trend-decrease';
+                const changeClass = hasChange && seq.sequence_change_percent >= 0 ? 'trend-increase' : 'trend-decrease';
+                const diffRatioClass = seq.diff_ratio_1day !== undefined && seq.diff_ratio_1day >= 100 ? 'trend-increase' : 'trend-decrease';
+                const change3Class = seq.change_3day_percent !== undefined && seq.change_3day_percent >= 0 ? 'trend-increase' : 'trend-decrease';
+                const change7Class = seq.change_7day_percent !== undefined && seq.change_7day_percent >= 0 ? 'trend-increase' : 'trend-decrease';
+                const change15Class = seq.change_15day_percent !== undefined && seq.change_15day_percent >= 0 ? 'trend-increase' : 'trend-decrease';
+                
+                html += `
+                    <div class="table-row">
+                        <div class="table-cell ${positionClass}">${positionCn}${(seq.sequence || 0).toString().padStart(2, '0')}</div>
+                        <div class="table-cell">${(seq.time || '').substring(11, 16)}</div>
+                        <div class="table-cell">$${(seq.price || 0).toFixed(2)}</div>
+                        <div class="table-cell">${(seq.sar || seq.sar_value || 0).toFixed(4)}</div>
+                        <div class="table-cell ${hasChange ? sarDiffClass : ''}">${seq.sar_diff_abs !== undefined ? seq.sar_diff_abs.toFixed(6) : '-'}</div>
+                        <div class="table-cell ${hasChange ? changeClass : ''}">${hasChange ? (seq.sequence_change_percent >= 0 ? '+' : '') + seq.sequence_change_percent.toFixed(4) + '%' : '-'}</div>
+                        <div class="table-cell ${diffRatioClass}">${seq.diff_ratio_1day !== undefined ? seq.diff_ratio_1day.toFixed(2) + '%' : '-'}</div>
+                        <div class="table-cell">${seq.avg_diff_1day !== undefined ? seq.avg_diff_1day.toFixed(6) : '-'}</div>
+                        <div class="table-cell ${bias1dayClass}">${bias1day}</div>
+                        <div class="table-cell ${change3Class}">${seq.change_3day_percent !== undefined ? (seq.change_3day_percent >= 0 ? '+' : '') + seq.change_3day_percent.toFixed(2) + '%' : '-'}</div>
+                        <div class="table-cell">${seq.avg_3day !== undefined ? seq.avg_3day.toFixed(6) + '%' : '-'}</div>
+                        <div class="table-cell ${bias3dayClass}">${bias3day}</div>
+                        <div class="table-cell ${change7Class}">${seq.change_7day_percent !== undefined ? (seq.change_7day_percent >= 0 ? '+' : '') + seq.change_7day_percent.toFixed(2) + '%' : '-'}</div>
+                        <div class="table-cell">${seq.avg_7day !== undefined ? seq.avg_7day.toFixed(6) + '%' : '-'}</div>
+                        <div class="table-cell ${change15Class}">${seq.change_15day_percent !== undefined ? (seq.change_15day_percent >= 0 ? '+' : '') + seq.change_15day_percent.toFixed(2) + '%' : '-'}</div>
+                        <div class="table-cell">${seq.avg_15day !== undefined ? seq.avg_15day.toFixed(6) + '%' : '-'}</div>
+                    </div>
+                `;
+            });
+            
+            tableBody.innerHTML = html;
+            document.getElementById('dataTable').style.display = 'block';
+        }
+        
+        // 加载数据
+        loadData();
+        
+        // 每30秒自动刷新
+        setInterval(loadData, 30000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+{"timestamp": "2026-03-07 14:38:07", "action": "config_update", "long_enabled": true, "short_enabled": false, "max_velocity_threshold": 8, "min_velocity_threshold": -15}
+{"timestamp": "2026-03-07 14:38:07", "action": "config_update", "long_enabled": true, "short_enabled": false, "max_velocity_threshold": 8, "min_velocity_threshold": -15}
+{"timestamp": "2026-03-10 02:32:08", "action": "config_update", "long_enabled": true, "short_enabled": false, "max_velocity_threshold": 15, "min_velocity_threshold": -15}

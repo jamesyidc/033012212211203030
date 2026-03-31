@@ -1,0 +1,170 @@
+{
+  "BTC": {
+    "highest_price": 73825.6,
+    "highest_time": "2026-03-05 03:19:08",
+    "lowest_price": 63867.5,
+    "lowest_time": "2026-02-28 20:54:32"
+  },
+  "ETH": {
+    "highest_price": 2186.15,
+    "highest_time": "2026-03-05 03:22:32",
+    "lowest_price": 1851.92,
+    "lowest_time": "2026-02-23 10:00:28"
+  },
+  "SOL": {
+    "highest_price": 93.75,
+    "highest_time": "2026-03-05 03:43:03",
+    "lowest_price": 77.19,
+    "lowest_time": "2026-02-23 12:41:28"
+  },
+  "BNB": {
+    "highest_price": 668.0,
+    "highest_time": "2026-03-13 18:49:06",
+    "lowest_price": 584.9,
+    "lowest_time": "2026-02-23 10:00:28"
+  },
+  "XRP": {
+    "highest_price": 1.503,
+    "highest_time": "2026-02-16 22:49:58",
+    "lowest_price": 1.2931,
+    "lowest_time": "2026-02-28 20:51:08"
+  },
+  "ADA": {
+    "highest_price": 0.2914,
+    "highest_time": "2026-03-01 10:07:38",
+    "lowest_price": 0.2467,
+    "lowest_time": "2026-03-09 06:20:47"
+  },
+  "DOGE": {
+    "highest_price": 0.10384,
+    "highest_time": "2026-03-05 03:43:03",
+    "lowest_price": 0.08762,
+    "lowest_time": "2026-03-09 06:07:07"
+  },
+  "TRX": {
+    "highest_price": 0.29892,
+    "highest_time": "2026-03-15 01:05:11",
+    "lowest_price": 0.2787,
+    "lowest_time": "2026-03-04 08:51:27"
+  },
+  "DOT": {
+    "highest_price": 1.676,
+    "highest_time": "2026-03-01 08:04:32",
+    "lowest_price": 1.239,
+    "lowest_time": "2026-02-23 10:00:28"
+  },
+  "LTC": {
+    "highest_price": 57.62,
+    "highest_time": "2026-03-05 03:53:18",
+    "lowest_price": 50.93,
+    "lowest_time": "2026-02-23 10:00:28"
+  },
+  "BCH": {
+    "highest_price": 583.6,
+    "highest_time": "2026-02-22 15:31:52",
+    "lowest_price": 431.8,
+    "lowest_time": "2026-03-02 04:44:10"
+  },
+  "LINK": {
+    "highest_price": 9.59,
+    "highest_time": "2026-03-05 03:43:03",
+    "lowest_price": 8.178,
+    "lowest_time": "2026-02-23 12:44:53"
+  },
+  "UNI": {
+    "highest_price": 4.117,
+    "highest_time": "2026-03-13 18:01:26",
+    "lowest_price": 3.281,
+    "lowest_time": "2026-02-23 10:00:28"
+  },
+  "FIL": {
+    "highest_price": 1.0411,
+    "highest_time": "2026-03-05 17:04:54",
+    "lowest_price": 0.8619,
+    "lowest_time": "2026-03-14 06:51:28"
+  },
+  "ETC": {
+    "highest_price": 9.745,
+    "highest_time": "2026-02-21 19:21:18",
+    "lowest_price": 7.877,
+    "lowest_time": "2026-03-09 06:24:11"
+  },
+  "AAVE": {
+    "highest_price": 128.84,
+    "highest_time": "2026-02-17 22:34:31",
+    "lowest_price": 104.22,
+    "lowest_time": "2026-03-09 06:24:11"
+  },
+  "CRV": {
+    "highest_price": 0.2657,
+    "highest_time": "2026-03-05 00:03:51",
+    "lowest_price": 0.2192,
+    "lowest_time": "2026-02-23 09:26:14"
+  },
+  "NEAR": {
+    "highest_price": 1.4489,
+    "highest_time": "2026-03-03 13:27:48",
+    "lowest_price": 0.9727,
+    "lowest_time": "2026-02-23 10:00:28"
+  },
+  "APT": {
+    "highest_price": 1.0339,
+    "highest_time": "2026-03-04 02:34:53",
+    "lowest_price": 0.7918,
+    "lowest_time": "2026-02-23 09:26:14"
+  },
+  "STX": {
+    "highest_price": 0.2752,
+    "highest_time": "2026-03-05 00:00:26",
+    "lowest_price": 0.232,
+    "lowest_time": "2026-02-23 09:26:14"
+  },
+  "LDO": {
+    "highest_price": 0.3479,
+    "highest_time": "2026-02-17 06:03:37",
+    "lowest_price": 0.2706,
+    "lowest_time": "2026-03-08 12:54:58"
+  },
+  "OKB": {
+    "highest_price": 120.14,
+    "highest_time": "2026-03-05 20:47:18",
+    "lowest_price": 73.51,
+    "lowest_time": "2026-02-28 21:42:21"
+  },
+  "CRO": {
+    "highest_price": 0.08095,
+    "highest_time": "2026-02-17 07:11:53",
+    "lowest_price": 0.07259,
+    "lowest_time": "2026-02-28 21:38:56"
+  },
+  "HBAR": {
+    "highest_price": 0.10383,
+    "highest_time": "2026-03-05 00:03:51",
+    "lowest_price": 0.09126,
+    "lowest_time": "2026-03-15 04:16:40"
+  },
+  "TON": {
+    "highest_price": 1.462,
+    "highest_time": "2026-02-16 22:22:26",
+    "lowest_price": 1.19,
+    "lowest_time": "2026-03-02 05:42:11"
+  },
+  "TAO": {
+    "highest_price": 245.7,
+    "highest_time": "2026-03-14 11:41:57",
+    "lowest_price": 165.2,
+    "lowest_time": "2026-02-23 14:02:09"
+  },
+  "SUI": {
+    "highest_price": 1.0499,
+    "highest_time": "2026-03-13 18:04:50",
+    "lowest_price": 0.8337,
+    "lowest_time": "2026-02-28 20:54:32"
+  },
+  "XLM": {
+    "highest_price": 0.17027,
+    "highest_time": "2026-02-16 23:03:38",
+    "lowest_price": 0.14686,
+    "lowest_time": "2026-03-09 06:20:47"
+  }
+}

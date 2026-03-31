@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>清除缓存指南</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        .method {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .method h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .shortcut {
+            background: #667eea;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: bold;
+        }
+        .button {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 10px 5px;
+        }
+        .button:hover {
+            background: #5568d3;
+        }
+        .success {
+            background: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🔄 为什么没有变化？</h1>
+        <p style="font-size: 18px; color: #666;">
+            <strong>原因：</strong>浏览器缓存了旧版页面！新的三大系统仪表板已经部署完成，但您的浏览器还在显示旧页面。
+        </p>
+    </div>
+
+    <div class="card">
+        <h2>📋 解决方法（三选一）</h2>
+        
+        <div class="method">
+            <h3>方法一：强制刷新（最简单）</h3>
+            <p>在当前页面按快捷键：</p>
+            <ul>
+                <li><strong>Windows/Linux:</strong> <span class="shortcut">Ctrl + Shift + R</span> 或 <span class="shortcut">Ctrl + F5</span></li>
+                <li><strong>Mac:</strong> <span class="shortcut">Cmd + Shift + R</span></li>
+            </ul>
+        </div>
+
+        <div class="method">
+            <h3>方法二：清除浏览器缓存</h3>
+            <ol>
+                <li>按 <span class="shortcut">Ctrl + Shift + Delete</span> (Mac: <span class="shortcut">Cmd + Shift + Delete</span>)</li>
+                <li>选择"缓存图像和文件"</li>
+                <li>点击"清除数据"</li>
+                <li>刷新页面</li>
+            </ol>
+        </div>
+
+        <div class="method">
+            <h3>方法三：使用无痕模式（推荐）</h3>
+            <ol>
+                <li>按 <span class="shortcut">Ctrl + Shift + N</span> (Mac: <span class="shortcut">Cmd + Shift + N</span>)</li>
+                <li>在无痕窗口中打开下面的链接</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>🚀 直接访问新仪表板</h2>
+        <p>点击下面的按钮，添加时间戳参数可以绕过缓存：</p>
+        <a href="/telegram-dashboard?v=20251215100500" class="button success">
+            🎯 打开新仪表板（带缓存破除）
+        </a>
+        <a href="/telegram-dashboard" class="button">
+            📱 打开新仪表板（普通）
+        </a>
+    </div>
+
+    <div class="card">
+        <h2>✅ 新仪表板包含的三大系统</h2>
+        <ol style="font-size: 16px; line-height: 2;">
+            <li><strong>支撑压力线系统</strong> - 显示抄底/逃顶信号（2小时内）</li>
+            <li><strong>计次预警系统</strong> - 每小时基准 + 达到阈值时预警</li>
+            <li><strong>交易信号系统</strong> - 买点1-4 + 卖点1 + 7天/48小时高低点</li>
+        </ol>
+    </div>
+
+    <div class="card" style="background: #fef3c7; border-left: 4px solid #f59e0b;">
+        <h2 style="color: #f59e0b;">⚡ 当前系统状态</h2>
+        <div id="status">检查中...</div>
+    </div>
+
+    <script>
+        // Check system status
+        fetch('/api/telegram/signals/stats')
+            .then(r => r.json())
+            .then(data => {
+                const statusDiv = document.getElementById('status');
+                if (data.success) {
+                    statusDiv.innerHTML = `
+                        <p style="color: #10b981; font-weight: bold;">✅ 系统运行正常</p>
+                        <p>最近1小时信号数: ${data.data.last_hour_count || 0}</p>
+                        <p>今日信号数: ${data.data.today_count || 0}</p>
+                        <p>总信号数: ${data.data.total_count || 0}</p>
+                    `;
+                } else {
+                    statusDiv.innerHTML = '<p style="color: #ef4444;">❌ 无法连接到系统</p>';
+                }
+            })
+            .catch(err => {
+                document.getElementById('status').innerHTML = 
+                    '<p style="color: #ef4444;">❌ API连接失败: ' + err.message + '</p>';
+            });
+    </script>
+</body>
+</html>

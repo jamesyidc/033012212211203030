@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>OKX利润分析 v3.0 - 全新版本</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        label {
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        select, input[type="date"] {
+            padding: 8px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        select:focus, input[type="date"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        select {
+            min-width: 200px;
+        }
+
+        button {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        #refreshBtn {
+            background: #10b981;
+        }
+
+        #refreshBtn:hover {
+            background: #059669;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        #refreshBtn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spinning {
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .stat-sub {
+            font-size: 12px;
+            color: #a0aec0;
+            margin-top: 4px;
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #profitChart, #transactionChart {
+            width: 100%;
+            height: 400px;
+        }
+
+        .table-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f7fafc;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #4a5568;
+        }
+
+        tr:hover {
+            background: #f7fafc;
+        }
+
+        .positive {
+            color: #10b981;
+        }
+
+        .negative {
+            color: #ef4444;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #a0aec0;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #c33;
+        }
+
+        .debug-info {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 12px;
+            color: #0c4a6e;
+        }
+
+        .debug-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #0369a1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 OKX每日利润分析 v3.0</h1>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label>账户:</label>
+                    <select id="accountSelect" onchange="loadData()">
+                        <option value="">加载中...</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label>查看日期:</label>
+                    <button onclick="previousDay()">← 前一天</button>
+                    <input type="date" id="currentDate" onchange="loadData()">
+                    <button onclick="nextDay()">后一天 →</button>
+                    <button onclick="loadToday()">📅 今天</button>
+                </div>
+                
+                <div class="control-group">
+                    <button onclick="refreshData()" id="refreshBtn" style="background: #10b981; display: flex; align-items: center; gap: 8px;">
+                        <span id="refreshIcon">🔄</span>
+                        <span id="refreshText">刷新数据</span>
+                    </button>
+                </div>
+                
+                <div class="control-group">
+                    <button onclick="location.href='/'" style="background: #6b7280; display: flex; align-items: center; gap: 8px;">
+                        <span>🏠</span>
+                        <span>返回首页</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Debug Info -->
+        <div id="debugInfo" class="debug-info" style="display: none;">
+            <div class="debug-title">🔍 调试信息</div>
+            <div id="debugContent"></div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">📈 累计利润</div>
+                <div class="stat-value" id="totalProfit">--</div>
+                <div class="stat-sub">Total Profit</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">📊 平均收益率</div>
+                <div class="stat-value" id="avgProfitRate">--</div>
+                <div class="stat-sub">Average Daily Profit Rate</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">🚀 最高收益率</div>
+                <div class="stat-value" id="maxProfitRate">--</div>
+                <div class="stat-sub" id="maxProfitDate">--</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">⚠️ 最低收益率</div>
+                <div class="stat-value" id="minProfitRate">--</div>
+                <div class="stat-sub" id="minProfitDate">--</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">📅 交易天数</div>
+                <div class="stat-value" id="tradingDays">--</div>
+                <div class="stat-sub">Trading Days</div>
+            </div>
+        </div>
+
+        <!-- Profit Chart -->
+        <div class="chart-container">
+            <div class="chart-title">📈 每日利润趋势</div>
+            <div id="profitChart"></div>
+        </div>
+
+        <!-- Transaction Chart -->
+        <div class="chart-container">
+            <div class="chart-title">💰 转账分析</div>
+            <div id="transactionChart"></div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="table-container">
+            <div class="chart-title">📋 明细数据</div>
+            <div id="tableContent">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📊</div>
+                    <h3>暂无数据</h3>
+                    <p>请选择账户和日期范围查看利润数据</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Note Dialog -->
+    <div id="noteDialog" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 15px; padding: 30px; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <h2 style="margin: 0 0 20px 0; color: #2d3748; font-size: 20px;">📝 添加/编辑备注</h2>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 8px; color: #4a5568; font-weight: 500;">日期:</label>
+                <input type="text" id="noteDate" readonly style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; background: #f7fafc; color: #2d3748;">
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; color: #4a5568; font-weight: 500;">备注内容:</label>
+                <textarea id="noteContent" rows="5" placeholder="记录今天的交易心得、经验教训..." style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; font-family: inherit; resize: vertical;"></textarea>
+                <div style="margin-top: 5px; color: #a0aec0; font-size: 12px;">💡 提示：记录您的交易心得，积累宝贵经验</div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="closeNoteDialog()" style="padding: 10px 20px; background: #e5e7eb; color: #4a5568; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500;">取消</button>
+                <button onclick="deleteNote()" id="deleteNoteBtn" style="padding: 10px 20px; background: #ef4444; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; display: none;">删除</button>
+                <button onclick="saveNote()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500;">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let accounts = [];
+        let currentAccount = null;
+        let currentDate = new Date();
+        let profitChart = null;
+        let transactionChart = null;
+        let profitNotes = {};
+
+        // Debug logging
+        function debugLog(message, data) {
+            console.log(`[DEBUG] ${message}`, data || '');
+            const debugDiv = document.getElementById('debugContent');
+            const time = new Date().toLocaleTimeString();
+            debugDiv.innerHTML += `<div>[${time}] ${message}: ${JSON.stringify(data || '')}</div>`;
+            document.getElementById('debugInfo').style.display = 'block';
+        }
+
+        // Load notes
+        async function loadNotes() {
+            const accountId = document.getElementById('accountSelect').value;
+            if (!accountId) return;
+
+            try {
+                const response = await fetch(`/api/okx-trading/profit-notes?account_id=${accountId}`);
+                const result = await response.json();
+                
+                if (result.success && result.notes) {
+                    profitNotes = {};
+                    result.notes.forEach(note => {
+                        profitNotes[note.date] = note.note;
+                    });
+                    debugLog('备注加载成功', Object.keys(profitNotes).length);
+                }
+            } catch (error) {
+                debugLog('ERROR: 加载备注失败', error.message);
+                console.error('加载备注失败:', error);
+            }
+        }
+
+        // Show note dialog
+        function showNoteDialog(date, currentNote) {
+            document.getElementById('noteDate').value = date;
+            document.getElementById('noteContent').value = currentNote || '';
+            document.getElementById('noteDialog').style.display = 'flex';
+            
+            // Show delete button if note exists
+            const deleteBtn = document.getElementById('deleteNoteBtn');
+            if (currentNote) {
+                deleteBtn.style.display = 'block';
+            } else {
+                deleteBtn.style.display = 'none';
+            }
+            
+            debugLog('显示备注对话框', { date, hasNote: !!currentNote });
+        }
+
+        // Close note dialog
+        function closeNoteDialog() {
+            document.getElementById('noteDialog').style.display = 'none';
+            document.getElementById('noteContent').value = '';
+            debugLog('关闭备注对话框');
+        }
+
+        // Save note
+        async function saveNote() {
+            const accountId = document.getElementById('accountSelect').value;
+            const date = document.getElementById('noteDate').value;
+            const note = document.getElementById('noteContent').value.trim();
+
+            if (!note) {
+                alert('请输入备注内容');
+                return;
+            }
+
+            debugLog('保存备注', { accountId, date, noteLength: note.length });
+
+            try {
+                const response = await fetch('/api/okx-trading/profit-notes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        account_id: accountId,
+                        date: date,
+                        note: note
+                    })
+                });
+
+                const result = await response.json();
+                debugLog('保存备注响应', result);
+
+                if (result.success) {
+                    profitNotes[date] = note;
+                    closeNoteDialog();
+                    // 重新加载数据以更新显示
+                    await loadData();
+                    debugLog('备注保存成功');
+                } else {
+                    alert('保存失败: ' + (result.error || '未知错误'));
+                }
+            } catch (error) {
+                debugLog('ERROR: 保存备注失败', error.message);
+                console.error('保存备注失败:', error);
+                alert('保存失败: ' + error.message);
+            }
+        }
+
+        // Delete note
+        async function deleteNote() {
+            const accountId = document.getElementById('accountSelect').value;
+            const date = document.getElementById('noteDate').value;
+
+            if (!confirm('确定要删除这条备注吗？')) {
+                return;
+            }
+
+            debugLog('删除备注', { accountId, date });
+
+            try {
+                const response = await fetch('/api/okx-trading/profit-notes', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        account_id: accountId,
+                        date: date
+                    })
+                });
+
+                const result = await response.json();
+                debugLog('删除备注响应', result);
+
+                if (result.success) {
+                    delete profitNotes[date];
+                    closeNoteDialog();
+                    // 重新加载数据以更新显示
+                    await loadData();
+                    debugLog('备注删除成功');
+                } else {
+                    alert('删除失败: ' + (result.error || '未知错误'));
+                }
+            } catch (error) {
+                debugLog('ERROR: 删除备注失败', error.message);
+                console.error('删除备注失败:', error);
+                alert('删除失败: ' + error.message);
+            }
+        }
+
+        // Format date
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Load accounts
+        async function loadAccounts() {
+            debugLog('开始加载账户');
+            
+            try {
+                const response = await fetch('/api/okx-accounts/list-with-credentials');
+                debugLog('API响应状态', response.status);
+                
+                const result = await response.json();
+                debugLog('API返回数据', result);
+                
+                if (result.success && result.accounts) {
+                    accounts = result.accounts.map(acc => ({
+                        id: acc.id || acc.account_id,
+                        name: acc.name || acc.account_name,
+                        apiKey: acc.apiKey || acc.api_key,
+                        apiSecret: acc.apiSecret || acc.api_secret,
+                        passphrase: acc.passphrase
+                    }));
+                    
+                    debugLog('账户映射完成', {
+                        count: accounts.length,
+                        ids: accounts.map(a => a.id)
+                    });
+                    
+                    // Save to localStorage
+                    localStorage.setItem('okx_accounts', JSON.stringify(accounts));
+                    debugLog('已保存到localStorage');
+                } else {
+                    debugLog('API未返回账户，尝试从localStorage加载');
+                    const stored = localStorage.getItem('okx_accounts');
+                    if (stored) {
+                        accounts = JSON.parse(stored);
+                        debugLog('从localStorage加载成功', accounts.length);
+                    }
+                }
+                
+                // Populate select
+                const select = document.getElementById('accountSelect');
+                if (accounts && accounts.length > 0) {
+                    debugLog('开始填充下拉框', accounts.length);
+                    
+                    select.innerHTML = accounts.map(acc => 
+                        `<option value="${acc.id}">${acc.name || acc.id}</option>`
+                    ).join('');
+                    
+                    debugLog('下拉框HTML已设置');
+                    
+                    // Set first account as default
+                    select.value = accounts[0].id;
+                    currentAccount = accounts[0].id;
+                    
+                    debugLog('设置默认账户', {
+                        currentAccount: currentAccount,
+                        selectValue: select.value,
+                        selectOptions: select.options.length
+                    });
+                    
+                    return true;
+                } else {
+                    debugLog('ERROR: 没有找到任何账户');
+                    select.innerHTML = '<option value="">没有账户</option>';
+                    showError('未找到账户配置，请先访问 OKX 交易页面加载账户');
+                    return false;
+                }
+            } catch (error) {
+                debugLog('ERROR: 加载账户失败', error.message);
+                console.error('加载账户失败:', error);
+                
+                // Try localStorage fallback
+                try {
+                    const stored = localStorage.getItem('okx_accounts');
+                    if (stored) {
+                        accounts = JSON.parse(stored);
+                        const select = document.getElementById('accountSelect');
+                        select.innerHTML = accounts.map(acc => 
+                            `<option value="${acc.id}">${acc.name || acc.id}</option>`
+                        ).join('');
+                        if (accounts.length > 0) {
+                            select.value = accounts[0].id;
+                            currentAccount = accounts[0].id;
+                        }
+                        debugLog('localStorage回退成功', accounts.length);
+                        return true;
+                    }
+                } catch (e) {
+                    debugLog('ERROR: localStorage回退也失败', e.message);
+                }
+                
+                showError('加载账户失败: ' + error.message);
+                return false;
+            }
+        }
+
+        // Load data
+        async function loadData() {
+            const accountId = document.getElementById('accountSelect').value;
+            const selectedDate = document.getElementById('currentDate').value;
+            
+            debugLog('loadData被调用', {
+                accountId: accountId,
+                selectedDate: selectedDate,
+                accountsLength: accounts.length
+            });
+            
+            currentDate = new Date(selectedDate + 'T00:00:00');
+
+            if (!accountId) {
+                debugLog('ERROR: accountId为空');
+                showError('未选择账户，无法加载数据');
+                return;
+            }
+
+            const account = accounts.find(acc => acc.id === accountId);
+            if (!account) {
+                debugLog('ERROR: 找不到账户', accountId);
+                showError('找不到账户配置');
+                return;
+            }
+            
+            debugLog('找到账户', account.name);
+
+            try {
+                // Show loading
+                document.getElementById('tableContent').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⏳</div>
+                        <h3>加载中...</h3>
+                    </div>
+                `;
+
+                // 先加载备注
+                await loadNotes();
+
+                debugLog('开始请求API', {
+                    url: '/api/okx-trading/profit-analysis',
+                    date: selectedDate
+                });
+
+                const response = await fetch('/api/okx-trading/profit-analysis', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        apiKey: account.apiKey,
+                        apiSecret: account.apiSecret,
+                        passphrase: account.passphrase,
+                        startDate: selectedDate,
+                        endDate: selectedDate
+                    })
+                });
+
+                debugLog('API响应', response.status);
+                const result = await response.json();
+                debugLog('API返回数据', result);
+
+                if (result.success) {
+                    updateStats(result.data.stats);
+                    updateProfitChart(result.data.dailyData);
+                    updateTransactionChart(result.data.dailyData);
+                    updateTable(result.data.dailyData);
+                    debugLog('数据更新完成');
+                } else {
+                    debugLog('ERROR: API返回失败', result.error);
+                    showError(result.error || '加载失败');
+                }
+            } catch (error) {
+                debugLog('ERROR: 请求失败', error.message);
+                console.error('加载数据失败:', error);
+                showError('网络错误: ' + error.message);
+            }
+        }
+
+        // Update stats
+        function updateStats(stats) {
+            document.getElementById('totalProfit').textContent = stats.totalProfit.toFixed(2) + ' USDT';
+            document.getElementById('avgProfitRate').textContent = stats.avgProfitRate.toFixed(2) + '%';
+            document.getElementById('maxProfitRate').textContent = stats.maxProfitRate.toFixed(2) + '%';
+            document.getElementById('maxProfitDate').textContent = stats.maxDailyDate;
+            document.getElementById('minProfitRate').textContent = stats.minProfitRate.toFixed(2) + '%';
+            document.getElementById('minProfitDate').textContent = stats.minDailyDate;
+            document.getElementById('tradingDays').textContent = stats.tradingDays + ' 天';
+        }
+
+        // Update profit chart
+        function updateProfitChart(dailyData) {
+            if (!profitChart) {
+                profitChart = echarts.init(document.getElementById('profitChart'));
+            }
+
+            if (!dailyData || dailyData.length === 0) {
+                profitChart.setOption({
+                    title: { text: '暂无数据', left: 'center', top: 'middle' }
+                });
+                return;
+            }
+
+            const dates = dailyData.map(d => d.date);
+            const profitRate = dailyData.map(d => d.profitRate);
+
+            // 为有备注的数据点添加标记
+            const symbolSize = dates.map(date => profitNotes[date] ? 15 : 8);
+            const itemStyle = dates.map(date => ({
+                color: profitNotes[date] ? '#f59e0b' : '#667eea'
+            }));
+
+            profitChart.setOption({
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: function(params) {
+                        const date = params[0].name;
+                        const note = profitNotes[date];
+                        let html = date + '<br/>' +
+                                   params[0].marker + ' 收益率: ' + params[0].value.toFixed(2) + '%';
+                        if (note) {
+                            html += '<br/>📝 备注: ' + note;
+                        } else {
+                            html += '<br/><span style="color:#999;">点击添加备注</span>';
+                        }
+                        return html;
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: dates
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '收益率 (%)',
+                    axisLabel: {
+                        formatter: '{value}%'
+                    }
+                },
+                series: [{
+                    name: '收益率',
+                    type: 'line',
+                    data: profitRate,
+                    smooth: true,
+                    lineStyle: { width: 3, color: '#667eea' },
+                    symbolSize: symbolSize,
+                    itemStyle: itemStyle,
+                    symbol: dates.map(date => profitNotes[date] ? 'pin' : 'circle'),
+                    areaStyle: {
+                        color: {
+                            type: 'linear',
+                            x: 0, y: 0, x2: 0, y2: 1,
+                            colorStops: [
+                                { offset: 0, color: 'rgba(102, 126, 234, 0.3)' },
+                                { offset: 1, color: 'rgba(102, 126, 234, 0.05)' }
+                            ]
+                        }
+                    }
+                }],
+                grid: { left: '5%', right: '5%', bottom: '10%', top: '15%' }
+            });
+
+            // 添加点击事件
+            profitChart.off('click');
+            profitChart.on('click', function(params) {
+                if (params.componentType === 'series') {
+                    const date = params.name;
+                    const currentNote = profitNotes[date] || '';
+                    showNoteDialog(date, currentNote);
+                }
+            });
+        }
+
+        // Update transaction chart
+        function updateTransactionChart(dailyData) {
+            if (!transactionChart) {
+                transactionChart = echarts.init(document.getElementById('transactionChart'));
+            }
+
+            if (!dailyData || dailyData.length === 0) {
+                transactionChart.setOption({
+                    title: { text: '暂无数据', left: 'center', top: 'middle' }
+                });
+                return;
+            }
+
+            const dates = dailyData.map(d => d.date);
+            const profit = dailyData.map(d => d.profit);
+            const cumulativeProfit = dailyData.map(d => d.cumulativeProfit);
+
+            transactionChart.setOption({
+                tooltip: { trigger: 'axis' },
+                legend: { data: ['每日利润', '累计利润'] },
+                xAxis: { type: 'category', data: dates },
+                yAxis: { type: 'value', name: 'USDT' },
+                series: [
+                    {
+                        name: '每日利润',
+                        type: 'bar',
+                        data: profit,
+                        itemStyle: {
+                            color: function(params) {
+                                return params.value >= 0 ? '#10b981' : '#ef4444';
+                            }
+                        }
+                    },
+                    {
+                        name: '累计利润',
+                        type: 'line',
+                        data: cumulativeProfit,
+                        smooth: true,
+                        lineStyle: { width: 3, color: '#667eea' }
+                    }
+                ],
+                grid: { left: '5%', right: '5%', bottom: '10%', top: '15%' }
+            });
+        }
+
+        // Update table
+        function updateTable(dailyData) {
+            const container = document.getElementById('tableContent');
+            
+            if (!dailyData || dailyData.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📊</div>
+                        <h3>暂无数据</h3>
+                        <p>请选择账户和日期范围查看利润数据</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>转出金额</th>
+                            <th>转入金额</th>
+                            <th>当日利润</th>
+                            <th>收益率</th>
+                            <th>累计利润</th>
+                            <th>交易次数</th>
+                            <th>备注</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            dailyData.forEach(day => {
+                const note = profitNotes[day.date] || '';
+                const notePreview = note ? (note.length > 20 ? note.substring(0, 20) + '...' : note) : '';
+                const buttonStyle = note ? 'background: #f59e0b; color: white;' : 'background: #e5e7eb; color: #6b7280;';
+                const buttonText = note ? '📝 编辑备注' : '➕ 添加备注';
+                
+                html += `
+                    <tr>
+                        <td>${day.date}</td>
+                        <td class="negative">${formatCurrency(day.withdraw)}</td>
+                        <td class="positive">${formatCurrency(day.deposit)}</td>
+                        <td class="${day.profit >= 0 ? 'positive' : 'negative'}">${formatCurrency(day.profit)}</td>
+                        <td>${day.profitRate.toFixed(2)}%</td>
+                        <td class="positive">${day.cumulativeProfit.toFixed(2)} USDT</td>
+                        <td>${day.transactionCount}</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                ${notePreview ? `<span style="color: #6b7280; font-size: 12px;">${notePreview}</span>` : ''}
+                                <button 
+                                    class="note-btn" 
+                                    data-date="${day.date}" 
+                                    style="padding: 4px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; ${buttonStyle}"
+                                >${buttonText}</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+            
+            // 为所有备注按钮添加点击事件
+            document.querySelectorAll('.note-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const date = this.getAttribute('data-date');
+                    const currentNote = profitNotes[date] || '';
+                    showNoteDialog(date, currentNote);
+                });
+            });
+        }
+
+        // Format currency
+        function formatCurrency(value) {
+            if (typeof value !== 'number') return '--';
+            const formatted = Math.abs(value).toFixed(2) + ' USDT';
+            return value >= 0 ? '+' + formatted : '-' + formatted;
+        }
+
+        // Show error
+        function showError(message) {
+            document.getElementById('tableContent').innerHTML = `
+                <div class="error-message">
+                    <strong>❌ 加载失败</strong><br>
+                    ${message}
+                </div>
+            `;
+        }
+
+        // Date navigation
+        function previousDay() {
+            currentDate.setDate(currentDate.getDate() - 1);
+            document.getElementById('currentDate').value = formatDate(currentDate);
+            loadData();
+        }
+
+        function nextDay() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            currentDate.setDate(currentDate.getDate() + 1);
+            if (currentDate > today) {
+                currentDate = today;
+            }
+            document.getElementById('currentDate').value = formatDate(currentDate);
+            loadData();
+        }
+
+        function loadToday() {
+            currentDate = new Date();
+            document.getElementById('currentDate').value = formatDate(currentDate);
+            loadData();
+        }
+
+        // Refresh data
+        async function refreshData() {
+            const btn = document.getElementById('refreshBtn');
+            const icon = document.getElementById('refreshIcon');
+            const text = document.getElementById('refreshText');
+            
+            // 禁用按钮，添加旋转动画
+            btn.disabled = true;
+            icon.classList.add('spinning');
+            text.textContent = '刷新中...';
+            
+            debugLog('手动刷新数据');
+            
+            try {
+                // 重新加载数据
+                await loadData();
+                
+                // 显示成功提示
+                text.textContent = '刷新成功 ✓';
+                setTimeout(() => {
+                    text.textContent = '刷新数据';
+                }, 2000);
+                
+                debugLog('数据刷新成功');
+            } catch (error) {
+                debugLog('ERROR: 数据刷新失败', error.message);
+                text.textContent = '刷新失败 ✗';
+                setTimeout(() => {
+                    text.textContent = '刷新数据';
+                }, 2000);
+            } finally {
+                // 恢复按钮状态
+                icon.classList.remove('spinning');
+                btn.disabled = false;
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            debugLog('页面加载完成，开始初始化');
+            
+            // Set today's date
+            document.getElementById('currentDate').value = formatDate(currentDate);
+            debugLog('设置当前日期', formatDate(currentDate));
+            
+            // Load accounts
+            const success = await loadAccounts();
+            debugLog('账户加载结果', success);
+            
+            // Load data if accounts loaded successfully
+            if (success) {
+                await loadData();
+                debugLog('初始化完成');
+            } else {
+                debugLog('初始化失败：账户加载失败');
+            }
+            
+            // Initialize charts
+            profitChart = echarts.init(document.getElementById('profitChart'));
+            transactionChart = echarts.init(document.getElementById('transactionChart'));
+            
+            // Resize charts on window resize
+            window.addEventListener('resize', () => {
+                if (profitChart) profitChart.resize();
+                if (transactionChart) transactionChart.resize();
+            });
+        });
+    </script>
+</body>
+</html>

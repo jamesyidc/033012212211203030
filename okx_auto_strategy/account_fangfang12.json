@@ -1,0 +1,13 @@
+{
+  "enabled": false,
+  "triggerPrice": 65000,
+  "strategyType": "bottom_performers",
+  "lastExecutedTime": null,
+  "executedCount": 0,
+  "lastUpdated": "2026-03-09 03:06:07",
+  "positionSize": 1.5,
+  "maxOrderSize": 5,
+  "apiKey": "e5867a9a-93b7-476f-81ce-093c3aacae0d",
+  "apiSecret": "4624EE63A9BF3F84250AC71C9A37F47D",
+  "passphrase": "Tencent@123"
+}

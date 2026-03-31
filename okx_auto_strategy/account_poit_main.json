@@ -1,0 +1,13 @@
+{
+  "enabled": false,
+  "triggerPrice": 66000.0,
+  "strategyType": "bottom_performers",
+  "positionSize": 1.5,
+  "maxOrderSize": 5.0,
+  "lastExecutedTime": "2026/2/18 01:41:31",
+  "executedCount": 2,
+  "lastUpdated": "2026-03-04 03:38:14",
+  "apiKey": "8650e46c-059b-431d-93cf-55f8c79babdb",
+  "apiSecret": "4C2BD2AC6A08615EA7F36A6251857FCE",
+  "passphrase": "Wu666666."
+}

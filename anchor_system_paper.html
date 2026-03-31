@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>锚点系统 - OKEx持仓监控</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+                'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            color: #2d3748;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header .subtitle {
+            color: #718096;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f7fafc;
+            color: #2d3748;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #edf2f7;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .stat-subvalue {
+            font-size: 14px;
+            color: #a0aec0;
+            margin-top: 5px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-container {
+            height: 350px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f7fafc;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 13px;
+            position: sticky;
+            top: 0;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 13px;
+            color: #2d3748;
+        }
+
+        tr:hover {
+            background: #f7fafc;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-profit {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .badge-loss {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .badge-short {
+            background: #feebc8;
+            color: #7c2d12;
+        }
+
+        .badge-long {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+
+        .badge-sent {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .badge-pending {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .badge-normal {
+            background: #e6fffa;
+            color: #234e52;
+        }
+
+        .alert-list {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .alert-item {
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            background: #f7fafc;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .alert-item.profit {
+            border-left-color: #48bb78;
+        }
+
+        .alert-item.loss {
+            border-left-color: #f56565;
+        }
+
+        .alert-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .alert-time {
+            color: #a0aec0;
+            font-size: 12px;
+        }
+
+        .alert-details {
+            font-size: 13px;
+            color: #4a5568;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #a0aec0;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #a0aec0;
+        }
+
+        /* 预警样式 */
+        .warning-badge {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .warning-badge.critical {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .warning-badge.warning {
+            background: #feebc8;
+            color: #dd6b20;
+        }
+
+        .warning-badge.info {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+
+        .profit-rate.warning-level {
+            color: #dd6b20;
+            font-weight: 600;
+        }
+
+        .profit-rate.critical-level {
+            color: #c53030;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 版本检测标记 -->
+        <div id="page-version" data-version="2025-12-29-v2" style="display: none;"></div>
+        
+        <div class="header">
+            <h1>
+                <span>📋</span>
+                模拟盘锚点系统
+            </h1>
+            <div class="subtitle">
+                <span>OKEx模拟盘持仓监控（Paper Trading）</span>
+                <span>•</span>
+                <span id="updateTime">--</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="refreshData()">
+                    <span>🔄</span>
+                    刷新数据
+                </button>
+                <a href="/" class="btn btn-secondary" style="text-decoration: none;">
+                    <span>🏠</span>
+                    返回首页
+                </a>
+            </div>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-label">总监控次数</div>
+                <div class="stat-value" id="totalMonitors">--</div>
+                <div class="stat-subvalue">累计检测记录</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🔔</div>
+                <div class="stat-label">告警触发次数</div>
+                <div class="stat-value" id="totalAlerts">--</div>
+                <div class="stat-subvalue">盈利 + 止损提醒</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-label">建仓多单预警</div>
+                <div class="stat-value" id="profitTarget">--</div>
+                <div class="stat-subvalue">做空盈利达标提醒</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⚠️</div>
+                <div class="stat-label">建仓空单预警</div>
+                <div class="stat-value" id="lossLimit">--</div>
+                <div class="stat-subvalue">做空亏损触发提醒</div>
+            </div>
+        </div>
+
+        <!-- 主要内容 -->
+        <div class="main-grid">
+            <!-- 收益率趋势图 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span>📈</span>
+                        收益率趋势
+                    </div>
+                </div>
+                <div class="chart-container" id="profitChart"></div>
+            </div>
+
+            <!-- 最新告警 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span>🔔</span>
+                        最新告警
+                    </div>
+                </div>
+                <div class="alert-list" id="alertList">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+
+            <!-- 当前预警 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span>⚠️</span>
+                        当前预警 (亏损 >= -8%)
+                    </div>
+                    <div class="update-time" id="warningsUpdateTime" style="font-size: 14px; color: #718096;">
+                        最后更新: --
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="warningsTable">
+                        <thead>
+                            <tr>
+                                <th>币种</th>
+                                <th>方向</th>
+                                <th>开仓价</th>
+                                <th>当前价</th>
+                                <th>盈亏率</th>
+                                <th>持仓量</th>
+                                <th>预警级别</th>
+                                <th>预警消息</th>
+                                <th>创建时间</th>
+                            </tr>
+                        </thead>
+                        <tbody id="warningsBody">
+                            <tr><td colspan="9" class="loading">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 历史极值记录 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <span>🏆</span>
+                    历史极值记录
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="recordsTable">
+                    <thead>
+                        <tr>
+                            <th>币种</th>
+                            <th>方向</th>
+                            <th>类型</th>
+                            <th>收益率</th>
+                            <th>持仓量</th>
+                            <th>开仓价</th>
+                            <th>标记价</th>
+                            <th>时间</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsBody">
+                        <tr><td colspan="8" class="loading">加载中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 当前持仓情况 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <span>💼</span>
+                    当前持仓情况
+                </div>
+                <div class="update-time" id="currentPositionTime" style="font-size: 14px; color: #718096;">
+                    最后更新: --
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="currentPositionTable">
+                    <thead>
+                        <tr>
+                            <th>币种</th>
+                            <th>方向</th>
+                            <th>持仓量</th>
+                            <th>开仓均价</th>
+                            <th>标记价格</th>
+                            <th>杠杆</th>
+                            <th>未实现盈亏</th>
+                            <th>保证金</th>
+                            <th>收益率</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody id="currentPositionBody">
+                        <tr><td colspan="10" class="loading">加载中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <!-- 历史监控记录 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <span>📋</span>
+                    历史监控记录
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="monitorTable">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>币种</th>
+                            <th>方向</th>
+                            <th>持仓量</th>
+                            <th>开仓均价</th>
+                            <th>标记价格</th>
+                            <th>杠杆</th>
+                            <th>收益率</th>
+                            <th>告警类型</th>
+                            <th>通知状态</th>
+                        </tr>
+                    </thead>
+                    <tbody id="monitorBody">
+                        <tr><td colspan="10" class="loading">加载中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化图表
+        const profitChart = echarts.init(document.getElementById('profitChart'));
+
+        // 加载数据
+        async function loadData() {
+            try {
+                // 加载状态
+                const statusRes = await fetch('/api/anchor-system/status');
+                const statusData = await statusRes.json();
+                
+                if (statusData.success) {
+                    document.getElementById('totalMonitors').textContent = statusData.status.total_monitors;
+                    document.getElementById('totalAlerts').textContent = statusData.status.total_alerts;
+                    document.getElementById('profitTarget').textContent = '+' + statusData.status.config.profit_target + '%';
+                    document.getElementById('lossLimit').textContent = statusData.status.config.loss_limit + '%';
+                }
+
+                // 加载监控记录
+                const monitorsRes = await fetch('/api/anchor-system/monitors?limit=50');
+                const monitorsData = await monitorsRes.json();
+                
+                if (monitorsData.success) {
+                    renderMonitorTable(monitorsData.data);
+                    renderProfitChart(monitorsData.data);
+                }
+
+                // 加载告警记录
+                const alertsRes = await fetch('/api/anchor-system/alerts?limit=10');
+                const alertsData = await alertsRes.json();
+                
+                if (alertsData.success) {
+                    renderAlerts(alertsData.data);
+                }
+
+                // 加载历史极值记录（模拟盘）
+                const recordsRes = await fetch('/api/anchor-system/profit-records?trade_mode=paper');
+                const recordsData = await recordsRes.json();
+                
+                if (recordsData.success) {
+                    renderRecordsTable(recordsData.records);
+                }
+
+                // 加载当前持仓情况（模拟盘模式）
+                const positionsRes = await fetch('/api/anchor-system/current-positions?trade_mode=paper');
+                const positionsData = await positionsRes.json();
+                
+                if (positionsData.success) {
+                    renderCurrentPositions(positionsData.positions);
+                }
+
+                // 加载当前预警（模拟盘模式）
+                const warningsRes = await fetch('/api/anchor-system/warnings?trade_mode=paper');
+                const warningsData = await warningsRes.json();
+                
+                console.log('🚨 预警数据加载:', warningsData);
+                
+                if (warningsData.success) {
+                    renderWarnings(warningsData.warnings);
+                }
+
+                // 更新时间
+                const now = new Date();
+                document.getElementById('updateTime').textContent = 
+                    `最后更新: ${now.toLocaleString('zh-CN')}`;
+                document.getElementById('currentPositionTime').textContent = 
+                    `最后更新: ${now.toLocaleString('zh-CN')}`;
+
+            } catch (error) {
+                console.error('加载数据失败:', error);
+            }
+        }
+
+        // 渲染历史极值记录表
+        function renderRecordsTable(data) {
+            const tbody = document.getElementById('recordsBody');
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty">暂无历史记录</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map(item => `
+                <tr>
+                    <td>${item.inst_id || '--'}</td>
+                    <td>
+                        <span class="badge ${item.pos_side === 'short' ? 'badge-short' : 'badge-long'}">
+                            ${item.pos_side === 'short' ? '做空' : '做多'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge ${item.record_type === 'max_profit' ? 'badge-profit' : 'badge-loss'}">
+                            ${item.record_type === 'max_profit' ? '🏆 最高盈利' : '📉 最大亏损'}
+                        </span>
+                    </td>
+                    <td style="color: ${(item.profit_rate || 0) >= 0 ? '#48bb78' : '#f56565'}; font-weight: 700; font-size: 16px;">
+                        ${(item.profit_rate || 0) >= 0 ? '+' : ''}${(item.profit_rate || 0).toFixed(2)}%
+                    </td>
+                    <td>${Math.abs(item.pos_size || 0).toFixed(4)}</td>
+                    <td>$${(item.avg_price || 0).toFixed(4)}</td>
+                    <td>$${(item.mark_price || 0).toFixed(4)}</td>
+                    <td>${item.timestamp}</td>
+                </tr>
+            `).join('');
+        }
+
+        // 渲染当前持仓情况
+        function renderCurrentPositions(data) {
+            const tbody = document.getElementById('currentPositionBody');
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="empty">当前无持仓</td></tr>';
+                return;
+            }
+
+            // 调试日志
+            console.log('🔍 渲染当前持仓数据:', data);
+            if (data.length > 0) {
+                console.log('📊 第一条数据 pos_size:', data[0].pos_size, 'type:', typeof data[0].pos_size);
+            }
+
+            tbody.innerHTML = data.map(item => `
+                <tr>
+                    <td style="font-weight: 600;">${item.inst_id || '--'}</td>
+                    <td>
+                        <span class="badge ${item.pos_side === 'short' ? 'badge-short' : 'badge-long'}">
+                            ${item.pos_side === 'short' ? '做空' : '做多'}
+                        </span>
+                    </td>
+                    <td>${(item.pos_size || 0).toFixed(4)}</td>
+                    <td>$${item.avg_price.toFixed(4)}</td>
+                    <td>$${item.mark_price.toFixed(4)}</td>
+                    <td>${item.lever}x</td>
+                    <td style="color: ${item.upl >= 0 ? '#48bb78' : '#f56565'}; font-weight: 600;">
+                        ${item.upl >= 0 ? '+' : ''}${item.upl.toFixed(4)} USDT
+                    </td>
+                    <td>${item.margin.toFixed(4)} USDT</td>
+                    <td style="color: ${item.profit_rate >= 0 ? '#48bb78' : '#f56565'}; font-weight: 700; font-size: 16px;">
+                        ${item.profit_rate >= 0 ? '+' : ''}${item.profit_rate.toFixed(2)}%
+                    </td>
+                    <td>
+                        <span class="badge ${
+                            item.status_class === 'profit' ? 'badge-profit' : 
+                            item.status_class === 'loss' ? 'badge-loss' : 
+                            'badge-normal'
+                        }">
+                            ${item.status}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 渲染预警表
+        function renderWarnings(data) {
+            const tbody = document.getElementById('warningsBody');
+            const updateTime = document.getElementById('warningsUpdateTime');
+            
+            // 更新时间
+            const now = new Date();
+            updateTime.textContent = `最后更新: ${now.toLocaleString('zh-CN')}`;
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="empty">✅ 当前无预警</td></tr>';
+                return;
+            }
+
+            console.log('⚠️ 渲染预警数据:', data);
+
+            tbody.innerHTML = data.map(item => `
+                <tr>
+                    <td style="font-weight: 600;">${item.inst_id || '--'}</td>
+                    <td>
+                        <span class="badge ${item.pos_side === 'short' ? 'badge-short' : 'badge-long'}">
+                            ${item.pos_side === 'short' ? '做空' : '做多'}
+                        </span>
+                    </td>
+                    <td>$${item.open_price.toFixed(4)}</td>
+                    <td>$${item.current_price.toFixed(4)}</td>
+                    <td>
+                        <span class="profit-rate ${
+                            item.warning_level === 'critical' ? 'critical-level' : 
+                            item.warning_level === 'warning' ? 'warning-level' : ''
+                        }">
+                            ${item.profit_rate.toFixed(2)}%
+                        </span>
+                    </td>
+                    <td>${item.open_size.toFixed(4)}</td>
+                    <td>
+                        <span class="warning-badge ${item.warning_level}">
+                            ${item.warning_level === 'critical' ? '🔴 临界' : 
+                              item.warning_level === 'warning' ? '🟡 预警' : 
+                              '🔵 信息'}
+                        </span>
+                    </td>
+                    <td style="max-width: 300px; white-space: normal;">${item.alert_message}</td>
+                    <td style="font-size: 12px; color: #718096;">${item.created_at}</td>
+                </tr>
+            `).join('');
+        }
+
+        // 渲染监控记录表
+        function renderMonitorTable(data) {
+            const tbody = document.getElementById('monitorBody');
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="empty">暂无监控记录</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map(item => `
+                <tr>
+                    <td>${item.timestamp}</td>
+                    <td>${item.inst_id || '--'}</td>
+                    <td>
+                        <span class="badge ${item.pos_side === 'short' ? 'badge-short' : 'badge-long'}">
+                            ${item.pos_side === 'short' ? '做空' : '做多'}
+                        </span>
+                    </td>
+                    <td>${Math.abs(item.pos_size || 0).toFixed(4)}</td>
+                    <td>$${(item.avg_price || 0).toFixed(4)}</td>
+                    <td>$${(item.mark_price || 0).toFixed(4)}</td>
+                    <td>${item.leverage}x</td>
+                    <td style="color: ${(item.profit_rate || 0) >= 0 ? '#48bb78' : '#f56565'}; font-weight: 600;">
+                        ${(item.profit_rate || 0) >= 0 ? '+' : ''}${(item.profit_rate || 0).toFixed(2)}%
+                    </td>
+                    <td>
+                        ${item.alert_type ? (() => {
+                            if (item.alert_type === 'profit_target') {
+                                return '<span class="badge badge-profit">盈利目标</span>';
+                            } else if (item.alert_type === 'loss_limit') {
+                                return '<span class="badge badge-loss">止损警告</span>';
+                            } else if (item.alert_type === 'extreme_max_profit') {
+                                return '<span class="badge badge-profit">最高盈利刷新</span>';
+                            } else if (item.alert_type === 'extreme_max_loss') {
+                                return '<span class="badge badge-loss">最大亏损刷新</span>';
+                            } else {
+                                return '<span class="badge badge-normal">其他告警</span>';
+                            }
+                        })() : '--'}
+                    </td>
+                    <td>
+                        ${item.alert_sent ? 
+                            '<span class="badge badge-sent">已发送</span>' : 
+                            (item.alert_type ? '<span class="badge badge-pending">未发送</span>' : '--')}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 渲染收益率图表
+        function renderProfitChart(data) {
+            // 反转数据顺序（从旧到新）
+            const reversedData = [...data].reverse();
+            
+            const timestamps = reversedData.map(item => {
+                const time = new Date(item.timestamp);
+                return time.toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'});
+            });
+            
+            const profitRates = reversedData.map(item => (item.profit_rate || 0).toFixed(2));
+
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: function(params) {
+                        const data = params[0];
+                        return `时间: ${data.name}<br/>收益率: ${data.value}%`;
+                    }
+                },
+                grid: {
+                    left: '50px',
+                    right: '20px',
+                    top: '20px',
+                    bottom: '30px'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: timestamps,
+                    axisLabel: {
+                        rotate: 45
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '收益率 (%)',
+                    axisLabel: {
+                        formatter: '{value}%'
+                    }
+                },
+                series: [{
+                    name: '收益率',
+                    type: 'line',
+                    data: profitRates,
+                    smooth: true,
+                    lineStyle: {
+                        width: 3,
+                        color: '#667eea'
+                    },
+                    areaStyle: {
+                        color: {
+                            type: 'linear',
+                            x: 0,
+                            y: 0,
+                            x2: 0,
+                            y2: 1,
+                            colorStops: [
+                                {offset: 0, color: 'rgba(102, 126, 234, 0.3)'},
+                                {offset: 1, color: 'rgba(102, 126, 234, 0.05)'}
+                            ]
+                        }
+                    }
+                }]
+            };
+
+            profitChart.setOption(option);
+        }
+
+        // 渲染告警列表
+        function renderAlerts(data) {
+            const alertList = document.getElementById('alertList');
+            
+            if (data.length === 0) {
+                alertList.innerHTML = '<div class="empty">暂无告警记录</div>';
+                return;
+            }
+
+            alertList.innerHTML = data.map(alert => {
+                // 判断告警类型
+                let alertTitle = '';
+                let alertClass = '';
+                
+                if (alert.alert_type === 'profit_target') {
+                    alertTitle = '🎉 盈利目标达成';
+                    alertClass = 'profit';
+                } else if (alert.alert_type === 'loss_limit') {
+                    alertTitle = '⚠️ 止损警告';
+                    alertClass = 'loss';
+                } else if (alert.alert_type === 'extreme_max_profit') {
+                    alertTitle = '🚀 最高盈利极值刷新预警';
+                    alertClass = 'profit';
+                } else if (alert.alert_type === 'extreme_max_loss') {
+                    alertTitle = '📉 最大亏损极值刷新预警';
+                    alertClass = 'loss';
+                } else {
+                    alertTitle = '📢 告警';
+                    alertClass = alert.profit_rate >= 0 ? 'profit' : 'loss';
+                }
+                
+                return `
+                    <div class="alert-item ${alertClass}">
+                        <div class="alert-header">
+                            <div class="alert-title">
+                                ${alertTitle}
+                            </div>
+                            <div class="alert-time">${alert.timestamp}</div>
+                        </div>
+                        <div class="alert-details">
+                            ${alert.inst_id} • ${alert.pos_side === 'short' ? '做空' : '做多'} • 
+                            <strong style="color: ${alert.profit_rate >= 0 ? '#48bb78' : '#f56565'}">
+                                ${alert.profit_rate >= 0 ? '+' : ''}${alert.profit_rate.toFixed(2)}%
+                            </strong>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 刷新数据
+        function refreshData() {
+            console.log('🔄 刷新数据...', new Date().toLocaleString('zh-CN'));
+            loadData();
+        }
+
+        // 窗口大小变化时调整图表
+        window.addEventListener('resize', () => {
+            profitChart.resize();
+        });
+
+        // ============================================================
+        // 页面初始化
+        // ============================================================
+        
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('📊 开始加载锚点系统数据...', new Date().toLocaleString('zh-CN'));
+            
+            // 初始加载数据
+            loadData();
+            
+            // 自动刷新（每30秒）
+            setInterval(() => {
+                console.log('⏰ 自动刷新触发...', new Date().toLocaleString('zh-CN'));
+                refreshData();
+            }, 30000);
+            
+            console.log('✅ 页面初始化完成，30秒自动刷新已启动');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+{
+  "date_range": {
+    "start": "20260201",
+    "end": "20260218"
+  },
+  "statistics": {
+    "total_days": 18,
+    "success_days": 18,
+    "total_peaks": 61,
+    "false_breakout_days": 5,
+    "avg_peaks_per_day": 3.388888888888889
+  },
+  "daily_data": [
+    {
+      "date": "20260201",
+      "peaks_count": 3,
+      "has_false_breakout": false,
+      "data_points": 896
+    },
+    {
+      "date": "20260202",
+      "peaks_count": 6,
+      "has_false_breakout": false,
+      "data_points": 722
+    },
+    {
+      "date": "20260203",
+      "peaks_count": 2,
+      "has_false_breakout": false,
+      "data_points": 649
+    },
+    {
+      "date": "20260204",
+      "peaks_count": 1,
+      "has_false_breakout": false,
+      "data_points": 1438
+    },
+    {
+      "date": "20260205",
+      "peaks_count": 10,
+      "has_false_breakout": true,
+      "data_points": 1405
+    },
+    {
+      "date": "20260206",
+      "peaks_count": 5,
+      "has_false_breakout": true,
+      "data_points": 1439
+    },
+    {
+      "date": "20260207",
+      "peaks_count": 6,
+      "has_false_breakout": true,
+      "data_points": 1389
+    },
+    {
+      "date": "20260208",
+      "peaks_count": 4,
+      "has_false_breakout": true,
+      "data_points": 1355
+    },
+    {
+      "date": "20260209",
+      "peaks_count": 5,
+      "has_false_breakout": true,
+      "data_points": 1436
+    },
+    {
+      "date": "20260210",
+      "peaks_count": 3,
+      "has_false_breakout": false,
+      "data_points": 992
+    },
+    {
+      "date": "20260211",
+      "peaks_count": 1,
+      "has_false_breakout": false,
+      "data_points": 330
+    },
+    {
+      "date": "20260212",
+      "peaks_count": 3,
+      "has_false_breakout": false,
+      "data_points": 1211
+    },
+    {
+      "date": "20260213",
+      "peaks_count": 2,
+      "has_false_breakout": false,
+      "data_points": 1205
+    },
+    {
+      "date": "20260214",
+      "peaks_count": 1,
+      "has_false_breakout": false,
+      "data_points": 1080
+    },
+    {
+      "date": "20260215",
+      "peaks_count": 2,
+      "has_false_breakout": false,
+      "data_points": 1211
+    },
+    {
+      "date": "20260216",
+      "peaks_count": 4,
+      "has_false_breakout": false,
+      "data_points": 1082
+    },
+    {
+      "date": "20260217",
+      "peaks_count": 2,
+      "has_false_breakout": false,
+      "data_points": 1158
+    },
+    {
+      "date": "20260218",
+      "peaks_count": 1,
+      "has_false_breakout": false,
+      "data_points": 894
+    }
+  ],
+  "generated_at": "2026-02-18T09:45:45.031202"
+}

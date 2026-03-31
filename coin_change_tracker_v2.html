@@ -1,0 +1,1828 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>27币涨跌幅追踪系统 v3.0 - 全新测试版</title>
+    <!-- 版本: 2026-02-09 - 独立测试版本，完整功能复制 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-lg mb-6">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-md hover:shadow-lg">
+                        <i class="fas fa-home mr-2"></i>
+                        返回首页
+                    </a>
+                    <h1 class="text-2xl font-bold text-gray-800">
+                        <i class="fas fa-chart-line text-blue-600 mr-2"></i>
+                        27币涨跌幅追踪系统
+                    </h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-600">
+                        <i class="far fa-clock mr-1"></i>
+                        1分钟周期
+                    </span>
+                    <span class="text-sm text-gray-600">
+                        <i class="fas fa-sync-alt mr-1"></i>
+                        每天0点重置
+                    </span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4">
+        <!-- 预警设置面板 -->
+        <div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg shadow-lg p-6 mb-6 border-2 border-orange-200">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold text-gray-800 flex items-center">
+                    <i class="fas fa-bell text-orange-600 mr-2"></i>
+                    涨跌预警设置
+                </h2>
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm text-gray-600">预警状态:</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="alertEnabled" class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+                    </label>
+                    <span id="alertStatus" class="text-sm font-medium text-orange-600">已开启</span>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- 上涨预警 -->
+                <div class="bg-white rounded-lg p-4 border-2 border-green-200">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-bold text-green-600 flex items-center">
+                            <i class="fas fa-arrow-up mr-2"></i>
+                            上涨预警
+                        </h3>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="upAlertEnabled" class="sr-only peer" checked>
+                            <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
+                        </label>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                触发阈值 (%)
+                            </label>
+                            <input type="number" id="upThreshold" step="0.1" min="0" max="100"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="加载中...">
+                        </div>
+                        <div class="text-xs text-gray-500">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            当任意币种涨幅大于此值时触发预警
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 下跌预警 -->
+                <div class="bg-white rounded-lg p-4 border-2 border-red-200">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-bold text-red-600 flex items-center">
+                            <i class="fas fa-arrow-down mr-2"></i>
+                            下跌预警
+                        </h3>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="downAlertEnabled" class="sr-only peer" checked>
+                            <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-red-600"></div>
+                        </label>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                触发阈值 (%)
+                            </label>
+                            <input type="number" id="downThreshold" step="0.1" max="0" min="-100"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="加载中...">
+                        </div>
+                        <div class="text-xs text-gray-500">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            当任意币种跌幅小于此值时触发预警
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Telegram设置 -->
+            <div class="mt-4 bg-white rounded-lg p-4 border-2 border-blue-200">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-bold text-blue-600 flex items-center">
+                        <i class="fab fa-telegram text-blue-500 mr-2"></i>
+                        Telegram通知
+                    </h3>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="tgEnabled" class="sr-only peer">
+                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+                <div class="text-xs text-gray-500">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    开启后将通过Telegram发送预警通知（需要后端配置）
+                </div>
+            </div>
+            
+            <!-- 保存按钮 -->
+            <div class="mt-4 flex justify-end space-x-3">
+                <button id="saveAlertSettings" class="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-lg shadow-lg hover:from-green-600 hover:to-green-700 transform hover:scale-105 transition-all duration-200 flex items-center">
+                    <i class="fas fa-save mr-2"></i>
+                    保存预警设置
+                </button>
+                <button id="resetAlertSettings" class="px-6 py-3 bg-gradient-to-r from-gray-400 to-gray-500 text-white font-bold rounded-lg shadow-lg hover:from-gray-500 hover:to-gray-600 transform hover:scale-105 transition-all duration-200 flex items-center">
+                    <i class="fas fa-undo mr-2"></i>
+                    恢复默认
+                </button>
+            </div>
+            
+            <!-- 保存成功提示 -->
+            <div id="saveSuccess" class="mt-4 hidden">
+                <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-lg">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                        <span class="font-medium text-green-800">预警设置已保存！</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 预警日志 -->
+            <div id="alertLog" class="mt-4 hidden">
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>
+                        <span class="font-medium text-yellow-800" id="alertMessage"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 实时数据卡片 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <!-- 总涨跌幅 -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-gray-600 font-medium">27币涨跌幅之和</span>
+                    <i class="fas fa-percentage text-blue-600"></i>
+                </div>
+                <div id="totalChange" class="text-3xl font-bold text-gray-800">--</div>
+                <div class="text-sm text-gray-500 mt-2">
+                    <i class="far fa-clock mr-1"></i>
+                    <span id="updateTime">--</span>
+                </div>
+            </div>
+
+            <!-- 有效币种数 -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-gray-600 font-medium">有效币种数</span>
+                    <i class="fas fa-coins text-green-600"></i>
+                </div>
+                <div id="validCount" class="text-3xl font-bold text-gray-800">--</div>
+                <div class="text-sm text-gray-500 mt-2">
+                    共 27 个币种
+                </div>
+            </div>
+
+            <!-- 基准价时间 -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-gray-600 font-medium">基准价时间</span>
+                    <i class="fas fa-calendar-alt text-purple-600"></i>
+                </div>
+                <div id="baselineDate" class="text-2xl font-bold text-gray-800">--</div>
+                <div class="text-sm text-gray-500 mt-2">
+                    每天0点重置
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- 图表区域 - 趋势图独占一行，放大2倍 -->
+        <div class="grid grid-cols-1 gap-6 mb-6">
+            <!-- 总涨跌幅趋势图 - 放大2倍 -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-bold">
+                        <i class="fas fa-chart-area text-blue-600 mr-2"></i>
+                        总涨跌幅趋势
+                        <span class="text-sm font-normal text-gray-500 ml-2">
+                            <i class="fas fa-arrow-up text-red-500"></i> 最高价
+                            <i class="fas fa-arrow-down text-green-500 ml-3"></i> 最低价
+                        </span>
+                    </h2>
+                    <!-- 日期选择器 -->
+                    <div class="flex items-center space-x-3">
+                        <button id="prevDay" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-200 shadow-md hover:shadow-lg">
+                            <i class="fas fa-chevron-left mr-1"></i> 前一天
+                        </button>
+                        <input type="date" id="dateSelector" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <button id="nextDay" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-200 shadow-md hover:shadow-lg">
+                            后一天 <i class="fas fa-chevron-right ml-1"></i>
+                        </button>
+                        <button id="todayBtn" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all duration-200 shadow-md hover:shadow-lg">
+                            <i class="fas fa-calendar-day mr-1"></i> 今天
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-3 flex flex-wrap gap-3 text-sm">
+                    <span class="inline-flex items-center">
+                        <span class="inline-block w-8 h-0.5 bg-red-600 mr-1" style="border-top: 2px dashed;"></span>
+                        <span class="text-red-600 font-semibold">+180%</span>
+                    </span>
+                    <span class="inline-flex items-center">
+                        <span class="inline-block w-8 h-0.5 bg-amber-500 mr-1" style="border-top: 2px dashed;"></span>
+                        <span class="text-amber-500 font-semibold">+90%</span>
+                    </span>
+                    <span class="inline-flex items-center">
+                        <span class="inline-block w-8 h-0.5 bg-blue-500 mr-1" style="border-top: 2px dashed;"></span>
+                        <span class="text-blue-500 font-semibold">-90%</span>
+                    </span>
+                    <span class="inline-flex items-center">
+                        <span class="inline-block w-8 h-0.5 bg-purple-600 mr-1" style="border-top: 2px dashed;"></span>
+                        <span class="text-purple-600 font-semibold">-180%</span>
+                    </span>
+                </div>
+                <div id="trendChart" style="height: 800px;"></div>
+            </div>
+        </div>
+
+        <!-- 策略筛选器 -->
+        <div class="grid grid-cols-1 gap-6 mb-6">
+            <!-- 流通盘6名策略 -->
+            <div class="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg shadow-lg p-6 border-2 border-indigo-200">
+                <h2 class="text-xl font-bold mb-4 flex items-center">
+                    <i class="fas fa-bolt text-yellow-500 mr-2"></i>
+                    流通盘6名策略
+                    <span class="ml-3 text-sm font-normal text-gray-600">点击按钮快速筛选策略</span>
+                </h2>
+                
+                <!-- 策略按钮网格 -->
+                <div class="grid grid-cols-4 gap-3 mb-4">
+                    <!-- 前8 1.5% 10倍做空 -->
+                    <button onclick="applyStrategy('top8', 1.5, 10, 'short')" 
+                            class="strategy-btn bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-base">📉 前8做空</span>
+                            <i class="fas fa-arrow-down text-lg"></i>
+                        </div>
+                        <div class="text-xs opacity-90">涨幅后: 1.5% • 10x</div>
+                        <div class="text-xs opacity-75 mt-1">涨幅前8名 开空单</div>
+                    </button>
+
+                    <!-- 前8 1.5% 10倍做多 -->
+                    <button onclick="applyStrategy('top8', 1.5, 10, 'long')" 
+                            class="strategy-btn bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-base">📈 前8做多</span>
+                            <i class="fas fa-arrow-up text-lg"></i>
+                        </div>
+                        <div class="text-xs opacity-90">涨幅后: 1.5% • 10x</div>
+                        <div class="text-xs opacity-75 mt-1">涨幅前8名 开多单</div>
+                    </button>
+
+                    <!-- 后8 1.5% 10倍做多 -->
+                    <button onclick="applyStrategy('bottom8', 1.5, 10, 'long')" 
+                            class="strategy-btn bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-base">📈 后8做多</span>
+                            <i class="fas fa-arrow-up text-lg"></i>
+                        </div>
+                        <div class="text-xs opacity-90">跌幅后: 1.5% • 10x</div>
+                        <div class="text-xs opacity-75 mt-1">跌幅后8名 开多单</div>
+                    </button>
+
+                    <!-- 后8 1.5% 10倍做空 -->
+                    <button onclick="applyStrategy('bottom8', 1.5, 10, 'short')" 
+                            class="strategy-btn bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-base">📉 后8做空</span>
+                            <i class="fas fa-arrow-down text-lg"></i>
+                        </div>
+                        <div class="text-xs opacity-90">跌幅后: 1.5% • 10x</div>
+                        <div class="text-xs opacity-75 mt-1">跌幅后8名 开空单</div>
+                    </button>
+                </div>
+
+                <!-- 策略说明 -->
+                <div class="bg-white rounded-lg p-4 border border-indigo-200">
+                    <h3 class="font-semibold text-gray-800 mb-2 flex items-center">
+                        <i class="fas fa-info-circle text-indigo-600 mr-2"></i>
+                        策略说明:
+                    </h3>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• <strong>前8</strong>: 在流通盘中选涨幅前8名的币种</li>
+                        <li>• <strong>后8</strong>: 在流通盘中选跌幅后8名的币种（即跌幅最大的8个）</li>
+                        <li>• <strong>涨幅后</strong>: 等待币种在当前价格基础上再涨1.5%后开仓</li>
+                        <li>• <strong>跌幅后</strong>: 等待币种在当前价格基础上再跌1.5%后开仓</li>
+                        <li>• <strong>10x</strong>: 使用10倍杠杆进行交易</li>
+                        <li>• <strong>做多/做空</strong>: 选择开多单或空单的方向</li>
+                    </ul>
+                </div>
+
+                <!-- 当前策略显示 -->
+                <div id="currentStrategy" class="mt-4 hidden bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-4 border-2 border-yellow-400">
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-yellow-600 text-2xl mr-3 mt-1"></i>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-gray-800 mb-2">当前选择的策略:</h4>
+                            <div id="strategyDetails" class="text-sm text-gray-700"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 排行榜 -->
+        <div class="grid grid-cols-1 gap-6 mb-6">
+            <!-- 单币涨跌幅排行 -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-bold mb-4">
+                    <i class="fas fa-trophy text-yellow-600 mr-2"></i>
+                    单币涨跌幅排行（实时）
+                </h2>
+                <div id="rankChart" style="height: 800px;"></div>
+            </div>
+        </div>
+
+        <!-- 详细数据表格 -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-bold mb-4">
+                <i class="fas fa-table text-green-600 mr-2"></i>
+                详细数据（27个币种）
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">币种</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">基准价</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">当前价</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">涨跌幅</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailTable" class="bg-white divide-y divide-gray-200">
+                        <!-- 数据将在这里填充 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 图表实例
+        let trendChart = null;
+        let rankChart = null;
+        
+        // 历史数据（用于趋势图）
+        let historyData = [];
+        
+        // 当前选择的日期
+        let currentDate = new Date();
+        
+        // 格式化日期为 YYYY-MM-DD
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        // 解析日期字符串
+        function parseDate(dateStr) {
+            return new Date(dateStr + 'T00:00:00');
+        }
+        
+        // 初始化图表
+        function initCharts() {
+            trendChart = echarts.init(document.getElementById('trendChart'));
+            rankChart = echarts.init(document.getElementById('rankChart'));
+            
+            // 趋势图配置
+            trendChart.setOption({
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        label: {
+                            backgroundColor: '#6a7985'
+                        }
+                    },
+                    formatter: function(params) {
+                        const p = params[0];
+                        const time = p.axisValue;
+                        const value = p.value;
+                        
+                        return `
+                            <div style="padding: 8px; min-width: 180px;">
+                                <div style="font-weight: bold; margin-bottom: 8px; font-size: 14px;">
+                                    <i class="far fa-clock" style="margin-right: 4px;"></i>${time}
+                                </div>
+                                <div style="margin-bottom: 4px;">
+                                    ${p.marker}<span style="font-weight: 600;">${p.seriesName}</span>
+                                </div>
+                                <div style="font-size: 16px; font-weight: bold; color: ${value > 0 ? '#10B981' : value < 0 ? '#EF4444' : '#6B7280'};">
+                                    ${value > 0 ? '+' : ''}${value}%
+                                </div>
+                            </div>
+                        `;
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: []
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLabel: {
+                        formatter: '{value}%'
+                    }
+                },
+                series: [{
+                    name: '27币涨跌幅之和',
+                    type: 'line',
+                    smooth: true,
+                    data: [],
+                    areaStyle: {
+                        color: {
+                            type: 'linear',
+                            x: 0, y: 0, x2: 0, y2: 1,
+                            colorStops: [
+                                { offset: 0, color: 'rgba(59, 130, 246, 0.5)' },
+                                { offset: 1, color: 'rgba(59, 130, 246, 0.1)' }
+                            ]
+                        }
+                    },
+                    lineStyle: {
+                        color: '#3B82F6',
+                        width: 2
+                    }
+                }]
+            });
+        }
+        
+        // 更新实时数据
+        async function updateLatestData() {
+            try {
+                const response = await fetch('/api/coin-change-tracker/latest');
+                const result = await response.json();
+                
+                if (result.success) {
+                    const data = result.data;
+                    
+                    // 保存当前数据到全局变量（供策略使用）
+                    window.currentCoinsData = data.changes;
+                    
+                    // 更新卡片数据
+                    const totalChange = data.total_change;
+                    const totalChangeEl = document.getElementById('totalChange');
+                    totalChangeEl.textContent = `${totalChange > 0 ? '+' : ''}${totalChange.toFixed(2)}%`;
+                    totalChangeEl.className = `text-3xl font-bold ${totalChange > 0 ? 'text-green-600' : totalChange < 0 ? 'text-red-600' : 'text-gray-800'}`;
+                    
+                    document.getElementById('validCount').textContent = `${data.valid_count}/27`;
+                    document.getElementById('updateTime').textContent = data.time;
+                    document.getElementById('baselineDate').textContent = data.baseline_date;
+                    
+                    // 更新单币排行榜
+                    updateRankChart(data.changes);
+                    
+                    // 更新详细表格
+                    updateDetailTable(data.changes);
+                    
+                } else {
+                    console.error('获取数据失败:', result.error);
+                }
+            } catch (error) {
+                console.error('更新数据异常:', error);
+            }
+        }
+        
+        // 更新历史趋势（支持指定日期）
+        async function updateHistoryData(date = null) {
+            try {
+                // 如果指定了日期，则查询特定日期的数据
+                let url = '/api/coin-change-tracker/history?limit=1440';
+                if (date) {
+                    url += `&date=${formatDate(date)}`;
+                }
+                
+                console.log('Fetching history data from:', url);
+                
+                const response = await fetch(url);
+                const result = await response.json();
+                
+                console.log('History data result:', result);
+                console.log('Fetched URL:', url);
+                console.log('Data count:', result.data ? result.data.length : 0);
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    historyData = result.data;
+                    
+                    // 提取时间和总涨跌幅
+                    const times = historyData.map(d => d.time);
+                    const changes = historyData.map(d => d.total_change);
+                    
+                    console.log('Times count:', times.length, 'Changes count:', changes.length);
+                    
+                    // 找出最高价和最低价
+                    const maxChange = Math.max(...changes);
+                    const minChange = Math.min(...changes);
+                    const maxIndex = changes.indexOf(maxChange);
+                    const minIndex = changes.indexOf(minChange);
+                    
+                    // 检测趋势转换信号（只在1点之后检测多转空信号）
+                    const trendSignals = [];
+                    for (let i = 1; i < historyData.length; i++) {
+                        const current = historyData[i];
+                        const previous = historyData[i - 1];
+                        const currentTime = current.time;  // 格式如 "05/14 16:57"
+                        
+                        // 解析时间，提取小时
+                        const timeMatch = currentTime.match(/(\d{2}):(\d{2})/);
+                        if (!timeMatch) continue;
+                        
+                        const hour = parseInt(timeMatch[1]);
+                        const minute = parseInt(timeMatch[2]);
+                        
+                        // 空转多：前一个是红色（负数），当前是绿色（正数）
+                        if (previous.total_change < 0 && current.total_change > 0) {
+                            trendSignals.push({
+                                type: 'bearToBull',
+                                name: '空转多',
+                                xAxis: i,
+                                yAxis: current.total_change,
+                                time: currentTime,
+                                color: '#10B981',
+                                symbol: 'circle',
+                                symbolSize: 40
+                            });
+                        }
+                        
+                        // 多转空：前一个是绿色（正数），当前是红色（负数）
+                        // 🔥 关键修改：只在1点（13:00）之后检测多转空信号
+                        if (previous.total_change > 0 && current.total_change < 0) {
+                            if (hour >= 13) {  // 只在13:00之后（含13:00）
+                                trendSignals.push({
+                                    type: 'bullToBear',
+                                    name: '多转空',
+                                    xAxis: i,
+                                    yAxis: current.total_change,
+                                    time: currentTime,
+                                    color: '#EF4444',
+                                    symbol: 'circle',
+                                    symbolSize: 40
+                                });
+                            }
+                        }
+                    }
+                    
+                    console.log('🎯 检测到趋势转换信号:', trendSignals.length, '个');
+                    console.log('信号详情:', trendSignals);
+                    
+                    // 更新趋势图，添加最高价、最低价和趋势转换信号标记
+                    // 使用 notMerge: true 强制重新渲染整个图表
+                    trendChart.setOption({
+                        tooltip: {
+                            trigger: 'axis',
+                            axisPointer: {
+                                type: 'cross',
+                                label: {
+                                    backgroundColor: '#6a7985'
+                                }
+                            },
+                            formatter: function(params) {
+                                const p = params[0];
+                                const time = p.axisValue;
+                                const value = p.value;
+                                
+                                return `
+                                    <div style="padding: 8px; min-width: 180px;">
+                                        <div style="font-weight: bold; margin-bottom: 8px; font-size: 14px;">
+                                            <i class="far fa-clock" style="margin-right: 4px;"></i>${time}
+                                        </div>
+                                        <div style="margin-bottom: 4px;">
+                                            ${p.marker}<span style="font-weight: 600;">${p.seriesName}</span>
+                                        </div>
+                                        <div style="font-size: 16px; font-weight: bold; color: ${value > 0 ? '#10B981' : value < 0 ? '#EF4444' : '#6B7280'};">
+                                            ${value > 0 ? '+' : ''}${value}%
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                        },
+                        xAxis: { 
+                            type: 'category',
+                            boundaryGap: false,
+                            data: times 
+                        },
+                        yAxis: {
+                            type: 'value',
+                            axisLabel: {
+                                formatter: '{value}%'
+                            }
+                        },
+                        series: [{
+                            name: '27币涨跌幅之和',
+                            type: 'line',
+                            smooth: true,
+                            data: changes,
+                            areaStyle: {
+                                color: {
+                                    type: 'linear',
+                                    x: 0,
+                                    y: 0,
+                                    x2: 0,
+                                    y2: 1,
+                                    colorStops: [
+                                        { offset: 0, color: 'rgba(59, 130, 246, 0.3)' },
+                                        { offset: 1, color: 'rgba(59, 130, 246, 0.05)' }
+                                    ]
+                                }
+                            },
+                            markPoint: {
+                                data: [
+                                    {
+                                        name: '最高价',
+                                        value: maxChange.toFixed(2) + '%',
+                                        xAxis: maxIndex,
+                                        yAxis: maxChange,
+                                        itemStyle: {
+                                            color: '#EF4444'
+                                        },
+                                        label: {
+                                            formatter: '{b}\n{c}',
+                                            fontSize: 14,
+                                            fontWeight: 'bold'
+                                        }
+                                    },
+                                    {
+                                        name: '最低价',
+                                        value: minChange.toFixed(2) + '%',
+                                        xAxis: minIndex,
+                                        yAxis: minChange,
+                                        itemStyle: {
+                                            color: '#10B981'
+                                        },
+                                        label: {
+                                            formatter: '{b}\n{c}',
+                                            fontSize: 14,
+                                            fontWeight: 'bold'
+                                        }
+                                    },
+                                    // 添加趋势转换信号标记
+                                    ...trendSignals.map(signal => ({
+                                        name: signal.name,
+                                        value: signal.name + '\n' + signal.time,
+                                        xAxis: signal.xAxis,
+                                        yAxis: signal.yAxis,
+                                        itemStyle: {
+                                            color: signal.color
+                                        },
+                                        symbol: signal.symbol,
+                                        symbolSize: signal.symbolSize,
+                                        label: {
+                                            formatter: '{c}',
+                                            fontSize: 12,
+                                            fontWeight: 'bold',
+                                            color: '#fff',
+                                            backgroundColor: signal.color,
+                                            padding: [4, 8],
+                                            borderRadius: 4
+                                        }
+                                    }))
+                                ],
+                                symbol: 'pin',
+                                symbolSize: 60
+                            },
+                            markLine: {
+                                silent: false,
+                                symbol: 'none',
+                                data: [
+                                    // 关键支撑线 +300%
+                                    {
+                                        yAxis: 300,
+                                        name: '+300%',
+                                        label: {
+                                            formatter: '{b}',
+                                            position: 'end',
+                                            fontSize: 12,
+                                            fontWeight: 'bold',
+                                            color: '#EF4444'
+                                        },
+                                        lineStyle: {
+                                            color: '#EF4444',
+                                            width: 2,
+                                            type: 'dashed'
+                                        }
+                                    },
+                                    // 关键支撑线 +180%
+                                    {
+                                        yAxis: 180,
+                                        name: '+180%',
+                                        label: {
+                                            formatter: '{b}',
+                                            position: 'end',
+                                            fontSize: 12,
+                                            fontWeight: 'bold',
+                                            color: '#DC2626'
+                                        },
+                                        lineStyle: {
+                                            color: '#DC2626',
+                                            width: 2,
+                                            type: 'dashed'
+                                        }
+                                    },
+                                    // 关键支撑线 +90%
+                                    {
+                                        yAxis: 90,
+                                        name: '+90%',
+                                        label: {
+                                            formatter: '{b}',
+                                            position: 'end',
+                                            fontSize: 12,
+                                            fontWeight: 'bold',
+                                            color: '#F59E0B'
+                                        },
+                                        lineStyle: {
+                                            color: '#F59E0B',
+                                            width: 2,
+                                            type: 'dashed'
+                                        }
+                                    },
+                                    // 关键支撑线 -90%
+                                    {
+                                        yAxis: -90,
+                                        name: '-90%',
+                                        label: {
+                                            formatter: '{b}',
+                                            position: 'end',
+                                            fontSize: 12,
+                                            fontWeight: 'bold',
+                                            color: '#3B82F6'
+                                        },
+                                        lineStyle: {
+                                            color: '#3B82F6',
+                                            width: 2,
+                                            type: 'dashed'
+                                        }
+                                    },
+                                    // 关键支撑线 -180%
+                                    {
+                                        yAxis: -180,
+                                        name: '-180%',
+                                        label: {
+                                            formatter: '{b}',
+                                            position: 'end',
+                                            fontSize: 12,
+                                            fontWeight: 'bold',
+                                            color: '#7C3AED'
+                                        },
+                                        lineStyle: {
+                                            color: '#7C3AED',
+                                            width: 2,
+                                            type: 'dashed'
+                                        }
+                                    },
+                                    // 关键支撑线 -300%
+                                    {
+                                        yAxis: -300,
+                                        name: '-300%',
+                                        label: {
+                                            formatter: '{b}',
+                                            position: 'end',
+                                            fontSize: 12,
+                                            fontWeight: 'bold',
+                                            color: '#10B981'
+                                        },
+                                        lineStyle: {
+                                            color: '#10B981',
+                                            width: 2,
+                                            type: 'dashed'
+                                        }
+                                    }
+                                ]
+                            }
+                        }]
+                    }, true, true); // notMerge=true, lazyUpdate=true
+                    
+                    // 强制resize图表确保正确显示
+                    setTimeout(() => {
+                        trendChart.resize();
+                        console.log('✅ 趋势图已渲染，数据点数:', changes.length);
+                    }, 100);
+                } else {
+                    console.warn('历史数据为空或加载失败');
+                    console.warn('Result:', result);
+                    // 如果没有数据，清空图表
+                    trendChart.setOption({
+                        xAxis: { data: [] },
+                        series: [{ data: [] }]
+                    }, true, true); // notMerge=true, lazyUpdate=true
+                }
+            } catch (error) {
+                console.error('更新历史数据异常:', error);
+            }
+        }
+        
+        // 更新排行榜图表
+        function updateRankChart(changes) {
+            const validChanges = Object.entries(changes).filter(([_, v]) => !v.error);
+            validChanges.sort((a, b) => b[1].change_pct - a[1].change_pct);
+            
+            const coins = validChanges.map(([k, _]) => k.replace('-USDT-SWAP', ''));
+            const values = validChanges.map(([_, v]) => v.change_pct);
+            
+            rankChart.setOption({
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' },
+                    formatter: function(params) {
+                        const p = params[0];
+                        const value = p.value;
+                        const coin = p.axisValue;
+                        
+                        return `
+                            <div style="padding: 8px; min-width: 150px;">
+                                <div style="font-weight: bold; margin-bottom: 8px; font-size: 14px;">
+                                    ${coin}
+                                </div>
+                                <div style="margin-bottom: 4px;">
+                                    ${p.marker}<span style="font-weight: 600;">涨跌幅</span>
+                                </div>
+                                <div style="font-size: 16px; font-weight: bold; color: ${value > 0 ? '#10B981' : value < 0 ? '#EF4444' : '#6B7280'};">
+                                    ${value > 0 ? '+' : ''}${value}%
+                                </div>
+                            </div>
+                        `;
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value',
+                    axisLabel: {
+                        formatter: '{value}%'
+                    }
+                },
+                yAxis: {
+                    type: 'category',
+                    data: coins,
+                    inverse: true
+                },
+                series: [{
+                    type: 'bar',
+                    data: values.map(v => ({
+                        value: v,
+                        itemStyle: {
+                            color: v > 0 ? '#10B981' : v < 0 ? '#EF4444' : '#6B7280'
+                        }
+                    }))
+                }]
+            });
+            
+            // 强制resize图表确保正确显示
+            setTimeout(() => {
+                rankChart.resize();
+                console.log('✅ 排行榜图已渲染，币种数:', coins.length);
+            }, 100);
+        }
+        
+        // 更新详细表格
+        function updateDetailTable(changes) {
+            const tbody = document.getElementById('detailTable');
+            
+            // 转换为数组并排序
+            const changesArray = Object.entries(changes)
+                .filter(([_, v]) => !v.error)
+                .sort((a, b) => b[1].change_pct - a[1].change_pct);
+            
+            tbody.innerHTML = changesArray.map(([symbol, data]) => {
+                const coin = symbol.replace('-USDT-SWAP', '');
+                const changePct = data.change_pct;
+                const changeClass = changePct > 0 ? 'text-green-600' : changePct < 0 ? 'text-red-600' : 'text-gray-600';
+                const changePrefix = changePct > 0 ? '+' : '';
+                
+                return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap font-medium">${coin}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-gray-600">$${data.baseline_price.toFixed(4)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-gray-600">$${data.current_price.toFixed(4)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap ${changeClass} font-bold">${changePrefix}${changePct.toFixed(2)}%</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        // 更新日期选择器和按钮状态
+        function updateDateSelector() {
+            const dateInput = document.getElementById('dateSelector');
+            dateInput.value = formatDate(currentDate);
+            
+            // 检查是否是今天
+            const isToday = formatDate(currentDate) === formatDate(new Date());
+            const nextDayBtn = document.getElementById('nextDay');
+            const todayBtn = document.getElementById('todayBtn');
+            
+            // 如果是今天，禁用"后一天"按钮
+            if (isToday) {
+                nextDayBtn.disabled = true;
+                nextDayBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                todayBtn.disabled = true;
+                todayBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                nextDayBtn.disabled = false;
+                nextDayBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                todayBtn.disabled = false;
+                todayBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+        
+        // 切换到前一天
+        function goToPrevDay() {
+            currentDate.setDate(currentDate.getDate() - 1);
+            updateDateSelector();
+            updateHistoryData(currentDate);
+        }
+        
+        // 切换到后一天
+        function goToNextDay() {
+            const today = new Date();
+            const nextDay = new Date(currentDate);
+            nextDay.setDate(nextDay.getDate() + 1);
+            
+            // 不能超过今天
+            if (formatDate(nextDay) <= formatDate(today)) {
+                currentDate = nextDay;
+                updateDateSelector();
+                updateHistoryData(currentDate);
+            }
+        }
+        
+        // 切换到今天
+        function goToToday() {
+            currentDate = new Date();
+            updateDateSelector();
+            updateLatestData();
+            updateHistoryData();
+        }
+        
+        // 手动选择日期
+        function onDateChange(e) {
+            const selectedDate = parseDate(e.target.value);
+            const today = new Date();
+            
+            // 不能选择未来的日期
+            if (selectedDate <= today) {
+                currentDate = selectedDate;
+                updateDateSelector();
+                updateHistoryData(currentDate);
+            } else {
+                // 恢复为今天
+                e.target.value = formatDate(currentDate);
+                alert('不能选择未来的日期');
+            }
+        }
+        
+        // 初始化
+        window.onload = function() {
+            initCharts();
+            updateLatestData();
+            updateHistoryData();
+            updateDateSelector();
+            
+            // 加载账户余额信息（用于策略开仓金额计算）
+            loadAccountsBalance().then(() => {
+                console.log('✅ 账户余额信息已加载，可以使用策略功能');
+            }).catch(error => {
+                console.error('❌ 账户余额加载失败:', error);
+            });
+            
+            // 绑定日期选择器事件
+            document.getElementById('prevDay').addEventListener('click', goToPrevDay);
+            document.getElementById('nextDay').addEventListener('click', goToNextDay);
+            document.getElementById('todayBtn').addEventListener('click', goToToday);
+            document.getElementById('dateSelector').addEventListener('change', onDateChange);
+            
+            // 设置日期选择器的最大日期为今天
+            const today = formatDate(new Date());
+            document.getElementById('dateSelector').max = today;
+            
+            // 只有在查看今天时才自动刷新
+            let autoRefreshInterval = null;
+            
+            function startAutoRefresh() {
+                // 每10秒更新实时数据
+                autoRefreshInterval = setInterval(() => {
+                    const isToday = formatDate(currentDate) === formatDate(new Date());
+                    if (isToday) {
+                        updateLatestData();
+                        updateHistoryData();
+                    }
+                }, 10000);
+            }
+            
+            startAutoRefresh();
+            
+            // 每天0点2分自动刷新页面（处理跨日期数据）
+            function scheduleAutoPageRefresh() {
+                // 获取当前北京时间
+                const now = new Date();
+                const beijingTime = new Date(now.toLocaleString('en-US', {timeZone: 'Asia/Shanghai'}));
+                
+                // 计算下一个0点2分（北京时间）
+                const tomorrow = new Date(beijingTime);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(0, 2, 0, 0); // 设置为明天0点2分
+                
+                // 计算当前浏览器本地时间到北京时间0点2分的时间差
+                const timezoneOffset = now - beijingTime;
+                const targetTime = new Date(tomorrow.getTime() + timezoneOffset);
+                const timeUntilRefresh = targetTime - now;
+                
+                console.log(`🔄 页面将在北京时间 ${tomorrow.toLocaleString('zh-CN')} 自动刷新`);
+                console.log(`⏰ 距离刷新还有 ${Math.floor(timeUntilRefresh / 1000 / 60)} 分钟 (${Math.floor(timeUntilRefresh / 1000 / 60 / 60)} 小时)`);
+                
+                setTimeout(() => {
+                    console.log('🔄 执行每日0点2分自动刷新（处理跨日期数据）...');
+                    location.reload();
+                }, timeUntilRefresh);
+            }
+            
+            // 加载所有账户的余额信息
+            async function loadAccountsBalance() {
+                try {
+                    const accounts = JSON.parse(localStorage.getItem('okx_accounts') || '[]');
+                    
+                    if (accounts.length === 0) {
+                        console.log('⚠️ 未找到账户信息');
+                        return [];
+                    }
+                    
+                    console.log(`🔄 正在加载 ${accounts.length} 个账户的余额信息...`);
+                    
+                    // 为每个账户获取余额
+                    for (let account of accounts) {
+                        if (!account.apiKey || !account.apiSecret || !account.passphrase) {
+                            console.log(`⚠️ 账户 ${account.name} 缺少API凭证，跳过`);
+                            continue;
+                        }
+                        
+                        try {
+                            const response = await fetch('/api/okx-trading/account-balance', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    apiKey: account.apiKey,
+                                    apiSecret: account.apiSecret,
+                                    passphrase: account.passphrase
+                                })
+                            });
+                            
+                            const result = await response.json();
+                            if (result.success) {
+                                // 使用现有API的格式：{success, balance, currency, raw_data}
+                                const availBal = result.balance || 0;
+                                
+                                // 从raw_data中提取详细信息
+                                let totalEq = availBal;
+                                if (result.raw_data && result.raw_data.length > 0) {
+                                    const details = result.raw_data[0].details || [];
+                                    for (const detail of details) {
+                                        if (detail.ccy === 'USDT') {
+                                            totalEq = parseFloat(detail.eq || availBal);
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                                account.balance = {
+                                    totalEquity: totalEq,
+                                    availableBalance: availBal
+                                };
+                                console.log(`✅ 账户 ${account.name} 余额: ${account.balance.availableBalance} USDT`);
+                            } else {
+                                console.error(`❌ 账户 ${account.name} 余额获取失败:`, result.error);
+                            }
+                        } catch (error) {
+                            console.error(`❌ 加载账户 ${account.name} 余额失败:`, error);
+                        }
+                    }
+                    
+                    // 保存更新后的账户数据到全局变量
+                    window.accountsWithBalance = accounts;
+                    console.log('✅ 所有账户余额加载完成');
+                    return accounts;
+                    
+                } catch (error) {
+                    console.error('❌ 加载账户余额失败:', error);
+                    return [];
+                }
+            }
+            
+            // 策略应用函数
+            function applyStrategy(range, threshold, leverage, direction) {
+                console.log(`🎯 应用策略: ${range}, 阈值: ${threshold}%, 杠杆: ${leverage}x, 方向: ${direction}`);
+                
+                // 获取当前数据
+                if (!window.currentCoinsData || window.currentCoinsData.length === 0) {
+                    alert('❌ 暂无数据，请等待数据加载完成！');
+                    return;
+                }
+                
+                // 排序币种数据（按涨跌幅）
+                const sortedCoins = [...window.currentCoinsData].sort((a, b) => b.change - a.change);
+                
+                // 选择目标币种
+                let targetCoins = [];
+                if (range === 'top8') {
+                    // 涨幅前8名
+                    targetCoins = sortedCoins.slice(0, 8);
+                } else if (range === 'bottom8') {
+                    // 跌幅后8名（即跌幅最大的8个）
+                    targetCoins = sortedCoins.slice(-8).reverse();
+                }
+                
+                // 显示策略详情
+                const strategyDiv = document.getElementById('currentStrategy');
+                const detailsDiv = document.getElementById('strategyDetails');
+                
+                const rangeText = range === 'top8' ? '涨幅前8名' : '跌幅后8名（跌幅最大的8个）';
+                const directionText = direction === 'long' ? '做多（开多单）' : '做空（开空单）';
+                const thresholdText = range === 'top8' ? '再涨' : '再跌';
+                const directionIcon = direction === 'long' ? '📈' : '📉';
+                const directionColor = direction === 'long' ? 'text-green-600' : 'text-red-600';
+                
+                let coinsListHTML = '<div class="mt-3 space-y-2">';
+                targetCoins.forEach((coin, index) => {
+                    const changeColor = coin.change >= 0 ? 'text-green-600' : 'text-red-600';
+                    const changeSign = coin.change >= 0 ? '+' : '';
+                    coinsListHTML += `
+                        <div class="flex items-center justify-between p-2 bg-white rounded border border-gray-200">
+                            <span class="font-semibold">${index + 1}. ${coin.symbol}</span>
+                            <span class="${changeColor} font-bold">${changeSign}${coin.change.toFixed(2)}%</span>
+                        </div>
+                    `;
+                });
+                coinsListHTML += '</div>';
+                
+                // 生成账户开仓建议HTML
+                let accountsHTML = '';
+                const accounts = window.accountsWithBalance || [];
+                
+                if (accounts.length === 0 || !accounts.some(a => a.balance)) {
+                    accountsHTML = `
+                        <div class="mt-4 p-3 bg-yellow-100 rounded border border-yellow-300">
+                            <div class="flex items-center">
+                                <i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>
+                                <span class="text-yellow-800 font-semibold">未加载账户余额信息</span>
+                            </div>
+                            <p class="text-sm text-yellow-700 mt-1">
+                                请刷新页面以加载账户余额，或前往 
+                                <a href="/okx-trading" class="underline font-semibold hover:text-yellow-900">OKX交易页面</a> 
+                                配置账户API凭证
+                            </p>
+                        </div>
+                    `;
+                } else {
+                    accountsHTML = '<div class="mt-4">';
+                    accountsHTML += '<h5 class="font-bold text-gray-800 mb-2 flex items-center">';
+                    accountsHTML += '<i class="fas fa-wallet text-blue-600 mr-2"></i>';
+                    accountsHTML += '各账户建议开仓金额：</h5>';
+                    accountsHTML += '<div class="space-y-2">';
+                    
+                    let totalSuggestedPosition = 0;
+                    let accountsWithBalance = 0;
+                    
+                    accounts.forEach(account => {
+                        if (account.balance && account.balance.availableBalance > 0) {
+                            accountsWithBalance++;
+                            const availBal = account.balance.availableBalance;
+                            const positionSize = availBal * (threshold / 100);
+                            const requiredMargin = positionSize / leverage;
+                            
+                            totalSuggestedPosition += positionSize;
+                            
+                            // 检查余额是否充足
+                            const isSufficient = requiredMargin <= availBal;
+                            const statusIcon = isSufficient ? '✅' : '⚠️';
+                            const borderColor = isSufficient ? 'border-blue-200' : 'border-orange-300';
+                            const bgColor = isSufficient ? 'bg-blue-50' : 'bg-orange-50';
+                            
+                            accountsHTML += `
+                                <div class="p-3 ${bgColor} rounded border ${borderColor}">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="font-semibold text-gray-800">${statusIcon} ${account.name}</span>
+                                        <span class="text-xs text-gray-500">可用: ${availBal.toFixed(2)} USDT</span>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2 text-sm">
+                                        <div>
+                                            <span class="text-gray-600">建议开仓:</span>
+                                            <span class="font-bold text-blue-700 ml-1">${positionSize.toFixed(2)} USDT</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-gray-600">需保证金:</span>
+                                            <span class="font-bold text-purple-700 ml-1">${requiredMargin.toFixed(2)} USDT</span>
+                                        </div>
+                                    </div>
+                                    ${!isSufficient ? '<div class="mt-1 text-xs text-orange-700">⚠️ 余额可能不足，请注意风险</div>' : ''}
+                                </div>
+                            `;
+                        }
+                    });
+                    
+                    accountsHTML += '</div>';
+                    
+                    // 添加总计信息
+                    if (accountsWithBalance > 0) {
+                        accountsHTML += `
+                            <div class="mt-3 p-2 bg-gradient-to-r from-blue-100 to-purple-100 rounded border border-blue-300">
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="font-semibold text-gray-800">
+                                        <i class="fas fa-calculator mr-1"></i>
+                                        总计 (${accountsWithBalance}个账户)
+                                    </span>
+                                    <span class="font-bold text-blue-800">
+                                        ${totalSuggestedPosition.toFixed(2)} USDT
+                                    </span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    accountsHTML += '</div>';
+                }
+                
+                detailsDiv.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="font-bold ${directionColor}">${directionIcon} ${directionText}</span>
+                            <span class="text-gray-500">|</span>
+                            <span>选择范围: <strong>${rangeText}</strong></span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span>触发条件: 等待${thresholdText} <strong class="text-orange-600">${threshold}%</strong> 后开仓</span>
+                            <span class="text-gray-500">|</span>
+                            <span>杠杆: <strong class="text-purple-600">${leverage}x</strong></span>
+                        </div>
+                        <div class="mt-3">
+                            <strong>选中的币种（${targetCoins.length}个）:</strong>
+                            ${coinsListHTML}
+                        </div>
+                        ${accountsHTML}
+                        <div class="mt-3 p-3 bg-yellow-100 rounded border border-yellow-300">
+                            <strong class="text-yellow-800">📌 下一步操作:</strong>
+                            <p class="text-sm text-yellow-700 mt-1">
+                                请前往 <a href="/okx-trading" class="underline font-semibold hover:text-yellow-900">OKX交易页面</a> 
+                                根据各账户建议金额手动下单
+                            </p>
+                        </div>
+                    </div>
+                `;
+                
+                strategyDiv.classList.remove('hidden');
+                
+                // 滚动到策略详情
+                strategyDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // 保存当前策略到localStorage
+                const strategyData = {
+                    range,
+                    threshold,
+                    leverage,
+                    direction,
+                    targetCoins: targetCoins.map(c => ({
+                        symbol: c.symbol,
+                        change: c.change,
+                        currentPrice: c.current_price
+                    })),
+                    timestamp: new Date().toISOString()
+                };
+                localStorage.setItem('currentStrategy', JSON.stringify(strategyData));
+                
+                console.log('✅ 策略已应用:', strategyData);
+            }
+            
+            // 页面加载时恢复上次的策略
+            function restoreLastStrategy() {
+                const savedStrategy = localStorage.getItem('currentStrategy');
+                if (savedStrategy) {
+                    try {
+                        const strategy = JSON.parse(savedStrategy);
+                        // 检查策略是否在24小时内
+                        const strategyTime = new Date(strategy.timestamp);
+                        const now = new Date();
+                        const hoursDiff = (now - strategyTime) / (1000 * 60 * 60);
+                        
+                        if (hoursDiff < 24) {
+                            console.log('🔄 恢复上次的策略...');
+                            // 这里不自动应用，只是提示用户
+                            console.log('上次策略:', strategy);
+                        } else {
+                            // 超过24小时，清除旧策略
+                            localStorage.removeItem('currentStrategy');
+                        }
+                    } catch (e) {
+                        console.error('恢复策略失败:', e);
+                    }
+                }
+            }
+            
+            // ==================== 预警功能 ====================
+            
+            // 预警状态管理
+            let alertState = {
+                upperEnabled: false,
+                lowerEnabled: false,
+                upperThreshold: 300,
+                lowerThreshold: -300,
+                upperTriggered: false,
+                lowerTriggered: false,
+                lastCheckTime: null
+            };
+            
+            // 从后端加载预警设置
+            async function loadAlertSettings() {
+                try {
+                    // 先从后端加载
+                    const response = await fetch('/api/coin-tracker/alert-settings');
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success && result.settings) {
+                            const settings = result.settings;
+                            
+                            // 更新alertState
+                            alertState.upperThreshold = settings.upperThreshold || 5;
+                            alertState.lowerThreshold = settings.lowerThreshold || -5;
+                            alertState.upperEnabled = settings.upperEnabled || false;
+                            alertState.lowerEnabled = settings.lowerEnabled || false;
+                            alertState.tgEnabled = settings.tgEnabled || false;
+                            alertState.upperTriggered = settings.upperTriggered || false;
+                            alertState.lowerTriggered = settings.lowerTriggered || false;
+                            
+                            // 强制更新UI（确保值被设置）
+                            const upInput = document.getElementById('upThreshold');
+                            const downInput = document.getElementById('downThreshold');
+                            const upSwitch = document.getElementById('upAlertEnabled');
+                            const downSwitch = document.getElementById('downAlertEnabled');
+                            const tgSwitch = document.getElementById('tgEnabled');
+                            
+                            if (upInput) upInput.value = alertState.upperThreshold;
+                            if (downInput) downInput.value = alertState.lowerThreshold;
+                            if (upSwitch) upSwitch.checked = alertState.upperEnabled;
+                            if (downSwitch) downSwitch.checked = alertState.lowerEnabled;
+                            if (tgSwitch) tgSwitch.checked = alertState.tgEnabled;
+                            
+                            updateSwitchStyles();
+                            console.log('✅ 预警设置已从服务器加载:', alertState);
+                            console.log('📊 阈值已更新 - 上限:', alertState.upperThreshold, '下限:', alertState.lowerThreshold);
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('从服务器加载预警设置失败，尝试从localStorage加载:', e);
+                }
+                
+                // 如果后端加载失败，尝试从localStorage加载
+                const saved = localStorage.getItem('coinAlertSettings');
+                if (saved) {
+                    try {
+                        const settings = JSON.parse(saved);
+                        
+                        // 更新alertState
+                        alertState.upperThreshold = settings.upperThreshold || 5;
+                        alertState.lowerThreshold = settings.lowerThreshold || -5;
+                        alertState.upperEnabled = settings.upperEnabled || false;
+                        alertState.lowerEnabled = settings.lowerEnabled || false;
+                        alertState.tgEnabled = settings.tgEnabled || false;
+                        alertState.upperTriggered = settings.upperTriggered || false;
+                        alertState.lowerTriggered = settings.lowerTriggered || false;
+                        
+                        // 强制更新UI
+                        const upInput = document.getElementById('upThreshold');
+                        const downInput = document.getElementById('downThreshold');
+                        const upSwitch = document.getElementById('upAlertEnabled');
+                        const downSwitch = document.getElementById('downAlertEnabled');
+                        const tgSwitch = document.getElementById('tgEnabled');
+                        
+                        if (upInput) upInput.value = alertState.upperThreshold;
+                        if (downInput) downInput.value = alertState.lowerThreshold;
+                        if (upSwitch) upSwitch.checked = alertState.upperEnabled;
+                        if (downSwitch) downSwitch.checked = alertState.lowerEnabled;
+                        if (tgSwitch) tgSwitch.checked = alertState.tgEnabled;
+                        
+                        updateSwitchStyles();
+                        console.log('✅ 预警设置已从localStorage加载:', alertState);
+                        console.log('📊 阈值已更新 - 上限:', alertState.upperThreshold, '下限:', alertState.lowerThreshold);
+                    } catch (e) {
+                        console.error('从localStorage加载预警设置失败:', e);
+                    }
+                }
+            }
+            
+            // 保存预警设置到后端和localStorage
+            async function saveAlertSettings() {
+                // 保存到localStorage（本地备份）
+                localStorage.setItem('coinAlertSettings', JSON.stringify(alertState));
+                
+                // 保存到后端
+                try {
+                    const response = await fetch('/api/coin-tracker/alert-settings', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(alertState)
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log('💾 预警设置已保存到服务器:', result);
+                    } else {
+                        console.error('保存到服务器失败，但已保存到localStorage');
+                    }
+                } catch (e) {
+                    console.error('保存到服务器失败:', e, '但已保存到localStorage');
+                }
+            }
+            
+            // 更新开关样式
+            function updateSwitchStyles() {
+                const upperSwitch = document.getElementById('upAlertEnabled');
+                const lowerSwitch = document.getElementById('downAlertEnabled');
+                const upperLabel = upperSwitch.parentElement;
+                const lowerLabel = lowerSwitch.parentElement;
+                
+                if (alertState.upperEnabled) {
+                    upperLabel.classList.add('bg-green-500');
+                    upperLabel.classList.remove('bg-gray-300');
+                } else {
+                    upperLabel.classList.remove('bg-green-500');
+                    upperLabel.classList.add('bg-gray-300');
+                }
+                
+                if (alertState.lowerEnabled) {
+                    lowerLabel.classList.add('bg-green-500');
+                    lowerLabel.classList.remove('bg-gray-300');
+                } else {
+                    lowerLabel.classList.remove('bg-green-500');
+                    lowerLabel.classList.add('bg-gray-300');
+                }
+            }
+            
+            // 播放预警音效
+            function playAlertSound() {
+                try {
+                    // 使用Web Audio API生成警报音
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = 800; // 频率 800Hz
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.5);
+                    
+                    // 重复3次
+                    setTimeout(() => {
+                        const osc2 = audioContext.createOscillator();
+                        const gain2 = audioContext.createGain();
+                        osc2.connect(gain2);
+                        gain2.connect(audioContext.destination);
+                        osc2.frequency.value = 1000;
+                        osc2.type = 'sine';
+                        gain2.gain.setValueAtTime(0.3, audioContext.currentTime);
+                        gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                        osc2.start(audioContext.currentTime);
+                        osc2.stop(audioContext.currentTime + 0.5);
+                    }, 600);
+                    
+                    setTimeout(() => {
+                        const osc3 = audioContext.createOscillator();
+                        const gain3 = audioContext.createGain();
+                        osc3.connect(gain3);
+                        gain3.connect(audioContext.destination);
+                        osc3.frequency.value = 800;
+                        osc3.type = 'sine';
+                        gain3.gain.setValueAtTime(0.3, audioContext.currentTime);
+                        gain3.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                        osc3.start(audioContext.currentTime);
+                        osc3.stop(audioContext.currentTime + 0.5);
+                    }, 1200);
+                    
+                    console.log('🔊 预警音效已播放');
+                } catch (e) {
+                    console.error('播放音效失败:', e);
+                }
+            }
+            
+            // 发送Telegram通知
+            async function sendTelegramAlert(message) {
+                try {
+                    const response = await fetch('/api/telegram/send-alert', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: message,
+                            type: 'coin_alert'
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log('✅ Telegram通知已发送:', result);
+                        return true;
+                    } else {
+                        console.error('❌ Telegram通知发送失败:', response.status);
+                        return false;
+                    }
+                } catch (e) {
+                    console.error('发送Telegram通知异常:', e);
+                    return false;
+                }
+            }
+            
+            // 显示预警弹窗
+            function showAlertDialog(type, value, coins) {
+                const title = type === 'upper' ? '🔴 涨幅预警触发' : '🟢 跌幅预警触发';
+                const threshold = type === 'upper' ? alertState.upperThreshold : alertState.lowerThreshold;
+                const coinsText = coins.map(c => `${c.symbol}: ${c.change > 0 ? '+' : ''}${c.change}%`).join('\n');
+                
+                const message = `${title}\n\n当前累计涨跌幅: ${value > 0 ? '+' : ''}${value}%\n阈值: ${threshold > 0 ? '+' : ''}${threshold}%\n\n触发币种:\n${coinsText}`;
+                
+                // 创建弹窗
+                const dialog = document.createElement('div');
+                dialog.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                dialog.innerHTML = `
+                    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-2xl">
+                        <h2 class="text-2xl font-bold mb-4 ${type === 'upper' ? 'text-red-600' : 'text-green-600'}">
+                            ${title}
+                        </h2>
+                        <div class="bg-gray-100 rounded p-4 mb-4">
+                            <p class="font-mono text-sm whitespace-pre-line">${message.replace(/\n/g, '<br>')}</p>
+                        </div>
+                        <div class="flex justify-end space-x-3">
+                            <button onclick="this.closest('.fixed').remove()" 
+                                    class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition">
+                                关闭
+                            </button>
+                            <button onclick="location.reload()" 
+                                    class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+                                刷新数据
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(dialog);
+                
+                // 5秒后自动关闭
+                setTimeout(() => {
+                    if (document.body.contains(dialog)) {
+                        dialog.remove();
+                    }
+                }, 5000);
+            }
+            
+            // 检查预警条件
+            function checkAlerts(currentData) {
+                if (!currentData || !currentData.cumulative_pct) return;
+                
+                const currentValue = currentData.cumulative_pct;
+                const now = Date.now();
+                
+                // 避免频繁检查（最少间隔10秒）
+                if (alertState.lastCheckTime && (now - alertState.lastCheckTime) < 10000) {
+                    return;
+                }
+                
+                alertState.lastCheckTime = now;
+                
+                // 获取触发的币种
+                const changes = currentData.changes || {};
+                const triggerCoins = [];
+                
+                Object.entries(changes).forEach(([symbol, data]) => {
+                    if (!data.error && Math.abs(data.change_pct) > 10) {
+                        triggerCoins.push({
+                            symbol: symbol.replace('-USDT-SWAP', ''),
+                            change: data.change_pct.toFixed(2)
+                        });
+                    }
+                });
+                
+                // 检查上限预警
+                if (alertState.upperEnabled && !alertState.upperTriggered && currentValue >= alertState.upperThreshold) {
+                    console.log('🔴 触发上限预警:', currentValue, '>=', alertState.upperThreshold);
+                    
+                    // 播放音效
+                    playAlertSound();
+                    
+                    // 显示弹窗
+                    showAlertDialog('upper', currentValue, triggerCoins);
+                    
+                    // 发送Telegram通知
+                    const message = `🔴 涨幅预警触发！\n\n当前累计涨跌幅: +${currentValue.toFixed(2)}%\n阈值: +${alertState.upperThreshold}%\n\n触发币种:\n${triggerCoins.map(c => `${c.symbol}: ${c.change > 0 ? '+' : ''}${c.change}%`).join('\n')}`;
+                    sendTelegramAlert(message);
+                    
+                    // 关闭开关
+                    alertState.upperEnabled = false;
+                    alertState.upperTriggered = true;
+                    document.getElementById('upAlertEnabled').checked = false;
+                    updateSwitchStyles();
+                    saveAlertSettings();
+                }
+                
+                // 检查下限预警
+                if (alertState.lowerEnabled && !alertState.lowerTriggered && currentValue <= alertState.lowerThreshold) {
+                    console.log('🟢 触发下限预警:', currentValue, '<=', alertState.lowerThreshold);
+                    
+                    // 播放音效
+                    playAlertSound();
+                    
+                    // 显示弹窗
+                    showAlertDialog('lower', currentValue, triggerCoins);
+                    
+                    // 发送Telegram通知
+                    const message = `🟢 跌幅预警触发！\n\n当前累计涨跌幅: ${currentValue.toFixed(2)}%\n阈值: ${alertState.lowerThreshold}%\n\n触发币种:\n${triggerCoins.map(c => `${c.symbol}: ${c.change > 0 ? '+' : ''}${c.change}%`).join('\n')}`;
+                    sendTelegramAlert(message);
+                    
+                    // 关闭开关
+                    alertState.lowerEnabled = false;
+                    alertState.lowerTriggered = true;
+                    document.getElementById('downAlertEnabled').checked = false;
+                    updateSwitchStyles();
+                    saveAlertSettings();
+                }
+            }
+            
+            // 绑定预警设置事件
+            document.getElementById('upThreshold').addEventListener('change', (e) => {
+                alertState.upperThreshold = parseFloat(e.target.value);
+                alertState.upperTriggered = false; // 重置触发状态
+                saveAlertSettings();
+                console.log('上限阈值已更新:', alertState.upperThreshold);
+            });
+            
+            document.getElementById('downThreshold').addEventListener('change', (e) => {
+                alertState.lowerThreshold = parseFloat(e.target.value);
+                alertState.lowerTriggered = false; // 重置触发状态
+                saveAlertSettings();
+                console.log('下限阈值已更新:', alertState.lowerThreshold);
+            });
+            
+            document.getElementById('upAlertEnabled').addEventListener('change', (e) => {
+                alertState.upperEnabled = e.target.checked;
+                if (alertState.upperEnabled) {
+                    alertState.upperTriggered = false; // 重新开启时重置触发状态
+                }
+                updateSwitchStyles();
+                saveAlertSettings();
+                console.log('上限预警', alertState.upperEnabled ? '已开启' : '已关闭');
+            });
+            
+            document.getElementById('downAlertEnabled').addEventListener('change', (e) => {
+                alertState.lowerEnabled = e.target.checked;
+                if (alertState.lowerEnabled) {
+                    alertState.lowerTriggered = false; // 重新开启时重置触发状态
+                }
+                updateSwitchStyles();
+                saveAlertSettings();
+                console.log('下限预警', alertState.lowerEnabled ? '已开启' : '已关闭');
+            });
+            
+            // 保存按钮点击事件
+            document.getElementById('saveAlertSettings').addEventListener('click', async () => {
+                // 读取当前设置
+                alertState.upperThreshold = parseFloat(document.getElementById('upThreshold').value || 5);
+                alertState.lowerThreshold = parseFloat(document.getElementById('downThreshold').value || -5);
+                alertState.upperEnabled = document.getElementById('upAlertEnabled').checked;
+                alertState.lowerEnabled = document.getElementById('downAlertEnabled').checked;
+                alertState.tgEnabled = document.getElementById('tgEnabled').checked;
+                
+                // 保存到后端和localStorage
+                await saveAlertSettings();
+                
+                // 显示保存成功提示
+                const successDiv = document.getElementById('saveSuccess');
+                successDiv.classList.remove('hidden');
+                
+                // 3秒后自动隐藏
+                setTimeout(() => {
+                    successDiv.classList.add('hidden');
+                }, 3000);
+                
+                console.log('✅ 预警设置已手动保存:', alertState);
+            });
+            
+            // 重置按钮点击事件
+            document.getElementById('resetAlertSettings').addEventListener('click', async () => {
+                // 恢复默认值
+                alertState = {
+                    upperEnabled: false,
+                    lowerEnabled: false,
+                    tgEnabled: false,
+                    upperThreshold: 5,
+                    lowerThreshold: -5,
+                    upperTriggered: false,
+                    lowerTriggered: false,
+                    lastCheckTime: null
+                };
+                
+                // 更新UI
+                document.getElementById('upThreshold').value = 5;
+                document.getElementById('downThreshold').value = -5;
+                document.getElementById('upAlertEnabled').checked = false;
+                document.getElementById('downAlertEnabled').checked = false;
+                document.getElementById('tgEnabled').checked = false;
+                
+                updateSwitchStyles();
+                await saveAlertSettings();
+                
+                // 显示提示
+                const alertLog = document.getElementById('alertLog');
+                const alertMessage = document.getElementById('alertMessage');
+                alertMessage.textContent = '已恢复默认设置：上限5%，下限-5%，开关已关闭';
+                alertLog.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    alertLog.classList.add('hidden');
+                }, 3000);
+                
+                console.log('🔄 预警设置已恢复默认');
+            });
+            
+            // 在updateData函数中添加预警检查（已禁用，因为updateData不存在）
+            // const originalUpdateData = updateData;
+            // window.updateData = async function() {
+            //     await originalUpdateData();
+            //     
+            //     // 检查预警
+            //     const latestResponse = await fetch('/api/coin-change-tracker/latest');
+            //     if (latestResponse.ok) {
+            //         const latestData = await latestResponse.json();
+            //         checkAlerts(latestData);
+            //     }
+            // };
+            
+            // 页面加载时加载预警设置（立即执行，确保最先加载）
+            loadAlertSettings().then(() => {
+                console.log('🎯 页面加载完成，预警设置已加载');
+                // 二次确认：500ms后再次验证输入框的值
+                setTimeout(() => {
+                    const upValue = document.getElementById('upThreshold').value;
+                    const downValue = document.getElementById('downThreshold').value;
+                    console.log('🔍 500ms后验证 - 上限输入框值:', upValue, '下限输入框值:', downValue);
+                    console.log('🔍 500ms后验证 - alertState:', JSON.stringify(alertState));
+                    
+                    // 如果不匹配，强制再次设置
+                    if (upValue != alertState.upperThreshold || downValue != alertState.lowerThreshold) {
+                        console.warn('⚠️ 检测到值不匹配，强制重新设置！');
+                        document.getElementById('upThreshold').value = alertState.upperThreshold;
+                        document.getElementById('downThreshold').value = alertState.lowerThreshold;
+                    }
+                }, 500);
+            });
+            
+            // ==================== 预警功能结束 ====================
+            
+            scheduleAutoPageRefresh();
+            
+            // 窗口大小改变时重绘图表
+            window.addEventListener('resize', () => {
+                trendChart.resize();
+                rankChart.resize();
+            });
+        };
+    </script>
+</body>
+</html>
