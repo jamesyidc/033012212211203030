@@ -686,22 +686,49 @@ function renderKChart(ecId, cc, bb, sar, sigs, iz=60){
 // ═══════════════════════════════════════════════════
 function renderRSI(ecId, cc, rsi, iz=60){
   const cats=cc.map(c=>ts2s(c.ts));
-  const rd=rsi.map(v=>v===null?null:+v.toFixed(2));
+  // 超出 30-70 区间的值截断为 null（留白）
+  const rd=rsi.map(v=>{
+    if(v===null)return null;
+    if(v>70||v<30)return null;
+    return +v.toFixed(2);
+  });
+  // 超过70的段（红色）
+  const rdOver=rsi.map(v=>{
+    if(v===null)return null;
+    return v>=70?+v.toFixed(2):null;
+  });
+  // 低于30的段（绿色）
+  const rdUnder=rsi.map(v=>{
+    if(v===null)return null;
+    return v<=30?+v.toFixed(2):null;
+  });
 
   ec[ecId].setOption({
     backgroundColor:'#131722',animation:false,
-    grid:[{left:60,right:8,top:8,bottom:24}],
+    grid:[{left:52,right:36,top:6,bottom:24}],
     xAxis:[{
       type:'category',data:cats,scale:true,
       axisLine:{lineStyle:{color:'#2a2e39'}},
       axisLabel:{color:'#555',fontSize:9,interval:'auto'},
-      splitLine:{lineStyle:{color:'#1e222d',opacity:.5}}
+      splitLine:{show:false}
     }],
     yAxis:[{
-      type:'value',min:0,max:100,interval:10,
+      type:'value',
+      // Y轴只显示 30-70，超出部分留白
+      min:28, max:72,
+      interval:5,
       axisLine:{lineStyle:{color:'#2a2e39'}},
-      axisLabel:{color:'#787b86',fontSize:10,formatter:v=>v},
-      splitLine:{lineStyle:{color:'#1e222d',opacity:.5}}
+      axisLabel:{
+        color:'#787b86',fontSize:10,
+        formatter:v=>{
+          if(v===70)return '70';
+          if(v===50)return '50';
+          if(v===45)return '45';
+          if(v===30)return '30';
+          return '';
+        }
+      },
+      splitLine:{show:false}
     }],
     dataZoom:[
       {type:'inside',start:iz,end:100},
@@ -713,34 +740,79 @@ function renderRSI(ecId, cc, rsi, iz=60){
       trigger:'axis',backgroundColor:'rgba(19,23,34,.95)',borderColor:'#2a2e39',
       textStyle:{color:'#d1d4dc',fontSize:11},
       formatter(p){
-        const v=p[0]?.value;
-        return `<span style="font-size:11px">RSI(14): <b style="color:${
-          v>70?'#ef5350':v<30?'#26a69a':'#d1d4dc'
-        }">${v??'──'}</b></span>`;
+        // tooltip 读原始 rsi 值
+        const idx=p[0]?.dataIndex;
+        const v=rsi[idx];
+        if(v===null||v===undefined)return '';
+        const raw=+v.toFixed(1);
+        const col=raw>70?'#ef5350':raw<30?'#26a69a':raw>=50?'#7b61ff':'#f0b90b';
+        return `<span style="font-size:11px">RSI(14): <b style="color:${col}">${raw}</b></span>`;
       }
     },
-    series:[{
-      name:'RSI',type:'line',data:rd,smooth:false,symbol:'none',
-      lineStyle:{color:'#7b61ff',width:2},
-      markLine:{
-        silent:true,
-        lineStyle:{type:'dashed',width:1},
-        label:{fontSize:11,fontWeight:'bold'},
-        data:[
-          {yAxis:70,lineStyle:{color:'#ef5350'},label:{color:'#ef5350',formatter:'70',position:'end'}},
-          {yAxis:50,lineStyle:{color:'#555'},   label:{color:'#787b86',formatter:'50',position:'end'}},
-          {yAxis:45,lineStyle:{color:'#f0b90b'},label:{color:'#f0b90b',formatter:'45',position:'end'}},
-          {yAxis:30,lineStyle:{color:'#26a69a'},label:{color:'#26a69a',formatter:'30',position:'end'}},
-        ]
+    series:[
+      // ── 主线：30-70 之间，紫色
+      {
+        name:'RSI',type:'line',data:rd,smooth:false,symbol:'none',
+        lineStyle:{color:'#7b61ff',width:1.5},
+        connectNulls:false,
+        z:4,
+        markLine:{
+          silent:true,
+          animation:false,
+          data:[
+            // 70 上边界 — 红色实线
+            {yAxis:70,
+             lineStyle:{color:'#ef5350',type:'solid',width:1.5},
+             label:{show:true,color:'#ef5350',fontSize:11,fontWeight:'bold',
+                    formatter:'70',position:'end'}},
+            // 50 中轴 — 灰色虚线
+            {yAxis:50,
+             lineStyle:{color:'#555',type:'dashed',width:1},
+             label:{show:true,color:'#9ca3af',fontSize:11,fontWeight:'bold',
+                    formatter:'50',position:'end'}},
+            // 45 关键线 — 黄色实线
+            {yAxis:45,
+             lineStyle:{color:'#f0b90b',type:'solid',width:1.5},
+             label:{show:true,color:'#f0b90b',fontSize:11,fontWeight:'bold',
+                    formatter:'45',position:'end'}},
+            // 30 下边界 — 绿色实线
+            {yAxis:30,
+             lineStyle:{color:'#26a69a',type:'solid',width:1.5},
+             label:{show:true,color:'#26a69a',fontSize:11,fontWeight:'bold',
+                    formatter:'30',position:'end'}},
+          ]
+        },
+        markArea:{
+          silent:true,animation:false,
+          data:[
+            // 70-72 留白带（超出区）
+            [{yAxis:70,itemStyle:{color:'rgba(239,83,80,.0)'}},{yAxis:72}],
+            // 50-70 上半区 — 极淡红
+            [{yAxis:50,itemStyle:{color:'rgba(239,83,80,.05)'}},{yAxis:70}],
+            // 45-50 中间区 — 淡黄
+            [{yAxis:45,itemStyle:{color:'rgba(240,185,11,.05)'}},{yAxis:50}],
+            // 30-45 下半区 — 极淡绿
+            [{yAxis:30,itemStyle:{color:'rgba(38,166,154,.05)'}},{yAxis:45}],
+            // 28-30 留白带（超出区）
+            [{yAxis:28,itemStyle:{color:'rgba(38,166,154,.0)'}},{yAxis:30}],
+          ]
+        }
       },
-      markArea:{
-        silent:true,
-        data:[
-          [{yAxis:70,itemStyle:{color:'rgba(239,83,80,.07)'}},{yAxis:100}],
-          [{yAxis:0, itemStyle:{color:'rgba(38,166,154,.07)'}},{yAxis:30}],
-        ]
+      // ── 超过70部分 — 红色，超出上边界
+      {
+        name:'RSI>70',type:'line',data:rdOver,smooth:false,symbol:'none',
+        lineStyle:{color:'#ef5350',width:1.5},
+        connectNulls:false,z:5,
+        tooltip:{show:false},markLine:{data:[]},markArea:{data:[]}
+      },
+      // ── 低于30部分 — 绿色，超出下边界
+      {
+        name:'RSI<30',type:'line',data:rdUnder,smooth:false,symbol:'none',
+        lineStyle:{color:'#26a69a',width:1.5},
+        connectNulls:false,z:5,
+        tooltip:{show:false},markLine:{data:[]},markArea:{data:[]}
       }
-    }]
+    ]
   });
 }
 
