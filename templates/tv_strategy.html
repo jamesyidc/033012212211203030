@@ -403,7 +403,7 @@ function calcSigs5m(cc,rsi){
 
 function calcSigs1h(cc,rsi){
   const sigs=[],N=cc.length;
-  let hit70=false,cross50=false;
+  let hit70=false,cross50=false,wasBelow30=false;
   for(let i=1;i<N;i++){
     const c=cc[i],r=rsi[i],rp=rsi[i-1];
     if(r===null||rp===null)continue;
@@ -414,6 +414,9 @@ function calcSigs1h(cc,rsi){
     hit70=false;if(r>=70)hit70=true;
     if(rp>50&&r<=50) cross50=true;
     if(cross50&&rp<50&&r>=50){sigs.push({i,type:'close_yk',price:c.close,ts:c.ts,rsi:r});cross50=false;}
+    // 2号线：RSI从超卖区(<30)回升穿越30时触发
+    if(rp<30) wasBelow30=true;
+    if(wasBelow30&&rp<30&&r>=30){sigs.push({i,type:'line2',price:c.close,ts:c.ts,rsi:r});wasBelow30=false;}
   }
   return sigs;
 }
@@ -461,8 +464,8 @@ function renderSigPanel(s5m, s1h, cc5m, cc1h){
         <span class="st">${ts2s(s.ts)}</span>
       </div>`).join('');
 
-  // 1类：2号线
-  const l2=s5m.filter(s=>s.type==='line2');
+  // 1类：2号线（5m + 1H合并）
+  const l2=[...s5m,...s1h].filter(s=>s.type==='line2');
   document.getElementById('cnt2').textContent=l2.length+'条';
   document.getElementById('list_line2').innerHTML= l2.length===0
     ? '<div class="sig-empty">暂无</div>'
@@ -589,7 +592,7 @@ function renderKChart(ecId, cc, bb, sar, sigs, iz=60){
   const mpts=[];
   sigs.forEach(s=>{
     const c=cc[s.i];
-    const above=['bear3','bear2','zhuankong','escape','yk_entry','line3'].includes(s.type);
+    const above=['bear3','bear2','zhuankong','escape','yk_entry','line3','line1'].includes(s.type);
     const cfg={
       line3:{color:'#ef5350',label:'3'},
       line1:{color:'#f0b90b',label:'1'},
@@ -940,7 +943,7 @@ async function saveSignals(s5m, s1h){
     const all=[
       ...s5m.filter(s=>['line3','line1','line2','yk_entry'].includes(s.type))
             .map(s=>({...s, bar:'5m'})),
-      ...s1h.filter(s=>['zhuanlong','zhuankong','escape','close_yk'].includes(s.type))
+      ...s1h.filter(s=>['zhuanlong','zhuankong','escape','close_yk','line2'].includes(s.type))
             .map(s=>({...s, bar:'1H'}))
     ];
     if(!all.length)return;
