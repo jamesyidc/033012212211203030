@@ -599,7 +599,7 @@ function renderKChart(ecId, cc, bb, sar, sigs, iz=60){
     }[s.type];
     if(!cfg)return;
     const yval=above?c.high*1.004:c.low*0.996;
-    mpts.push({coord:[s.i,yval],value:cfg.label,
+    mpts.push({coord:[cats[s.i],yval],value:cfg.label,
       itemStyle:{color:cfg.color},label:{fontSize:9,color:'#fff',fontWeight:'bold'}});
   });
 
