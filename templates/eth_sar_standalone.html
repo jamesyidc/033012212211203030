@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETH SAR + 布林带 监控</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background: #0a0f1e;
+            color: #e2e8f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.35; }
+        }
+        .animate-spin { animation: spin 0.8s linear infinite; }
+
+        /* scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); }
+        ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.35); border-radius: 3px; }
+
+        /* table sticky header */
+        .sticky-thead thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: #0f172a;
+        }
+
+        /* row hover */
+        #ethSarBarsTable tr:hover,
+        #ethSarFlipsTbody tr:hover {
+            background: rgba(99,102,241,0.08) !important;
+        }
+
+        /* History modal */
+        #ethSarHistoryModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+        }
+        #ethSarHistoryModal.open { display: flex; }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     PAGE HEADER
+═══════════════════════════════════════════ -->
+<div style="background:rgba(255,255,255,0.03); border-bottom:1px solid rgba(255,255,255,0.07); padding:10px 20px; display:flex; align-items:center; justify-content:between; gap:12px;">
+    <div style="display:flex; align-items:center; gap:10px; flex:1;">
+        <!-- 返回首页 -->
+        <a href="/coin-change-tracker"
+           style="display:inline-flex;align-items:center;gap:5px;padding:4px 12px;height:28px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(148,163,184,0.12);border:1px solid rgba(148,163,184,0.3);color:#94a3b8;text-decoration:none;transition:background 0.2s;white-space:nowrap;"
+           onmouseover="this.style.background='rgba(148,163,184,0.22)';this.style.color='#e2e8f0'"
+           onmouseout="this.style.background='rgba(148,163,184,0.12)';this.style.color='#94a3b8'">
+            <svg style="width:13px;height:13px;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            首页
+        </a>
+        <div style="width:1px;height:18px;background:rgba(255,255,255,0.1);"></div>
+        <div style="width:8px;height:8px;border-radius:50%;background:#4ade80;box-shadow:0 0 8px #4ade80;" id="pageDot"></div>
+        <span style="font-weight:700;font-size:15px;color:#e2e8f0;">ETH-USDT-SWAP · 5分钟 · SAR + 布林带</span>
+        <span style="padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(99,102,241,0.25);color:#a5b4fc;">OKX 永续</span>
+        <span style="padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(251,191,36,0.15);color:#fbbf24;">独立监控页</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+        <span id="pageUpdateTime" style="font-size:11px;color:#64748b;font-family:monospace;">--:--:--</span>
+        <button onclick="openEthSarHistory()" title="历史数据"
+                style="display:flex;align-items:center;gap:4px;padding:4px 12px;height:28px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);color:#a5b4fc;cursor:pointer;transition:background 0.2s;"
+                onmouseover="this.style.background='rgba(99,102,241,0.35)'"
+                onmouseout="this.style.background='rgba(99,102,241,0.2)'">
+            <svg style="width:13px;height:13px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            历史
+        </button>
+        <button onclick="loadEthSarBoll()" title="刷新"
+                style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,255,255,0.08);border:none;cursor:pointer;transition:background 0.2s;"
+                onmouseover="this.style.background='rgba(255,255,255,0.18)'"
+                onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+            <svg id="ethSarRefreshIcon" style="width:15px;height:15px;color:#cbd5e1;" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+        </button>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════════════ -->
+<div style="max-width:1600px; margin:0 auto; padding:16px 16px 40px;">
+
+    <!-- ── TOP PANEL: 实时 K 线 ── -->
+    <div style="background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);border:1px solid rgba(255,255,255,0.08);border-radius:16px;margin-bottom:16px;overflow:hidden;">
+
+        <!-- metric cards + dot -->
+        <div style="padding:14px 18px 0;">
+            <div id="ethSarCurrentStatus" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+                <!-- dynamic -->
+            </div>
+
+            <!-- Bollinger progress bar -->
+            <div style="margin-bottom:16px;">
+                <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:6px;color:#94a3b8;">
+                    <span style="color:#f87171;">LB <span id="ethSarLB" style="font-family:monospace;font-size:12px;font-weight:700;">--</span></span>
+                    <span style="color:#fde68a;">MID <span id="ethSarMID" style="font-family:monospace;font-size:12px;font-weight:700;">--</span></span>
+                    <span style="color:#4ade80;">UB <span id="ethSarUB" style="font-family:monospace;font-size:12px;font-weight:700;">--</span></span>
+                </div>
+                <div style="position:relative;height:10px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,0.08);">
+                    <div style="position:absolute;inset:0;border-radius:99px;background:linear-gradient(90deg,#ef4444 0%,#fbbf24 50%,#22c55e 100%);opacity:0.25;"></div>
+                    <div id="ethSarPctBar" style="position:absolute;top:0;bottom:0;width:3px;border-radius:99px;background:#818cf8;box-shadow:0 0 8px #818cf8;transition:left 0.7s;left:50%;"></div>
+                    <div id="ethPricePctBar" style="position:absolute;top:0;bottom:0;width:3px;border-radius:99px;background:#fbbf24;box-shadow:0 0 8px #fbbf24;transition:left 0.7s;left:50%;"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:10px;margin-top:3px;color:#64748b;">
+                    <span>0%</span>
+                    <span style="color:#a5b4fc;">SAR% <span id="ethSarPctLabel" style="font-family:monospace;font-weight:700;">--</span>%</span>
+                    <span>100%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- K-line table -->
+        <div style="padding:0 18px 16px;">
+            <div style="font-size:11px;font-weight:600;color:#94a3b8;margin-bottom:8px;display:flex;align-items:center;gap-6px;">
+                📊 最近 K线（含实时K线，30秒更新）
+            </div>
+            <div class="overflow-x-auto sticky-thead" style="border:1px solid rgba(255,255,255,0.07);border-radius:10px;max-height:520px;overflow-y:auto;">
+                <table style="width:100%;border-collapse:collapse;font-size:11.5px;">
+                    <thead>
+                        <tr style="background:rgba(15,23,42,0.95);color:#64748b;">
+                            <th style="padding:8px 10px;text-align:left;font-weight:600;white-space:nowrap;">时间</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fb923c;white-space:nowrap;">最高</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#60a5fa;white-space:nowrap;">最低</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;white-space:nowrap;">收盘价</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fde68a;white-space:nowrap;">实体%</th><th style="padding:8px 8px;text-align:right;font-weight:600;color:#67e8f9;white-space:nowrap;" title="当日截至该时间点收盘价在最高最低区间的位置">所处位置</th>
+                            
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fb923c;white-space:nowrap;" title="(最高-收盘)/收盘 百分比">上影线%</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#60a5fa;white-space:nowrap;" title="(收盘-最低)/收盘 百分比">下影线%</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fdba74;white-space:nowrap;" title="上影线% ÷ 实体%绝对值">上影/实体</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#93c5fd;white-space:nowrap;" title="下影线% ÷ 实体%绝对值">下影/实体</th><th style="padding:8px 8px;text-align:right;font-weight:600;white-space:nowrap;">SAR</th>
+                            <th style="padding:8px 8px;text-align:center;font-weight:600;white-space:nowrap;">方向</th>
+                            <th style="padding:8px 8px;text-align:center;font-weight:600;white-space:nowrap;">序号</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;white-space:nowrap;">SAR%</th>
+                            <th style="padding:8px 8px;text-align:center;font-weight:600;white-space:nowrap;">变化</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#f87171;white-space:nowrap;">LB</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fde68a;white-space:nowrap;">MID</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#4ade80;white-space:nowrap;">UB</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#a78bfa;white-space:nowrap;">开口</th>
+                            <th style="padding:8px 8px;text-align:center;font-weight:600;color:#a78bfa;white-space:nowrap;">开口变化</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#c084fc;white-space:nowrap;" title="当前开口 ÷ 本轮起始开口">开口比</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#e879f9;white-space:nowrap;">SAR距离</th>
+                            <th style="padding:8px 8px;text-align:center;font-weight:600;color:#e879f9;white-space:nowrap;">距离变化</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ethSarBarsTable">
+                        <tr><td colspan="23" style="text-align:center;padding:32px;color:#475569;">
+                            <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+                                <div style="width:14px;height:14px;border:2px solid #818cf8;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+                                加载中...
+                            </div>
+                        </td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── BOTTOM PANEL: 空头01 / 多头01 汇总 ── -->
+    <div style="background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);border:1px solid rgba(255,255,255,0.08);border-radius:16px;overflow:hidden;">
+
+        <!-- title bar -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 18px;background:rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.07);">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:8px;height:8px;border-radius:50%;background:#c084fc;box-shadow:0 0 6px #c084fc;"></div>
+                <span style="font-weight:700;font-size:13px;color:#fff;">空头01 / 多头01 汇总</span>
+                <span style="padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;background:rgba(192,132,252,0.2);color:#c084fc;">sar_seq = 1</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <select id="ethSarFlipsDateSel"
+                        onchange="loadEthSarDailyFlips(this.value)"
+                        style="background:rgba(15,23,42,0.9);border:1px solid rgba(192,132,252,0.35);color:#c084fc;border-radius:8px;padding:3px 8px;font-size:11px;cursor:pointer;outline:none;">
+                    <option value="">加载中...</option>
+                </select>
+                <span id="ethSarFlipsCount" style="padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;background:rgba(99,102,241,0.2);color:#818cf8;">--</span>
+                <button onclick="loadEthSarDailyFlips(document.getElementById('ethSarFlipsDateSel').value)" title="刷新"
+                        style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,255,255,0.08);border:none;cursor:pointer;"
+                        onmouseover="this.style.background='rgba(255,255,255,0.18)'"
+                        onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+                    <svg style="width:13px;height:13px;" fill="none" stroke="#94a3b8" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- seq1 table -->
+        <div style="padding:14px 18px;">
+            <div class="overflow-x-auto sticky-thead" style="border:1px solid rgba(255,255,255,0.07);border-radius:10px;max-height:480px;overflow-y:auto;">
+                <table style="width:100%;border-collapse:collapse;font-size:11.5px;">
+                    <thead>
+                        <tr style="background:rgba(15,23,42,0.95);color:#64748b;">
+                            <th style="padding:8px 10px;text-align:left;font-weight:600;white-space:nowrap;">时间</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fb923c;white-space:nowrap;">最高</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#60a5fa;white-space:nowrap;">最低</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;white-space:nowrap;">收盘价</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fde68a;white-space:nowrap;">实体%</th><th style="padding:8px 8px;text-align:right;font-weight:600;color:#67e8f9;white-space:nowrap;" title="当日截至该时间点收盘价在最高最低区间的位置">所处位置</th>
+                            
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fb923c;white-space:nowrap;" title="(最高-收盘)/收盘 百分比">上影线%</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#60a5fa;white-space:nowrap;" title="(收盘-最低)/收盘 百分比">下影线%</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fdba74;white-space:nowrap;" title="上影线% ÷ 实体%绝对值">上影/实体</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#93c5fd;white-space:nowrap;" title="下影线% ÷ 实体%绝对值">下影/实体</th><th style="padding:8px 8px;text-align:right;font-weight:600;white-space:nowrap;">SAR</th>
+                            <th style="padding:8px 8px;text-align:center;font-weight:600;white-space:nowrap;">方向</th>
+                            <th style="padding:8px 8px;text-align:center;font-weight:600;white-space:nowrap;">序号</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;white-space:nowrap;">SAR%</th>
+                            <th style="padding:8px 8px;text-align:center;font-weight:600;white-space:nowrap;">变化</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#f87171;white-space:nowrap;">LB</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fde68a;white-space:nowrap;">MID</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#4ade80;white-space:nowrap;">UB</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#a78bfa;white-space:nowrap;">开口</th>
+                            <th style="padding:8px 8px;text-align:center;font-weight:600;color:#a78bfa;white-space:nowrap;">开口变化</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#c084fc;white-space:nowrap;" title="当前开口 ÷ 本轮起始开口">开口比</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#e879f9;white-space:nowrap;">SAR距离</th>
+                            <th style="padding:8px 8px;text-align:center;font-weight:600;color:#e879f9;white-space:nowrap;">距离变化</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ethSarFlipsTbody">
+                        <tr><td colspan="23" style="text-align:center;padding:32px;color:#475569;">
+                            <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+                                <div style="width:14px;height:14px;border:2px solid #c084fc;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+                                加载中...
+                            </div>
+                        </td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 影线预警记录面板 ─────────────────────────────────────────── -->
+    <div style="margin-top:18px;background:linear-gradient(135deg,rgba(15,23,42,0.9) 0%,rgba(30,41,59,0.95) 100%);border:1px solid rgba(251,146,60,0.25);border-radius:14px;overflow:hidden;">
+        <!-- panel header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:rgba(251,146,60,0.07);border-bottom:1px solid rgba(251,146,60,0.15);">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:8px;height:8px;border-radius:50%;background:#fb923c;box-shadow:0 0 6px #fb923c;"></div>
+                <span style="font-weight:700;font-size:13px;color:#fff;">🕯️ 影线预警记录</span>
+                <span style="padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;background:rgba(251,146,60,0.2);color:#fb923c;">上影线≥0.5% 或 下影线≥0.3%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <select id="ethSarShadowDateSel"
+                        onchange="loadShadowAlertRows(this.value)"
+                        style="background:rgba(15,23,42,0.9);border:1px solid rgba(251,146,60,0.35);color:#fb923c;border-radius:8px;padding:3px 8px;font-size:11px;cursor:pointer;outline:none;">
+                    <option value="">加载中...</option>
+                </select>
+                <span id="ethSarShadowCount" style="padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;background:rgba(251,146,60,0.15);color:#fdba74;">--</span>
+                <button onclick="loadShadowAlertRows(document.getElementById('ethSarShadowDateSel').value)" title="刷新"
+                        style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,255,255,0.08);border:none;cursor:pointer;"
+                        onmouseover="this.style.background='rgba(255,255,255,0.18)'"
+                        onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+                    <svg style="width:13px;height:13px;" fill="none" stroke="#94a3b8" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- shadow alert table -->
+        <div style="padding:14px 18px;">
+            <div class="overflow-x-auto sticky-thead" style="border:1px solid rgba(255,255,255,0.07);border-radius:10px;max-height:420px;overflow-y:auto;">
+                <table style="width:100%;border-collapse:collapse;font-size:11.5px;">
+                    <thead>
+                        <tr style="background:rgba(15,23,42,0.95);color:#64748b;">
+                            <th style="padding:8px 8px;text-align:center;font-weight:600;white-space:nowrap;color:#fb923c;">类型</th>
+                            <th style="padding:8px 10px;text-align:left;font-weight:600;white-space:nowrap;">时间</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fb923c;white-space:nowrap;">最高</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#60a5fa;white-space:nowrap;">最低</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;white-space:nowrap;">收盘价</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fde68a;white-space:nowrap;">实体%</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#67e8f9;white-space:nowrap;">所处位置</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fb923c;white-space:nowrap;">上影线%</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#60a5fa;white-space:nowrap;">下影线%</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fdba74;white-space:nowrap;">上影/实体</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#93c5fd;white-space:nowrap;">下影/实体</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;white-space:nowrap;">SAR</th>
+                            <th style="padding:8px 8px;text-align:center;font-weight:600;white-space:nowrap;">方向</th>
+                            <th style="padding:8px 8px;text-align:center;font-weight:600;white-space:nowrap;">序号</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;white-space:nowrap;">SAR%</th>
+                            <th style="padding:8px 8px;text-align:center;font-weight:600;white-space:nowrap;">变化</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#f87171;white-space:nowrap;">LB</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fde68a;white-space:nowrap;">MID</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#4ade80;white-space:nowrap;">UB</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#a78bfa;white-space:nowrap;">开口</th>
+                            <th style="padding:8px 8px;text-align:center;font-weight:600;color:#a78bfa;white-space:nowrap;">开口变化</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#c084fc;white-space:nowrap;">开口比</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#e879f9;white-space:nowrap;">SAR距离</th>
+                            <th style="padding:8px 8px;text-align:center;font-weight:600;color:#e879f9;white-space:nowrap;">距离变化</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ethSarShadowTbody">
+                        <tr><td colspan="24" style="text-align:center;padding:32px;color:#475569;">
+                            <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+                                <div style="width:14px;height:14px;border:2px solid #fb923c;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+                                加载中...
+                            </div>
+                        </td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /main -->
+
+
+<!-- ═══════════════════════════════════════════
+     HISTORY MODAL
+═══════════════════════════════════════════ -->
+<div id="ethSarHistoryModal" onclick="if(event.target===this)closeEthSarHistory()">
+    <div style="background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);border:1px solid rgba(255,255,255,0.1);border-radius:16px;width:min(99vw,1480px);max-height:92vh;display:flex;flex-direction:column;overflow:hidden;">
+        <!-- modal header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-weight:700;font-size:13px;color:#fff;">📋 历史 K线数据</span>
+                <select id="ethSarHistoryDateSel" onchange="onEthSarDateChange()"
+                        style="background:rgba(15,23,42,0.9);border:1px solid rgba(99,102,241,0.4);color:#a5b4fc;border-radius:8px;padding:3px 8px;font-size:11px;cursor:pointer;outline:none;">
+                    <option>加载中...</option>
+                </select>
+                <span id="ethSarHistoryInfo" style="font-size:11px;color:#64748b;"></span>
+            </div>
+            <button onclick="closeEthSarHistory()"
+                    style="width:28px;height:28px;border-radius:50%;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;"
+                    onmouseover="this.style.background='rgba(239,68,68,0.3)'"
+                    onmouseout="this.style.background='rgba(239,68,68,0.15)'">×</button>
+        </div>
+        <!-- modal body -->
+        <div style="overflow:auto;flex:1;padding:14px;">
+            <div class="sticky-thead" style="border:1px solid rgba(255,255,255,0.07);border-radius:10px;overflow:auto;">
+                <table style="width:100%;border-collapse:collapse;font-size:11px;min-width:1200px;">
+                    <thead>
+                        <tr style="background:rgba(15,23,42,0.95);color:#64748b;">
+                            <th style="padding:7px 10px;text-align:left;font-weight:600;white-space:nowrap;">时间</th>
+                            <th style="padding:7px 8px;text-align:right;font-weight:600;color:#fb923c;white-space:nowrap;">最高</th>
+                            <th style="padding:7px 8px;text-align:right;font-weight:600;color:#60a5fa;white-space:nowrap;">最低</th>
+                            <th style="padding:7px 8px;text-align:right;font-weight:600;white-space:nowrap;">收盘价</th>
+                            <th style="padding:7px 8px;text-align:right;font-weight:600;color:#fde68a;white-space:nowrap;">实体%</th><th style="padding:7px 8px;text-align:right;font-weight:600;color:#67e8f9;white-space:nowrap;" title="当日截至该时间点收盘价在最高最低区间的位置">所处位置</th>
+                            
+                            <th style="padding:7px 8px;text-align:right;font-weight:600;color:#fb923c;white-space:nowrap;" title="(最高-收盘)/收盘">上影线%</th>
+                            <th style="padding:7px 8px;text-align:right;font-weight:600;color:#60a5fa;white-space:nowrap;" title="(收盘-最低)/收盘">下影线%</th>
+                            <th style="padding:7px 8px;text-align:right;font-weight:600;color:#fdba74;white-space:nowrap;" title="上影线% ÷ 实体%">上影/实体</th>
+                            <th style="padding:7px 8px;text-align:right;font-weight:600;color:#93c5fd;white-space:nowrap;" title="下影线% ÷ 实体%">下影/实体</th><th style="padding:7px 8px;text-align:right;font-weight:600;white-space:nowrap;">SAR</th>
+                            <th style="padding:7px 8px;text-align:center;font-weight:600;white-space:nowrap;">方向</th>
+                            <th style="padding:7px 8px;text-align:right;font-weight:600;white-space:nowrap;">SAR%</th>
+                            <th style="padding:7px 8px;text-align:center;font-weight:600;white-space:nowrap;">变化</th>
+                            <th style="padding:7px 8px;text-align:right;font-weight:600;color:#f87171;white-space:nowrap;">LB</th>
+                            <th style="padding:7px 8px;text-align:right;font-weight:600;color:#fde68a;white-space:nowrap;">MID</th>
+                            <th style="padding:7px 8px;text-align:right;font-weight:600;color:#4ade80;white-space:nowrap;">UB</th>
+                            <th style="padding:7px 8px;text-align:right;font-weight:600;color:#a78bfa;white-space:nowrap;">开口</th>
+                            <th style="padding:7px 8px;text-align:center;font-weight:600;color:#a78bfa;white-space:nowrap;">开口变化</th>
+                            <th style="padding:7px 8px;text-align:right;font-weight:600;color:#c084fc;white-space:nowrap;">开口比</th>
+                            <th style="padding:7px 8px;text-align:right;font-weight:600;color:#e879f9;white-space:nowrap;">SAR距离</th>
+                            <th style="padding:7px 8px;text-align:center;font-weight:600;color:#e879f9;white-space:nowrap;">距离变化</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ethSarHistoryTbody">
+                        <tr><td colspan="23" style="text-align:center;padding:32px;color:#475569;">选择日期后加载</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════ -->
+<script>
+
+// ── Global TG alert helper ──────────────────────────────────────────
+async function _sendTgAlert(message) {
+    try {
+        const resp = await fetch('/api/telegram/send-alert', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: message, type: 'coin_alert' })
+        });
+        if (resp.ok) {
+            const r = await resp.json();
+            console.log('✅ [TG] 通知已发送:', r);
+            return true;
+        } else {
+            console.error('❌ [TG] 发送失败 HTTP', resp.status);
+            return false;
+        }
+    } catch (e) {
+        console.error('[TG] 发送异常:', e);
+        return false;
+    }
+}
+
+// ── Formatting helpers ──────────────────────────────────────────────
+function _pctColor(pct) {
+    if (pct === null || pct === undefined) return '#94a3b8';
+    if (pct > 100) return '#22c55e';
+    if (pct < 0)   return '#ef4444';
+    if (pct > 70)  return '#4ade80';
+    if (pct < 30)  return '#f87171';
+    return '#a5b4fc';
+}
+function _pctToLeft(pct) {
+    if (pct === null || pct === undefined) return '50%';
+    const c = Math.max(0, Math.min(100, pct));
+    return c.toFixed(1) + '%';
+}
+function _deltaBadge(delta) {
+    if (delta === null || delta === undefined) return '<span style="color:#475569;">--</span>';
+    if (Math.abs(delta) < 0.01) return '<span style="color:#475569;">±0.0%</span>';
+    const color = delta > 0 ? '#4ade80' : '#f87171';
+    const sign  = delta > 0 ? '+' : '';
+    return `<span style="color:${color};font-weight:600;">${sign}${delta.toFixed(1)}%</span>`;
+}
+function _bWidthDeltaBadge(delta) {
+    if (delta === null || delta === undefined) return '<span style="color:#475569;">--</span>';
+    if (Math.abs(delta) < 0.005) return '<span style="color:#475569;">±0.00</span>';
+    return delta > 0
+        ? `<span style="color:#fb923c;font-weight:600;">▲${delta.toFixed(2)}</span>`
+        : `<span style="color:#60a5fa;font-weight:600;">▼${Math.abs(delta).toFixed(2)}</span>`;
+}
+function _sarDistHtml(sarDist, sarSeq, bull) {
+    if (sarDist === null || sarDist === undefined) return '<span style="color:#475569;">--</span>';
+    const abs = Math.abs(sarDist);
+    const col = sarDist > 0 ? '#f87171' : '#4ade80';
+    const arr = sarDist > 0 ? '↑' : '↓';
+    const isSeq1 = sarSeq === 1;
+    const triggerShort = isSeq1 && bull === false && sarDist > 25;
+    const triggerLong  = isSeq1 && bull === true  && sarDist < -25;
+    if (triggerShort || triggerLong) {
+        return `<span style="color:#f97316;font-weight:800;background:rgba(249,115,22,0.18);padding:2px 6px;border-radius:4px;border:1px solid rgba(249,115,22,0.55);white-space:nowrap;">🔔${arr}${abs.toFixed(2)}</span>`;
+    }
+    return `<span style="color:${col};font-weight:600;">${arr}${abs.toFixed(2)}</span>`;
+}
+function _sarDistDeltaBadge(delta) {
+    if (delta === null || delta === undefined) return '<span style="color:#475569;">--</span>';
+    if (Math.abs(delta) < 0.005) return '<span style="color:#475569;">±0.00</span>';
+    return delta > 0
+        ? `<span style="color:#fb923c;font-weight:600;">▲${delta.toFixed(2)}</span>`
+        : `<span style="color:#818cf8;font-weight:600;">▼${Math.abs(delta).toFixed(2)}</span>`;
+}
+// ── 影线辅助函数 ─────────────────────────────────────────────────────
+// 返回 [上影线%HTML, 下影线%HTML, 上影/实体HTML, 下影/实体HTML]
+function _shadowCols(high, low, close, bodyPct) {
+    const na = '<span style="color:#475569;">--</span>';
+    if (high == null || low == null || close == null || close === 0) return [na, na, na, na, 0, 0];
+    const upperPct = (high - close) / close * 100;
+    const lowerPct = (close - low)  / close * 100;
+
+    // 阈值标记：上影线≥0.5%  下影线≥0.3%
+    const UPPER_THR = 0.5;
+    const LOWER_THR = 0.3;
+
+    function _pctHtml(val, col, thr) {
+        if (val < 0) return na;
+        const hit = val >= thr;
+        const baseStyle = `color:${hit ? '#fff' : col};font-weight:${hit ? '800' : '600'};`;
+        const bgStyle   = hit
+            ? `background:${col === '#fb923c' ? 'rgba(251,146,60,0.35)' : 'rgba(96,165,250,0.35)'};border-radius:4px;padding:1px 5px;`
+            : '';
+        return `<span style="${baseStyle}${bgStyle}">${val.toFixed(2)}%${hit ? ' 🔺' : ''}</span>`;
+    }
+    function _ratioHtml(shadowPct, col) {
+        const absBody = bodyPct != null ? Math.abs(bodyPct) : null;
+        if (absBody == null || absBody < 0.001) return `<span style="color:#475569;">--</span>`;
+        const ratio = shadowPct / absBody;
+        const intensity = ratio >= 3 ? '#ef4444' : ratio >= 2 ? '#f87171' : ratio >= 1 ? '#fb923c' : col;
+        const weight    = ratio >= 2 ? '800' : '600';
+        return `<span style="color:${intensity};font-weight:${weight};">${ratio.toFixed(2)}</span>`;
+    }
+    return [
+        _pctHtml(upperPct, '#fb923c', UPPER_THR),
+        _pctHtml(lowerPct, '#60a5fa', LOWER_THR),
+        _ratioHtml(upperPct, '#fdba74'),
+        _ratioHtml(lowerPct, '#93c5fd'),
+        upperPct,
+        lowerPct
+    ];
+}
+function _bodyPctHtml(bodyPct) {
+    if (bodyPct === null || bodyPct === undefined) return '<span style="color:#475569;">--</span>';
+    const col  = bodyPct > 0 ? '#4ade80' : bodyPct < 0 ? '#f87171' : '#475569';
+    const sign = bodyPct > 0 ? '+' : '';
+    return `<span style="color:${col};font-weight:600;">${sign}${bodyPct.toFixed(2)}%</span>`;
+}
+function _posHtml(pos) {
+    if (pos == null || isNaN(pos)) return '<span style="color:#475569;">--</span>';
+    const p = Math.max(0, Math.min(100, pos));
+    const col = p >= 80 ? '#f87171' : p >= 50 ? '#fde68a' : p >= 20 ? '#86efac' : '#67e8f9';
+    const bold = (p >= 80 || p <= 20) ? 'font-weight:800;' : 'font-weight:600;';
+    return `<span style="color:${col};${bold}">${p.toFixed(1)}%</span>`;
+}
+
+function _dirBadge(bull, sarSeq, switched) {
+    const seqStr = String(sarSeq ?? 0).padStart(2, '0');
+    const label  = bull ? `多头${seqStr}` : `空头${seqStr}`;
+    const bg     = bull ? 'rgba(34,197,94,0.18)'  : 'rgba(239,68,68,0.18)';
+    const border = bull ? 'rgba(34,197,94,0.45)'  : 'rgba(239,68,68,0.45)';
+    const color  = bull ? '#4ade80' : '#f87171';
+    const sym    = bull ? '▲' : '▼';
+    return `<span style="display:inline-flex;align-items:center;gap:2px;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;background:${bg};border:1px solid ${border};color:${color};">${sym} ${label}</span>`;
+}
+function _widthRatioHtml(bWidth, precomputedRatio, liveStartWidth) {
+    const ratio = (precomputedRatio != null)
+        ? precomputedRatio
+        : (liveStartWidth != null && bWidth != null ? bWidth / liveStartWidth : null);
+    if (ratio == null) return `<span style="color:#475569;">--</span>`;
+    const rv = ratio.toFixed(2);
+    if (ratio >= 2.2) {
+        return `<span style="color:#ef4444;font-weight:800;background:rgba(239,68,68,0.15);padding:1px 5px;border-radius:3px;border:1px solid rgba(239,68,68,0.4);">${rv}</span>`;
+    }
+    const rc = ratio >= 2.0 ? '#f87171' : ratio >= 1.5 ? '#fb923c' : ratio >= 1.0 ? '#c084fc' : '#86efac';
+    const rw = ratio >= 1.5 ? '700' : '600';
+    return `<span style="color:${rc};font-weight:${rw};">${rv}</span>`;
+}
+
+// ── Build a single K-line row ────────────────────────────────────────
+let _liveStartWidth = null;
+let _barPosMap = new Map();   // 当日累计最高/最低位置%，渲染前由 loadEthSarBoll 填充
+
+function _buildBarRow(b, isLive) {
+    const isLiveRow  = isLive === true;
+    const rowBg      = isLiveRow ? 'background:rgba(99,102,241,0.15);' : 'background:rgba(255,255,255,0.02);';
+    const leftBorder = b.switched
+        ? (b.bull ? 'border-left:3px solid #22c55e;' : 'border-left:3px solid #ef4444;')
+        : 'border-left:3px solid transparent;';
+
+    const closeVal = b.close ?? b.price ?? 0;
+    const openVal  = b.open  ?? closeVal;
+    const priceColor = closeVal >= openVal ? '#4ade80' : '#f87171';
+    const timeStr  = (b.beijing_time || b.bar_time || '').split(' ')[1] || '--';
+    const timePart = isLiveRow
+        ? `${timeStr} <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#818cf8;margin-left:4px;vertical-align:middle;animation:pulse 1.2s infinite;"></span>`
+        : timeStr;
+
+    const bollLb  = b.boll_lb  != null ? b.boll_lb.toFixed(2)  : '--';
+    const bollMid = b.boll_mid != null ? b.boll_mid.toFixed(2) : '--';
+    const bollUb  = b.boll_ub  != null ? b.boll_ub.toFixed(2)  : '--';
+    const bWidth  = b.boll_width != null ? b.boll_width.toFixed(2) : '--';
+
+    return `
+        <tr style="${rowBg}${leftBorder}transition:background 0.2s;">
+            <td style="padding:6px 10px;font-family:monospace;color:${isLiveRow?'#e2e8f0':'#94a3b8'};white-space:nowrap;">${timePart}</td>
+            <td style="padding:6px 8px;text-align:right;font-family:monospace;color:#fb923c;opacity:0.9;">${b.high != null ? b.high.toFixed(2) : '--'}</td>
+            <td style="padding:6px 8px;text-align:right;font-family:monospace;color:#60a5fa;opacity:0.9;">${b.low != null ? b.low.toFixed(2) : '--'}</td>
+            <td style="padding:6px 8px;text-align:right;font-family:monospace;color:${priceColor};">${closeVal.toFixed(2)}</td>
+            <td style="padding:6px 8px;text-align:right;font-family:monospace;">${_bodyPctHtml(b.body_pct)}</td>
+            <td style="padding:6px 8px;text-align:right;font-family:monospace;">${_posHtml(_barPosMap.get(b.bar_time??b.beijing_time))}</td>
+            ${(([u,d,ur,dr])=>`<td style="padding:6px 8px;text-align:right;font-family:monospace;">${u}</td><td style="padding:6px 8px;text-align:right;font-family:monospace;">${d}</td><td style="padding:6px 8px;text-align:right;font-family:monospace;">${ur}</td><td style="padding:6px 8px;text-align:right;font-family:monospace;">${dr}</td>`)(_shadowCols(b.high,b.low,b.close??b.price,b.body_pct))}
+            <td style="padding:6px 8px;text-align:right;font-family:monospace;color:#818cf8;">${b.sar != null ? b.sar.toFixed(2) : '--'}</td>
+            <td style="padding:6px 8px;text-align:center;">${_dirBadge(b.bull, b.sar_seq, b.switched)}</td>
+            <td style="padding:6px 8px;text-align:center;font-family:monospace;color:${b.bull?'#86efac':'#fca5a5'};font-size:10px;">#${String(b.sar_seq ?? 0).padStart(2,'0')}</td>
+            <td style="padding:6px 8px;text-align:right;font-family:monospace;"><span style="color:${_pctColor(b.sar_pct)};font-weight:700;">${b.sar_pct != null ? b.sar_pct.toFixed(1)+'%' : '--'}</span></td>
+            <td style="padding:6px 8px;text-align:center;font-family:monospace;">${_deltaBadge(b.sar_pct_delta)}</td>
+            <td style="padding:6px 8px;text-align:right;font-family:monospace;color:#f87171;opacity:0.85;">${bollLb}</td>
+            <td style="padding:6px 8px;text-align:right;font-family:monospace;color:#fde68a;opacity:0.85;">${bollMid}</td>
+            <td style="padding:6px 8px;text-align:right;font-family:monospace;color:#4ade80;opacity:0.85;">${bollUb}</td>
+            <td style="padding:6px 8px;text-align:right;font-family:monospace;color:#a78bfa;font-weight:600;">${bWidth}</td>
+            <td style="padding:6px 8px;text-align:center;font-family:monospace;">${_bWidthDeltaBadge(b.boll_width_delta)}</td>
+            <td style="padding:6px 8px;text-align:right;font-family:monospace;">${_widthRatioHtml(b.boll_width, b.width_ratio ?? null, _liveStartWidth)}</td>
+            <td style="padding:6px 8px;text-align:right;font-family:monospace;">${_sarDistHtml(b.sar_dist, b.sar_seq, b.bull)}</td>
+            <td style="padding:6px 8px;text-align:center;font-family:monospace;">${_sarDistDeltaBadge(b.sar_dist_delta)}</td>
+        </tr>`;
+}
+
+// ── Main load function ──────────────────────────────────────────────
+let _ethSarTimer = null;
+
+async function loadEthSarBoll() {
+    const refreshIcon = document.getElementById('ethSarRefreshIcon');
+    if (refreshIcon) refreshIcon.style.animation = 'spin 0.8s linear infinite';
+
+    try {
+        const res  = await fetch('/api/eth-sar-boll/latest-rows?_t=' + Date.now(), {cache:'no-store'});
+        const json = await res.json();
+        if (!json.success) {
+            console.warn('[ETH-SAR] API error:', json.error);
+            return;
+        }
+
+        const bars       = json.bars || [];
+        const currentBar = json.current_bar;
+        const cur        = currentBar || bars[bars.length - 1];
+        const _apiDayHigh = json.day_high;   // 当日0点起累计最高价（后端计算）
+        const _apiDayLow  = json.day_low;    // 当日0点起累计最低价（后端计算）
+
+        // Update time
+        const now = new Date();
+        const timeEl = document.getElementById('pageUpdateTime');
+        if (timeEl) timeEl.textContent = now.toLocaleTimeString('zh-CN', {timeZone:'Asia/Shanghai'});
+
+        // Update status cards
+        const statusEl = document.getElementById('ethSarCurrentStatus');
+        if (statusEl && cur) {
+            const sarPctDisplay = cur.sar_pct != null
+                ? `<span style="color:${_pctColor(cur.sar_pct)};font-size:16px;font-weight:800;font-family:monospace;">${cur.sar_pct.toFixed(1)}%</span>`
+                : '--';
+            statusEl.innerHTML = `
+                <div style="flex:0 0 auto;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:12px;padding:8px 14px;">
+                    <div style="color:#64748b;font-size:10px;margin-bottom:2px;">当前价格</div>
+                    <div style="color:#fbbf24;font-size:18px;font-weight:800;font-family:monospace;">${(cur.close ?? cur.price ?? 0).toFixed(2)}</div>
+                </div>
+                <div style="flex:0 0 auto;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:12px;padding:8px 14px;">
+                    <div style="color:#64748b;font-size:10px;margin-bottom:2px;">SAR</div>
+                    <div style="color:#818cf8;font-size:18px;font-weight:800;font-family:monospace;">${cur.sar.toFixed(2)}</div>
+                </div>
+                <div style="flex:0 0 auto;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:12px;padding:8px 14px;">
+                    <div style="color:#64748b;font-size:10px;margin-bottom:2px;">趋势方向</div>
+                    <div style="margin-top:2px;">${_dirBadge(cur.bull, cur.sar_seq, false)}</div>
+                </div>
+                <div style="flex:0 0 auto;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:12px;padding:8px 14px;">
+                    <div style="color:#64748b;font-size:10px;margin-bottom:2px;">SAR 布林位置</div>
+                    <div style="font-size:16px;font-weight:800;">${sarPctDisplay}</div>
+                </div>
+                <div style="flex:0 0 auto;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:8px 14px;">
+                    <div style="color:#94a3b8;font-size:10px;margin-bottom:2px;">BOLL LB <span style="color:#ef4444;font-size:9px;">下轨 0%</span></div>
+                    <div style="color:#f87171;font-size:16px;font-weight:800;font-family:monospace;">${cur.boll_lb.toFixed(2)}</div>
+                </div>
+                <div style="flex:0 0 auto;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.3);border-radius:12px;padding:8px 14px;">
+                    <div style="color:#94a3b8;font-size:10px;margin-bottom:2px;">BOLL MID <span style="color:#fbbf24;font-size:9px;">中轨 50%</span></div>
+                    <div style="color:#fde68a;font-size:16px;font-weight:800;font-family:monospace;">${cur.boll_mid.toFixed(2)}</div>
+                </div>
+                <div style="flex:0 0 auto;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.3);border-radius:12px;padding:8px 14px;">
+                    <div style="color:#94a3b8;font-size:10px;margin-bottom:2px;">BOLL UB <span style="color:#22c55e;font-size:9px;">上轨 100%</span></div>
+                    <div style="color:#4ade80;font-size:16px;font-weight:800;font-family:monospace;">${cur.boll_ub.toFixed(2)}</div>
+                </div>`;
+        }
+
+        // Progress bars
+        const lbEl  = document.getElementById('ethSarLB');
+        const midEl = document.getElementById('ethSarMID');
+        const ubEl  = document.getElementById('ethSarUB');
+        if (lbEl && cur)  lbEl.textContent  = cur.boll_lb.toFixed(2);
+        if (midEl && cur) midEl.textContent = cur.boll_mid.toFixed(2);
+        if (ubEl && cur)  ubEl.textContent  = cur.boll_ub.toFixed(2);
+
+        const sarBar   = document.getElementById('ethSarPctBar');
+        const priceBar = document.getElementById('ethPricePctBar');
+        const pctLabel = document.getElementById('ethSarPctLabel');
+        if (cur) {
+            const sarPct   = cur.sar_pct;
+            const pricePct = cur.price_pct ?? 0;
+            if (sarBar)   sarBar.style.left   = _pctToLeft(sarPct);
+            if (priceBar) priceBar.style.left = _pctToLeft(pricePct);
+            if (pctLabel) {
+                pctLabel.textContent = sarPct.toFixed(1);
+                pctLabel.style.color = _pctColor(sarPct);
+            }
+        }
+
+        // Compute live start width
+        _liveStartWidth = json.trend_start_boll_width ?? null;
+        if (_liveStartWidth == null) {
+            let _liveStartBull = null;
+            bars.forEach(r => {
+                if (r.sar_seq === 1 && r.boll_width != null) {
+                    _liveStartWidth = r.boll_width;
+                    _liveStartBull  = r.bull;
+                } else if (r.bull !== _liveStartBull) {
+                    if (_liveStartBull !== null) _liveStartWidth = null;
+                    _liveStartBull = r.bull;
+                }
+            });
+        }
+
+        // 预计算当日截至每根K线的最高/最低位置%（旧→新升序扫描）
+        // 用后端返回的当日锚点（day_high/day_low）填充 _barPosMap，
+        // 避免只有10根K线时高低区间过窄导致位置%失真。
+        {
+            _barPosMap = new Map();
+            const useFixed = (_apiDayHigh != null && _apiDayLow != null && _apiDayHigh > _apiDayLow);
+            let runHi = useFixed ? _apiDayHigh : -Infinity;
+            let runLo = useFixed ? _apiDayLow  :  Infinity;
+            const allAsc = currentBar ? [...bars, currentBar] : [...bars];
+            allAsc.forEach(b => {
+                if (!useFixed) {
+                    if (b.high != null) runHi = Math.max(runHi, b.high);
+                    if (b.low  != null) runLo = Math.min(runLo, b.low);
+                }
+                const cls = b.close ?? b.price;
+                const pos = (runHi > runLo && cls != null)
+                    ? (cls - runLo) / (runHi - runLo) * 100 : null;
+                _barPosMap.set(b.bar_time ?? b.beijing_time, pos);
+            });
+        }
+
+        // Render rows
+        const tbody = document.getElementById('ethSarBarsTable');
+        if (tbody && bars.length > 0) {
+            const barsDesc = [...bars].reverse();
+            let rows = '';
+            if (currentBar) rows += _buildBarRow(currentBar, true);
+            barsDesc.forEach(b => { rows += _buildBarRow(b, false); });
+            tbody.innerHTML = rows;
+
+            const _tgAlert = _sendTgAlert;
+
+            // ── Alert ①: 开口比 ≥ 2.2 ────────────────────────────────
+            {
+                const allBars = currentBar ? [currentBar, ...bars] : [...bars];
+                let maxRatio = 0, maxRatioBar = null;
+                allBars.forEach(b => {
+                    const r = (b.width_ratio != null)
+                        ? b.width_ratio
+                        : (_liveStartWidth != null && b.boll_width != null ? b.boll_width / _liveStartWidth : 0);
+                    if (r > maxRatio) { maxRatio = r; maxRatioBar = b; }
+                });
+                if (maxRatio >= 2.2 && maxRatioBar) {
+                    const alertKey = `bollWidthRatioAlert_${Math.floor(maxRatio * 100)}`;
+                    const lastAlert = parseInt(localStorage.getItem(alertKey) || '0');
+                    const now2 = Date.now();
+                    if (now2 - lastAlert > 10 * 60 * 1000) {
+                        localStorage.setItem(alertKey, now2);
+                        const barTime = maxRatioBar.beijing_time || maxRatioBar.bar_time || '--';
+                        const price   = (maxRatioBar.close ?? maxRatioBar.price ?? 0).toFixed(2);
+                        const bw      = maxRatioBar.boll_width != null ? maxRatioBar.boll_width.toFixed(2) : '--';
+                        const sw      = _liveStartWidth != null ? _liveStartWidth.toFixed(2) : '--';
+                        const bull    = maxRatioBar.bull;
+                        const dir     = bull ? '📈多头' : '📉空头';
+                        const msg = `⚠️ ETH布林带开口比值告警\n\n`
+                            + `开口比值: ${maxRatio.toFixed(2)} (≥ 2.2 触发)\n`
+                            + `当前开口: ${bw}  起始开口: ${sw}\n`
+                            + `方向: ${dir}  序列: #${String(maxRatioBar.sar_seq).padStart(2,'0')}\n`
+                            + `K线时间: ${barTime}\n`
+                            + `ETH价格: ${price} USDT\n\n`
+                            + `💡 布林带大幅扩张，波动加剧，注意风险`;
+                        _tgAlert(msg).then(ok => {
+                            if (ok) console.log(`✅ [BollWidth] 开口比值 ${maxRatio.toFixed(2)} 告警已发送`);
+                        });
+                    }
+                }
+            }
+
+            // ── Alert ②: 连续4根开口比递增 ───────────────────────────
+            {
+                const allBars2 = currentBar ? [...bars, currentBar] : [...bars];
+                const now3 = Date.now();
+                for (const checkBull of [true, false]) {
+                    const dirBars = allBars2.filter(b => b.bull === checkBull);
+                    if (dirBars.length < 4) continue;
+                    const last4 = dirBars.slice(-4);
+                    const tid0 = last4[0].trend_id;
+                    const tid3 = last4[3].trend_id ?? last4[3].sar_seq ?? 0;
+                    const sameTrend = (tid0 != null && tid3 != null && tid0 === last4[1].trend_id && last4[1].trend_id === last4[2].trend_id && last4[2].trend_id === tid3);
+                    const seqContinuous = (last4[0].sar_seq != null &&
+                        last4[1].sar_seq === last4[0].sar_seq + 1 &&
+                        last4[2].sar_seq === last4[1].sar_seq + 1 &&
+                        last4[3].sar_seq === last4[2].sar_seq + 1);
+                    if (!sameTrend && !seqContinuous) continue;
+                    const r0 = last4[0].width_ratio, r1 = last4[1].width_ratio,
+                          r2 = last4[2].width_ratio, r3 = last4[3].width_ratio;
+                    if (r0 == null || r1 == null || r2 == null || r3 == null) continue;
+                    if (!(r0 < r1 && r1 < r2 && r2 < r3)) continue;
+                    const dirLabel = checkBull ? '多头' : '空头';
+                    const coolKey  = `sarConsec4Alert_${checkBull ? 'bull' : 'bear'}_${tid3}`;
+                    const lastSent = parseInt(localStorage.getItem(coolKey) || '0');
+                    if (now3 - lastSent < 60 * 60 * 1000) continue;
+                    localStorage.setItem(coolKey, now3);
+                    const seq3  = last4[3].sar_seq ?? '--';
+                    const bt3   = last4[3].beijing_time || last4[3].bar_time || '--';
+                    const bt0   = last4[0].beijing_time || last4[0].bar_time || '--';
+                    const price3 = (last4[3].close ?? last4[3].price ?? 0).toFixed(2);
+                    const ratioList = last4.map((b,i) => {
+                        const seq = b.sar_seq ?? (i+1);
+                        return `  ${dirLabel}${String(seq).padStart(2,'0')}: ${b.width_ratio.toFixed(4)}`;
+                    }).join('\n');
+                    const msgC4 = `📊 ETH布林带连续4根开口比递增告警\n\n`
+                        + `方向: ${checkBull ? '📈多头' : '📉空头'}  趋势ID: #${tid3}\n`
+                        + `序列: ${dirLabel}${String(last4[0].sar_seq ?? '--').padStart(2,'0')} → ${dirLabel}${String(seq3).padStart(2,'0')}\n`
+                        + `时间范围: ${bt0} → ${bt3}\n`
+                        + `开口比递增:\n${ratioList}\n`
+                        + `当前ETH: ${price3} USDT\n\n`
+                        + `💡 布林带持续扩张，波动性正在加剧`;
+                    if (typeof _tgAlert === 'function') {
+                        _tgAlert(msgC4).then(ok => {
+                            if (ok) console.log(`✅ [Consec4] ${dirLabel} 递增告警已发送`);
+                        });
+                    }
+                    const savePayload = {
+                        event_type: 'consec4_increasing', bull: checkBull, direction: dirLabel, trend_id: tid3,
+                        bars: last4.map(b => ({ beijing_time: b.beijing_time||b.bar_time, sar_seq: b.sar_seq,
+                            width_ratio: b.width_ratio, boll_width: b.boll_width, close: b.close??b.price, bull: b.bull })),
+                        ratios: [r0, r1, r2, r3],
+                        trigger_time: new Date().toLocaleString('sv', {timeZone:'Asia/Shanghai'}).replace('T',' '),
+                        eth_price: parseFloat(price3)
+                    };
+                    fetch('/api/eth-sar-boll/save-consec4-event', {
+                        method: 'POST', headers: {'Content-Type':'application/json'},
+                        body: JSON.stringify(savePayload)
+                    }).then(r=>r.json()).then(j=>console.log('[Consec4] 已保存:', j))
+                      .catch(e=>console.error('[Consec4] 保存失败:', e));
+                }
+            }
+
+            // ── Alert ③: 空头01 SAR距离>25 / 多头01 SAR距离<-25 ──────
+            {
+                const allBars3 = currentBar ? [currentBar, ...bars] : [...bars];
+                const now4 = Date.now();
+                let shortSeq1Bar = null, longSeq1Bar = null;
+                for (const b of allBars3) {
+                    if (b.sar_seq === 1) {
+                        if (b.bull === false && shortSeq1Bar === null) shortSeq1Bar = b;
+                        if (b.bull === true  && longSeq1Bar  === null) longSeq1Bar  = b;
+                    }
+                    if (shortSeq1Bar && longSeq1Bar) break;
+                }
+                if (shortSeq1Bar && shortSeq1Bar.sar_dist != null && shortSeq1Bar.sar_dist > 25) {
+                    const coolKey = 'sarDist_short01_gt25';
+                    const lastSent = parseInt(localStorage.getItem(coolKey) || '0');
+                    if (now4 - lastSent >= 60 * 60 * 1000) {
+                        localStorage.setItem(coolKey, now4);
+                        const bt   = shortSeq1Bar.beijing_time || shortSeq1Bar.bar_time || '--';
+                        const dist = shortSeq1Bar.sar_dist.toFixed(2);
+                        const sarV = shortSeq1Bar.sar != null ? shortSeq1Bar.sar.toFixed(2) : '--';
+                        const cls  = shortSeq1Bar.close ?? shortSeq1Bar.price ?? 0;
+                        const msg  = `🚨 ETH SAR距离预警 — 空头01\n\n`
+                            + `方向: 📉空头  序列: #01\n`
+                            + `SAR距离: ${dist}（> 25 触发）\n`
+                            + `SAR: ${sarV}  收盘价: ${cls.toFixed(2)}\n`
+                            + `K线时间: ${bt}\n`
+                            + `ETH价格: ${cls.toFixed(2)} USDT\n\n`
+                            + `💡 空头SAR距离过大，价格远离SAR，注意反转风险`;
+                        _tgAlert(msg).then(ok => {
+                            if (ok) console.log(`✅ [SarDist] 空头01 SAR距离 ${dist} > 25 告警已发送`);
+                        });
+                    }
+                }
+                if (longSeq1Bar && longSeq1Bar.sar_dist != null && longSeq1Bar.sar_dist < -25) {
+                    const coolKey = 'sarDist_long01_lt_n25';
+                    const lastSent = parseInt(localStorage.getItem(coolKey) || '0');
+                    if (now4 - lastSent >= 60 * 60 * 1000) {
+                        localStorage.setItem(coolKey, now4);
+                        const bt   = longSeq1Bar.beijing_time || longSeq1Bar.bar_time || '--';
+                        const dist = longSeq1Bar.sar_dist.toFixed(2);
+                        const sarV = longSeq1Bar.sar != null ? longSeq1Bar.sar.toFixed(2) : '--';
+                        const cls  = longSeq1Bar.close ?? longSeq1Bar.price ?? 0;
+                        const msg  = `🚨 ETH SAR距离预警 — 多头01\n\n`
+                            + `方向: 📈多头  序列: #01\n`
+                            + `SAR距离: ${dist}（< -25 触发）\n`
+                            + `SAR: ${sarV}  收盘价: ${cls.toFixed(2)}\n`
+                            + `K线时间: ${bt}\n`
+                            + `ETH价格: ${cls.toFixed(2)} USDT\n\n`
+                            + `💡 多头SAR距离过大，价格大幅高于SAR，注意回调风险`;
+                        _tgAlert(msg).then(ok => {
+                            if (ok) console.log(`✅ [SarDist] 多头01 SAR距离 ${dist} < -25 告警已发送`);
+                        });
+                    }
+                }
+            }
+        }
+
+        // ── ④ 上影线% ≥ 0.5  /  下影线% ≥ 0.3  告警 ──────────────
+        // 规则：任一触发即记录一条（每根K线只存一条，alert_type=upper/lower/both）
+        {
+            const allBarsS = currentBar ? [currentBar, ...bars] : [...bars];
+            const UPPER_THR = 0.5;
+            const LOWER_THR = 0.3;
+
+            for (const b of allBarsS) {
+                const hi  = b.high;
+                const lo  = b.low;
+                const cls = b.close ?? b.price;
+                if (hi == null || lo == null || cls == null || cls === 0) continue;
+
+                const upperPct = (hi - cls) / cls * 100;
+                const lowerPct = (cls - lo) / cls * 100;
+                const barKey   = b.beijing_time || b.bar_time || '';
+                if (!barKey) continue;
+
+                const hitUpper = upperPct >= UPPER_THR;
+                const hitLower = lowerPct >= LOWER_THR;
+                if (!hitUpper && !hitLower) continue;
+
+                // 每根K线只用一个冷却key，避免同一根K线存两条
+                const coolKey = `shadowAlert_${barKey}`;
+                if (localStorage.getItem(coolKey)) continue;
+                localStorage.setItem(coolKey, '1');
+
+                const alertType = (hitUpper && hitLower) ? 'both' : hitUpper ? 'upper' : 'lower';
+                const dirLabel  = b.bull ? '📈多头' : '📉空头';
+                const sarSeqStr = String(b.sar_seq ?? 0).padStart(2,'0');
+                const priceStr  = cls.toFixed(2);
+
+                // TG消息
+                let msgLines = [`🕯️ ETH影线预警\n`];
+                if (hitUpper) msgLines.push(`上影线%: ${upperPct.toFixed(2)}% ≥ ${UPPER_THR}% 🔺 卖压较强`);
+                if (hitLower) msgLines.push(`下影线%: ${lowerPct.toFixed(2)}% ≥ ${LOWER_THR}% 🔻 买方支撑`);
+                msgLines.push(`\n最高: ${hi.toFixed(2)}  最低: ${lo.toFixed(2)}  收盘: ${priceStr}`);
+                msgLines.push(`方向: ${dirLabel}  序列: #${sarSeqStr}`);
+                msgLines.push(`K线时间: ${barKey}  ETH: ${priceStr} USDT`);
+                const msg = msgLines.join('\n');
+                _sendTgAlert(msg).then(ok => {
+                    if (ok) console.log(`✅ [Shadow] ${alertType} 告警已发送 (${barKey})`);
+                    else    console.warn(`⚠️ [Shadow] TG发送失败`);
+                });
+
+                // 每根K线保存一条记录
+                fetch('/api/eth-sar-boll/save-shadow-alert', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        bar_time:    barKey,
+                        high:        hi,
+                        low:         lo,
+                        close:       cls,
+                        body_pct:    b.body_pct ?? null,
+                        upper_pct:   upperPct,
+                        lower_pct:   lowerPct,
+                        upper_body_ratio: (b.body_pct != null && Math.abs(b.body_pct) >= 0.001) ? upperPct / Math.abs(b.body_pct) : null,
+                        lower_body_ratio: (b.body_pct != null && Math.abs(b.body_pct) >= 0.001) ? lowerPct / Math.abs(b.body_pct) : null,
+                        sar:         b.sar ?? null,
+                        bull:        b.bull ?? null,
+                        sar_seq:     b.sar_seq ?? null,
+                        sar_pct:     b.sar_pct ?? null,
+                        sar_pct_delta: b.sar_pct_delta ?? null,
+                        boll_lb:     b.boll_lb ?? null,
+                        boll_mid:    b.boll_mid ?? null,
+                        boll_ub:     b.boll_ub ?? null,
+                        boll_width:  b.boll_width ?? null,
+                        boll_width_delta: b.boll_width_delta ?? null,
+                        width_ratio: b.width_ratio ?? null,
+                        sar_dist:    b.sar_dist ?? null,
+                        sar_dist_delta: b.sar_dist_delta ?? null,
+                        pos_pct:     _barPosMap.get(b.bar_time ?? b.beijing_time) ?? null,
+                        date:        barKey.split(' ')[0] || '',
+                        alert_type:  alertType,
+                    })
+                }).catch(e => console.warn('[Shadow] 保存失败', e));
+            }
+        }
+
+        // Update page dot color
+        const dot = document.getElementById('pageDot');
+        if (dot && cur) {
+            dot.style.background = cur.bull ? '#4ade80' : '#ef4444';
+            dot.style.boxShadow  = cur.bull ? '0 0 8px #4ade80' : '0 0 8px #ef4444';
+        }
+
+        // 影线预警面板静默刷新（每次 loadEthSarBoll 完成后直接从后端重新扫描）
+        {
+            const shadowSel = document.getElementById('ethSarShadowDateSel');
+            const shadowDate = shadowSel ? shadowSel.value : '';
+            if (shadowDate) {
+                loadShadowAlertRows(shadowDate).catch(() => {});
+            }
+        }
+
+        console.log(`[ETH-SAR] 已加载: {price: ${(cur?.close??cur?.price??0)}, bars: ${bars.length}, currentBar: ${currentBar?.beijing_time||'--'}}`);
+
+    } catch(e) {
+        console.error('[ETH-SAR] loadEthSarBoll error:', e);
+    } finally {
+        if (refreshIcon) refreshIcon.style.animation = '';
+    }
+}
+
+// ── Load seq1 daily flips ────────────────────────────────────────────
+async function loadEthSarDailyFlips(date) {
+    const tbody = document.getElementById('ethSarFlipsTbody');
+    const countEl = document.getElementById('ethSarFlipsCount');
+    if (!tbody) return;
+
+    // 有内容时降低透明度静默刷新，避免数据闪烁消失
+    const _flipsIsEmpty = tbody.querySelector('tr') === null ||
+                          tbody.innerHTML.trim() === '' ||
+                          tbody.querySelector('td[colspan]') !== null;
+    if (_flipsIsEmpty) {
+        tbody.innerHTML = `<tr><td colspan="23" style="text-align:center;padding:24px;color:#475569;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+            <div style="width:14px;height:14px;border:2px solid #c084fc;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+            加载中...</div></td></tr>`;
+    } else {
+        tbody.style.opacity = '0.45';
+        tbody.style.transition = 'opacity 0.15s';
+    }
+
+    try {
+        const d   = date || new Date().toLocaleDateString('en-CA', {timeZone:'Asia/Shanghai'});
+        const res = await fetch(`/api/eth-sar-boll/seq1-rows?date=${d}&_t=` + Date.now(), {cache:'no-store'});
+        const json = await res.json();
+        if (!json.success) {
+            if (_flipsIsEmpty) tbody.innerHTML = `<tr><td colspan="23" style="text-align:center;padding:24px;color:#ef4444;">加载失败: ${json.error||''}</td></tr>`;
+            return;
+        }
+
+        const rows = json.rows || [];
+        if (countEl) countEl.textContent = rows.length + '条';
+
+        if (rows.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="23" style="text-align:center;padding:24px;color:#64748b;">暂无数据</td></tr>`;
+            return;
+        }
+
+        // 预计算 seq1 面板每行截至当时的当日最高/最低位置%（升序扫描，API 返回已升序）
+        const _flipsPosMap = new Map();
+        {
+            let runHi = -Infinity, runLo = Infinity;
+            rows.forEach(b => {
+                if (b.high != null) runHi = Math.max(runHi, b.high);
+                if (b.low  != null) runLo = Math.min(runLo, b.low);
+                const cls = b.close ?? b.price;
+                const pos = (runHi > runLo && cls != null)
+                    ? (cls - runLo) / (runHi - runLo) * 100 : null;
+                _flipsPosMap.set(b.bar_time ?? b.beijing_time, pos);
+            });
+        }
+
+        let html = '';
+        rows.forEach((r, idx) => {
+            const bull     = r.bull ?? false;
+            const sarSeq   = r.sar_seq ?? 1;
+            const seqStr   = String(sarSeq).padStart(2,'0');
+            const dirColor = bull ? '#4ade80' : '#f87171';
+            const dirBg    = bull ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)';
+            const dirBorder= bull ? 'border-left:3px solid #22c55e;' : 'border-left:3px solid #ef4444;';
+            const dirLabel = bull ? `多头${seqStr}` : `空头${seqStr}`;
+            const rowBg    = idx % 2 === 0 ? 'background:rgba(255,255,255,0.02);' : '';
+
+            const timeOnly = (r.beijing_time || r.bar_time || '').split(' ')[1] || (r.beijing_time || r.bar_time || '');
+            const high     = r.high      != null ? r.high.toFixed(2)      : '--';
+            const low      = r.low       != null ? r.low.toFixed(2)       : '--';
+            const cls      = r.close     != null ? r.close.toFixed(2)     : '--';
+            const sar      = r.sar       != null ? r.sar.toFixed(2)       : '--';
+            const lb       = r.boll_lb   != null ? r.boll_lb.toFixed(2)   : '--';
+            const mid      = r.boll_mid  != null ? r.boll_mid.toFixed(2)  : '--';
+            const ub       = r.boll_ub   != null ? r.boll_ub.toFixed(2)   : '--';
+            const bw       = r.boll_width!= null ? r.boll_width.toFixed(2): '--';
+            const dist     = r.sar_dist  != null ? r.sar_dist.toFixed(2)  : '--';
+
+            const bodyPct    = r.body_pct;
+            const bodyStr    = bodyPct != null ? (bodyPct > 0 ? '+' : '') + bodyPct.toFixed(2) + '%' : '--';
+            const bodyCol    = bodyPct != null ? (bodyPct > 0 ? '#4ade80' : '#f87171') : '#64748b';
+            const sarPct     = r.sar_pct;
+            const sarPctStr  = sarPct != null ? sarPct.toFixed(1) + '%' : '--';
+            const sarPctCol  = sarPct != null ? (sarPct > 100 ? '#22c55e' : sarPct < 0 ? '#ef4444' : '#a5b4fc') : '#64748b';
+
+            function _dp(v) {
+                if (v == null) return `<span style="color:#475569;">--</span>`;
+                const sym = v > 0 ? '▲' : '▼';
+                const col = v > 0 ? '#fb923c' : '#818cf8';
+                return `<span style="color:${col};font-size:10px;">${sym}${(v > 0 ? '+' : '')}${v.toFixed(1)}</span>`;
+            }
+            function _bwdelta(v) {
+                if (v == null) return `<span style="color:#475569;">--</span>`;
+                const sym = v > 0 ? '▲' : '▼';
+                const col = v > 0 ? '#fb923c' : '#60a5fa';
+                return `<span style="color:${col};font-size:10px;">${sym}${(v > 0 ? '+' : '')}${v.toFixed(2)}</span>`;
+            }
+            // 开口比
+            const wr = r.width_ratio;
+            let wrHtml;
+            if (wr == null) {
+                wrHtml = `<span style="color:#475569;">--</span>`;
+            } else {
+                const wrStr = wr.toFixed(2);
+                const wrCol = wr >= 2.2 ? '#ef4444' : wr >= 2.0 ? '#f87171' : wr >= 1.5 ? '#fb923c' : wr >= 1.0 ? '#c084fc' : '#86efac';
+                const wrW   = wr >= 1.5 ? '800' : '600';
+                wrHtml = wr >= 2.2
+                    ? `<span style="color:#ef4444;font-weight:800;background:rgba(239,68,68,0.15);padding:1px 4px;border-radius:3px;border:1px solid rgba(239,68,68,0.4);">${wrStr}</span>`
+                    : `<span style="color:${wrCol};font-weight:${wrW};">${wrStr}</span>`;
+            }
+            // SAR距离颜色（seq1面板所有行均为sar_seq=1，直接判断阈值）
+            const distRaw = r.sar_dist;
+            const distCol = bull ? '#4ade80' : '#f87171';
+            const _triggerShortSeq1 = !bull && distRaw != null && distRaw > 25;
+            const _triggerLongSeq1  =  bull && distRaw != null && distRaw < -25;
+            const distHtml = dist === '--'
+                ? `<span style="color:#475569;">--</span>`
+                : (_triggerShortSeq1 || _triggerLongSeq1)
+                    ? `<span style="color:#f97316;font-weight:800;background:rgba(249,115,22,0.18);padding:2px 6px;border-radius:4px;border:1px solid rgba(249,115,22,0.55);white-space:nowrap;">🔔${distRaw > 0 ? '↑' : '↓'}${Math.abs(distRaw).toFixed(2)}</span>`
+                    : `<span style="color:${distCol};font-weight:600;">${distRaw > 0 ? '↑' : '↓'}${Math.abs(distRaw).toFixed(2)}</span>`;
+            function _distdelta(v) {
+                if (v == null) return `<span style="color:#475569;">--</span>`;
+                const sym = v > 0 ? '▲' : '▼';
+                const col = v > 0 ? '#fb923c' : '#818cf8';
+                return `<span style="color:${col};font-size:10px;">${sym}${(v > 0 ? '+' : '')}${v.toFixed(2)}</span>`;
+            }
+
+            html += `<tr style="${dirBorder}${rowBg}">
+                <td style="padding:5px 10px;font-family:monospace;color:${dirColor};font-weight:700;white-space:nowrap;">${timeOnly}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#fb923c;opacity:0.9;">${high}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#60a5fa;opacity:0.9;">${low}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:${dirColor};font-weight:600;">${cls}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;"><span style="color:${bodyCol};font-weight:600;">${bodyStr}</span></td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;">${_posHtml(_flipsPosMap.get(r.bar_time??r.beijing_time))}</td>
+                ${(([u,d,ur,dr])=>`<td style="padding:5px 8px;text-align:right;font-family:monospace;">${u}</td><td style="padding:5px 8px;text-align:right;font-family:monospace;">${d}</td><td style="padding:5px 8px;text-align:right;font-family:monospace;">${ur}</td><td style="padding:5px 8px;text-align:right;font-family:monospace;">${dr}</td>`)(_shadowCols(r.high,r.low,r.close,r.body_pct))}
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#818cf8;">${sar}</td>
+                <td style="padding:5px 8px;text-align:center;">
+                    <span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;
+                        background:${dirBg};border:1px solid ${bull?'rgba(34,197,94,0.4)':'rgba(239,68,68,0.4)'};color:${dirColor};">
+                        ${bull?'▲':'▼'} ${dirLabel}
+                    </span>
+                </td>
+                <td style="padding:5px 8px;text-align:center;font-family:monospace;color:${bull?'#86efac':'#fca5a5'};font-size:10px;">#${seqStr}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;"><span style="color:${sarPctCol};font-weight:700;">${sarPctStr}</span></td>
+                <td style="padding:5px 8px;text-align:center;font-family:monospace;">${_dp(r.sar_pct_delta)}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#f87171;opacity:0.85;">${lb}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#fde68a;opacity:0.85;">${mid}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#4ade80;opacity:0.85;">${ub}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#a78bfa;font-weight:600;">${bw}</td>
+                <td style="padding:5px 8px;text-align:center;font-family:monospace;">${_bwdelta(r.boll_width_delta)}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;">${wrHtml}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;">${distHtml}</td>
+                <td style="padding:5px 8px;text-align:center;font-family:monospace;">${_distdelta(r.sar_dist_delta)}</td>
+            </tr>`;
+        });
+        tbody.innerHTML = html;
+
+    } catch(e) {
+        console.error('[DailyFlips] 加载失败:', e);
+        if (_flipsIsEmpty) tbody.innerHTML = `<tr><td colspan="23" style="text-align:center;padding:16px;color:#ef4444;">加载出错</td></tr>`;
+    } finally {
+        tbody.style.opacity = '1';
+    }
+}
+
+// ── History modal functions ──────────────────────────────────────────
+let _ethSarHistoryDate = null;
+
+function openEthSarHistory() {
+    const modal = document.getElementById('ethSarHistoryModal');
+    if (modal) { modal.classList.add('open'); _loadEthSarDates(); }
+}
+function closeEthSarHistory() {
+    const modal = document.getElementById('ethSarHistoryModal');
+    if (modal) modal.classList.remove('open');
+}
+
+async function _loadEthSarDates() {
+    try {
+        const res  = await fetch('/api/eth-sar-boll/available-dates', {cache:'no-store'});
+        const json = await res.json();
+        const sel  = document.getElementById('ethSarHistoryDateSel');
+        if (!sel || !json.success) return;
+        sel.innerHTML = '';
+        (json.dates || []).forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = d; opt.textContent = d;
+            sel.appendChild(opt);
+        });
+        if (json.dates && json.dates.length > 0) {
+            const today = new Date().toLocaleDateString('en-CA', {timeZone:'Asia/Shanghai'});
+            _ethSarHistoryDate = json.dates.includes(today) ? today : json.dates[0];
+            sel.value = _ethSarHistoryDate;
+            await _loadEthSarHistoryData(_ethSarHistoryDate);
+        }
+    } catch(e) { console.error('[History] 加载日期失败:', e); }
+}
+
+async function _loadEthSarHistoryData(date) {
+    const tbody = document.getElementById('ethSarHistoryTbody');
+    const info  = document.getElementById('ethSarHistoryInfo');
+    if (!tbody) return;
+    tbody.innerHTML = `<tr><td colspan="23" style="text-align:center;padding:24px;color:#475569;">
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+        <div style="width:14px;height:14px;border:2px solid #818cf8;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+        加载中...</div></td></tr>`;
+    try {
+        const res  = await fetch(`/api/eth-sar-boll/history-rows?date=${date}&limit=2000`, {cache:'no-store'});
+        const json = await res.json();
+        if (!json.success) {
+            tbody.innerHTML = `<tr><td colspan="23" style="text-align:center;padding:24px;color:#ef4444;">加载失败: ${json.error||''}</td></tr>`;
+            return;
+        }
+        const rows = json.rows || [];
+        if (info) info.textContent = `共 ${rows.length} 根K线`;
+
+        if (rows.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="23" style="text-align:center;padding:24px;color:#64748b;">暂无数据</td></tr>`;
+            return;
+        }
+
+        // Detect consec4 marks
+        const rowsAsc = [...rows].reverse();
+        // 预计算位置%（按日期分组累计最高/最低，升序扫描）
+        // history-rows 可能跨日（含前一天末尾K线），必须按日期重置 runHi/runLo
+        const _histPosMap = new Map();
+        {
+            let runHi = -Infinity, runLo = Infinity;
+            let curDate = null;
+            rowsAsc.forEach(b => {
+                const barKey  = b.bar_time ?? b.beijing_time ?? '';
+                const barDate = barKey.slice(0, 10); // 'YYYY-MM-DD'
+                if (barDate !== curDate) {
+                    // 新的一天，重置累计区间
+                    runHi = -Infinity;
+                    runLo = Infinity;
+                    curDate = barDate;
+                }
+                if (b.high != null) runHi = Math.max(runHi, b.high);
+                if (b.low  != null) runLo = Math.min(runLo, b.low);
+                const cls = b.close ?? b.price;
+                const pos = (runHi > runLo && cls != null)
+                    ? (cls - runLo) / (runHi - runLo) * 100 : null;
+                _histPosMap.set(barKey, pos);
+            });
+        }
+        const consec4Marks = new Set();
+        for (const checkBull of [true, false]) {
+            const dirBarsAsc = rowsAsc.filter(r => r.bull === checkBull && r.width_ratio != null);
+            const tidGroups = {};
+            dirBarsAsc.forEach(b => {
+                const tid = b.trend_id ?? 0;
+                if (!tidGroups[tid]) tidGroups[tid] = [];
+                tidGroups[tid].push(b);
+            });
+            Object.values(tidGroups).forEach(grp => {
+                for (let i = 0; i <= grp.length - 4; i++) {
+                    const b0=grp[i],b1=grp[i+1],b2=grp[i+2],b3=grp[i+3];
+                    const seqUp = (b0.sar_seq < b1.sar_seq && b1.sar_seq < b2.sar_seq && b2.sar_seq < b3.sar_seq);
+                    if (!seqUp) continue;
+                    if (b0.width_ratio < b1.width_ratio && b1.width_ratio < b2.width_ratio && b2.width_ratio < b3.width_ratio) {
+                        [b0,b1,b2,b3].forEach(b => { const key=b.beijing_time||b.bar_time; if (key) consec4Marks.add(key); });
+                    }
+                }
+            });
+        }
+
+        // Render
+        function _histWidthRatioHtml(widthRatio, isConsec4Mark) {
+            if (widthRatio == null) return `<span style="color:#475569;">--</span>`;
+            const rv = widthRatio.toFixed(2);
+            const mark = isConsec4Mark ? ` <span title="连续4根递增" style="font-size:9px;background:rgba(251,191,36,0.3);color:#fbbf24;padding:1px 4px;border-radius:8px;border:1px solid rgba(251,191,36,0.5);vertical-align:middle;">↑4</span>` : '';
+            if (widthRatio >= 2.2)
+                return `<span style="color:#ef4444;font-weight:800;background:rgba(239,68,68,0.15);padding:1px 4px;border-radius:3px;border:1px solid rgba(239,68,68,0.4);">${rv}</span>${mark}`;
+            const rc = widthRatio >= 2.0 ? '#f87171' : widthRatio >= 1.5 ? '#fb923c' : widthRatio >= 1.0 ? '#c084fc' : '#86efac';
+            const rw = widthRatio >= 1.5 ? '700' : '600';
+            return `<span style="color:${rc};font-weight:${rw};">${rv}</span>${mark}`;
+        }
+
+        let html = '';
+        rows.forEach((b, idx) => {
+            const _btKey   = b.beijing_time || b.bar_time || '';
+            const isC4     = consec4Marks.has(_btKey);
+            const bull     = b.bull ?? false;
+            const sarSeq   = b.sar_seq ?? 0;
+            const switched = b.switched ?? false;
+            const seqStr   = String(sarSeq).padStart(2,'0');
+            const dirColor = bull ? '#4ade80' : '#f87171';
+            const dirSymbol= bull ? '▲' : '▼';
+            const dirLabel = bull ? `多头${seqStr}` : `空头${seqStr}`;
+            const bt       = b.beijing_time || b.bar_time || '';
+            const timeOnly = bt.split(' ')[1] || bt;
+            const rowBorder= switched
+                ? (bull ? 'border-left:3px solid #22c55e;' : 'border-left:3px solid #ef4444;')
+                : (isC4 ? 'border-left:3px solid #fbbf24;' : 'border-left:3px solid transparent;');
+            const rowBg    = isC4
+                ? 'background:rgba(251,191,36,0.07);'
+                : (switched
+                    ? (bull ? 'background:rgba(34,197,94,0.08);' : 'background:rgba(239,68,68,0.08);')
+                    : (idx % 2 === 0 ? 'background:rgba(255,255,255,0.02);' : ''));
+            const pctColor = _pctColor(b.sar_pct);
+            const widthRatioHtml = _histWidthRatioHtml(b.width_ratio ?? null, isC4);
+
+            html += `<tr style="${rowBg}${rowBorder}">
+                <td style="padding:5px 10px;font-family:monospace;color:${switched?dirColor:'#94a3b8'};white-space:nowrap;">
+                    ${timeOnly}${switched ? ` <span style="font-size:9px;font-weight:700;background:${bull?'rgba(34,197,94,0.25)':'rgba(239,68,68,0.25)'};padding:1px 5px;border-radius:10px;color:${dirColor};">${bull?'↑多':'↓空'}</span>` : ''}
+                </td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#fb923c;opacity:0.9;">${b.high != null ? Number(b.high).toFixed(2) : '--'}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#60a5fa;opacity:0.9;">${b.low  != null ? Number(b.low).toFixed(2)  : '--'}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:${bull?'#4ade80':'#f87171'};">${b.close != null ? Number(b.close).toFixed(2) : '--'}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;">${_bodyPctHtml(b.body_pct)}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;">${_posHtml(_histPosMap.get(b.bar_time??b.beijing_time))}</td>
+                ${(([u,d,ur,dr])=>`<td style="padding:5px 8px;text-align:right;font-family:monospace;">${u}</td><td style="padding:5px 8px;text-align:right;font-family:monospace;">${d}</td><td style="padding:5px 8px;text-align:right;font-family:monospace;">${ur}</td><td style="padding:5px 8px;text-align:right;font-family:monospace;">${dr}</td>`)(_shadowCols(b.high,b.low,b.close,b.body_pct))}
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#818cf8;">${b.sar != null ? Number(b.sar).toFixed(2) : '--'}</td>
+                <td style="padding:5px 8px;text-align:center;">
+                    <span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;
+                        background:${bull?'rgba(34,197,94,0.15)':'rgba(239,68,68,0.15)'};
+                        border:1px solid ${bull?'rgba(34,197,94,0.4)':'rgba(239,68,68,0.4)'};color:${dirColor};">
+                        ${dirSymbol} ${dirLabel}
+                    </span>
+                </td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:${pctColor};font-weight:700;">${b.sar_pct != null ? b.sar_pct.toFixed(1)+'%' : '--'}</td>
+                <td style="padding:5px 8px;text-align:center;font-family:monospace;">${_deltaBadge(b.sar_pct_delta)}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#f87171;opacity:0.85;">${b.boll_lb  != null ? Number(b.boll_lb).toFixed(2)  : '--'}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#fde68a;opacity:0.85;">${b.boll_mid != null ? Number(b.boll_mid).toFixed(2) : '--'}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#4ade80;opacity:0.85;">${b.boll_ub  != null ? Number(b.boll_ub).toFixed(2)  : '--'}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#a78bfa;font-weight:600;">${b.boll_width != null ? b.boll_width.toFixed(2) : '--'}</td>
+                <td style="padding:5px 8px;text-align:center;font-family:monospace;">${_bWidthDeltaBadge(b.boll_width_delta)}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;">${widthRatioHtml}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;">${_sarDistHtml(b.sar_dist, b.sar_seq, b.bull)}</td>
+                <td style="padding:5px 8px;text-align:center;font-family:monospace;">${_sarDistDeltaBadge(b.sar_dist_delta)}</td>
+            </tr>`;
+        });
+        tbody.innerHTML = html;
+    } catch(e) {
+        console.error('[History] 加载数据失败:', e);
+        tbody.innerHTML = `<tr><td colspan="23" style="text-align:center;padding:24px;color:#ef4444;">加载出错: ${e.message}</td></tr>`;
+    }
+}
+
+async function onEthSarDateChange() {
+    const sel = document.getElementById('ethSarHistoryDateSel');
+    if (sel) await _loadEthSarHistoryData(sel.value);
+}
+
+// ── Load available dates for flips selector ──────────────────────────
+async function _loadFlipsDates() {
+    try {
+        const res  = await fetch('/api/eth-sar-boll/available-dates', {cache:'no-store'});
+        const json = await res.json();
+        const sel  = document.getElementById('ethSarFlipsDateSel');
+        if (!sel || !json.success) return;
+        sel.innerHTML = '';
+        const today = new Date().toLocaleDateString('en-CA', {timeZone:'Asia/Shanghai'});
+        (json.dates || []).forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = d;
+            opt.textContent = d + (d === today ? ' (今日)' : '');
+            sel.appendChild(opt);
+        });
+        const initDate = (json.dates || []).includes(today) ? today : (json.dates || [])[0];
+        if (initDate) {
+            sel.value = initDate;
+            await loadEthSarDailyFlips(initDate);
+        }
+    } catch(e) { console.error('[FlipsDates] 加载失败:', e); }
+}
+
+// ── Shadow alert rows ────────────────────────────────────────────────
+async function loadShadowAlertRows(date) {
+    const tbody   = document.getElementById('ethSarShadowTbody');
+    const countEl = document.getElementById('ethSarShadowCount');
+    if (!tbody) return;
+    // 仅在内容为空时显示加载占位，有内容时静默刷新（避免看盘时数据闪烁消失）
+    const isEmpty = tbody.querySelector('tr') === null ||
+                    tbody.innerHTML.trim() === '' ||
+                    tbody.querySelector('td[colspan]') !== null;
+    if (isEmpty) {
+        tbody.innerHTML = `<tr><td colspan="24" style="text-align:center;padding:32px;color:#475569;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+                <div style="width:14px;height:14px;border:2px solid #fb923c;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+                加载中...
+            </div></td></tr>`;
+    } else {
+        tbody.style.opacity = '0.45';
+        tbody.style.transition = 'opacity 0.15s';
+    }
+    try {
+        const url  = '/api/eth-sar-boll/shadow-alert-rows?date=' + encodeURIComponent(date || '');
+        const res  = await fetch(url + '&_t=' + Date.now(), {cache:'no-store'});
+        const json = await res.json();
+        if (!json.success) { if (isEmpty) tbody.innerHTML = `<tr><td colspan="24" style="text-align:center;padding:24px;color:#f87171;">加载失败</td></tr>`; return; }
+        const rows = json.rows || [];
+        if (countEl) countEl.textContent = rows.length + ' 条';
+        if (rows.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="24" style="text-align:center;padding:32px;color:#475569;">暂无影线预警记录</td></tr>`;
+            return;
+        }
+        const html = rows.map(r => {
+            const at = r.alert_type || 'upper';
+            const isBoth  = at === 'both';
+            const isUpper = at === 'upper';
+            const isLower = at === 'lower';
+            const typeBadge = isBoth
+                ? `<span style="background:rgba(251,146,60,0.3);color:#fb923c;font-weight:700;padding:1px 5px;border-radius:4px;font-size:10px;">上影线</span><span style="background:rgba(96,165,250,0.3);color:#60a5fa;font-weight:700;padding:1px 5px;border-radius:4px;font-size:10px;margin-left:3px;">下影线</span>`
+                : isUpper
+                ? `<span style="background:rgba(251,146,60,0.3);color:#fb923c;font-weight:700;padding:1px 6px;border-radius:4px;font-size:10px;">上影线</span>`
+                : `<span style="background:rgba(96,165,250,0.3);color:#60a5fa;font-weight:700;padding:1px 6px;border-radius:4px;font-size:10px;">下影线</span>`;
+            const rowBg = isBoth
+                ? 'background:rgba(168,85,247,0.06);'
+                : isUpper ? 'background:rgba(251,146,60,0.06);' : 'background:rgba(96,165,250,0.06);';
+            const borderColor = isBoth ? '#a855f7' : isUpper ? '#fb923c' : '#60a5fa';
+            const timeStr = (r.bar_time || '').split(' ')[1] || r.bar_time || '--';
+            const cls = r.close ?? 0;
+            const [uHtml, dHtml, urHtml, drHtml] = _shadowCols(r.high, r.low, r.close, r.body_pct);
+            return `<tr style="${rowBg}border-left:3px solid ${borderColor};transition:background 0.2s;">
+                <td style="padding:5px 8px;text-align:center;white-space:nowrap;">${typeBadge}</td>
+                <td style="padding:5px 10px;font-family:monospace;color:#94a3b8;white-space:nowrap;">${timeStr}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#fb923c;">${r.high != null ? r.high.toFixed(2) : '--'}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#60a5fa;">${r.low != null ? r.low.toFixed(2) : '--'}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:${cls >= (r.open ?? cls) ? '#4ade80' : '#f87171'};">${cls.toFixed(2)}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;">${_bodyPctHtml(r.body_pct)}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;">${_posHtml(r.pos_pct)}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;">${uHtml}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;">${dHtml}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;">${urHtml}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;">${drHtml}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#818cf8;">${r.sar != null ? r.sar.toFixed(2) : '--'}</td>
+                <td style="padding:5px 8px;text-align:center;">${_dirBadge(r.bull, r.sar_seq, false)}</td>
+                <td style="padding:5px 8px;text-align:center;font-family:monospace;color:${r.bull ? '#86efac' : '#fca5a5'};font-size:10px;">#${String(r.sar_seq ?? 0).padStart(2,'0')}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;"><span style="color:${_pctColor(r.sar_pct)};font-weight:700;">${r.sar_pct != null ? r.sar_pct.toFixed(1)+'%' : '--'}</span></td>
+                <td style="padding:5px 8px;text-align:center;font-family:monospace;">${_deltaBadge(r.sar_pct_delta)}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#f87171;">${r.boll_lb != null ? r.boll_lb.toFixed(2) : '--'}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#fde68a;">${r.boll_mid != null ? r.boll_mid.toFixed(2) : '--'}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#4ade80;">${r.boll_ub != null ? r.boll_ub.toFixed(2) : '--'}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#a78bfa;">${r.boll_width != null ? r.boll_width.toFixed(2) : '--'}</td>
+                <td style="padding:5px 8px;text-align:center;font-family:monospace;">${_bWidthDeltaBadge(r.boll_width_delta)}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;">${_widthRatioHtml(r.boll_width, r.width_ratio ?? null, null)}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;">${_sarDistHtml(r.sar_dist, r.sar_seq, r.bull)}</td>
+                <td style="padding:5px 8px;text-align:center;font-family:monospace;">${_sarDistDeltaBadge(r.sar_dist_delta)}</td>
+            </tr>`;
+        }).join('');
+        tbody.innerHTML = html;
+    } catch(e) {
+        if (isEmpty) tbody.innerHTML = `<tr><td colspan="24" style="text-align:center;padding:24px;color:#f87171;">加载异常: ${e.message}</td></tr>`;
+        console.error('[Shadow] loadShadowAlertRows error:', e);
+    } finally {
+        tbody.style.opacity = '1';
+    }
+}
+
+async function _loadShadowAlertDates() {
+    try {
+        const res  = await fetch('/api/eth-sar-boll/shadow-alert-dates', {cache:'no-store'});
+        const json = await res.json();
+        const sel  = document.getElementById('ethSarShadowDateSel');
+        if (!sel || !json.success) return;
+        sel.innerHTML = '';
+        const today = new Date().toLocaleDateString('en-CA', {timeZone:'Asia/Shanghai'});
+        const dates = json.dates || [];
+        if (dates.length === 0) {
+            const opt = document.createElement('option');
+            opt.value = today; opt.textContent = today + ' (今日)';
+            sel.appendChild(opt);
+            await loadShadowAlertRows(today);
+            return;
+        }
+        dates.forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = d;
+            opt.textContent = d + (d === today ? ' (今日)' : '');
+            sel.appendChild(opt);
+        });
+        const initDate = dates.includes(today) ? today : dates[0];
+        sel.value = initDate;
+        await loadShadowAlertRows(initDate);
+    } catch(e) { console.error('[ShadowDates] 加载失败:', e); }
+}
+
+// ── Init ─────────────────────────────────────────────────────────────
+// 迁移旧 localStorage key 格式（shadowAlert_upper_* / shadowAlert_lower_* → shadowAlert_*）
+(function _migrateShadowAlertKeys() {
+    const toRemove = [], toAdd = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!k) continue;
+        if (k.startsWith('shadowAlert_upper_')) {
+            const barKey = k.slice('shadowAlert_upper_'.length);
+            toAdd.push('shadowAlert_' + barKey);
+            toRemove.push(k);
+        } else if (k.startsWith('shadowAlert_lower_')) {
+            const barKey = k.slice('shadowAlert_lower_'.length);
+            toAdd.push('shadowAlert_' + barKey);
+            toRemove.push(k);
+        }
+    }
+    toAdd.forEach(k => localStorage.setItem(k, '1'));
+    toRemove.forEach(k => localStorage.removeItem(k));
+    if (toRemove.length) console.log(`[Shadow] 已迁移 ${toRemove.length} 个旧冷却key`);
+})();
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadEthSarBoll();
+    await _loadFlipsDates();
+    await _loadShadowAlertDates();
+    // Auto-refresh every 30 seconds
+    _ethSarTimer = setInterval(loadEthSarBoll, 30 * 1000);
+});
+</script>
+
+</body>
+</html>

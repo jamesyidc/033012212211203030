@@ -2912,6 +2912,7 @@ def get_position_color(account_id, total_cost):
             const allSeries = ['A', 'B', 'C', 'D'];
             const series = [];
             const allPositionIncreasePoints = {};  // 存储所有账户的加仓点 {accId: {idx: point}}
+            let markLineDrawn = false;  // ✅ 全局标志：确保markLine/markArea只绘制一次（放在第一个有normal段的账户）
             
             allSeries
                 .filter(accId => showAccounts[accId])
@@ -2950,11 +2951,34 @@ def get_position_color(account_id, total_cost):
                     let positionIncreasePoints = [];  // 加仓点数组
                     let prevPositionCount = 0;
                     
+                    // ✅ 检测该账户全天是否完全无持仓
+                    const hasAnyPosition = historyData.some(d => (d.accounts[accId]?.position_count || 0) > 0);
+                    
                     historyData.forEach((d, idx) => {
                         const account = d.accounts[accId];
                         const pnl = account?.pnl_pct || 0;
                         const cost = account?.total_cost || 0;
                         const posCount = account?.position_count || 0;
+                        
+                        // ✅ 无持仓时跳过（用null断线，不画在0轴上）
+                        // 但如果全天都无持仓，后面会单独处理（显示"无持仓"虚线）
+                        if (posCount === 0 && hasAnyPosition) {
+                            // 结束当前段（如果有）
+                            currentSegment = null;
+                            prevPositionCount = 0;
+                            return;
+                        }
+                        
+                        // 如果全天无持仓，仍然把0值加入段（后续用特殊样式）
+                        if (!hasAnyPosition) {
+                            if (!currentSegment) {
+                                currentSegment = { color: 'nopos', data: [] };
+                                segments.push(currentSegment);
+                            }
+                            currentSegment.data.push([idx, 0]);
+                            prevPositionCount = 0;
+                            return;
+                        }
                         
                         // 检测加仓点：position_count增加时
                         if (idx > 0 && posCount > prevPositionCount && posCount > 0) {
@@ -3010,117 +3034,118 @@ def get_position_color(account_id, total_cost):
                     });
                     
                     // 为每个颜色段创建一个series
+                    // ✅ 修复：统计该账户是否有任何normal段（用于决定markLine/markArea放在哪个段）
+                    const firstNormalSegIdx = segments.findIndex(s => s.color !== 'nopos');
+                    
                     segments.forEach((segment, segIdx) => {
-                        series.push({
-                            name: segIdx === 0 ? accountName : '',  // 只在第一个段显示图例
-                            type: 'line',
-                            smooth: true,
-                            showSymbol: false,
-                            legendHoverLink: false,
-                            data: segment.data,
-                            lineStyle: {
-                                width: lineStyleMap[accId].width,
-                                type: lineStyleMap[accId].type,
-                                color: colorMap[segment.color]
-                            },
-                            itemStyle: {
-                                color: colorMap[segment.color]
-                            },
-                            emphasis: {
-                                focus: 'series'
-                            },
-                            // 只在第一个账户的第一个段添加markLine和markArea
-                            markLine: (accountIndex === 0 && segIdx === 0) ? {
-                                silent: true,
-                                symbol: 'none',
+                        // ✅ 无持仓特殊处理：显示带标注的虚线，偏移到-2%避免被0基准线遮住
+                        const isNoPosition = segment.color === 'nopos';
+                        
+                        // 无持仓时：每5点采样1个，y固定在-2%，确保可见
+                        const displayData = isNoPosition
+                            ? segment.data.filter((_, i) => i % 5 === 0).map(([x]) => [x, -2])
+                            : segment.data;
+                        
+                        const seriesColor = isNoPosition ? '#b0b8c8' : colorMap[segment.color];
+                        const seriesLineStyle = isNoPosition
+                            ? { width: 2, type: 'dashed', color: '#b0b8c8', opacity: 0.7 }
+                            : { width: lineStyleMap[accId].width, type: lineStyleMap[accId].type, color: seriesColor };
+                        
+                        // ✅ 修复Bug1：无持仓系列名称与legendData保持一致，都用 accountName
+                        // legendData 里用 accountName，series里也用 accountName
+                        // 无持仓信息通过 markPoint label 显示，不放在系列名称里
+                        const seriesName = segIdx === 0 ? accountName : '';
+                        
+                        // 无持仓标注点：放在数据中间位置，字体更醒目
+                        const noPosMarkPoint = (isNoPosition && segIdx === 0 && displayData.length > 0) ? {
+                            data: [{
+                                coord: [displayData[Math.floor(displayData.length / 2)][0], -2],
+                                value: `${accountName}\n暂无持仓`,
+                                symbol: 'roundRect',
+                                symbolSize: [80, 28],
+                                itemStyle: { color: 'rgba(100,116,139,0.15)', borderColor: '#94a3b8', borderWidth: 1 },
                                 label: {
                                     show: true,
-                                    position: 'end',
-                                    formatter: '盈亏分界线'
-                                },
+                                    color: '#64748b',
+                                    fontSize: 11,
+                                    fontWeight: 'bold',
+                                    lineHeight: 16
+                                }
+                            }]
+                        } : undefined;
+                        
+                        // 有持仓时的加仓点标记
+                        const posMarkPoint = (!isNoPosition && segIdx === 0 && positionIncreasePoints.length > 0) ? {
+                            symbol: 'circle',
+                            symbolSize: 12,
+                            itemStyle: {
+                                color: '#8b5cf6',
+                                borderColor: '#fff',
+                                borderWidth: 2
+                            },
+                            label: {
+                                show: true,
+                                position: 'top',
+                                formatter: function(params) { return params.value; },
+                                fontSize: 10,
+                                color: '#8b5cf6',
+                                fontWeight: 'bold',
+                                distance: 8
+                            },
+                            emphasis: {
+                                scale: 1.5,
+                                label: { show: true, fontSize: 12 }
+                            },
+                            data: positionIncreasePoints
+                        } : undefined;
+                        
+                        // ✅ 修复Bug2：markLine/markArea 全局标志
+                        // 只在第一个含有normal段的账户的第一个normal段上绘制，不管账户顺序
+                        const shouldDrawMarkDecor = !isNoPosition && !markLineDrawn && (segIdx === firstNormalSegIdx);
+                        if (shouldDrawMarkDecor) markLineDrawn = true;  // 标记已绘制，避免重复
+                        
+                        series.push({
+                            name: seriesName,
+                            type: 'line',
+                            smooth: !isNoPosition,
+                            showSymbol: false,
+                            legendHoverLink: false,
+                            data: displayData,
+                            lineStyle: seriesLineStyle,
+                            itemStyle: { color: seriesColor },
+                            emphasis: { focus: 'series' },
+                            // markLine 和 markArea 放在第一个有持仓的账户的第一个normal段
+                            markLine: shouldDrawMarkDecor ? {
+                                silent: true,
+                                symbol: 'none',
+                                label: { show: true, position: 'end', formatter: '盈亏分界线' },
                                 data: [{
                                     yAxis: 0,
-                                    lineStyle: {
-                                        type: 'solid',
-                                        color: '#374151',
-                                        width: 2
-                                    },
-                                    label: {
-                                        color: '#374151',
-                                        fontSize: 12,
-                                        fontWeight: 'bold'
-                                    }
+                                    lineStyle: { type: 'solid', color: '#374151', width: 2 },
+                                    label: { color: '#374151', fontSize: 12, fontWeight: 'bold' }
                                 }]
                             } : undefined,
-                            markArea: (accountIndex === 0 && segIdx === 0) ? {
+                            markArea: shouldDrawMarkDecor ? {
                                 silent: true,
                                 data: [
                                     [{
-                                        name: '盈利区',
-                                        yAxis: 0,
-                                        itemStyle: {
-                                            color: 'rgba(16, 185, 129, 0.05)'
-                                        },
-                                        label: {
-                                            position: 'insideTop',
-                                            color: '#10b981',
-                                            fontSize: 14,
-                                            fontWeight: 'bold'
-                                        }
-                                    }, {
-                                        yAxis: 'max'
-                                    }],
+                                        name: '盈利区', yAxis: 0,
+                                        itemStyle: { color: 'rgba(16, 185, 129, 0.05)' },
+                                        label: { position: 'insideTop', color: '#10b981', fontSize: 14, fontWeight: 'bold' }
+                                    }, { yAxis: 'max' }],
                                     [{
-                                        name: '亏损区',
-                                        yAxis: 'min',
-                                        itemStyle: {
-                                            color: 'rgba(239, 68, 68, 0.05)'
-                                        },
-                                        label: {
-                                            position: 'insideBottom',
-                                            color: '#ef4444',
-                                            fontSize: 14,
-                                            fontWeight: 'bold'
-                                        }
-                                    }, {
-                                        yAxis: 0
-                                    }]
+                                        name: '亏损区', yAxis: 'min',
+                                        itemStyle: { color: 'rgba(239, 68, 68, 0.05)' },
+                                        label: { position: 'insideBottom', color: '#ef4444', fontSize: 14, fontWeight: 'bold' }
+                                    }, { yAxis: 0 }]
                                 ]
                             } : undefined,
-                            // 在第一个段添加加仓点标记（所有账户）
-                            markPoint: (segIdx === 0 && positionIncreasePoints.length > 0) ? {
-                                symbol: 'circle',
-                                symbolSize: 12,
-                                itemStyle: {
-                                    color: '#8b5cf6',  // 紫色圆点
-                                    borderColor: '#fff',
-                                    borderWidth: 2
-                                },
-                                label: {
-                                    show: true,
-                                    position: 'top',
-                                    formatter: function(params) {
-                                        return params.value;
-                                    },
-                                    fontSize: 10,
-                                    color: '#8b5cf6',
-                                    fontWeight: 'bold',
-                                    distance: 8
-                                },
-                                emphasis: {
-                                    scale: 1.5,
-                                    label: {
-                                        show: true,
-                                        fontSize: 12
-                                    }
-                                },
-                                data: positionIncreasePoints
-                            } : undefined
+                            markPoint: noPosMarkPoint || posMarkPoint
                         });
                     });
                 });
             
-            // 图例数据（只显示勾选的账户）
+            // ✅ 修复Bug1：图例数据使用 accountName（不加"(无持仓)"后缀），与系列名称完全一致
             const legendData = allSeries
                 .filter(accId => showAccounts[accId])
                 .map(accId => accountNames[accId]);

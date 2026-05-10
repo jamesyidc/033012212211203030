@@ -250,31 +250,19 @@ def check_consolidation(symbol, config, state):
     record_consolidation_data(symbol, timestamp, change_percent, price, is_consolidation, consecutive)
     
     # 判断是否需要告警
+    # 规则：连续次数≥min_consecutive，且距上次告警超过1小时，才发送
+    ALERT_COOLDOWN_SECONDS = 3600  # 1小时冷却
     if consecutive >= min_consecutive:
-        # 检查是否已经为这个连续序列发送过告警（避免重复）
-        # 只在刚达到阈值时发送一次
-        if len(symbol_state['history']) >= min_consecutive:
-            # 检查前一条记录的连续次数
-            if len(symbol_state['history']) >= min_consecutive + 1:
-                # 找到倒数第min_consecutive+1条记录
-                idx = -(min_consecutive + 1)
-                if idx >= -len(symbol_state['history']):
-                    prev_records = list(symbol_state['history'])[:idx]
-                    prev_consecutive = 0
-                    for rec in reversed(prev_records):
-                        if rec['is_consolidation']:
-                            prev_consecutive += 1
-                        else:
-                            break
-                    
-                    # 只在刚从min_consecutive-1变成min_consecutive时告警
-                    if prev_consecutive < min_consecutive:
-                        print(f"[{get_beijing_now_str()}] 🔔 {config_name} 横盘连续{consecutive}次！发送告警...")
-                        send_telegram_alert(symbol, config_name, consecutive, list(symbol_state['history']))
-            else:
-                # 首次达到阈值
-                print(f"[{get_beijing_now_str()}] 🔔 {config_name} 横盘连续{consecutive}次！发送告警...")
-                send_telegram_alert(symbol, config_name, consecutive, list(symbol_state['history']))
+        now_ts = time.time()
+        last_alert_ts = symbol_state.get('last_alert_timestamp', 0)
+        elapsed = now_ts - last_alert_ts
+        if elapsed >= ALERT_COOLDOWN_SECONDS:
+            print(f"[{get_beijing_now_str()}] 🔔 {config_name} 横盘连续{consecutive}次！发送告警（距上次 {elapsed/3600:.1f} 小时）...")
+            if send_telegram_alert(symbol, config_name, consecutive, list(symbol_state['history'])):
+                symbol_state['last_alert_timestamp'] = now_ts
+        else:
+            remaining = (ALERT_COOLDOWN_SECONDS - elapsed) / 60
+            print(f"[{get_beijing_now_str()}] ⏳ {config_name} 横盘连续{consecutive}次，冷却中（剩余 {remaining:.0f} 分钟）")
     
     # 保存状态
     save_state(state)

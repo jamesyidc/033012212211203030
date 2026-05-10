@@ -3,16 +3,16 @@
 自动备份系统
 
 【重要要求】
-1. 备份文件必须大于 260MB（压缩后）
+1. 备份文件必须大于 354.46MB（压缩后）
 2. 保留最近 3 个备份（自动删除更旧的备份）
 3. 备份必须包含所有历史数据（绝对不允许删除历史数据）
 4. 每12小时自动备份一次
 5. 记录详细备份信息到 backup_history.jsonl
 
 【备份策略】
-- 备份目标：完整的 webapp 项目（约 3.6 GB）
-- 压缩后大小：约 285 MB
-- 如果压缩后小于 260MB，说明数据不完整，备份失败！
+- 备份目标：完整的 webapp 项目（含 eth_sar_bollinger/ JSONL 数据）
+- 压缩后大小：约 355+ MB
+- 如果压缩后小于 354.46MB，说明数据不完整，备份失败！
 - 备份位置：/tmp 目录
 - 备份格式：tar.gz
 
@@ -36,7 +36,7 @@ BACKUP_DIR = Path('/tmp')
 WEBAPP_DIR = Path('/home/user/webapp')
 BACKUP_LOG_FILE = WEBAPP_DIR / 'data' / 'backup_history.jsonl'
 MAX_BACKUPS = 3  # 保留最近3个备份
-MIN_BACKUP_SIZE_MB = 260  # 备份文件最小大小（MB），低于此值视为备份失败
+MIN_BACKUP_SIZE_MB = 354.46  # 备份文件最小大小（MB），低于此值视为备份失败（含 eth_sar_bollinger JSONL 数据）
 
 # 备份策略：复制整个webapp目录，包含所有内容
 # 用户要求包含：logs/, node_modules/, backups/, __pycache__/, 所有数据文件
@@ -217,10 +217,11 @@ def create_backup():
         if backup_size_mb < MIN_BACKUP_SIZE_MB:
             print(f"\n❌ 备份失败：文件大小 {backup_size_mb:.2f} MB < 最小要求 {MIN_BACKUP_SIZE_MB} MB")
             print(f"⚠️  数据不完整！请检查是否有数据被清理或丢失")
+            print(f"⚠️  必须包含 eth_sar_bollinger/ JSONL 数据")
             os.remove(backup_path)
-            raise Exception(f"备份文件过小 ({backup_size_mb:.2f} MB < {MIN_BACKUP_SIZE_MB} MB)，数据不完整")
+            raise Exception(f"备份文件过小 ({backup_size_mb:.2f} MB < {MIN_BACKUP_SIZE_MB} MB)，数据不完整（需包含 eth_sar_bollinger JSONL）")
         
-        print(f"✅ 备份大小验证通过：{backup_size_mb:.2f} MB > {MIN_BACKUP_SIZE_MB} MB")
+        print(f"✅ 备份大小验证通过：{backup_size_mb:.2f} MB > {MIN_BACKUP_SIZE_MB} MB（含 eth_sar_bollinger JSONL）")
         
         # 追加到备份历史文件
         BACKUP_LOG_FILE.parent.mkdir(parents=True, exist_ok=True)

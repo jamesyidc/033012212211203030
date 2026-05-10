@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ETH 双周期策略 — 5m / 1H</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;background:#131722;color:#d1d4dc;font-family:'Segoe UI',Arial,sans-serif;overflow:hidden}
+
+/* ── 顶部栏 ── */
+.topbar{
+  height:36px;display:flex;align-items:center;gap:10px;
+  padding:0 12px;background:#1e222d;border-bottom:1px solid #2a2e39;flex-shrink:0;
+}
+.sym{font-size:14px;font-weight:700;color:#fff}
+.price-val{font-size:17px;font-weight:700;font-family:'Courier New',monospace}
+.chg-val{font-size:11px}
+.sep{width:1px;height:18px;background:#2a2e39}
+.tinfo{font-size:10px;color:#555}
+.tinfo b{color:#9ca3af}
+.btn{background:#2a2e39;border:1px solid #363a45;color:#d1d4dc;
+  padding:3px 10px;border-radius:4px;font-size:11px;cursor:pointer;transition:background .15s;}
+.btn:hover{background:#363a45}
+.btn.on{background:#1f6feb;border-color:#1f6feb;color:#fff}
+.ml{margin-left:auto;display:flex;gap:6px}
+
+/* ── 状态栏 ── */
+.sbar{
+  height:24px;display:flex;align-items:center;gap:6px;
+  padding:0 12px;background:#161a25;border-bottom:1px solid #2a2e39;
+  flex-shrink:0;overflow-x:auto;white-space:nowrap;
+}
+.stag{font-size:10px;padding:1px 7px;border-radius:3px;font-weight:600;border:1px solid}
+.sr{color:#ef5350;border-color:#ef5350;background:rgba(239,83,80,.12)}
+.sg{color:#26a69a;border-color:#26a69a;background:rgba(38,166,154,.12)}
+.sy{color:#f0b90b;border-color:#f0b90b;background:rgba(240,185,11,.12)}
+.sp{color:#9c6aff;border-color:#9c6aff;background:rgba(156,106,255,.12)}
+.so{color:#ff9800;border-color:#ff9800;background:rgba(255,152,0,.12)}
+.sb{color:#5c9bff;border-color:#5c9bff;background:rgba(92,155,255,.12)}
+
+/* ── 主区域 ── */
+.main-wrap{
+  display:flex;flex-direction:column;
+  width:100%;height:calc(100vh - 60px); /* topbar+sbar */
+}
+
+/* 双图区 */
+.charts-row{
+  display:flex;flex-direction:row;
+  flex:1;min-height:0;
+}
+.col{
+  flex:1;display:flex;flex-direction:column;min-width:0;
+  border-right:2px solid #2a2e39;
+}
+.col:last-child{border-right:none}
+
+.col-hdr{
+  height:26px;display:flex;align-items:center;gap:7px;
+  padding:0 10px;background:#1e222d;border-bottom:1px solid #2a2e39;flex-shrink:0;
+}
+.col-hdr .tf{font-size:12px;font-weight:700;color:#5c9bff}
+.col-hdr .cn{font-size:11px;color:#d1d4dc;font-weight:600}
+.col-hdr .lgd{display:flex;gap:8px;margin-left:6px}
+.li{font-size:9px;display:flex;align-items:center;gap:3px;color:#555}
+.ld{width:10px;height:2px;border-radius:1px;display:inline-block}
+.sigtags{display:flex;gap:4px;margin-left:auto}
+
+/* K线+VOL合并区 */
+.karea{flex:1;min-height:0;position:relative}
+.karea canvas,.karea>div{width:100%;height:100%}
+.ldmask{
+  position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;background:rgba(19,23,34,.8);
+  font-size:13px;color:#555;z-index:10;
+}
+
+/* RSI 区 — 加大 */
+.rsi-area{height:140px;flex-shrink:0;border-top:1px solid #2a2e39;position:relative}
+.rsi-area>div{width:100%;height:100%}
+
+/* ── 信号面板（底部可折叠）── */
+.sig-panel{
+  flex-shrink:0;background:#161a25;border-top:2px solid #2a2e39;
+  overflow:hidden;transition:height .25s ease;
+}
+.sig-panel.open{height:160px}
+.sig-panel.closed{height:28px}
+
+.sig-panel-hdr{
+  height:28px;display:flex;align-items:center;gap:10px;
+  padding:0 12px;background:#1e222d;cursor:pointer;user-select:none;
+  border-bottom:1px solid #2a2e39;flex-shrink:0;
+}
+.sig-panel-hdr:hover{background:#252b3b}
+.sig-panel-title{font-size:11px;font-weight:700;color:#d1d4dc}
+.sig-panel-arrow{font-size:11px;color:#555;margin-left:auto;transition:transform .25s}
+.sig-panel.open .sig-panel-arrow{transform:rotate(180deg)}
+
+.sig-panel-body{
+  display:flex;gap:0;height:132px;overflow:hidden;
+}
+
+/* 1类信号列 */
+.sigcol{
+  flex:1;padding:8px 10px;border-right:1px solid #2a2e39;
+  display:flex;flex-direction:column;gap:0;min-width:0;overflow:hidden;
+}
+.sigcol:last-child{border-right:none}
+.sigcol-title{
+  font-size:10px;font-weight:700;color:#787b86;
+  padding-bottom:5px;border-bottom:1px solid #2a2e39;margin-bottom:5px;
+  display:flex;align-items:center;gap:5px;
+}
+.siglist{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:3px}
+.siglist::-webkit-scrollbar{width:3px}
+.siglist::-webkit-scrollbar-thumb{background:#2a2e39;border-radius:2px}
+
+.sigrow{
+  display:grid;grid-template-columns:60px 1fr 80px 70px;
+  align-items:center;gap:6px;
+  padding:3px 6px;border-radius:4px;font-size:10px;
+  border-left:3px solid;
+}
+.sigrow.r{background:rgba(239,83,80,.07);border-color:#ef5350}
+.sigrow.g{background:rgba(38,166,154,.07);border-color:#26a69a}
+.sigrow.y{background:rgba(240,185,11,.07);border-color:#f0b90b}
+.sigrow.o{background:rgba(255,152,0,.07);border-color:#ff9800}
+.sigrow.p{background:rgba(156,106,255,.07);border-color:#9c6aff}
+.sigrow .sn{font-weight:700}
+.sigrow.r .sn{color:#ef5350}
+.sigrow.g .sn{color:#26a69a}
+.sigrow.y .sn{color:#f0b90b}
+.sigrow.o .sn{color:#ff9800}
+.sigrow.p .sn{color:#9c6aff}
+.sigrow .sv{color:#d1d4dc;font-family:'Courier New',monospace}
+.sigrow .st{color:#555}
+.sigrow .sd{color:#787b86;font-size:9px}
+.sig-empty{color:#2a2e39;font-size:10px;text-align:center;margin-top:10px}
+</style>
+</head>
+<body>
+
+<!-- ═══ 顶部栏 ═══ -->
+<div class="topbar">
+  <span class="sym">ETH/USDT · PERP</span>
+  <div class="sep"></div>
+  <span class="price-val" id="livePrice" style="color:#26a69a">──</span>
+  <span class="chg-val" id="liveChg">──</span>
+  <div class="sep"></div>
+  <span class="tinfo">BB <b>20,2</b></span>
+  <span class="tinfo">SAR <b>0.02,0.2</b></span>
+  <span class="tinfo">RSI <b>14</b></span>
+  <div class="sep"></div>
+  <span class="tinfo" id="lastUpd" style="color:#363a45">──</span>
+  <div class="ml">
+    <button class="btn on" id="btnAuto" onclick="toggleAuto()">🔄 自动</button>
+    <button class="btn" onclick="loadAll()">↺ 刷新</button>
+  </div>
+</div>
+
+<!-- ═══ 状态栏 ═══ -->
+<div class="sbar">
+  <span class="stag sb" id="st5rsi">5m RSI: ──</span>
+  <span class="stag sb" id="st1rsi">1H RSI: ──</span>
+  <span class="stag sr" id="stL3">3号线: ──</span>
+  <span class="stag sy" id="stL1">1号线: ──</span>
+  <span class="stag sg" id="stL2">2号线: ──</span>
+  <span class="stag sp" id="stYK">诱空: 待机</span>
+  <span class="stag sb" id="stDir">方向: ──</span>
+  <span class="stag so" id="stEsc">逃顶: ──</span>
+</div>
+
+<!-- ═══ 主区域 ═══ -->
+<div class="main-wrap">
+
+  <!-- 双图行 -->
+  <div class="charts-row">
+
+    <!-- 左：5分钟 -->
+    <div class="col">
+      <div class="col-hdr">
+        <span class="tf">5m</span>
+        <span class="cn">ETH/USDT</span>
+        <div class="lgd">
+          <div class="li"><span class="ld" style="background:#5c9bff"></span>BB</div>
+          <div class="li"><span class="ld" style="background:#26a69a;height:4px;width:4px;border-radius:50%"></span>SAR多</div>
+          <div class="li"><span class="ld" style="background:#ef5350;height:4px;width:4px;border-radius:50%"></span>SAR空</div>
+          <div class="li"><span class="ld" style="background:rgba(255,152,0,.7)"></span>VOL</div>
+        </div>
+        <div class="sigtags" id="sigtags5m"></div>
+      </div>
+      <div class="karea" id="wrap5mK">
+        <div class="ldmask" id="ld5m">⏳ 加载中…</div>
+        <div id="c5mK"></div>
+      </div>
+      <div class="rsi-area">
+        <div id="c5mR"></div>
+      </div>
+    </div>
+
+    <!-- 右：1小时 -->
+    <div class="col">
+      <div class="col-hdr">
+        <span class="tf">1H</span>
+        <span class="cn">ETH/USDT</span>
+        <div class="lgd">
+          <div class="li"><span class="ld" style="background:#5c9bff"></span>BB</div>
+          <div class="li"><span class="ld" style="background:#26a69a;height:4px;width:4px;border-radius:50%"></span>SAR多</div>
+          <div class="li"><span class="ld" style="background:#ef5350;height:4px;width:4px;border-radius:50%"></span>SAR空</div>
+          <div class="li"><span class="ld" style="background:rgba(255,152,0,.7)"></span>VOL</div>
+        </div>
+        <div class="sigtags" id="sigtags1h"></div>
+      </div>
+      <div class="karea" id="wrap1hK">
+        <div class="ldmask" id="ld1h">⏳ 加载中…</div>
+        <div id="c1hK"></div>
+      </div>
+      <div class="rsi-area">
+        <div id="c1hR"></div>
+      </div>
+    </div>
+
+  </div><!-- end charts-row -->
+
+  <!-- ═══ 信号面板（可折叠）═══ -->
+  <div class="sig-panel open" id="sigPanel">
+    <div class="sig-panel-hdr" onclick="toggleSigPanel()">
+      <span class="sig-panel-title">📊 信号记录</span>
+      <span class="stag sr" style="font-size:9px">1类: 3号线 / 1号线 / 2号线 / 逃顶</span>
+      <span class="stag sp" style="font-size:9px">2类: 转多 / 转空 / 平空开多</span>
+      <span class="sig-panel-arrow" id="panelArrow">▲</span>
+    </div>
+    <div class="sig-panel-body">
+
+      <!-- 1类：3号线 -->
+      <div class="sigcol">
+        <div class="sigcol-title">
+          <span style="color:#ef5350">●</span> 3号线信号
+          <span id="cnt3" style="color:#363a45;font-size:9px;margin-left:auto">0条</span>
+        </div>
+        <div class="siglist" id="list_line3"></div>
+      </div>
+
+      <!-- 1类：1号线 -->
+      <div class="sigcol">
+        <div class="sigcol-title">
+          <span style="color:#f0b90b">●</span> 1号线信号
+          <span id="cnt1" style="color:#363a45;font-size:9px;margin-left:auto">0条</span>
+        </div>
+        <div class="siglist" id="list_line1"></div>
+      </div>
+
+      <!-- 1类：2号线 -->
+      <div class="sigcol">
+        <div class="sigcol-title">
+          <span style="color:#26a69a">●</span> 2号线信号
+          <span id="cnt2" style="color:#363a45;font-size:9px;margin-left:auto">0条</span>
+        </div>
+        <div class="siglist" id="list_line2"></div>
+      </div>
+
+      <!-- 1类：逃顶 -->
+      <div class="sigcol">
+        <div class="sigcol-title">
+          <span style="color:#ff9800">●</span> 逃顶信号
+          <span id="cntEsc" style="color:#363a45;font-size:9px;margin-left:auto">0条</span>
+        </div>
+        <div class="siglist" id="list_escape"></div>
+      </div>
+
+      <!-- 2类：转多 -->
+      <div class="sigcol">
+        <div class="sigcol-title">
+          <span style="color:#26a69a">▲</span> 转多信号
+          <span id="cntZL" style="color:#363a45;font-size:9px;margin-left:auto">0条</span>
+        </div>
+        <div class="siglist" id="list_zhuanlong"></div>
+      </div>
+
+      <!-- 2类：转空 -->
+      <div class="sigcol">
+        <div class="sigcol-title">
+          <span style="color:#ef5350">▼</span> 转空信号
+          <span id="cntZK" style="color:#363a45;font-size:9px;margin-left:auto">0条</span>
+        </div>
+        <div class="siglist" id="list_zhuankong"></div>
+      </div>
+
+      <!-- 2类：平空开多 -->
+      <div class="sigcol">
+        <div class="sigcol-title">
+          <span style="color:#9c6aff">◆</span> 平空开多
+          <span id="cntCY" style="color:#363a45;font-size:9px;margin-left:auto">0条</span>
+        </div>
+        <div class="siglist" id="list_close_yk"></div>
+      </div>
+
+    </div>
+  </div><!-- end sig-panel -->
+
+</div><!-- end main-wrap -->
+
+<script>
+// ═══════════════════════════════════════════════════
+//  指标计算
+// ═══════════════════════════════════════════════════
+function calcRSI(cl,p=14){
+  const o=new Array(cl.length).fill(null);
+  if(cl.length<=p)return o;
+  let ag=0,al=0;
+  for(let i=1;i<=p;i++){const d=cl[i]-cl[i-1];d>0?ag+=d:al-=d;}
+  ag/=p;al/=p;
+  o[p]=al===0?100:100-100/(1+ag/al);
+  for(let i=p+1;i<cl.length;i++){
+    const d=cl[i]-cl[i-1],g=d>0?d:0,l=d<0?-d:0;
+    ag=(ag*(p-1)+g)/p;al=(al*(p-1)+l)/p;
+    o[i]=al===0?100:100-100/(1+ag/al);
+  }
+  return o;
+}
+
+function calcBB(cl,p=20,k=2){
+  const mid=new Array(cl.length).fill(null);
+  const up=new Array(cl.length).fill(null);
+  const dn=new Array(cl.length).fill(null);
+  for(let i=p-1;i<cl.length;i++){
+    const sl=cl.slice(i-p+1,i+1);
+    const m=sl.reduce((a,b)=>a+b,0)/p;
+    const sd=Math.sqrt(sl.reduce((a,b)=>a+(b-m)**2,0)/p);
+    mid[i]=m;up[i]=m+k*sd;dn[i]=m-k*sd;
+  }
+  return{mid,up,dn};
+}
+
+function calcSAR(hi,lo,step=0.02,maxAF=0.2){
+  const n=hi.length,sar=new Array(n).fill(null);
+  if(n<2)return sar;
+  let bull=true,af=step,ep=hi[0],s=lo[0];
+  sar[0]=s;
+  for(let i=1;i<n;i++){
+    let ns=s+af*(ep-s);
+    if(bull){
+      ns=Math.min(ns,lo[i-1],i>1?lo[i-2]:lo[i-1]);
+      if(lo[i]<ns){bull=false;s=ep;ep=lo[i];af=step;ns=s;}
+      else{if(hi[i]>ep){ep=hi[i];af=Math.min(af+step,maxAF);}s=ns;}
+    }else{
+      ns=Math.max(ns,hi[i-1],i>1?hi[i-2]:hi[i-1]);
+      if(hi[i]>ns){bull=true;s=ep;ep=hi[i];af=step;ns=s;}
+      else{if(lo[i]<ep){ep=lo[i];af=Math.min(af+step,maxAF);}s=ns;}
+    }
+    sar[i]=s;
+  }
+  return sar;
+}
+
+// ═══════════════════════════════════════════════════
+//  策略信号
+// ═══════════════════════════════════════════════════
+const P={L3_5MTO:200000000,L3_1HTO:600000000,L3RSI:70,
+         L1DROP:0.3,L1TO:600000000,L2TO:300000000,L2RSI:30};
+
+function calcSigs5m(cc,rsi){
+  const sigs=[],N=cc.length;
+  let la=false,l1d=false,l2d=false,aHi=false,aLo=false;
+  let l3h=null,l3r=null,l2l=null,l2r=null,yk=false;
+  let p3=false,p1=false,p2=false;
+  function mto(i){let m=0;for(let k=Math.max(0,i-4);k<=i;k++)m=Math.max(m,cc[k].turnover);return m;}
+  for(let i=1;i<N;i++){
+    const c=cc[i],r=rsi[i];if(r===null)continue;
+    const mt=mto(i),dr=(c.close/cc[i-1].close-1)*100;
+    const c3=mt>=P.L3_5MTO&&r>P.L3RSI&&c.turnover>=P.L3_1HTO;
+    const c1=la&&!l2d&&!l1d&&dr<-P.L1DROP&&c.turnover>=P.L1TO;
+    const c2=l1d&&c.turnover>=P.L2TO&&r<P.L2RSI;
+    const t3=c3&&!p3,t1=c1&&!p1,t2=c2&&!p2;
+    if(t3){la=true;l1d=false;l2d=false;aHi=true;aLo=false;l3h=c.high;l3r=r;yk=true;
+      sigs.push({i,type:'line3',price:c.close,rsi:r,ts:c.ts,turnover:c.turnover});}
+    if(t1){l1d=true;aHi=false;
+      sigs.push({i,type:'line1',price:c.close,rsi:r,ts:c.ts,drop:dr.toFixed(2)});
+      if(yk){sigs.push({i,type:'yk_entry',price:c.close,ts:c.ts});yk=false;}}
+    if(t2){l2d=true;la=false;aLo=true;aHi=false;l2l=c.low;l2r=r;yk=false;
+      sigs.push({i,type:'line2',price:c.close,rsi:r,ts:c.ts,turnover:c.turnover});}
+    if(aHi&&l3h!==null&&(c.close>=l3h||c.high>=l3h)){
+      if(r<l3r)sigs.push({i,type:'bull3',price:c.high,ts:c.ts});
+      else if(r>l3r)sigs.push({i,type:'bear3',price:c.high,ts:c.ts});
+    }
+    if(aLo&&l2l!==null&&(c.close<=l2l||c.low<=l2l)){
+      if(r>l2r)sigs.push({i,type:'bull2',price:c.low,ts:c.ts});
+      else if(r<l2r)sigs.push({i,type:'bear2',price:c.low,ts:c.ts});
+    }
+    p3=c3;p1=c1;p2=c2;
+  }
+  return sigs;
+}
+
+function calcSigs1h(cc,rsi){
+  const sigs=[],N=cc.length;
+  let hit70=false,cross50=false;
+  for(let i=1;i<N;i++){
+    const c=cc[i],r=rsi[i],rp=rsi[i-1];
+    if(r===null||rp===null)continue;
+    if(rp<45&&r>=45) sigs.push({i,type:'zhuanlong',price:c.low,ts:c.ts,rsi:r});
+    if(rp>45&&r<=45) sigs.push({i,type:'zhuankong',price:c.high,ts:c.ts,rsi:r});
+    if(r>=70) hit70=true;
+    if(hit70&&rp>=70&&r<70){sigs.push({i,type:'escape',price:c.high,ts:c.ts,rsi:r});hit70=false;}
+    hit70=false;if(r>=70)hit70=true;
+    if(rp>50&&r<=50) cross50=true;
+    if(cross50&&rp<50&&r>=50){sigs.push({i,type:'close_yk',price:c.close,ts:c.ts,rsi:r});cross50=false;}
+  }
+  return sigs;
+}
+
+// ═══════════════════════════════════════════════════
+//  时间格式
+// ═══════════════════════════════════════════════════
+function ts2s(ts){
+  const d=new Date(ts);
+  return (d.getMonth()+1)+'/'+(d.getDate())+' '+
+    String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+function ts2date(ts){
+  const d=new Date(ts);
+  return (d.getMonth()+1)+'/'+d.getDate();
+}
+
+// ═══════════════════════════════════════════════════
+//  信号面板渲染
+// ═══════════════════════════════════════════════════
+function renderSigPanel(s5m, s1h, cc5m, cc1h){
+  // 1类：3号线
+  const l3=s5m.filter(s=>s.type==='line3');
+  document.getElementById('cnt3').textContent=l3.length+'条';
+  document.getElementById('list_line3').innerHTML= l3.length===0
+    ? '<div class="sig-empty">暂无</div>'
+    : [...l3].reverse().map(s=>`
+      <div class="sigrow r">
+        <span class="sn">3号线</span>
+        <span class="sv">${s.price.toFixed(2)}</span>
+        <span class="sd">RSI ${s.rsi.toFixed(1)}</span>
+        <span class="st">${ts2s(s.ts)}</span>
+      </div>`).join('');
+
+  // 1类：1号线
+  const l1=s5m.filter(s=>s.type==='line1');
+  document.getElementById('cnt1').textContent=l1.length+'条';
+  document.getElementById('list_line1').innerHTML= l1.length===0
+    ? '<div class="sig-empty">暂无</div>'
+    : [...l1].reverse().map(s=>`
+      <div class="sigrow y">
+        <span class="sn">1号线</span>
+        <span class="sv">${s.price.toFixed(2)}</span>
+        <span class="sd">跌${s.drop}%</span>
+        <span class="st">${ts2s(s.ts)}</span>
+      </div>`).join('');
+
+  // 1类：2号线
+  const l2=s5m.filter(s=>s.type==='line2');
+  document.getElementById('cnt2').textContent=l2.length+'条';
+  document.getElementById('list_line2').innerHTML= l2.length===0
+    ? '<div class="sig-empty">暂无</div>'
+    : [...l2].reverse().map(s=>`
+      <div class="sigrow g">
+        <span class="sn">2号线</span>
+        <span class="sv">${s.price.toFixed(2)}</span>
+        <span class="sd">RSI ${s.rsi.toFixed(1)}</span>
+        <span class="st">${ts2s(s.ts)}</span>
+      </div>`).join('');
+
+  // 1类：逃顶
+  const esc=s1h.filter(s=>s.type==='escape');
+  document.getElementById('cntEsc').textContent=esc.length+'条';
+  document.getElementById('list_escape').innerHTML= esc.length===0
+    ? '<div class="sig-empty">暂无</div>'
+    : [...esc].reverse().map(s=>`
+      <div class="sigrow o">
+        <span class="sn">逃顶</span>
+        <span class="sv">${s.price.toFixed(2)}</span>
+        <span class="sd">RSI ${s.rsi.toFixed(1)}</span>
+        <span class="st">${ts2s(s.ts)}</span>
+      </div>`).join('');
+
+  // 2类：转多
+  const zl=s1h.filter(s=>s.type==='zhuanlong');
+  document.getElementById('cntZL').textContent=zl.length+'条';
+  document.getElementById('list_zhuanlong').innerHTML= zl.length===0
+    ? '<div class="sig-empty">暂无</div>'
+    : [...zl].reverse().map(s=>`
+      <div class="sigrow g">
+        <span class="sn">转多▲</span>
+        <span class="sv">${s.price.toFixed(2)}</span>
+        <span class="sd">RSI ${s.rsi.toFixed(1)}</span>
+        <span class="st">${ts2s(s.ts)}</span>
+      </div>`).join('');
+
+  // 2类：转空
+  const zk=s1h.filter(s=>s.type==='zhuankong');
+  document.getElementById('cntZK').textContent=zk.length+'条';
+  document.getElementById('list_zhuankong').innerHTML= zk.length===0
+    ? '<div class="sig-empty">暂无</div>'
+    : [...zk].reverse().map(s=>`
+      <div class="sigrow r">
+        <span class="sn">转空▼</span>
+        <span class="sv">${s.price.toFixed(2)}</span>
+        <span class="sd">RSI ${s.rsi.toFixed(1)}</span>
+        <span class="st">${ts2s(s.ts)}</span>
+      </div>`).join('');
+
+  // 2类：平空开多
+  const cy=s1h.filter(s=>s.type==='close_yk');
+  document.getElementById('cntCY').textContent=cy.length+'条';
+  document.getElementById('list_close_yk').innerHTML= cy.length===0
+    ? '<div class="sig-empty">暂无</div>'
+    : [...cy].reverse().map(s=>`
+      <div class="sigrow p">
+        <span class="sn">平空开多</span>
+        <span class="sv">${s.price.toFixed(2)}</span>
+        <span class="sd">RSI ${s.rsi.toFixed(1)}</span>
+        <span class="st">${ts2s(s.ts)}</span>
+      </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════
+//  信号面板折叠
+// ═══════════════════════════════════════════════════
+let panelOpen=true;
+function toggleSigPanel(){
+  panelOpen=!panelOpen;
+  document.getElementById('sigPanel').className='sig-panel '+(panelOpen?'open':'closed');
+  document.getElementById('panelArrow').textContent=panelOpen?'▲':'▼';
+  setTimeout(()=>Object.values(ec).forEach(c=>c.resize()),280);
+}
+
+// ═══════════════════════════════════════════════════
+//  ECharts 初始化
+// ═══════════════════════════════════════════════════
+const ec={};
+function initCharts(){
+  ['5mK','5mR','1hK','1hR'].forEach(id=>{
+    ec[id]=echarts.init(document.getElementById('c'+id),'dark');
+  });
+  window.addEventListener('resize',()=>Object.values(ec).forEach(c=>c.resize()));
+
+  // dataZoom 联动 — 5m
+  ['5mK','5mR'].forEach(id=>{
+    ec[id].on('dataZoom',evt=>{
+      const s=evt.start??evt.batch?.[0]?.start??60;
+      const e=evt.end??evt.batch?.[0]?.end??100;
+      ['5mK','5mR'].filter(x=>x!==id).forEach(x=>ec[x].dispatchAction({type:'dataZoom',start:s,end:e}));
+    });
+  });
+  // dataZoom 联动 — 1h
+  ['1hK','1hR'].forEach(id=>{
+    ec[id].on('dataZoom',evt=>{
+      const s=evt.start??evt.batch?.[0]?.start??55;
+      const e=evt.end??evt.batch?.[0]?.end??100;
+      ['1hK','1hR'].filter(x=>x!==id).forEach(x=>ec[x].dispatchAction({type:'dataZoom',start:s,end:e}));
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  渲染：K线 + BB + SAR + VOL(内嵌副轴)
+// ═══════════════════════════════════════════════════
+function renderKChart(ecId, cc, bb, sar, sigs, iz=60){
+  const cats=cc.map(c=>ts2s(c.ts));
+  const kd=cc.map(c=>[c.open,c.close,c.low,c.high]);
+  const vd=cc.map(c=>({
+    value:c.turnover,
+    itemStyle:{color:c.close>=c.open?'rgba(38,166,154,.5)':'rgba(239,83,80,.5)'}
+  }));
+
+  // SAR 按多空分组
+  const sarUp=[],sarDn=[];
+  sar.forEach((v,i)=>{
+    if(v===null)return;
+    if(v<cc[i].close) sarUp.push([i,+v.toFixed(4)]);
+    else sarDn.push([i,+v.toFixed(4)]);
+  });
+
+  // 信号标注
+  const mpts=[];
+  sigs.forEach(s=>{
+    const c=cc[s.i];
+    const above=['bear3','bear2','zhuankong','escape','yk_entry','line3'].includes(s.type);
+    const cfg={
+      line3:{color:'#ef5350',label:'3'},
+      line1:{color:'#f0b90b',label:'1'},
+      line2:{color:'#26a69a',label:'2'},
+      yk_entry:{color:'#9c6aff',label:'诱↓'},
+      close_yk:{color:'#29b6f6',label:'平↑'},
+      zhuanlong:{color:'#26a69a',label:'多▲'},
+      zhuankong:{color:'#ef5350',label:'空▼'},
+      escape:{color:'#ff9800',label:'顶'},
+      bull3:{color:'#26a69a',label:'↑'},bear3:{color:'#ef5350',label:'↓'},
+      bull2:{color:'#26a69a',label:'↑'},bear2:{color:'#ef5350',label:'↓'},
+    }[s.type];
+    if(!cfg)return;
+    const yval=above?c.high*1.004:c.low*0.996;
+    mpts.push({coord:[s.i,yval],value:cfg.label,
+      itemStyle:{color:cfg.color},label:{fontSize:9,color:'#fff',fontWeight:'bold'}});
+  });
+
+  ec[ecId].setOption({
+    backgroundColor:'#131722',animation:false,
+    grid:[
+      {left:60,right:8,top:6,bottom:58,id:'kgrid'},   // K线 占大部分
+      {left:60,right:8,bottom:18,height:'18%',id:'vgrid'}, // VOL 底部
+    ],
+    xAxis:[
+      {type:'category',data:cats,gridIndex:0,scale:true,
+       axisLine:{lineStyle:{color:'#2a2e39'}},
+       axisLabel:{show:false},
+       splitLine:{lineStyle:{color:'#1e222d'}}},
+      {type:'category',data:cats,gridIndex:1,scale:true,
+       axisLine:{lineStyle:{color:'#2a2e39'}},
+       axisLabel:{color:'#444',fontSize:8,interval:'auto'},
+       splitLine:{lineStyle:{color:'#1e222d'}}},
+    ],
+    yAxis:[
+      {type:'value',scale:true,splitNumber:5,gridIndex:0,
+       axisLine:{lineStyle:{color:'#2a2e39'}},
+       axisLabel:{color:'#555',fontSize:9,formatter:v=>v.toFixed(0)},
+       splitLine:{lineStyle:{color:'#1e222d'}}},
+      {type:'value',scale:true,splitNumber:2,gridIndex:1,
+       axisLine:{lineStyle:{color:'#2a2e39'}},
+       axisLabel:{color:'#444',fontSize:8,formatter:v=>(v/1e6).toFixed(0)+'M'},
+       splitLine:{show:false}},
+    ],
+    dataZoom:[
+      {type:'inside',xAxisIndex:[0,1],start:iz,end:100},
+      {type:'slider',xAxisIndex:[0,1],start:iz,end:100,bottom:0,height:16,
+       borderColor:'#2a2e39',fillerColor:'rgba(92,155,255,.08)',
+       handleStyle:{color:'#5c9bff'},textStyle:{color:'#444',fontSize:8}},
+    ],
+    tooltip:{
+      trigger:'axis',axisPointer:{type:'cross'},
+      backgroundColor:'rgba(19,23,34,.95)',borderColor:'#2a2e39',
+      textStyle:{color:'#d1d4dc',fontSize:10},
+      formatter(params){
+        let h=`<div style="font-size:10px;color:#555">${params[0]?.axisValueLabel||''}</div>`;
+        params.forEach(p=>{
+          if(p.seriesName==='K线'&&Array.isArray(p.value))
+            h+=`<div>O:${p.value[0].toFixed(2)} H:${p.value[3].toFixed(2)} L:${p.value[2].toFixed(2)} C:${p.value[1].toFixed(2)}</div>`;
+          if(p.seriesName==='VOL')
+            h+=`<div style="color:#9ca3af">成交额: ${(p.value/1e8).toFixed(2)}亿</div>`;
+        });
+        return h;
+      }
+    },
+    series:[
+      // K线
+      {name:'K线',type:'candlestick',xAxisIndex:0,yAxisIndex:0,data:kd,
+       itemStyle:{color:'#26a69a',color0:'#ef5350',borderColor:'#26a69a',borderColor0:'#ef5350'},
+       markPoint:{symbolSize:22,data:mpts}},
+      // BB 上轨
+      {name:'BB上',type:'line',xAxisIndex:0,yAxisIndex:0,data:bb.up,
+       smooth:false,symbol:'none',
+       lineStyle:{color:'#5c9bff',width:1},
+       areaStyle:{color:'rgba(92,155,255,.04)'}},
+      // BB 中轨
+      {name:'BB中',type:'line',xAxisIndex:0,yAxisIndex:0,data:bb.mid,
+       smooth:false,symbol:'none',
+       lineStyle:{color:'#5c9bff',width:1,type:'dashed',opacity:.4}},
+      // BB 下轨
+      {name:'BB下',type:'line',xAxisIndex:0,yAxisIndex:0,data:bb.dn,
+       smooth:false,symbol:'none',
+       lineStyle:{color:'#5c9bff',width:1},
+       areaStyle:{color:'rgba(92,155,255,.04)'}},
+      // SAR 多（绿点，价格下方）
+      {name:'SAR多',type:'scatter',xAxisIndex:0,yAxisIndex:0,data:sarUp,
+       symbol:'circle',symbolSize:3.5,itemStyle:{color:'#26a69a'}},
+      // SAR 空（红点，价格上方）
+      {name:'SAR空',type:'scatter',xAxisIndex:0,yAxisIndex:0,data:sarDn,
+       symbol:'circle',symbolSize:3.5,itemStyle:{color:'#ef5350'}},
+      // VOL
+      {name:'VOL',type:'bar',xAxisIndex:1,yAxisIndex:1,data:vd,barMaxWidth:6},
+    ]
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  渲染：RSI（加大，字体清晰）
+// ═══════════════════════════════════════════════════
+function renderRSI(ecId, cc, rsi, iz=60){
+  const cats=cc.map(c=>ts2s(c.ts));
+  const rd=rsi.map(v=>v===null?null:+v.toFixed(2));
+
+  ec[ecId].setOption({
+    backgroundColor:'#131722',animation:false,
+    grid:[{left:60,right:8,top:8,bottom:24}],
+    xAxis:[{
+      type:'category',data:cats,scale:true,
+      axisLine:{lineStyle:{color:'#2a2e39'}},
+      axisLabel:{color:'#555',fontSize:9,interval:'auto'},
+      splitLine:{lineStyle:{color:'#1e222d',opacity:.5}}
+    }],
+    yAxis:[{
+      type:'value',min:0,max:100,interval:10,
+      axisLine:{lineStyle:{color:'#2a2e39'}},
+      axisLabel:{color:'#787b86',fontSize:10,formatter:v=>v},
+      splitLine:{lineStyle:{color:'#1e222d',opacity:.5}}
+    }],
+    dataZoom:[
+      {type:'inside',start:iz,end:100},
+      {type:'slider',start:iz,end:100,bottom:0,height:18,
+       borderColor:'#2a2e39',fillerColor:'rgba(92,155,255,.08)',
+       handleStyle:{color:'#5c9bff'},textStyle:{color:'#555',fontSize:9}},
+    ],
+    tooltip:{
+      trigger:'axis',backgroundColor:'rgba(19,23,34,.95)',borderColor:'#2a2e39',
+      textStyle:{color:'#d1d4dc',fontSize:11},
+      formatter(p){
+        const v=p[0]?.value;
+        return `<span style="font-size:11px">RSI(14): <b style="color:${
+          v>70?'#ef5350':v<30?'#26a69a':'#d1d4dc'
+        }">${v??'──'}</b></span>`;
+      }
+    },
+    series:[{
+      name:'RSI',type:'line',data:rd,smooth:false,symbol:'none',
+      lineStyle:{color:'#7b61ff',width:2},
+      markLine:{
+        silent:true,
+        lineStyle:{type:'dashed',width:1},
+        label:{fontSize:11,fontWeight:'bold'},
+        data:[
+          {yAxis:70,lineStyle:{color:'#ef5350'},label:{color:'#ef5350',formatter:'70',position:'end'}},
+          {yAxis:50,lineStyle:{color:'#555'},   label:{color:'#787b86',formatter:'50',position:'end'}},
+          {yAxis:45,lineStyle:{color:'#f0b90b'},label:{color:'#f0b90b',formatter:'45',position:'end'}},
+          {yAxis:30,lineStyle:{color:'#26a69a'},label:{color:'#26a69a',formatter:'30',position:'end'}},
+        ]
+      },
+      markArea:{
+        silent:true,
+        data:[
+          [{yAxis:70,itemStyle:{color:'rgba(239,83,80,.07)'}},{yAxis:100}],
+          [{yAxis:0, itemStyle:{color:'rgba(38,166,154,.07)'}},{yAxis:30}],
+        ]
+      }
+    }]
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  状态栏更新
+// ═══════════════════════════════════════════════════
+function updateStatus(c5,r5,c1,r1,s5,s1){
+  const lr5=[...r5].reverse().find(v=>v!==null);
+  const lr1=[...r1].reverse().find(v=>v!==null);
+  const lc=c5[c5.length-1],pc=c5[c5.length-2];
+
+  if(lc){
+    const el=document.getElementById('livePrice');
+    el.textContent=lc.close.toFixed(2);
+    el.style.color=lc.close>=lc.open?'#26a69a':'#ef5350';
+    if(pc){
+      const ch=((lc.close-pc.close)/pc.close*100).toFixed(2);
+      const ce=document.getElementById('liveChg');
+      ce.textContent=(ch>0?'+':'')+ch+'%';
+      ce.style.color=ch>=0?'#26a69a':'#ef5350';
+    }
+  }
+
+  const r5e=document.getElementById('st5rsi');
+  const r1e=document.getElementById('st1rsi');
+  r5e.textContent='5m RSI: '+(lr5?lr5.toFixed(1):'──');
+  r1e.textContent='1H RSI: '+(lr1?lr1.toFixed(1):'──');
+  r1e.className='stag '+(lr1>70?'sr':lr1<30?'sg':'sb');
+
+  const l3=[...s5].reverse().find(s=>s.type==='line3');
+  const l1=[...s5].reverse().find(s=>s.type==='line1');
+  const l2=[...s5].reverse().find(s=>s.type==='line2');
+  const yk=[...s5].reverse().find(s=>s.type==='yk_entry');
+  const cy=[...s1].reverse().find(s=>s.type==='close_yk');
+  const esc=[...s1].reverse().find(s=>s.type==='escape');
+  const zl=[...s1].reverse().find(s=>s.type==='zhuanlong');
+  const zk=[...s1].reverse().find(s=>s.type==='zhuankong');
+
+  if(l3) document.getElementById('stL3').textContent='3号线: '+ts2s(l3.ts);
+  if(l1) document.getElementById('stL1').textContent='1号线: '+ts2s(l1.ts);
+  if(l2) document.getElementById('stL2').textContent='2号线: '+ts2s(l2.ts);
+  if(esc) document.getElementById('stEsc').textContent='逃顶: '+ts2s(esc.ts);
+
+  const yke=document.getElementById('stYK');
+  if(yk&&(!cy||yk.i>cy.i)){yke.textContent='诱空: 持仓中';yke.className='stag sp';}
+  else{yke.textContent='诱空: 待机';yke.className='stag sb';}
+
+  const de=document.getElementById('stDir');
+  if(zl&&(!zk||zl.i>zk.i)){de.textContent='方向: 多↑';de.className='stag sg';}
+  else if(zk){de.textContent='方向: 空↓';de.className='stag sr';}
+
+  // 面板标签
+  const t5=[];
+  if(l3)t5.push('<span class="stag sr" style="font-size:9px">3号线</span>');
+  if(l1)t5.push('<span class="stag sy" style="font-size:9px">1号线</span>');
+  if(l2)t5.push('<span class="stag sg" style="font-size:9px">2号线</span>');
+  const nyke=s5.filter(s=>s.type==='yk_entry').length;
+  if(nyke)t5.push('<span class="stag sp" style="font-size:9px">诱空×'+nyke+'</span>');
+  document.getElementById('sigtags5m').innerHTML=t5.join('');
+
+  const t1=[];
+  if(esc)t1.push('<span class="stag so" style="font-size:9px">逃顶</span>');
+  const ncy=s1.filter(s=>s.type==='close_yk').length;
+  if(ncy)t1.push('<span class="stag sp" style="font-size:9px">平空×'+ncy+'</span>');
+  const nzl=s1.filter(s=>s.type==='zhuanlong').length;
+  if(nzl)t1.push('<span class="stag sg" style="font-size:9px">转多×'+nzl+'</span>');
+  const nzk=s1.filter(s=>s.type==='zhuankong').length;
+  if(nzk)t1.push('<span class="stag sr" style="font-size:9px">转空×'+nzk+'</span>');
+  document.getElementById('sigtags1h').innerHTML=t1.join('');
+
+  document.getElementById('lastUpd').textContent='刷新: '+new Date().toLocaleTimeString('zh-CN');
+}
+
+// ═══════════════════════════════════════════════════
+//  数据加载
+// ═══════════════════════════════════════════════════
+async function fetchK(bar,limit=300){
+  const r=await fetch(`/api/tv-sim/klines?bar=${bar}&limit=${limit}&inst=ETH-USDT-SWAP`);
+  const j=await r.json();
+  if(!j.success)throw new Error(j.error);
+  return j.data;
+}
+
+async function loadAll(){
+  document.getElementById('ld5m').style.display='flex';
+  document.getElementById('ld1h').style.display='flex';
+  try{
+    const [c5,c1]=await Promise.all([fetchK('5m',300),fetchK('1H',300)]);
+    const cl5=c5.map(c=>c.close),cl1=c1.map(c=>c.close);
+    const hi5=c5.map(c=>c.high),lo5=c5.map(c=>c.low);
+    const hi1=c1.map(c=>c.high),lo1=c1.map(c=>c.low);
+    const r5=calcRSI(cl5),r1=calcRSI(cl1);
+    const bb5=calcBB(cl5),bb1=calcBB(cl1);
+    const sar5=calcSAR(hi5,lo5),sar1=calcSAR(hi1,lo1);
+    const s5=calcSigs5m(c5,r5),s1=calcSigs1h(c1,r1);
+
+    renderKChart('5mK',c5,bb5,sar5,s5,62);
+    renderRSI('5mR',c5,r5,62);
+    renderKChart('1hK',c1,bb1,sar1,s1,55);
+    renderRSI('1hR',c1,r1,55);
+
+    updateStatus(c5,r5,c1,r1,s5,s1);
+    renderSigPanel(s5,s1,c5,c1);
+
+  }catch(e){
+    document.getElementById('ld5m').textContent='❌ '+e.message;
+    document.getElementById('ld1h').textContent='❌ '+e.message;
+    console.error(e);
+  }
+  document.getElementById('ld5m').style.display='none';
+  document.getElementById('ld1h').style.display='none';
+}
+
+// ═══════════════════════════════════════════════════
+//  自动刷新
+// ═══════════════════════════════════════════════════
+let atimer=null,aon=true;
+function toggleAuto(){
+  aon=!aon;
+  document.getElementById('btnAuto').className='btn '+(aon?'on':'');
+  document.getElementById('btnAuto').textContent='🔄 自动';
+  aon?startAuto():clearInterval(atimer);
+}
+function startAuto(){clearInterval(atimer);atimer=setInterval(loadAll,30000);}
+
+// ═══════════════════════════════════════════════════
+//  启动
+// ═══════════════════════════════════════════════════
+window.onload=function(){initCharts();loadAll();startAuto();};
+</script>
+</body>
+</html>

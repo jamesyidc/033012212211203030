@@ -126,41 +126,67 @@ def get_all_rsi_values():
     return rsi_values
 
 
+def get_beijing_midnight_ts():
+    """获取今天北京时间0点的毫秒时间戳"""
+    now = datetime.now(BEIJING_TZ)
+    midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    return int(midnight.timestamp() * 1000)
+
+
 def get_daily_open_prices():
-    """从OKX获取今日开盘价（日线开盘价）"""
+    """从OKX获取今日开盘价——以北京时间0点的5分钟K线开盘价为基准。
+
+    OKX bar=1D 使用 UTC 时区，对应北京时间08:00，不是0点。
+    因此改为：取北京时间0点的 5分钟K线，读取该K线的开盘价(candle[1])作为基准。
+
+    修复说明：
+    - OKX candles API after=<ts> 返回 ts 之前的数据（不含ts本身）
+    - 用 after=midnight_ts+5min 可获取 midnight_ts 那根K线
+    - 严格验证 candle_ts == midnight_ts（不接受前一天K线）
+    - 若0点K线尚未出现则返回空，主循环会在下一分钟重试
+    """
     try:
         open_prices = {}
+        # 北京时间今日0点的毫秒时间戳
+        midnight_ts = get_beijing_midnight_ts()
+        # after=midnight_ts+5min => OKX返回 < midnight_ts+5min 的K线，第一条即0点K线
+        after_ts = midnight_ts + 5 * 60 * 1000
+
         for symbol in SYMBOLS:
             try:
-                # 优先使用永续合约，如果失败则使用现货
-                # 永续合约后缀：-USDT-SWAP
-                url = f"https://www.okx.com/api/v5/market/candles?instId={symbol}-USDT-SWAP&bar=1D&limit=1"
-                response = requests.get(url, timeout=5)
-                data = response.json()
-                
-                # 如果永续合约失败，尝试现货
-                if data.get('code') != '0' or not data.get('data'):
-                    url = f"https://www.okx.com/api/v5/market/candles?instId={symbol}-USDT&bar=1D&limit=1"
+                fetched = False
+                for inst_suffix in ['-USDT-SWAP', '-USDT']:
+                    url = (f"https://www.okx.com/api/v5/market/candles"
+                           f"?instId={symbol}{inst_suffix}&bar=5m&limit=3&after={after_ts}")
                     response = requests.get(url, timeout=5)
                     data = response.json()
-                
-                if data.get('code') == '0' and data.get('data'):
-                    # 日线数据格式: [时间戳, 开盘价, 最高价, 最低价, 收盘价, ...]
-                    candle = data['data'][0]
-                    open_price = float(candle[1])  # 开盘价
-                    open_prices[symbol] = open_price
-                    print(f"[开盘价] {symbol}: {open_price}")
-                else:
-                    print(f"[警告] {symbol} 开盘价获取失败")
-                    
+                    if data.get('code') == '0' and data.get('data'):
+                        # 找到 candle_ts == midnight_ts 的那根（严格匹配0点K线）
+                        exact = next((c for c in data['data'] if int(c[0]) == midnight_ts), None)
+                        if exact:
+                            open_prices[symbol] = float(exact[1])
+                            print(f"[开盘价] {symbol}: {float(exact[1])} (北京0点K线 精确匹配)")
+                            fetched = True
+                            break
+                        # 退而求其次：找最近的但必须是今天（>= midnight_ts）的K线
+                        today_candles = [c for c in data['data'] if int(c[0]) >= midnight_ts]
+                        if today_candles:
+                            best = min(today_candles, key=lambda c: int(c[0]) - midnight_ts)
+                            open_prices[symbol] = float(best[1])
+                            print(f"[开盘价] {symbol}: {float(best[1])} (今日最近K线 ts={best[0]}, diff={(int(best[0])-midnight_ts)//1000}s)")
+                            fetched = True
+                            break
+                if not fetched:
+                    print(f"[警告] {symbol} 今日0点K线暂未出现，稍后重试")
+
                 time.sleep(0.1)  # 避免请求过快
-                
+
             except Exception as e:
                 print(f"[错误] {symbol} 获取开盘价失败: {e}")
                 continue
-                
+
         return open_prices
-        
+
     except Exception as e:
         print(f"[错误] 获取开盘价失败: {e}")
         return {}
@@ -231,8 +257,14 @@ def save_baseline(prices):
         print(f"[错误] 保存基准价格失败: {e}")
 
 
-def calculate_changes(current_prices, baseline_prices):
-    """计算涨跌幅"""
+def calculate_changes(current_prices, baseline_prices, open_prices=None):
+    """计算涨跌幅
+    
+    Args:
+        current_prices: 当前价格
+        baseline_prices: 基准价格（昨日收盘价）
+        open_prices: 今日开盘价（可选）
+    """
     changes = {}
     
     for symbol in SYMBOLS:
@@ -242,11 +274,21 @@ def calculate_changes(current_prices, baseline_prices):
             
             if baseline > 0:
                 change_pct = ((current - baseline) / baseline) * 100
-                changes[symbol] = {
+                coin_data = {
                     'current_price': current,
                     'baseline_price': baseline,
                     'change_pct': round(change_pct, 2)
                 }
+                
+                # 添加今日开盘价（如果有）
+                if open_prices and symbol in open_prices:
+                    coin_data['open_price'] = open_prices[symbol]
+                    # 计算相对于今日开盘价的涨跌幅
+                    if open_prices[symbol] > 0:
+                        daily_change_pct = ((current - open_prices[symbol]) / open_prices[symbol]) * 100
+                        coin_data['daily_change_pct'] = round(daily_change_pct, 2)
+                
+                changes[symbol] = coin_data
     
     return changes
 
@@ -344,6 +386,7 @@ def main():
     
     # 加载或初始化基准价格
     baseline_prices = load_baseline()
+    daily_open_prices = {}  # 今日开盘价
     last_baseline_date = None
     last_rsi_collect_time = None  # 记录上次RSI采集时间
     
@@ -356,8 +399,12 @@ def main():
         if baseline_prices:
             save_baseline(baseline_prices)
             last_baseline_date = today
+            daily_open_prices = baseline_prices.copy()  # 保存今日开盘价
     else:
         last_baseline_date = today
+        # 同时获取今日开盘价
+        print("[初始化] 获取今日开盘价...")
+        daily_open_prices = get_daily_open_prices()
     
     while True:
         try:
@@ -367,10 +414,16 @@ def main():
             # 检查是否是新的一天，如果是则重置基准价格
             if current_date != last_baseline_date:
                 print(f"\n[新的一天] {current_date} - 重置基准价格...")
-                baseline_prices = get_daily_open_prices()
-                if baseline_prices:
+                new_baseline = get_daily_open_prices()
+                if new_baseline and len(new_baseline) >= len(SYMBOLS) * 0.9:  # 至少90%币种成功
+                    baseline_prices = new_baseline
                     save_baseline(baseline_prices)
                     last_baseline_date = current_date
+                    daily_open_prices = baseline_prices.copy()  # 更新今日开盘价
+                    print(f"[基准] 今日0点基准价格已更新，共{len(baseline_prices)}个币种")
+                else:
+                    print(f"[基准] 今日0点K线获取不完整({len(new_baseline)}/{len(SYMBOLS)})，等待下次重试...")
+                    # 注意：不更新 last_baseline_date，下次循环继续重试
             
             print(f"\n[{now.strftime('%Y-%m-%d %H:%M:%S')}] 开始采集...")
             
@@ -429,8 +482,8 @@ def main():
                     time.sleep(60)
                     continue
                 
-                # 计算涨跌幅
-                changes = calculate_changes(current_prices, baseline_prices)
+                # 计算涨跌幅（传递今日开盘价）
+                changes = calculate_changes(current_prices, baseline_prices, daily_open_prices)
                 
                 # 再次检查：确保所有27个币种都有涨跌幅数据
                 if len(changes) < 27:
