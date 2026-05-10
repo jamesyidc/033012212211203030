@@ -37676,6 +37676,106 @@ def tv_sim_klines():
 def tv_strategy_page():
     return render_template('tv_strategy.html')
 
+# ============================================================
+#  TradingView 策略模拟 — 信号存储 / 读取接口
+#  数据路径: data/tv_signals/tv_signals_YYYYMMDD.jsonl
+#  保留规则: 仅保留最近 15 天
+# ============================================================
+import os as _os, json as _json
+from datetime import datetime as _dt, timedelta as _td
+
+TV_SIG_DIR = _os.path.join(_os.path.dirname(__file__), '..', 'data', 'tv_signals')
+
+def _tv_sig_cleanup():
+    """删除 15 天前的信号文件（按文件名日期，非信号内容日期）"""
+    cutoff = (_dt.now() - _td(days=15)).strftime('%Y%m%d')
+    try:
+        if not _os.path.isdir(TV_SIG_DIR):
+            return
+        for fname in _os.listdir(TV_SIG_DIR):
+            if fname.startswith('tv_signals_') and fname.endswith('.jsonl'):
+                day = fname[len('tv_signals_'):-len('.jsonl')]
+                if day < cutoff:
+                    _os.remove(_os.path.join(TV_SIG_DIR, fname))
+    except Exception:
+        pass
+
+@app.route('/api/tv-sim/save-signal', methods=['POST'])
+def tv_sim_save_signal():
+    """
+    接收前端上报的策略信号，写入**当天**日期的 JSONL 文件。
+    以 (type, ts) 为 key 去重，避免重复追加。
+    Body JSON: { signals: [{type, price, rsi, ts, bar, ...}, ...] }
+    """
+    try:
+        _os.makedirs(TV_SIG_DIR, exist_ok=True)
+        # 先清理旧文件，不会影响今天文件
+        _tv_sig_cleanup()
+
+        body = request.get_json(force=True)
+        signals = body.get('signals', [])
+        if not signals:
+            return jsonify({'success': True, 'saved': 0})
+
+        # 所有信号统一写入今天的文件（本地时间）
+        today = _dt.now().strftime('%Y%m%d')
+        fpath = _os.path.join(TV_SIG_DIR, f'tv_signals_{today}.jsonl')
+
+        # 读取已有记录，用 (type, ts) 去重
+        existing = set()
+        if _os.path.exists(fpath):
+            with open(fpath, 'r', encoding='utf-8') as f:
+                for line in f:
+                    try:
+                        rec = _json.loads(line)
+                        existing.add((rec.get('type'), rec.get('ts')))
+                    except Exception:
+                        pass
+
+        saved = 0
+        with open(fpath, 'a', encoding='utf-8') as f:
+            for sig in signals:
+                key = (sig.get('type'), sig.get('ts'))
+                if key not in existing:
+                    f.write(_json.dumps(sig, ensure_ascii=False) + '\n')
+                    existing.add(key)
+                    saved += 1
+
+        return jsonify({'success': True, 'saved': saved, 'file': f'tv_signals_{today}.jsonl'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/api/tv-sim/signals')
+def tv_sim_get_signals():
+    """
+    读取最近 N 天的信号记录。
+    参数: days=15 (默认), type=line3,line1,... (可选过滤)
+    """
+    try:
+        days  = int(request.args.get('days', 15))
+        ftype = request.args.get('type', '')   # 逗号分隔
+        types = set(ftype.split(',')) if ftype else set()
+
+        records = []
+        for i in range(days):
+            day = (_dt.now() - _td(days=i)).strftime('%Y%m%d')
+            fpath = _os.path.join(TV_SIG_DIR, f'tv_signals_{day}.jsonl')
+            if not _os.path.exists(fpath):
+                continue
+            with open(fpath, 'r', encoding='utf-8') as f:
+                for line in f:
+                    try:
+                        rec = _json.loads(line)
+                        if not types or rec.get('type') in types:
+                            records.append(rec)
+                    except Exception:
+                        pass
+
+        records.sort(key=lambda x: x.get('ts', 0), reverse=True)
+        return jsonify({'success': True, 'count': len(records), 'data': records})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=9002, debug=False)
