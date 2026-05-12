@@ -210,16 +210,22 @@ def save_prediction(prediction):
         return False
 
 def check_and_generate_prediction():
-    """检查并生成当天的预判（在凌晨2点后运行）"""
+    """检查并生成当天的预判（在凌晨2点后运行）
+    
+    修复说明：
+    - 旧逻辑：只在 02:00-03:00 这1小时窗口内生成，错过则永久无预判
+    - 新逻辑：只要当前时间 >= 02:00，且当天预判文件不存在，就立即生成
+             这样即使进程在2点时因重启等原因未生成，后续检查时也会补生成
+    """
     beijing_time = get_beijing_time()
     current_date = beijing_time.strftime('%Y-%m-%d')
     current_hour = beijing_time.hour
     
     logger.info(f"当前北京时间: {beijing_time.strftime('%Y-%m-%d %H:%M:%S')}")
     
-    # 只在凌晨2点到3点之间生成预判
-    if current_hour < 2 or current_hour >= 3:
-        logger.info(f"当前时间 {current_hour}:xx 不在生成时间窗口（02:00-03:00），跳过")
+    # 0点到2点之间不生成（数据还没采集完）
+    if current_hour < 2:
+        logger.info(f"当前时间 {current_hour}:xx 未到凌晨2点，跳过生成（等待0-2点数据采集完成）")
         return False
     
     # 检查今天的预判是否已存在
@@ -230,8 +236,8 @@ def check_and_generate_prediction():
         logger.info(f"今日预判已存在: {pred_file}，跳过生成")
         return False
     
-    # 等待一段时间确保有足够的0-2点数据
-    logger.info("开始生成今日预判...")
+    # 2点后且文件不存在 → 立即生成（无论是2:01还是23:59都会尝试）
+    logger.info(f"凌晨2点后预判文件不存在，立即生成今日预判（当前时间: {beijing_time.strftime('%H:%M:%S')}）...")
     
     # 生成预判
     prediction = generate_prediction_for_date(current_date)

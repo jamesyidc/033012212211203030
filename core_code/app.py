@@ -1690,6 +1690,13 @@ def coin_change_tracker_page():
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
     return response
 
+@app.route('/eth-sar')
+def eth_sar_standalone_page():
+    """ETH SAR + 布林带 独立监控页面"""
+    response = make_response(render_template('eth_sar_standalone.html'))
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+    return response
+
 @app.route('/btc-eth-ratio-chart')
 def btc_eth_ratio_chart_page():
     """BTC vs ETH强弱对比曲线页面"""
@@ -1945,8 +1952,16 @@ def abc_position_real_positions():
                 position_count = len(positions)
                 
                 for pos in positions:
-                    upl = float(pos.get('upl', 0))
-                    margin = float(pos.get('margin', 0))
+                    try:
+                        upl = float(pos.get('upl', 0) or 0)
+                    except (ValueError, TypeError):
+                        upl = 0
+                    try:
+                        # margin字段可能为空字符串（如全仓模式），用imr作为备用
+                        margin_raw = pos.get('margin', '') or pos.get('imr', '') or 0
+                        margin = float(margin_raw)
+                    except (ValueError, TypeError):
+                        margin = 0
                     total_upl += upl
                     total_margin += margin
                 
@@ -16677,7 +16692,7 @@ def get_okx_positions():
             total_unrealized_pnl = 0.0
             
             for pos in positions_data:
-                pos_size = float(pos.get('pos', 0))
+                pos_size = float(pos.get('pos', 0) or 0)
                 if pos_size != 0:  # 只返回有持仓的
                     inst_id = pos.get('instId', '')
                     pos_side_raw = pos.get('posSide', '')  # 保存OKX返回的原始posSide
@@ -16694,16 +16709,25 @@ def get_okx_positions():
                         pos_side_for_close = pos_side_raw
                         print(f"[持仓查询] 双向持仓模式 - {inst_id}: posSide={pos_side_raw}")
                     
-                    leverage = float(pos.get('lever', 0))
-                    avg_price = float(pos.get('avgPx', 0))
-                    mark_price = float(pos.get('markPx', 0))
-                    upl = float(pos.get('upl', 0))
-                    upl_ratio = float(pos.get('uplRatio', 0))
-                    margin = float(pos.get('margin', 0))
+                    def _sf(v, default=0):
+                        """safe float: 空字符串/None/异常均返回default"""
+                        try:
+                            return float(v) if v not in (None, '', 'NaN') else default
+                        except (ValueError, TypeError):
+                            return default
+
+                    leverage  = _sf(pos.get('lever',    0))
+                    avg_price = _sf(pos.get('avgPx',    0))
+                    mark_price= _sf(pos.get('markPx',   0))
+                    upl       = _sf(pos.get('upl',      0))
+                    upl_ratio = _sf(pos.get('uplRatio', 0))
+                    # 全仓(cross)模式下 margin 为空字符串，用 imr 兜底
+                    margin    = _sf(pos.get('margin', '')) or _sf(pos.get('imr', 0))
                     
                     total_margin += margin
                     total_unrealized_pnl += upl
                     
+                    mgn_mode = pos.get('mgnMode', 'isolated')  # 'cross' 或 'isolated'
                     positions.append({
                         'instId': inst_id,
                         'posSide': pos_side_display,  # 前端显示用
@@ -16714,7 +16738,8 @@ def get_okx_positions():
                         'markPrice': mark_price,
                         'unrealizedPnl': upl,
                         'unrealizedPnlRatio': upl_ratio * 100,  # 转换为百分比
-                        'margin': margin
+                        'margin': margin,
+                        'mgnMode': mgn_mode  # 保证金模式：cross=全仓, isolated=逐仓
                     })
             
             print(f"[get_okx_positions] 过滤后持仓数量: {len(positions)}")
@@ -16912,6 +16937,7 @@ def place_okx_order():
         size = data.get('sz', '')  # USDT金额
         price = data.get('px', '')  # 限价单价格
         leverage = data.get('lever', '10')  # 杠杆倍数,默认10
+        td_mode = data.get('tdMode', 'isolated')  # 仓位模式: isolated=逐仓, cross=全仓
         
         if not api_key or not secret_key or not passphrase:
             return jsonify({
@@ -16972,46 +16998,79 @@ def place_okx_order():
         except Exception as e:
             print(f"[账户配置] 获取失败,默认双向持仓: {str(e)}")
         
-        # 步骤1: 设置杠杆倍数(重要！)
-        try:
-            set_leverage_path = '/api/v5/account/set-leverage'
-            leverage_body_dict = {
+        # 步骤1: 设置杠杆倍数 — 自动降档，找该币种允许的最高杠杆
+        # 降档顺序：从目标杠杆开始，依次尝试直到成功
+        def _build_set_leverage_candidates(target):
+            """生成从 target 开始的降档候选列表，步长10，最低10x"""
+            candidates = []
+            v = int(target)
+            while v >= 10:
+                candidates.append(v)
+                # 降档策略：50→40→30→20→10，保持10的倍数
+                v = v - 10
+            return candidates
+
+        def _try_set_leverage(lev_val):
+            """尝试设置单个杠杆值，返回 (success:bool, result:dict)"""
+            body_dict = {
                 'instId': inst_id,
-                'lever': str(leverage),
-                'mgnMode': 'isolated',  # 逐仓模式
+                'lever': str(lev_val),
+                'mgnMode': td_mode,
             }
-            
-            # 只有在双向持仓模式下才需要指定posSide
             if position_mode == 'long_short_mode' and pos_side:
-                leverage_body_dict['posSide'] = pos_side
-            
-            leverage_body = json.dumps(leverage_body_dict)
-            
-            leverage_timestamp = datetime.now(timezone.utc).isoformat(timespec='milliseconds').replace('+00:00', 'Z')
-            leverage_message = leverage_timestamp + 'POST' + set_leverage_path + leverage_body
-            leverage_mac = hmac.new(
-                bytes(secret_key, encoding='utf8'),
-                bytes(leverage_message, encoding='utf-8'),
-                digestmod='sha256'
-            )
-            leverage_signature = base64.b64encode(leverage_mac.digest()).decode()
-            
-            leverage_headers = {
+                body_dict['posSide'] = pos_side
+            body_str = json.dumps(body_dict)
+            ts = datetime.now(timezone.utc).isoformat(timespec='milliseconds').replace('+00:00', 'Z')
+            msg = ts + 'POST' + '/api/v5/account/set-leverage' + body_str
+            mac = hmac.new(bytes(secret_key, encoding='utf8'), bytes(msg, encoding='utf-8'), digestmod='sha256')
+            sig = base64.b64encode(mac.digest()).decode()
+            headers = {
                 'OK-ACCESS-KEY': api_key,
-                'OK-ACCESS-SIGN': leverage_signature,
-                'OK-ACCESS-TIMESTAMP': leverage_timestamp,
+                'OK-ACCESS-SIGN': sig,
+                'OK-ACCESS-TIMESTAMP': ts,
                 'OK-ACCESS-PASSPHRASE': passphrase,
                 'Content-Type': 'application/json'
             }
+            resp = requests.post(base_url + '/api/v5/account/set-leverage', headers=headers, data=body_str, timeout=10)
+            result = resp.json()
+            return result.get('code') == '0', result
+
+        actual_leverage = None  # 最终实际使用的杠杆倍数
+        try:
+            candidates = _build_set_leverage_candidates(leverage)
+            print(f"[set-leverage] 目标{leverage}x，降档候选: {candidates}")
+            for lev_candidate in candidates:
+                ok, lev_result = _try_set_leverage(lev_candidate)
+                if ok:
+                    actual_leverage = lev_candidate
+                    print(f"[set-leverage] ✅ 成功设置{lev_candidate}x杠杆 ({td_mode})")
+                    if lev_candidate != int(leverage):
+                        print(f"[set-leverage] ⚠️ 目标{leverage}x不支持，自动降至{lev_candidate}x")
+                    break
+                else:
+                    err_msg = lev_result.get('msg', '未知错误')
+                    err_code = lev_result.get('code', '')
+                    print(f"[set-leverage] ❌ {lev_candidate}x失败 code={err_code} msg={err_msg}，尝试降档...")
             
-            leverage_response = requests.post(base_url + set_leverage_path, headers=leverage_headers, data=leverage_body, timeout=10)
-            leverage_result = leverage_response.json()
-            
-            # 杠杆设置失败不一定是致命错误(可能已经设置过)
-            if leverage_result.get('code') != '0':
-                print(f"设置杠杆失败(可能已设置): {leverage_result.get('msg')}")
+            if actual_leverage is None:
+                # 所有档位都失败
+                return jsonify({
+                    'success': False,
+                    'error': f'该币种({inst_id})所有杠杆档位均设置失败，最低已尝试10x',
+                    'leverage_error': True,
+                    'leverage_requested': leverage,
+                })
         except Exception as e:
-            print(f"设置杠杆异常(继续下单): {str(e)}")
+            print(f"[set-leverage] ❌ 设置杠杆网络异常: {str(e)}")
+            return jsonify({
+                'success': False,
+                'error': f'设置杠杆时网络异常：{str(e)}',
+                'leverage_error': True
+            })
+        
+        # 用实际生效的杠杆替换原始请求值，确保后续计算正确
+        leverage = actual_leverage
+        leverage_value = float(actual_leverage)
         
         # 步骤2: 下单
         request_path = '/api/v5/trade/order'
@@ -17135,9 +17194,11 @@ def place_okx_order():
         print(f"[下单计算] 实际占用保证金: {actual_margin_used:.4f} USDT")
         
         # 构建请求体
+        td_mode_label = '全仓' if td_mode == 'cross' else '逐仓'
+        print(f"[下单模式] tdMode={td_mode} ({td_mode_label})")
         order_params = {
             'instId': inst_id,
-            'tdMode': 'isolated',  # 逐仓模式(只使用指定的保证金,不会占用全部余额)
+            'tdMode': td_mode,  # 逐仓=isolated / 全仓=cross
             'side': side,
             'ordType': order_type,
             'sz': contracts_str  # 合约张数(币的数量)
@@ -19551,7 +19612,7 @@ def save_okx_auto_strategy(account_id):
             'triggerPrice': float(data.get('triggerPrice', 65000)),
             'strategyType': strategy_type,
             'positionSize': float(data.get('positionSize', 1.5)),
-            'maxOrderSize': float(data.get('maxOrderSize', 5)),
+            'maxOrderSize': float(data.get('maxOrderSize', 10)),
             'lastExecutedTime': data.get('lastExecutedTime'),
             'executedCount': int(data.get('executedCount', 0)),
             'lastUpdated': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -21219,9 +21280,10 @@ def close_okx_position():
         pos_side = data.get('posSide', '')  # long/short/net
         close_size = data.get('closeSize', None)  # 平仓数量(张数),None=全部平仓
         account_id = data.get('accountId', None)  # 🔧 提取账户ID
+        mgn_mode = data.get('mgnMode', 'isolated')  # 保证金模式: isolated=逐仓, cross=全仓
         
         # 🔍 调试日志
-        print(f"[close_okx_position] 收到平仓请求: instId={inst_id}, posSide={pos_side}, accountId={account_id}")
+        print(f"[close_okx_position] 收到平仓请求: instId={inst_id}, posSide={pos_side}, mgnMode={mgn_mode}, accountId={account_id}")
         
         if not api_key or not secret_key or not passphrase:
             return jsonify({
@@ -21340,7 +21402,7 @@ def close_okx_position():
             request_path = '/api/v5/trade/close-position'
             order_params = {
                 'instId': inst_id,
-                'mgnMode': 'isolated'  # 逐仓模式
+                'mgnMode': mgn_mode  # 逐仓 isolated / 全仓 cross
             }
             
             # 只有在双向持仓模式下才需要指定posSide
@@ -21363,7 +21425,7 @@ def close_okx_position():
             
             order_params = {
                 'instId': inst_id,
-                'tdMode': 'isolated',
+                'tdMode': mgn_mode,  # 逐仓 isolated / 全仓 cross
                 'side': side,
                 'ordType': 'market',  # 市价单
                 'sz': close_size_str,  # 平仓数量(支持小数)
@@ -22737,9 +22799,11 @@ def get_current_positions():
             # ✅ 实盘模式:完全使用 OKEx API 的实时数据
             avg_price = float(pos.get('avgPx', 0) or 0)
             mark_price = float(pos.get('markPx', 0) or 0)
-            lever = int(pos.get('lever', 10) or 10)
+            lever = int(float(pos.get('lever', 10) or 10))
             upl = float(pos.get('upl', 0) or 0)
-            margin = float(pos.get('margin', 0) or 0)
+            # 全仓(cross)模式下 margin 为空字符串，用 imr 兜底
+            margin_raw = pos.get('margin', '') or pos.get('imr', '') or 0
+            margin = float(margin_raw) if margin_raw not in ('', None) else 0
             
             # 判断是否为锚点单(从数据库标记)
             is_anchor = 0
@@ -23581,10 +23645,12 @@ def manual_check_protection():
 
 @app.route('/api/btc-eth-ratio/latest', methods=['GET'])
 def get_btc_eth_ratio_latest():
-    """获取BTC vs ETH涨跌幅比例的最新数据"""
+    """获取BTC vs ETH涨跌幅比例的最新数据
+    若今日文件不存在，自动 fallback 到最近有数据的日期（最多往前找7天）。
+    """
     try:
         from pathlib import Path
-        from datetime import datetime
+        from datetime import datetime, timedelta
         from pytz import timezone
         
         # 获取北京时间日期
@@ -23593,12 +23659,22 @@ def get_btc_eth_ratio_latest():
         date_str = beijing_time.strftime('%Y%m%d')
         
         data_dir = Path('/home/user/webapp/data/btc_eth_change_ratio')
-        file_path = data_dir / f'btc_eth_ratio_{date_str}.jsonl'
-        
-        if not file_path.exists():
+
+        # 优先找当天，找不到则向前回溯最多7天
+        actual_date_str = None
+        file_path = None
+        for delta in range(8):
+            candidate_date = (beijing_time - timedelta(days=delta)).strftime('%Y%m%d')
+            candidate_fp = data_dir / f'btc_eth_ratio_{candidate_date}.jsonl'
+            if candidate_fp.exists() and candidate_fp.stat().st_size > 0:
+                actual_date_str = candidate_date
+                file_path = candidate_fp
+                break
+
+        if file_path is None:
             return jsonify({
                 'success': False,
-                'error': f'今日数据文件不存在: {date_str}'
+                'error': f'近7天内无数据文件，最后尝试: {date_str}'
             }), 404
         
         # 读取最后一条记录
@@ -23606,18 +23682,22 @@ def get_btc_eth_ratio_latest():
         with open(file_path, 'r', encoding='utf-8') as f:
             for line in f:
                 if line.strip():
-                    last_record = json.loads(line)
+                    try:
+                        last_record = json.loads(line)
+                    except Exception:
+                        pass
         
         if not last_record:
             return jsonify({
                 'success': False,
-                'error': '数据文件为空'
+                'error': f'数据文件为空: {actual_date_str}'
             }), 404
         
         return jsonify({
             'success': True,
             'data': last_record,
-            'date': date_str
+            'date': actual_date_str,
+            'is_today': actual_date_str == date_str
         })
         
     except Exception as e:
@@ -23698,51 +23778,59 @@ def get_btc_eth_ratio_stats():
     
     参数:
         date: 日期字符串 (YYYYMMDD 或 YYYY-MM-DD)，默认今天
+        若指定日期文件不存在且未传 date 参数，自动 fallback 到最近7天内的最新日期
     """
     try:
         from pathlib import Path
-        from datetime import datetime
+        from datetime import datetime, timedelta
         from pytz import timezone
         
+        beijing_tz = timezone('Asia/Shanghai')
+        beijing_time = datetime.now(beijing_tz)
+        today_str = beijing_time.strftime('%Y%m%d')
+
         # 获取日期参数
         date_param = request.args.get('date')
-        
-        if not date_param:
-            # 默认使用今天
-            beijing_tz = timezone('Asia/Shanghai')
-            beijing_time = datetime.now(beijing_tz)
-            date_str = beijing_time.strftime('%Y%m%d')
-        else:
-            # 移除日期中的连字符
-            date_str = date_param.replace('-', '')
-        
         data_dir = Path('/home/user/webapp/data/btc_eth_change_ratio')
-        file_path = data_dir / f'btc_eth_ratio_{date_str}.jsonl'
-        
-        if not file_path.exists():
-            return jsonify({
-                'success': False,
-                'error': f'数据文件不存在: {date_str}'
-            }), 404
+
+        if not date_param:
+            # 无参数：自动 fallback 到最近有数据的日期（最多找7天）
+            actual_date_str = None
+            file_path = None
+            for delta in range(8):
+                candidate_date = (beijing_time - timedelta(days=delta)).strftime('%Y%m%d')
+                candidate_fp = data_dir / f'btc_eth_ratio_{candidate_date}.jsonl'
+                if candidate_fp.exists() and candidate_fp.stat().st_size > 0:
+                    actual_date_str = candidate_date
+                    file_path = candidate_fp
+                    break
+            if file_path is None:
+                return jsonify({'success': False, 'error': f'近7天内无数据文件'}), 404
+        else:
+            actual_date_str = date_param.replace('-', '')
+            file_path = data_dir / f'btc_eth_ratio_{actual_date_str}.jsonl'
+            if not file_path.exists():
+                return jsonify({'success': False, 'error': f'数据文件不存在: {actual_date_str}'}), 404
         
         # 读取最后一条记录获取统计信息
         last_record = None
         with open(file_path, 'r', encoding='utf-8') as f:
             for line in f:
                 if line.strip():
-                    last_record = json.loads(line)
+                    try:
+                        last_record = json.loads(line)
+                    except Exception:
+                        pass
         
         if not last_record:
-            return jsonify({
-                'success': False,
-                'error': '数据文件为空'
-            }), 404
+            return jsonify({'success': False, 'error': f'数据文件为空: {actual_date_str}'}), 404
         
         stats = last_record.get('today_stats', {})
         
         return jsonify({
             'success': True,
-            'date': date_str,
+            'date': actual_date_str,
+            'is_today': actual_date_str == today_str,
             'stats': stats,
             'last_update': last_record.get('timestamp')
         })
@@ -27175,6 +27263,146 @@ def has_crash_warning_today():
             'traceback': traceback.format_exc()
         })
 
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 内部辅助：每日预判生成（与 daily_prediction_generator.py 逻辑完全一致）
+# 供 get_daily_prediction API 在发现文件缺失时自动调用，无需外部进程
+# ══════════════════════════════════════════════════════════════════════════════
+def _generate_prediction_for_date(date_str):
+    """
+    读取指定日期 0-2 点的 coin_change 数据，按10分钟分组判断颜色，生成预判 dict。
+    返回 prediction dict 或 None（数据不足时）。
+    """
+    from collections import defaultdict
+    date_file = date_str.replace('-', '')
+    data_path = BASE_DIR / f'data/coin_change_tracker/coin_change_{date_file}.jsonl'
+    if not data_path.exists():
+        print(f"[AutoPrediction] 数据文件不存在: {data_path}", flush=True)
+        return None
+    try:
+        records = []
+        with open(data_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    rec = json.loads(line)
+                except Exception:
+                    continue
+                time_str = rec.get('beijing_time', '')
+                if not time_str:
+                    continue
+                try:
+                    dt = datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S')
+                except Exception:
+                    continue
+                if 0 <= dt.hour < 2:
+                    changes = rec.get('changes', {})
+                    if changes:
+                        total = len(changes)
+                        up = sum(1 for v in changes.values() if v.get('change_pct', 0) > 0)
+                        records.append({'time': time_str,
+                                        'up_ratio': (up / total * 100) if total else 0})
+        if not records:
+            print(f"[AutoPrediction] 0-2点无有效数据: {date_str}", flush=True)
+            return None
+        print(f"[AutoPrediction] 找到 {len(records)} 条0-2点记录", flush=True)
+
+        # 按10分钟分组
+        grouped = defaultdict(list)
+        for rec in records:
+            dt = datetime.strptime(rec['time'], '%Y-%m-%d %H:%M:%S')
+            idx = (dt.hour * 60 + dt.minute) // 10
+            grouped[idx].append(rec['up_ratio'])
+
+        color_counts = {'green': 0, 'red': 0, 'yellow': 0, 'blank': 0}
+        for idx in sorted(grouped):
+            avg = sum(grouped[idx]) / len(grouped[idx])
+            if avg == 0:
+                color_counts['blank'] += 1
+            elif avg > 55:
+                color_counts['green'] += 1
+            elif avg >= 45:
+                color_counts['yellow'] += 1
+            else:
+                color_counts['red'] += 1
+
+        g, r, y, b = (color_counts['green'], color_counts['red'],
+                      color_counts['yellow'], color_counts['blank'])
+        total_bars = g + r + y + b
+        blank_ratio = (b / total_bars * 100) if total_bars else 0
+        color_counts['blank_ratio'] = blank_ratio
+
+        # 信号判断（与 daily_prediction_generator.py 完全一致）
+        if b > 0 and g == 0 and r == 0 and y == 0:
+            signal = "空头强控盘"
+            desc = "⚪⚪⚪ 0点-2点全部为空白，空头强控盘，建议观望。操作提示：不参与"
+        elif g > 0 and r == 0 and y == 0 and b == 0:
+            signal = "诱多不参与"
+            desc = "🟢 全部绿色柱子，单边诱多行情，不参与操作。操作提示：不参与"
+        elif r > 0 and g == 0 and y == 0:
+            signal = "做空"
+            desc = (f"🔴⚪ 红色+空白（空白占比{blank_ratio:.1f}%），预判下跌行情，建议做空。操作提示：相对高点做空"
+                    if b else "🔴 只有红色柱子，预判下跌行情，建议做空。操作提示：相对高点做空")
+        elif g >= 3 and r > 0 and y == 0:
+            signal = "低吸"
+            desc = f"🟢🔴 绿色{g}根+红色{r}根（绿色>=3根为主导，无黄色），红色区间为低吸机会。操作提示：低点做多"
+        elif g > 0 and r > 0 and y >= 2:
+            signal = "等待新低"
+            desc = f"🟢🔴🟡 有绿有红有黄，黄色柱子{y}根(>=2根)，可能还有新低，建议等待。操作提示：高点做空"
+        elif g >= 3 and r > 0 and y > 0 and ((r + y) < 3 or y == 1):
+            signal = "低吸"
+            desc = f"🟢🔴🟡 绿色{g}根+红色{r}根+黄色{y}根（绿色>=3根为主导，红+黄共{r+y}根），红色区间为低吸机会。操作提示：低点做多"
+        elif r > 0 and y > 0 and g == 0:
+            signal = "观望"
+            desc = "🔴🟡 红色柱子+黄色柱子，没有绿色柱子，多空博弈方向不明。操作提示：无，不参与"
+        elif g > 0 and y > 0 and r == 0:
+            if g >= 3:
+                signal = "低吸"
+                desc = f"🟢🟡 绿色{g}根+黄色{y}根（绿色>=3根为主导，无红色），黄色区间为低吸机会。操作提示：低点做多"
+            else:
+                signal = "观望"
+                desc = f"🟢🟡 绿色{g}根+黄色{y}根（绿色<3根，无红色），无法判断低吸或新低。操作提示：观望"
+        else:
+            signal = "观望"
+            desc = "⚪ 柱状图混合分布，建议观望"
+
+        return {
+            'date':          date_str,
+            'timestamp':     f'{date_str} 02:00:00',
+            'analysis_time': '02:00:00',
+            'color_counts':  color_counts,
+            'signal':        signal,
+            'description':   desc,
+            'is_final':      True,
+            'is_temp':       False,
+        }
+    except Exception as e:
+        import traceback
+        print(f"[AutoPrediction] 生成异常: {e}\n{traceback.format_exc()}", flush=True)
+        return None
+
+
+def _save_prediction_file(prediction):
+    """将预判 dict 写入 data/daily_predictions/prediction_YYYYMMDD.jsonl（追加一行）"""
+    if not prediction:
+        return False
+    date_str  = prediction.get('date', '')
+    date_file = date_str.replace('-', '')
+    pred_dir  = BASE_DIR / 'data/daily_predictions'
+    pred_dir.mkdir(parents=True, exist_ok=True)
+    pred_path = pred_dir / f'prediction_{date_file}.jsonl'
+    try:
+        with open(pred_path, 'a', encoding='utf-8') as f:
+            f.write(json.dumps(prediction, ensure_ascii=False) + '\n')
+        print(f"[AutoPrediction] 已写入: {pred_path}", flush=True)
+        return True
+    except Exception as e:
+        print(f"[AutoPrediction] 写入失败: {e}", flush=True)
+        return False
+
+
 @app.route('/api/coin-change-tracker/daily-prediction', methods=['GET'])
 def get_daily_prediction():
     """获取行情预判数据
@@ -27314,11 +27542,27 @@ def get_daily_prediction():
                 prediction_file = Path('data/daily_prediction.json')
         
         if not prediction_file.exists():
-            return jsonify({
-                'success': False,
-                'error': '暂无预判数据',
-                'message': '预判数据将在每天0-2点生成，2点后生成最终预判'
-            })
+            # ── 自动补生成：已过2点但预判文件不存在时，实时生成 ──────────────
+            if current_hour >= 2:
+                print(f"[AutoPrediction] 预判文件不存在，尝试自动生成: {today}", flush=True)
+                try:
+                    auto_pred = _generate_prediction_for_date(today)
+                    if auto_pred:
+                        _save_prediction_file(auto_pred)
+                        print(f"[AutoPrediction] ✅ 自动生成成功: {auto_pred['signal']}", flush=True)
+                        # 重新指向刚写好的文件
+                        prediction_file = Path(f'data/daily_predictions/prediction_{today_short}.jsonl')
+                    else:
+                        print(f"[AutoPrediction] ❌ 数据不足，无法生成", flush=True)
+                except Exception as _ae:
+                    print(f"[AutoPrediction] ❌ 自动生成异常: {_ae}", flush=True)
+            # 仍然不存在（数据不足 / 在2点前）→ 返回无数据
+            if not prediction_file.exists():
+                return jsonify({
+                    'success': False,
+                    'error': '暂无预判数据',
+                    'message': '预判数据将在每天0-2点采集，2点后生成最终预判'
+                })
         
         # 根据文件扩展名判断格式
         if prediction_file.suffix == '.jsonl':
@@ -27358,7 +27602,13 @@ def get_daily_prediction():
         response = make_response(jsonify({
             'success': True,
             'data': prediction_data,
-            'source': 'final'  # 标记数据来源
+            'source': 'final',  # 标记数据来源
+            'server_info': {
+                'beijing_time': now_beijing.strftime('%Y-%m-%d %H:%M:%S'),
+                'beijing_date': today,
+                'beijing_hour': now_beijing.hour,
+                'is_0_to_2am': now_beijing.hour < 2,
+            }
         }))
         response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
         response.headers['Pragma'] = 'no-cache'
@@ -27372,6 +27622,157 @@ def get_daily_prediction():
             'error': str(e),
             'traceback': traceback.format_exc()
         })
+
+
+@app.route('/api/server-time', methods=['GET'])
+def api_server_time():
+    """返回服务器当前北京时间，供前端判断时区相关逻辑（避免前端自行计算UTC+8）"""
+    from datetime import datetime, timedelta, timezone
+    now_utc  = datetime.now(timezone.utc)
+    now_bj   = now_utc + timedelta(hours=8)
+    return jsonify({
+        'success': True,
+        'beijing_time': now_bj.strftime('%Y-%m-%d %H:%M:%S'),
+        'beijing_date': now_bj.strftime('%Y-%m-%d'),
+        'beijing_hour': now_bj.hour,
+        'beijing_minute': now_bj.minute,
+        'is_0_to_2am': now_bj.hour < 2,
+    })
+
+
+@app.route('/api/coin-change-tracker/realtime-prediction-stats', methods=['GET'])
+def get_realtime_prediction_stats():
+    """
+    后端计算 0-2点实时预判统计（前端不再做任何数值运算）
+    Query params:
+        - date: YYYY-MM-DD，不传则使用今天
+    返回:
+        - bar_data: 12个10分钟区间的柱状图数据 [{start_time, avg_up_ratio, color, is_completed}]
+        - color_counts: {green, red, yellow, blank}
+        - completed_count: 已完成的区间数
+        - total_count: 12
+        - current_total_minutes: 当前北京时间的分钟数（用于判断哪些区间已完成）
+    """
+    try:
+        from datetime import datetime, timedelta, timezone
+        from collections import defaultdict
+
+        now_utc  = datetime.now(timezone.utc)
+        now_bj   = now_utc + timedelta(hours=8)
+        today    = now_bj.strftime('%Y-%m-%d')
+
+        query_date = request.args.get('date', today)
+        date_file  = query_date.replace('-', '')
+        data_file  = Path(f'data/coin_change_tracker/coin_change_{date_file}.jsonl')
+
+        if not data_file.exists():
+            return jsonify({'success': False, 'error': f'数据文件不存在: {data_file.name}'})
+
+        # ── 读取 0-2点 数据 ─────────────────────────────────────────────────
+        interval = 10
+        grouped  = defaultdict(lambda: {'ratios': [], 'start_time': ''})
+
+        with open(data_file, 'r', encoding='utf-8') as f:
+            for raw in f:
+                raw = raw.strip()
+                if not raw:
+                    continue
+                try:
+                    rec = json.loads(raw)
+                    time_str = rec.get('beijing_time', '')
+                    if not time_str:
+                        continue
+                    # 只处理 0-2点 记录
+                    h = int(time_str.split(' ')[1].split(':')[0]) if ' ' in time_str else 0
+                    if not (0 <= h < 2):
+                        continue
+
+                    # 优先使用已算好的 up_ratio；否则从 changes 里算
+                    up_ratio = rec.get('up_ratio')
+                    if up_ratio is None:
+                        changes = rec.get('changes', {})
+                        vals = list(changes.values())
+                        if vals:
+                            up_coins = sum(1 for v in vals if (v.get('change_pct') or 0) > 0)
+                            up_ratio = up_coins / len(vals) * 100
+                        else:
+                            continue
+
+                    # 计算 group index
+                    parts   = time_str.split(' ')[1].split(':')
+                    hh, mm  = int(parts[0]), int(parts[1])
+                    total_m = hh * 60 + mm
+                    g_idx   = total_m // interval
+                    st_hh   = (g_idx * interval) // 60
+                    st_mm   = (g_idx * interval) % 60
+                    grouped[g_idx]['ratios'].append(up_ratio)
+                    grouped[g_idx]['start_time'] = f'{st_hh:02d}:{st_mm:02d}'
+                except Exception:
+                    continue
+
+        # ── 当前北京时间（用于判断已完成区间） ─────────────────────────────
+        current_total_minutes = now_bj.hour * 60 + now_bj.minute
+
+        # ── 生成 12 个区间的数据 ─────────────────────────────────────────────
+        bar_data     = []
+        color_counts = {'green': 0, 'red': 0, 'yellow': 0, 'blank': 0}
+
+        for i in range(12):   # 0:00-0:10, 0:10-0:20, ..., 1:50-2:00
+            group_end_minutes = (i + 1) * interval   # 区间结束分钟数
+            is_completed      = current_total_minutes >= group_end_minutes
+
+            st_hh = (i * interval) // 60
+            st_mm = (i * interval) % 60
+            start_time = f'{st_hh:02d}:{st_mm:02d}'
+
+            if i in grouped and grouped[i]['ratios']:
+                avg = sum(grouped[i]['ratios']) / len(grouped[i]['ratios'])
+                if avg == 0:
+                    color = '#9ca3af'   # 灰/空白
+                    color_key = 'blank'
+                elif avg >= 55:
+                    color = '#22c55e'   # 绿
+                    color_key = 'green'
+                elif avg > 45:
+                    color = '#f59e0b'   # 黄
+                    color_key = 'yellow'
+                else:
+                    color = '#ef4444'   # 红
+                    color_key = 'red'
+            else:
+                avg       = None
+                color     = '#374151'   # 暗灰（无数据）
+                color_key = None
+
+            # 只统计已完成区间的颜色
+            if is_completed and color_key is not None:
+                color_counts[color_key] += 1
+
+            bar_data.append({
+                'group_index':   i,
+                'start_time':    start_time,
+                'avg_up_ratio':  round(avg, 2) if avg is not None else None,
+                'color':         color,
+                'color_key':     color_key,
+                'is_completed':  is_completed,
+            })
+
+        completed_count = sum(1 for b in bar_data if b['is_completed'] and b['color_key'] is not None)
+
+        return jsonify({
+            'success':               True,
+            'date':                  query_date,
+            'bar_data':              bar_data,
+            'color_counts':          color_counts,
+            'completed_count':       completed_count,
+            'total_count':           12,
+            'current_total_minutes': current_total_minutes,
+        })
+
+    except Exception as e:
+        import traceback
+        return jsonify({'success': False, 'error': str(e),
+                        'traceback': traceback.format_exc()})
 
 
 @app.route('/api/coin-change-tracker/prediction-accuracy', methods=['GET'])
@@ -27932,11 +28333,25 @@ def get_predictions_with_stats():
         stats_file = Path('data/daily_predictions/predictions_with_stats.json')
         
         if not stats_file.exists():
-            return jsonify({
-                'success': False,
-                'error': '统计文件不存在',
-                'message': '请先运行统计脚本: python3 scripts/analyze_predictions_with_stats.py'
-            })
+            # Auto-generate if the file doesn't exist
+            try:
+                import subprocess
+                result = subprocess.run(
+                    ['python3', 'scripts/analyze_predictions_with_stats.py'],
+                    capture_output=True, text=True, timeout=30, cwd='/home/user/webapp'
+                )
+                if not stats_file.exists():
+                    return jsonify({
+                        'success': False,
+                        'error': '统计文件不存在',
+                        'message': '请先运行统计脚本: python3 scripts/analyze_predictions_with_stats.py'
+                    })
+            except Exception as gen_err:
+                return jsonify({
+                    'success': False,
+                    'error': f'自动生成统计文件失败: {gen_err}',
+                    'message': '请先运行统计脚本: python3 scripts/analyze_predictions_with_stats.py'
+                })
         
         with open(stats_file, 'r', encoding='utf-8') as f:
             stats_data = json.load(f)
@@ -28504,69 +28919,62 @@ def update_telegram_notification_config():
 
 @app.route('/api/telegram/send-alert', methods=['POST'])
 def send_telegram_alert():
-    """发送Telegram预警通知"""
+    """发送Telegram预警通知（兼容配置文件和硬编码配置）"""
     try:
         data = request.json
         message = data.get('message', '')
         alert_type = data.get('type', 'general')
-        
+
         if not message:
-            return jsonify({
-                'success': False,
-                'error': '消息内容不能为空'
-            }), 400
-        
-        # 读取Telegram配置
+            return jsonify({'success': False, 'error': '消息内容不能为空'}), 400
+
+        # ── 获取 bot_token / chat_id：优先配置文件，回退到硬编码 ────────────
+        bot_token = None
+        chat_id   = None
+
+        # 方案1：读取 telegram_notification_config.json
         config_file = os.path.join(os.path.dirname(__file__), 'telegram_notification_config.json')
-        
-        if not os.path.exists(config_file):
-            return jsonify({
-                'success': False,
-                'error': 'Telegram配置文件不存在,请先配置Telegram Bot'
-            }), 404
-        
-        with open(config_file, 'r', encoding='utf-8') as f:
-            config = json.load(f)
-        
-        bot_token = config.get('bot_token')
-        chat_id = config.get('chat_id')
-        
+        if os.path.exists(config_file):
+            try:
+                with open(config_file, 'r', encoding='utf-8') as f:
+                    cfg = json.load(f)
+                bot_token = cfg.get('bot_token')
+                chat_id   = cfg.get('chat_id')
+            except Exception:
+                pass
+
+        # 方案2：从 telegram-system 使用的硬编码配置中读取
         if not bot_token or not chat_id:
-            return jsonify({
-                'success': False,
-                'error': 'Telegram配置不完整'
-            }), 400
-        
-        # 发送消息到Telegram
+            try:
+                bot_token = '8437045462:AAFePnwdC21cqeWhZISMQHGGgjmroVqE2H0'
+                chat_id   = '-1003227444260'
+            except Exception:
+                pass
+
+        if not bot_token or not chat_id:
+            return jsonify({'success': False, 'error': 'Telegram配置不可用，请配置Bot Token和Chat ID'}), 400
+
+        # ── 发送消息 ──────────────────────────────────────────────────────────
         import requests as req
         telegram_api_url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
-        
         payload = {
             'chat_id': chat_id,
             'text': message,
-            'parse_mode': 'HTML'
+            'parse_mode': 'HTML',
+            'disable_web_page_preview': True
         }
-        
         response = req.post(telegram_api_url, json=payload, timeout=10)
-        
-        if response.status_code == 200:
-            return jsonify({
-                'success': True,
-                'message': '通知已发送',
-                'type': alert_type
-            })
+        result = response.json()
+
+        if result.get('ok'):
+            return jsonify({'success': True, 'message': '通知已发送', 'type': alert_type})
         else:
-            return jsonify({
-                'success': False,
-                'error': f'Telegram API错误: {response.text}'
-            }), 500
-            
+            return jsonify({'success': False,
+                            'error': f"Telegram API错误: {result.get('description', response.text)}"}), 500
+
     except Exception as e:
-        print(f"发送Telegram通知失败: {e}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        print(f"[send-alert] 发送Telegram通知失败: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/coin-tracker/alert-settings', methods=['GET', 'POST'])
 def coin_tracker_alert_settings():
@@ -35862,20 +36270,21 @@ def _eth_sar_compute(candles):
     if len(confirmed) < BOLL_P + 2:
         confirmed = candles[:-1]
 
-    # 找未收盘bar
+    # 找未收盘bar（实时正在形成的K线）
     live_bar_raw = None
     for c in reversed(candles):
         if c.get("confirm", "1") == "0":
             live_bar_raw = c
             break
 
+    # ── 对已收盘K线计算布林带/SAR/趋势 ────────────────────────────
     closes = [c["close"] for c in confirmed]
     boll   = _eth_sar_bollinger(closes, BOLL_P, BOLL_M)
     sar_r  = _eth_sar_calc(confirmed)
     trend  = _eth_sar_trend_seq(sar_r)
 
     last5 = []
-    for idx in range(max(0, len(confirmed) - 5), len(confirmed)):
+    for idx in range(max(0, len(confirmed) - 10), len(confirmed)):
         c, s, b, t = confirmed[idx], sar_r[idx], boll[idx], trend[idx]
         if s is None or b is None or t is None: continue
         dt_bj = datetime.fromtimestamp(c["ts"] / 1000, tz=bj_tz)
@@ -35895,32 +36304,63 @@ def _eth_sar_compute(candles):
             "sar_pct":  pct,
         })
     if not last5: return None
-    latest    = last5[-1]
-    now_bj    = datetime.now(pytz.timezone("Asia/Shanghai"))
+    latest = last5[-1]
+    now_bj = datetime.now(pytz.timezone("Asia/Shanghai"))
 
-    # 构建实时未收盘K线数据（current_bar）
-    live_price = live_bar_raw["close"] if live_bar_raw else candles[-1]["close"]
+    # ── 对实时K线计算其自身的 SAR/趋势/布林 ─────────────────────────
+    # 将未收盘K线拼入已收盘序列，重新计算最后一步，获取正确的
+    # sar_seq / bull / sar / boll_lb/mid/ub 值（而非从上一根已收盘K线复制）
     if live_bar_raw:
-        live_ts_ms   = live_bar_raw["ts"]
-        live_dt_bj   = datetime.fromtimestamp(live_ts_ms / 1000, tz=bj_tz)
+        live_price    = live_bar_raw["close"]
+        live_ts_ms    = live_bar_raw["ts"]
+        live_dt_bj    = datetime.fromtimestamp(live_ts_ms / 1000, tz=bj_tz)
         live_bar_time = live_dt_bj.strftime("%Y-%m-%d %H:%M")
-    else:
-        next_ts_ms   = latest["ts_ms"] + 5 * 60 * 1000
-        next_dt_bj   = datetime.fromtimestamp(next_ts_ms / 1000, tz=bj_tz)
-        live_bar_time = next_dt_bj.strftime("%Y-%m-%d %H:%M")
 
-    live_sar_pct = _eth_sar_pct(latest["sar"], latest["boll_ub"], latest["boll_lb"])
-    current_bar  = {
+        # 用已收盘+实时K线计算SAR/趋势（只取最后一步的结果）
+        all_bars      = confirmed + [live_bar_raw]
+        all_sar_r     = _eth_sar_calc(all_bars)
+        all_trend     = _eth_sar_trend_seq(all_sar_r)
+        live_sar_info = all_sar_r[-1]   # {sar, bull}
+        live_t_info   = all_trend[-1]   # {bull, seq, trend_id, switched}
+
+        # 布林带：用已收盘收盘价计算（不含未收盘），保持与已收盘K线一致
+        live_boll_ub  = latest["boll_ub"]
+        live_boll_mid = latest["boll_mid"]
+        live_boll_lb  = latest["boll_lb"]
+
+        live_sar       = round(live_sar_info["sar"], 4) if live_sar_info else latest["sar"]
+        live_bull      = live_t_info["bull"]   if live_t_info else latest["bull"]
+        live_seq       = live_t_info["seq"]    if live_t_info else latest["sar_seq"]
+        live_trend_id  = live_t_info["trend_id"] if live_t_info else latest["trend_id"]
+        live_switched  = live_t_info["switched"]  if live_t_info else False
+    else:
+        # 没有未收盘K线时，推算下一根K线的时间
+        live_price    = candles[-1]["close"]
+        next_ts_ms    = latest["ts_ms"] + 5 * 60 * 1000
+        next_dt_bj    = datetime.fromtimestamp(next_ts_ms / 1000, tz=bj_tz)
+        live_bar_time = next_dt_bj.strftime("%Y-%m-%d %H:%M")
+        live_boll_ub  = latest["boll_ub"]
+        live_boll_mid = latest["boll_mid"]
+        live_boll_lb  = latest["boll_lb"]
+        live_sar      = latest["sar"]
+        live_bull     = latest["bull"]
+        live_seq      = latest["sar_seq"]
+        live_trend_id = latest["trend_id"]
+        live_switched = False
+
+    live_sar_pct = _eth_sar_pct(live_sar, live_boll_ub, live_boll_lb)
+
+    current_bar = {
         "bar_time":  live_bar_time,
         "price":     live_price,
-        "sar":       latest["sar"],
-        "bull":      latest["bull"],
-        "sar_seq":   latest["sar_seq"],
-        "trend_id":  latest["trend_id"],
-        "switched":  False,
-        "boll_ub":   latest["boll_ub"],
-        "boll_mid":  latest["boll_mid"],
-        "boll_lb":   latest["boll_lb"],
+        "sar":       live_sar,
+        "bull":      live_bull,
+        "sar_seq":   live_seq,
+        "trend_id":  live_trend_id,
+        "switched":  live_switched,
+        "boll_ub":   live_boll_ub,
+        "boll_mid":  live_boll_mid,
+        "boll_lb":   live_boll_lb,
         "sar_pct":   live_sar_pct,
         "confirmed": False,
         "open":      live_bar_raw["open"]  if live_bar_raw else latest["close"],
@@ -35935,11 +36375,11 @@ def _eth_sar_compute(candles):
         "symbol":      "ETH-USDT-SWAP",
         "bar":         "5m",
         "current":     {
-            "price":    live_price,        "sar":      latest["sar"],
-            "bull":     latest["bull"],    "sar_seq":  latest["sar_seq"],
-            "trend_id": latest["trend_id"],"sar_pct":  live_sar_pct,
-            "boll_ub":  latest["boll_ub"], "boll_mid": latest["boll_mid"],
-            "boll_lb":  latest["boll_lb"], "bar_time": live_bar_time,
+            "price":    live_price,    "sar":      live_sar,
+            "bull":     live_bull,     "sar_seq":  live_seq,
+            "trend_id": live_trend_id, "sar_pct":  live_sar_pct,
+            "boll_ub":  live_boll_ub,  "boll_mid": live_boll_mid,
+            "boll_lb":  live_boll_lb,  "bar_time": live_bar_time,
         },
         "current_bar": current_bar,
         "last5_bars":  last5,
@@ -35974,22 +36414,15 @@ def _eth_sar_get_latest_from_file():
 
 @app.route('/api/eth-sar-boll/latest')
 def api_eth_sar_boll_latest():
-    """获取 ETH 5m SAR+Bollinger 最新快照（实时计算 + 存储）"""
+    """获取 ETH 5m SAR+Bollinger 最新快照
+    直接读取 collector 写入的 JSONL 文件，不独立重新计算
+    确保实时表与历史表数据来源一致
+    """
     try:
-        candles = _eth_sar_fetch_klines(120)
-        if not candles:
-            # fallback: 读文件
-            snap = _eth_sar_get_latest_from_file()
-            if snap:
-                return jsonify({"success": True, "data": snap, "source": "cache"})
-            return jsonify({"success": False, "error": "无法获取OKX数据"}), 503
-
-        snap = _eth_sar_compute(candles)
-        if not snap:
-            return jsonify({"success": False, "error": "K线数据不足"}), 500
-
-        _eth_sar_save(snap)
-        return jsonify({"success": True, "data": snap, "source": "live"})
+        snap = _eth_sar_get_latest_from_file()
+        if snap:
+            return jsonify({"success": True, "data": snap, "source": "jsonl"})
+        return jsonify({"success": False, "error": "暂无数据，collector尚未写入"}), 503
     except Exception as e:
         return jsonify({"success": False, "error": str(e),
                         "traceback": traceback.format_exc()}), 500
@@ -36024,6 +36457,905 @@ def api_eth_sar_boll_history():
         return jsonify({"success": False, "error": str(e)}), 500
 
 
+def _eth_sar_compute_row_fields(bars_list):
+    """
+    后端统一计算所有派生字段（前端完全不做数值运算）。
+    输入：已排好序的 bar 列表（旧→新）
+    输出：同列表，每个 bar 补充以下字段：
+      body_pct      实体涨跌幅 % = (close-open)/open*100
+      boll_width    布林带宽度 = boll_ub - boll_lb
+      sar_dist      SAR距离 = sar - close (正=上方/空头压力, 负=下方/多头支撑)
+      sar_pct_delta SAR%与前一根的差值 (前一根为 None 则 null)
+      boll_width_delta 布林带宽度与前一根差值
+      sar_dist_delta   |SAR距离|与前一根|SAR距离|的差值（方向切换时为null）
+    """
+    result = []
+    prev = None
+    for b in bars_list:
+        b = dict(b)  # 浅拷贝，避免修改原始数据
+
+        o = b.get("open")
+        c = b.get("close") or b.get("price")
+        sar = b.get("sar")
+        ub  = b.get("boll_ub")
+        lb  = b.get("boll_lb")
+        pct = b.get("sar_pct")
+        bull = b.get("bull")
+
+        # body_pct（若 collector 已写入则不重新算，仅在旧数据中补算）
+        if "body_pct" not in b or b["body_pct"] is None:
+            if o and o != 0 and c is not None:
+                b["body_pct"] = round((c - o) / o * 100, 4)
+            else:
+                b["body_pct"] = None
+
+        # boll_width
+        if "boll_width" not in b or b["boll_width"] is None:
+            if ub is not None and lb is not None:
+                b["boll_width"] = round(ub - lb, 4)
+            else:
+                b["boll_width"] = None
+
+        # sar_dist
+        if "sar_dist" not in b or b["sar_dist"] is None:
+            if sar is not None and c is not None:
+                b["sar_dist"] = round(sar - c, 4)
+            else:
+                b["sar_dist"] = None
+
+        # 与前一根的比较字段
+        b["sar_pct_delta"]      = None
+        b["boll_width_delta"]   = None
+        b["sar_dist_delta"]     = None
+
+        if prev is not None:
+            # SAR% 变化（始终显示，包括方向切换行）
+            if pct is not None and prev.get("sar_pct") is not None:
+                b["sar_pct_delta"] = round(pct - prev["sar_pct"], 4)
+
+            # 布林带宽度变化
+            if b["boll_width"] is not None and prev.get("boll_width") is not None:
+                b["boll_width_delta"] = round(b["boll_width"] - prev["boll_width"], 4)
+
+            # SAR距离变化（方向切换时设为 None，因为SAR从一侧跳到另一侧）
+            if (b["sar_dist"] is not None and prev.get("sar_dist") is not None
+                    and bull == prev.get("bull")):   # 同方向才比较
+                cur_abs  = abs(b["sar_dist"])
+                prev_abs = abs(prev["sar_dist"])
+                b["sar_dist_delta"] = round(cur_abs - prev_abs, 4)
+
+        result.append(b)
+        prev = b
+    return result
+
+
+def _eth_sar_get_trend_start_width(snap):
+    """
+    找本轮趋势(trend_id)的第一根K线(sar_seq=1)的boll_width，
+    用于计算实时表格的「开口比」。
+    使用与 history-rows 完全相同的「链兼容筛选」算法，确保实时页面和
+    历史弹窗使用同一基准值，避免两者开口比不一致的问题。
+    搜索顺序：chain-compat 筛选后的今天数据 → 昨天补充 → fallback: last5_bars
+    """
+    def _calc_boll_width(cb):
+        """从 bar dict 取 boll_width，若无则用 ub-lb 补算"""
+        bw = cb.get("boll_width")
+        if bw is not None:
+            return bw
+        ub = cb.get("boll_ub")
+        lb = cb.get("boll_lb")
+        if ub is not None and lb is not None:
+            return round(ub - lb, 4)
+        return None
+
+    def _load_bars_chain_compat(fp, limit=2000):
+        """
+        读取 JSONL 文件，应用链兼容筛选，返回 (旧→新) 升序 bar 列表。
+        与 history-rows API 的筛选逻辑完全一致。
+        """
+        all_recs = []
+        try:
+            with open(fp, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line:
+                        try:
+                            all_recs.append(json.loads(line))
+                        except Exception:
+                            pass
+        except Exception:
+            return []
+
+        all_recs = all_recs[-limit:]
+        all_recs.sort(key=lambda r: r.get("record_time", ""))
+
+        bar_data_map = {}
+        # Step 1: 用最新快照的 last5_bars 初始化基准链
+        if all_recs:
+            latest_rec = all_recs[-1]
+            for bar in (latest_rec.get("last5_bars") or []):
+                bbt = bar.get("beijing_time")
+                if bbt:
+                    bar_data_map[bbt] = dict(bar)
+
+        # Step 2: 从新→旧遍历，只接受链兼容的快照
+        for rec in reversed(all_recs):
+            l5 = rec.get("last5_bars") or []
+            if not l5:
+                continue
+            overlap_count = 0
+            mismatch = False
+            for bar in l5:
+                bbt = bar.get("beijing_time")
+                if not bbt:
+                    continue
+                if bbt in bar_data_map:
+                    overlap_count += 1
+                    if bar_data_map[bbt].get("sar_seq") != bar.get("sar_seq"):
+                        mismatch = True
+            if overlap_count > 0 and mismatch:
+                continue
+            for bar in l5:
+                bbt = bar.get("beijing_time")
+                if bbt and bbt not in bar_data_map:
+                    bar_data_map[bbt] = dict(bar)
+
+        result = sorted(bar_data_map.values(),
+                        key=lambda x: x.get("bar_time") or x.get("beijing_time", ""))
+        return result
+
+    try:
+        import pytz as _pytz
+        from datetime import datetime as _dt, timedelta as _td
+        bj_tz = _pytz.timezone("Asia/Shanghai")
+        today = _dt.now(bj_tz)
+
+        # 当前趋势信息（trend_id + bull 都必须匹配）
+        cur = snap.get("current", {})
+        trend_id = cur.get("trend_id")
+        cur_bull  = cur.get("bull")
+        if trend_id is None:
+            return None
+
+        # ── 主路径：使用链兼容算法读取今天数据，找当前方向（bull）最后一个 sar_seq=1 的基准 ──
+        # 修复 v2：不再限定 trend_id，只按 bull 方向查找 sar_seq=1，
+        # 确保与 history-rows 的「按 bull 追踪基准」逻辑完全一致。
+        # 多个 trend_id 对同一方向的 sar_seq=1 可能出现在不同时刻，
+        # 取按时间排序后最新的（最后出现的）作为当前段基准。
+        for delta in range(4):   # 今天→昨天→前天→大前天
+            date_str = (today - _td(days=delta)).strftime("%Y-%m-%d")
+            fp = _ETH_SAR_DATA_DIR / f"eth_sar_boll_{date_str}.jsonl"
+            if not fp.exists():
+                continue
+            bars = _load_bars_chain_compat(fp)
+            # 在链兼容 bars 里，按时间顺序找 bull 方向的 sar_seq=1
+            # 取最后一条（时间最新的那次切换），与 history-rows 保持一致
+            result = None
+            for bar in bars:
+                if (bar.get("bull") == cur_bull
+                        and bar.get("sar_seq") == 1):
+                    bw = _calc_boll_width(bar)
+                    if bw is not None:
+                        result = bw   # 继续向后，取最后一条（时间最新的那次切换）
+            if result is not None:
+                return result
+
+        # ── Fallback：从 last5_bars 里找 sar_seq=1；再不行取最早同向 bar ──
+        earliest_bw = None
+        for bar in (snap.get("last5_bars") or []):
+            if bar.get("sar_seq") == 1 and bar.get("bull") == cur_bull:
+                bw = _calc_boll_width(bar)
+                if bw is not None:
+                    return bw
+            if bar.get("bull") == cur_bull and earliest_bw is None:
+                bw = _calc_boll_width(bar)
+                if bw is not None:
+                    earliest_bw = bw
+        if earliest_bw is not None:
+            return earliest_bw
+
+        return None
+    except Exception:
+        return None
+
+
+@app.route('/api/eth-sar-boll/latest-rows')
+def api_eth_sar_boll_latest_rows():
+    """
+    获取实时K线表格数据（后端全部计算好，前端只做渲染）
+    返回：
+      current_bar  - 实时未收盘K线（含所有派生字段）
+      bars         - 最近10根已收盘K线（含所有派生字段，旧→新顺序）
+      current      - 顶部状态卡片数据（含 price_pct）
+    """
+    try:
+        snap = _eth_sar_get_latest_from_file()
+        if not snap:
+            return jsonify({"success": False, "error": "暂无数据"}), 503
+
+        last5 = snap.get("last5_bars") or []
+        cur_bar = snap.get("current_bar")
+        cur     = snap.get("current", {})
+
+        # 对已收盘K线补算派生字段（旧→新）
+        bars_computed = _eth_sar_compute_row_fields(last5)
+
+        # 对 current_bar 补算派生字段（与最后一根已收盘K线比较）
+        if cur_bar:
+            prev_bar = bars_computed[-1] if bars_computed else None
+            [cur_bar_computed] = _eth_sar_compute_row_fields(
+                ([prev_bar] if prev_bar else []) + [cur_bar]
+            )[-1:]
+        else:
+            cur_bar_computed = None
+
+        # ── 为每根 bar 计算 width_ratio（开口比）─────────────────────────────
+        # 使用与 history-rows 相同的链兼容数据，确保实时表与历史弹窗基准一致
+        # 从今天完整的链兼容数据里建立每个 (trend_id, bull) 的最新 sar_seq=1 基准
+        try:
+            import pytz as _pytz2
+            _bj_tz2 = _pytz2.timezone("Asia/Shanghai")
+            _today_str2 = datetime.now(_bj_tz2).strftime("%Y-%m-%d")
+            _fp2 = _ETH_SAR_DATA_DIR / f"eth_sar_boll_{_today_str2}.jsonl"
+
+            def _calc_bw(b):
+                bw = b.get("boll_width")
+                if bw is not None:
+                    return bw
+                ub, lb = b.get("boll_ub"), b.get("boll_lb")
+                return round(ub - lb, 4) if (ub is not None and lb is not None) else None
+
+            # 读取今天链兼容 bars
+            _all_recs2 = []
+            if _fp2.exists():
+                with open(_fp2, "r", encoding="utf-8") as _f2:
+                    for _ln in _f2:
+                        _ln = _ln.strip()
+                        if _ln:
+                            try: _all_recs2.append(json.loads(_ln))
+                            except: pass
+            _all_recs2.sort(key=lambda r: r.get("record_time", ""))
+
+            _bdm2 = {}
+            if _all_recs2:
+                for _b in (_all_recs2[-1].get("last5_bars") or []):
+                    _bbt = _b.get("beijing_time")
+                    if _bbt:
+                        _bdm2[_bbt] = dict(_b)
+            for _rec in reversed(_all_recs2):
+                _l5 = _rec.get("last5_bars") or []
+                if not _l5: continue
+                _oc, _mm = 0, False
+                for _b in _l5:
+                    _bbt = _b.get("beijing_time")
+                    if _bbt and _bbt in _bdm2:
+                        _oc += 1
+                        if _bdm2[_bbt].get("sar_seq") != _b.get("sar_seq"):
+                            _mm = True
+                if _oc > 0 and _mm: continue
+                for _b in _l5:
+                    _bbt = _b.get("beijing_time")
+                    if _bbt and _bbt not in _bdm2:
+                        _bdm2[_bbt] = dict(_b)
+
+            _cc_bars2 = sorted(_bdm2.values(),
+                               key=lambda x: x.get("bar_time") or x.get("beijing_time", ""))
+
+            # 按时间顺序追踪每个 bull 方向的最新 sar_seq=1 基准
+            # 修复：不区分 trend_id，只按 bull 方向追踪，避免 tid 切换导致基准跳跃
+            _cur_start2 = {}
+            for _b in _cc_bars2:
+                _bull_key2 = _b.get("bull")
+                if _b.get("sar_seq") == 1:
+                    _bw2 = _calc_bw(_b)
+                    if _bw2 is not None:
+                        _cur_start2[_bull_key2] = _bw2
+
+            # 为 bars_computed 中每根 bar 设置 width_ratio
+            for _b in bars_computed:
+                _bull_key2 = _b.get("bull")
+                _sw = _cur_start2.get(_bull_key2)
+                _bw2 = _calc_bw(_b)
+                if _sw and _bw2 and _sw > 0:
+                    _b["width_ratio"] = round(_bw2 / _sw, 4)
+                else:
+                    _b["width_ratio"] = None
+
+            # 同样为 current_bar 设置 width_ratio
+            if cur_bar_computed:
+                _bull_key2 = cur_bar_computed.get("bull")
+                _sw = _cur_start2.get(_bull_key2)
+                _bw2 = _calc_bw(cur_bar_computed)
+                if _sw and _bw2 and _sw > 0:
+                    cur_bar_computed["width_ratio"] = round(_bw2 / _sw, 4)
+                else:
+                    cur_bar_computed["width_ratio"] = None
+        except Exception:
+            pass  # 失败时 width_ratio 保持 None，前端 fallback 到旧算法
+
+        # current 状态卡片补算 price_pct（价格在布林带中的百分位）
+        cur_out = dict(cur)
+        ub = cur_out.get("boll_ub")
+        lb = cur_out.get("boll_lb")
+        price = cur_out.get("price")
+        if ub is not None and lb is not None and ub != lb and price is not None:
+            cur_out["price_pct"] = round((price - lb) / (ub - lb) * 100, 4)
+        else:
+            cur_out["price_pct"] = 0.0
+
+        # ── 计算当日（从0点起）截至最新K线的累计最高/最低 ──────────────────────
+        # 用于前端实时K线面板的"所处位置"列（收盘价在当日高低区间内的百分位）
+        try:
+            import pytz as _pytz3
+            _bj3 = _pytz3.timezone("Asia/Shanghai")
+            _today3 = datetime.now(_bj3).strftime("%Y-%m-%d")
+            _fp3 = _ETH_SAR_DATA_DIR / f"eth_sar_boll_{_today3}.jsonl"
+            _day_hi, _day_lo = None, None
+            if _fp3.exists():
+                # 从今日 JSONL 收集所有独立 bar（按 bar_time 去重），升序扫描
+                _bar_map3 = {}
+                with open(_fp3, "r", encoding="utf-8") as _f3:
+                    for _ln3 in _f3:
+                        _ln3 = _ln3.strip()
+                        if not _ln3:
+                            continue
+                        try:
+                            _rec3 = json.loads(_ln3)
+                        except Exception:
+                            continue
+                        for _b3 in (_rec3.get("last5_bars") or []):
+                            _bkey3 = _b3.get("bar_time") or _b3.get("beijing_time")
+                            if _bkey3 and _bkey3 not in _bar_map3:
+                                _bar_map3[_bkey3] = _b3
+                        _cb3 = _rec3.get("current_bar")
+                        if _cb3:
+                            _bkey3 = _cb3.get("bar_time") or _cb3.get("beijing_time")
+                            if _bkey3 and _bkey3 not in _bar_map3:
+                                _bar_map3[_bkey3] = _cb3
+                # 取当日 00:00 以后的 bars，升序扫描累计高低
+                _today_prefix3 = _today3 + " "
+                _sorted3 = sorted(
+                    [b for k, b in _bar_map3.items() if k and k.startswith(_today_prefix3)],
+                    key=lambda x: x.get("bar_time") or x.get("beijing_time", "")
+                )
+                _rhi3, _rlo3 = float("-inf"), float("inf")
+                for _b3 in _sorted3:
+                    _h3 = _b3.get("high")
+                    _l3 = _b3.get("low")
+                    if _h3 is not None: _rhi3 = max(_rhi3, _h3)
+                    if _l3 is not None: _rlo3 = min(_rlo3, _l3)
+                if _rhi3 > _rlo3:
+                    _day_hi = _rhi3
+                    _day_lo = _rlo3
+        except Exception:
+            _day_hi, _day_lo = None, None
+
+        return jsonify({
+            "success":     True,
+            "record_time": snap.get("record_time"),
+            "current":     cur_out,
+            "bars":        bars_computed,   # 旧→新，前端 reverse() 后最新在前
+            "current_bar": cur_bar_computed,
+            "source":      "jsonl",
+            "trend_start_boll_width": _eth_sar_get_trend_start_width(snap),
+            "day_high":    _day_hi,   # 当日0点起累计最高价
+            "day_low":     _day_lo,   # 当日0点起累计最低价
+        })
+    except Exception as e:
+        import traceback as tb
+        return jsonify({"success": False, "error": str(e),
+                        "traceback": tb.format_exc()}), 500
+
+
+@app.route('/api/eth-sar-boll/history-rows')
+def api_eth_sar_boll_history_rows():
+    """
+    历史K线表格数据（后端全部计算，含链兼容筛选算法）
+    参数：date=YYYY-MM-DD, limit=int(default 2000)
+    返回：rows 列表（降序，最新在前），每行含所有派生字段
+    跨日期修复：自动从前一天文件补取 sar_seq=1 的起始宽度记录，
+               并为每行计算 width_ratio（开口比）字段。
+    """
+    def _boll_width_of(bar):
+        """获取 bar 的布林带宽度，若无则用 ub-lb 补算"""
+        bw = bar.get("boll_width")
+        if bw is not None:
+            return bw
+        ub = bar.get("boll_ub")
+        lb = bar.get("boll_lb")
+        if ub is not None and lb is not None:
+            return round(ub - lb, 4)
+        return None
+
+    def _load_bars_from_file(fp):
+        """从 JSONL 文件提取所有 current_bar，按 bar_time 去重，返回有序列表"""
+        recs = []
+        try:
+            with open(fp, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        rec = json.loads(line)
+                        cb = rec.get("current_bar")
+                        if cb:
+                            recs.append(cb)
+                    except Exception:
+                        pass
+        except Exception:
+            pass
+        # 去重：同一 bar_time 只保留最后一条（最新快照）
+        seen = {}
+        for r in recs:
+            bt = r.get("bar_time") or r.get("beijing_time", "")
+            if bt:
+                seen[bt] = r
+        result = list(seen.values())
+        result.sort(key=lambda x: x.get("bar_time") or x.get("beijing_time", ""))
+        return result
+
+    try:
+        bj_tz    = pytz.timezone("Asia/Shanghai")
+        date_str = request.args.get('date', '')
+        limit    = request.args.get('limit', 2000, type=int)
+        if not date_str:
+            date_str = datetime.now(bj_tz).strftime("%Y-%m-%d")
+
+        fp = _ETH_SAR_DATA_DIR / f"eth_sar_boll_{date_str}.jsonl"
+        if not fp.exists():
+            return jsonify({"success": True, "rows": [], "date": date_str, "count": 0})
+
+        all_recs = []
+        with open(fp, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    try: all_recs.append(json.loads(line))
+                    except: pass
+
+        # ★ 注意：链兼容筛选和开口比基准计算必须使用**全量**记录（不能 truncate），
+        #   以确保 sar_seq=1 的起始 bar 始终被包含，避免 limit 截断导致基准丢失。
+        #   limit 仅控制最终返回给前端的行数，不影响中间计算。
+        all_recs.sort(key=lambda r: r.get("record_time", ""))
+
+        # ── 链兼容筛选算法（与前端完全相同，移到后端） ────────────────────────
+        bar_data_map = {}  # beijing_time -> bar dict
+        latest_current_bar = None
+
+        for rec in all_recs:
+            if rec.get("current_bar"):
+                latest_current_bar = rec["current_bar"]
+
+        # Step 1: 用最新快照的 last5_bars 初始化基准链
+        if all_recs:
+            latest_rec = all_recs[-1]
+            for bar in (latest_rec.get("last5_bars") or []):
+                bbt = bar.get("beijing_time")
+                if bbt:
+                    bar_data_map[bbt] = dict(bar)
+
+        # Step 2: 从新→旧遍历，只接受链兼容的快照
+        for rec in reversed(all_recs):
+            l5 = rec.get("last5_bars") or []
+            if not l5:
+                continue
+            overlap_count = 0
+            mismatch = False
+            for bar in l5:
+                bbt = bar.get("beijing_time")
+                if not bbt:
+                    continue
+                if bbt in bar_data_map:
+                    overlap_count += 1
+                    if bar_data_map[bbt].get("sar_seq") != bar.get("sar_seq"):
+                        mismatch = True
+            if overlap_count > 0 and mismatch:
+                continue
+            for bar in l5:
+                bbt = bar.get("beijing_time")
+                if bbt and bbt not in bar_data_map:
+                    bar_data_map[bbt] = dict(bar)
+
+        # 收集所有时间，包括未收盘的 current_bar
+        all_times = set(bar_data_map.keys())
+        if latest_current_bar and latest_current_bar.get("bar_time"):
+            if not latest_current_bar.get("confirmed", True):
+                all_times.add(latest_current_bar["bar_time"])
+
+        sorted_times = sorted(all_times, reverse=True)
+
+        # 转为列表（旧→新）用于计算派生字段
+        asc_times = sorted_times[::-1]
+        ordered_bars = []
+        for bt in asc_times:
+            if bt in bar_data_map:
+                ordered_bars.append(bar_data_map[bt])
+            elif (latest_current_bar and latest_current_bar.get("bar_time") == bt):
+                cb = dict(latest_current_bar)
+                cb.setdefault("beijing_time", bt)
+                ordered_bars.append(cb)
+
+        # ── 跨日期补全：找出当天最早的趋势缺失 sar_seq=1 的情况 ────────────────
+        # 收集当天所有出现的 (trend_id, bull) 组合，以及哪些有 seq=1
+        trend_has_seq1 = {}   # (trend_id, bull) -> boll_width or None
+        for bar in ordered_bars:
+            tid  = bar.get("trend_id")
+            bull = bar.get("bull")
+            key  = (tid, bull)
+            if key not in trend_has_seq1:
+                trend_has_seq1[key] = None
+            if bar.get("sar_seq") == 1:
+                bw = _boll_width_of(bar)
+                if bw is not None:
+                    trend_has_seq1[key] = bw
+
+        # 需要从历史文件补取的 trend_id 集合（没有 seq=1 的）
+        missing_keys = {k for k, v in trend_has_seq1.items() if v is None and k[0] is not None}
+
+        if missing_keys:
+            # 往前最多搜索 5 天的文件
+            from datetime import timedelta as _td
+            try:
+                req_date = datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=bj_tz)
+            except Exception:
+                req_date = datetime.now(bj_tz)
+
+            # 构建补充 bars：只保留 seq=1 且 (trend_id,bull) 在 missing_keys 里的 bars
+            supplement_bars = []   # 将插入 ordered_bars 最前面（按时间升序）
+            found_keys = set()
+
+            # ── 优先在同一天文件里向前搜索（处理 limit 截断导致的 seq=1 丢失） ──
+            # _load_bars_from_file 使用 current_bar 去重，能覆盖 limit 窗口之前的所有 bars
+            today_bars_full = _load_bars_from_file(fp)   # 当天完整 bars（升序）
+            for bar in today_bars_full:
+                tid  = bar.get("trend_id")
+                bull = bar.get("bull")
+                key  = (tid, bull)
+                if key not in missing_keys or key in found_keys:
+                    continue
+                if bar.get("sar_seq") == 1:
+                    bw = _boll_width_of(bar)
+                    if bw is not None:
+                        b = dict(bar)
+                        b["boll_width"] = bw
+                        b["_supplement"] = True
+                        supplement_bars.append(b)
+                        found_keys.add(key)
+
+            # 仍然缺失的 key 才去前几天找
+            for delta in range(1, 6):
+                if not missing_keys - found_keys:
+                    break
+                prev_date_str = (req_date - _td(days=delta)).strftime("%Y-%m-%d")
+                prev_fp = _ETH_SAR_DATA_DIR / f"eth_sar_boll_{prev_date_str}.jsonl"
+                if not prev_fp.exists():
+                    continue
+                prev_bars = _load_bars_from_file(prev_fp)   # 升序
+                # 从旧→新遍历，找到对应 trend 的 seq=1
+                for bar in prev_bars:
+                    tid  = bar.get("trend_id")
+                    bull = bar.get("bull")
+                    key  = (tid, bull)
+                    if key not in missing_keys or key in found_keys:
+                        continue
+                    if bar.get("sar_seq") == 1:
+                        bw = _boll_width_of(bar)
+                        if bw is not None:
+                            b = dict(bar)
+                            b["boll_width"] = bw          # 确保字段存在
+                            b["_supplement"] = True        # 标记为补充行（前端不渲染）
+                            supplement_bars.append(b)
+                            found_keys.add(key)
+
+            if supplement_bars:
+                # 插到 ordered_bars 最前面（时间最早），确保 compute_row_fields 能算出 delta
+                supplement_bars.sort(key=lambda x: x.get("bar_time") or x.get("beijing_time", ""))
+                ordered_bars = supplement_bars + ordered_bars
+
+        # 后端统一计算所有派生字段
+        computed = _eth_sar_compute_row_fields(ordered_bars)
+
+        # ── 计算 width_ratio（开口比）：当前 boll_width / 本轮 sar_seq=1 的 boll_width ──
+        # 修复（v2）：以 bull 方向（True/False）为基准 key，不区分 trend_id。
+        # 同一 bull 方向下，无论 trend_id 如何切换，只要 sar_seq=1 出现就更新基准，
+        # 确保相邻 bars 使用统一基准，避免 ratio 因 tid 切换而跳跃（0.9 ↔ 1.5）。
+
+        # ① 从前置补充 bars 中预建基准（supplement bars 带 _supplement=True 标记）
+        #    它们代表跨日期的起始 K 线，sar_seq=1 已确认，boll_width 已补算
+        #    key 用 bull（方向），不再区分 trend_id
+        pre_start = {}  # bull -> boll_width，来自跨日期补全
+        for bar in computed:
+            if bar.get("_supplement") and bar.get("sar_seq") == 1:
+                bw = _boll_width_of(bar)
+                if bw is not None:
+                    bull_key = bar.get("bull")
+                    pre_start[bull_key] = bw
+
+        # ② 按时间顺序（升序）逐 bar 计算 width_ratio
+        #    current_start[bull] = 当前该方向的起始 boll_width
+        current_start = dict(pre_start)   # 以跨日期补全值初始化
+        # 对于跨日期补全没覆盖到的方向，先做一次 fallback：
+        # 用该 bull 方向最早出现的 bar 的 boll_width 作为基准
+        seen_first = {}
+        for bar in computed:
+            if bar.get("_supplement"):
+                continue
+            bull_key = bar.get("bull")
+            if bull_key not in current_start and bull_key not in seen_first:
+                bw = _boll_width_of(bar)
+                if bw is not None:
+                    seen_first[bull_key] = bw
+        for bull_key, bw in seen_first.items():
+            if bull_key not in current_start:
+                current_start[bull_key] = bw
+
+        for bar in computed:
+            bull = bar.get("bull")
+            bull_key = bull
+
+            # 遇到 sar_seq=1 时，更新该方向的「当前起始基准」（不区分 trend_id）
+            if bar.get("sar_seq") == 1:
+                bw1 = _boll_width_of(bar)
+                if bw1 is not None:
+                    current_start[bull_key] = bw1
+
+            sw = current_start.get(bull_key)
+            bw = _boll_width_of(bar)
+            if sw and bw is not None and sw > 0:
+                bar["width_ratio"] = round(bw / sw, 4)
+            else:
+                bar["width_ratio"] = None
+
+        # 过滤掉补充行（前端不展示），降序返回（最新在前），再按 limit 截取
+        rows = [b for b in computed if not b.get("_supplement")][::-1]
+        rows = rows[:limit]   # limit 仅控制输出行数，不影响基准计算
+        return jsonify({
+            "success": True,
+            "rows":    rows,
+            "date":    date_str,
+            "count":   len(rows)
+        })
+    except Exception as e:
+        import traceback as tb
+        return jsonify({"success": False, "error": str(e),
+                        "traceback": tb.format_exc()}), 500
+
+
+@app.route('/api/eth-sar-boll/save-consec4-event', methods=['POST'])
+def api_eth_sar_boll_save_consec4():
+    """
+    保存连续4根K线开口比递增事件到 JSONL 文件。
+    文件路径：eth_sar_bollinger/eth_sar_consec4_YYYY-MM-DD.jsonl
+    """
+    try:
+        bj_tz    = pytz.timezone("Asia/Shanghai")
+        today    = datetime.now(bj_tz).strftime("%Y-%m-%d")
+        payload  = request.get_json(force=True) or {}
+
+        # 补充服务端时间戳
+        payload.setdefault("server_time", datetime.now(bj_tz).strftime("%Y-%m-%d %H:%M:%S"))
+        payload.setdefault("date", today)
+
+        fp = _ETH_SAR_DATA_DIR / f"eth_sar_consec4_{today}.jsonl"
+        with open(fp, "a", encoding="utf-8") as f:
+            f.write(json.dumps(payload, ensure_ascii=False) + "\n")
+
+        return jsonify({"success": True, "file": str(fp.name)})
+    except Exception as e:
+        import traceback as tb
+        return jsonify({"success": False, "error": str(e),
+                        "traceback": tb.format_exc()}), 500
+
+
+@app.route('/api/eth-sar-boll/save-shadow-alert', methods=['POST'])
+def api_eth_sar_boll_save_shadow_alert():
+    """
+    保存影线预警行到 JSONL 文件。
+    文件路径：eth_sar_bollinger/eth_sar_shadow_alert_YYYY-MM-DD.jsonl
+    请求体字段：bar_time, high, low, close, body_pct, upper_pct, lower_pct,
+                upper_body_ratio, lower_body_ratio, sar, bull, sar_seq,
+                sar_pct, sar_delta, lb, mid, ub, boll_width, width_delta,
+                width_ratio, sar_dist, dist_delta, pos_pct,
+                alert_type (upper/lower/both), date (可选)
+    """
+    try:
+        bj_tz   = pytz.timezone("Asia/Shanghai")
+        today   = datetime.now(bj_tz).strftime("%Y-%m-%d")
+        payload = request.get_json(force=True) or {}
+
+        payload.setdefault("server_time", datetime.now(bj_tz).strftime("%Y-%m-%d %H:%M:%S"))
+        date_str = payload.get("date") or today
+        payload.setdefault("date", date_str)
+
+        fp = _ETH_SAR_DATA_DIR / f"eth_sar_shadow_alert_{date_str}.jsonl"
+        with open(fp, "a", encoding="utf-8") as f:
+            f.write(json.dumps(payload, ensure_ascii=False) + "\n")
+
+        return jsonify({"success": True, "file": str(fp.name)})
+    except Exception as e:
+        import traceback as tb
+        return jsonify({"success": False, "error": str(e),
+                        "traceback": tb.format_exc()}), 500
+
+
+@app.route('/api/eth-sar-boll/shadow-alert-rows')
+def api_eth_sar_boll_shadow_alert_rows():
+    """
+    返回指定日期所有满足影线阈值的K线行，直接从 boll 原始数据扫描。
+    上影线% >= 0.5% 或 下影线% >= 0.3% 的均包含。
+    参数：date=YYYY-MM-DD（默认今日北京时间）
+    结果按 bar_time 降序（最新在前）。
+    所有 delta 字段（开口变化/开口比/SAR%变化/距离变化/所处位置）均在后端计算。
+    """
+    try:
+        bj_tz    = pytz.timezone("Asia/Shanghai")
+        today    = datetime.now(bj_tz).strftime("%Y-%m-%d")
+        date_str = request.args.get("date", today)
+
+        UPPER_THR = 0.5
+        LOWER_THR = 0.3
+
+        # ── 1. 从 boll 原始数据中提取所有唯一 K 线（按时间升序排列）──
+        boll_fp = _ETH_SAR_DATA_DIR / f"eth_sar_boll_{date_str}.jsonl"
+        bar_map = {}   # bar_time -> bar_dict (取最新出现的一条，越晚越准)
+
+        if boll_fp.exists():
+            with open(boll_fp, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        rec = json.loads(line)
+                    except Exception:
+                        continue
+
+                    # last5_bars（实际最多10根已收盘K线）
+                    for bar in rec.get("last5_bars", []):
+                        bt = bar.get("beijing_time", "")
+                        if bt:
+                            bar_map[bt] = bar   # 后出现的覆盖
+
+                    # current_bar（实时未收盘K线）
+                    cb = rec.get("current_bar", {})
+                    bt = cb.get("bar_time", "") or cb.get("beijing_time", "")
+                    if bt:
+                        bar_map[bt] = cb
+
+        # ── 2. 按时间升序排列，计算 delta 字段 ──────────────────────
+        sorted_bars = sorted(bar_map.items(), key=lambda x: x[0])  # 升序
+
+        # 计算当日最高最低，用于 pos_pct（所处位置）
+        day_high = max((b.get("high") or 0 for _, b in sorted_bars), default=0)
+        day_low  = min((b.get("low")  or 999999 for _, b in sorted_bars), default=0)
+        day_range = day_high - day_low if (day_high > day_low) else 0
+
+        # 逐根计算增量字段
+        enriched = {}   # bar_time -> enriched bar dict
+        prev_bt = None
+        for bt, bar in sorted_bars:
+            high  = bar.get("high")
+            low   = bar.get("low")
+            close = bar.get("close") or bar.get("price")
+            boll_width = bar.get("boll_width")
+            sar_pct    = bar.get("sar_pct")
+            sar_dist   = bar.get("sar_dist")
+
+            # pos_pct: (close - day_low) / day_range * 100
+            pos_pct = None
+            if close is not None and day_range > 0:
+                pos_pct = round((close - day_low) / day_range * 100, 2)
+
+            # delta fields vs previous bar
+            boll_width_delta = None
+            sar_pct_delta    = None
+            sar_dist_delta   = None
+            width_ratio      = None
+
+            if prev_bt is not None and prev_bt in enriched:
+                prev = enriched[prev_bt]
+                prev_width = prev.get("boll_width")
+                prev_sar_pct  = prev.get("sar_pct")
+                prev_sar_dist = prev.get("sar_dist")
+
+                if boll_width is not None and prev_width is not None:
+                    boll_width_delta = round(boll_width - prev_width, 4)
+                    # width_ratio: 当前开口 / 前一根开口（避免除以0）
+                    if prev_width and abs(prev_width) >= 0.001:
+                        width_ratio = round(boll_width / prev_width, 4)
+
+                if sar_pct is not None and prev_sar_pct is not None:
+                    sar_pct_delta = round(sar_pct - prev_sar_pct, 4)
+
+                if sar_dist is not None and prev_sar_dist is not None:
+                    sar_dist_delta = round(sar_dist - prev_sar_dist, 4)
+
+            enriched[bt] = dict(bar,
+                pos_pct=pos_pct,
+                boll_width_delta=boll_width_delta,
+                sar_pct_delta=sar_pct_delta,
+                sar_dist_delta=sar_dist_delta,
+                width_ratio=width_ratio,
+            )
+            prev_bt = bt
+
+        # ── 3. 筛选满足阈值的 K 线 ───────────────────────────────────
+        result_rows = []
+        for bt, bar in enriched.items():
+            high  = bar.get("high")
+            low   = bar.get("low")
+            close = bar.get("close") or bar.get("price")
+            if high is None or low is None or close is None or close == 0:
+                continue
+
+            upper_pct = (high - close) / close * 100
+            lower_pct = (close - low)  / close * 100
+
+            hit_upper = upper_pct >= UPPER_THR
+            hit_lower = lower_pct >= LOWER_THR
+            if not hit_upper and not hit_lower:
+                continue
+
+            alert_type = "both" if (hit_upper and hit_lower) else ("upper" if hit_upper else "lower")
+
+            body_pct   = bar.get("body_pct")
+            upper_body = (upper_pct / abs(body_pct)) if (body_pct is not None and abs(body_pct) >= 0.001) else None
+            lower_body = (lower_pct / abs(body_pct)) if (body_pct is not None and abs(body_pct) >= 0.001) else None
+
+            result_rows.append({
+                "bar_time":         bt,
+                "high":             high,
+                "low":              low,
+                "close":            close,
+                "body_pct":         body_pct,
+                "upper_pct":        round(upper_pct, 4),
+                "lower_pct":        round(lower_pct, 4),
+                "upper_body_ratio": round(upper_body, 4) if upper_body is not None else None,
+                "lower_body_ratio": round(lower_body, 4) if lower_body is not None else None,
+                "sar":              bar.get("sar"),
+                "bull":             bar.get("bull"),
+                "sar_seq":          bar.get("sar_seq"),
+                "sar_pct":          bar.get("sar_pct"),
+                "sar_pct_delta":    bar.get("sar_pct_delta"),
+                "boll_lb":          bar.get("boll_lb"),
+                "boll_mid":         bar.get("boll_mid"),
+                "boll_ub":          bar.get("boll_ub"),
+                "boll_width":       bar.get("boll_width"),
+                "boll_width_delta": bar.get("boll_width_delta"),
+                "width_ratio":      bar.get("width_ratio"),
+                "sar_dist":         bar.get("sar_dist"),
+                "sar_dist_delta":   bar.get("sar_dist_delta"),
+                "pos_pct":          bar.get("pos_pct"),
+                "date":             date_str,
+                "alert_type":       alert_type,
+            })
+
+        # 按 bar_time 降序（最新在前）
+        result_rows.sort(key=lambda x: x.get("bar_time", ""), reverse=True)
+
+        return jsonify({"success": True, "date": date_str, "rows": result_rows})
+    except Exception as e:
+        import traceback as tb
+        return jsonify({"success": False, "error": str(e),
+                        "traceback": tb.format_exc()}), 500
+
+
+@app.route('/api/eth-sar-boll/shadow-alert-dates')
+def api_eth_sar_boll_shadow_alert_dates():
+    """返回有 boll 数据的日期列表（影线预警直接扫描 boll 文件，所以用 boll 文件来确定有哪些日期）"""
+    try:
+        dates = []
+        for fp in sorted(_ETH_SAR_DATA_DIR.glob("eth_sar_boll_*.jsonl"), reverse=True):
+            d = fp.stem.replace("eth_sar_boll_", "")
+            if d.endswith(".backup"):
+                continue
+            dates.append(d)
+        return jsonify({"success": True, "dates": dates})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
 @app.route('/api/eth-sar-boll/available-dates')
 def api_eth_sar_boll_dates():
     """获取有数据的日期列表"""
@@ -36035,6 +37367,414 @@ def api_eth_sar_boll_dates():
         return jsonify({"success": True, "dates": dates})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route('/api/eth-sar-boll/seq1-rows')
+def api_eth_sar_boll_seq1_rows():
+    """
+    返回指定日期所有 sar_seq=1 的 K 线记录（空头01 + 多头01），按时间升序。
+    优先读取缓存文件 eth_sar_seq1_YYYY-MM-DD.jsonl；
+    若不存在则从 history-rows 逻辑实时生成并写入缓存。
+    参数：date=YYYY-MM-DD（默认今日北京时间）
+    """
+    try:
+        bj_tz    = pytz.timezone("Asia/Shanghai")
+        date_str = request.args.get('date', '')
+        if not date_str:
+            date_str = datetime.now(bj_tz).strftime("%Y-%m-%d")
+
+        today_str = datetime.now(bj_tz).strftime("%Y-%m-%d")
+        cache_fp  = _ETH_SAR_DATA_DIR / f"eth_sar_seq1_{date_str}.jsonl"
+
+        # ── 读缓存（非今日直接用，今日每次实时生成） ────────────────────────────
+        if date_str != today_str and cache_fp.exists():
+            rows = []
+            with open(cache_fp, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line:
+                        try:
+                            rows.append(json.loads(line))
+                        except Exception:
+                            pass
+            rows.sort(key=lambda r: r.get("beijing_time") or r.get("bar_time", ""))
+            return jsonify({"success": True, "rows": rows, "date": date_str,
+                            "count": len(rows), "from_cache": True})
+
+        # ── 实时从 history-rows 数据提取 ────────────────────────────────────────
+        src_fp = _ETH_SAR_DATA_DIR / f"eth_sar_boll_{date_str}.jsonl"
+        if not src_fp.exists():
+            return jsonify({"success": True, "rows": [], "date": date_str, "count": 0})
+
+        # 调用内部 history-rows 逻辑（复用已有函数）：
+        # 直接 call flask test_client 会有循环依赖，改为直接读文件+调用已有函数
+
+        def _boll_width_of(bar):
+            bw = bar.get("boll_width")
+            if bw is not None:
+                return bw
+            ub = bar.get("boll_ub")
+            lb = bar.get("boll_lb")
+            if ub is not None and lb is not None:
+                return round(ub - lb, 4)
+            return None
+
+        def _load_bars_local(fp):
+            recs = []
+            try:
+                with open(fp, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line = line.strip()
+                        if not line:
+                            continue
+                        try:
+                            rec = json.loads(line)
+                            cb = rec.get("current_bar")
+                            if cb:
+                                recs.append(cb)
+                        except Exception:
+                            pass
+            except Exception:
+                pass
+            seen = {}
+            for r in recs:
+                bt = r.get("bar_time") or r.get("beijing_time", "")
+                if bt:
+                    seen[bt] = r
+            result = list(seen.values())
+            result.sort(key=lambda x: x.get("bar_time") or x.get("beijing_time", ""))
+            return result
+
+        all_recs = []
+        with open(src_fp, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    try:
+                        all_recs.append(json.loads(line))
+                    except Exception:
+                        pass
+        all_recs.sort(key=lambda r: r.get("record_time", ""))
+
+        # 链兼容筛选
+        bar_data_map = {}
+        latest_current_bar = None
+        for rec in all_recs:
+            if rec.get("current_bar"):
+                latest_current_bar = rec["current_bar"]
+
+        if all_recs:
+            for bar in (all_recs[-1].get("last5_bars") or []):
+                bbt = bar.get("beijing_time")
+                if bbt:
+                    bar_data_map[bbt] = dict(bar)
+
+        for rec in reversed(all_recs):
+            l5 = rec.get("last5_bars") or []
+            if not l5:
+                continue
+            overlap_count = 0
+            mismatch = False
+            for bar in l5:
+                bbt = bar.get("beijing_time")
+                if not bbt:
+                    continue
+                if bbt in bar_data_map:
+                    overlap_count += 1
+                    if bar_data_map[bbt].get("sar_seq") != bar.get("sar_seq"):
+                        mismatch = True
+            if overlap_count > 0 and mismatch:
+                continue
+            for bar in l5:
+                bbt = bar.get("beijing_time")
+                if bbt and bbt not in bar_data_map:
+                    bar_data_map[bbt] = dict(bar)
+
+        all_times = set(bar_data_map.keys())
+        asc_times = sorted(all_times)
+        ordered_bars = [bar_data_map[bt] for bt in asc_times]
+
+        # 跨日期补全 sar_seq=1
+        trend_has_seq1 = {}
+        for bar in ordered_bars:
+            tid  = bar.get("trend_id")
+            bull = bar.get("bull")
+            key  = (tid, bull)
+            if key not in trend_has_seq1:
+                trend_has_seq1[key] = None
+            if bar.get("sar_seq") == 1:
+                bw = _boll_width_of(bar)
+                if bw is not None:
+                    trend_has_seq1[key] = bw
+
+        missing_keys = {k for k, v in trend_has_seq1.items() if v is None and k[0] is not None}
+        supplement_bars = []
+        found_keys = set()
+
+        if missing_keys:
+            from datetime import timedelta as _td
+            try:
+                req_date = datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=bj_tz)
+            except Exception:
+                req_date = datetime.now(bj_tz)
+
+            today_bars_full = _load_bars_local(src_fp)
+            for bar in today_bars_full:
+                key = (bar.get("trend_id"), bar.get("bull"))
+                if key not in missing_keys or key in found_keys:
+                    continue
+                if bar.get("sar_seq") == 1:
+                    bw = _boll_width_of(bar)
+                    if bw is not None:
+                        b = dict(bar)
+                        b["boll_width"] = bw
+                        b["_supplement"] = True
+                        supplement_bars.append(b)
+                        found_keys.add(key)
+
+            for delta in range(1, 6):
+                if not missing_keys - found_keys:
+                    break
+                prev_date_str = (req_date - _td(days=delta)).strftime("%Y-%m-%d")
+                prev_fp = _ETH_SAR_DATA_DIR / f"eth_sar_boll_{prev_date_str}.jsonl"
+                if not prev_fp.exists():
+                    continue
+                for bar in _load_bars_local(prev_fp):
+                    key = (bar.get("trend_id"), bar.get("bull"))
+                    if key not in missing_keys or key in found_keys:
+                        continue
+                    if bar.get("sar_seq") == 1:
+                        bw = _boll_width_of(bar)
+                        if bw is not None:
+                            b = dict(bar)
+                            b["boll_width"] = bw
+                            b["_supplement"] = True
+                            supplement_bars.append(b)
+                            found_keys.add(key)
+
+        if supplement_bars:
+            supplement_bars.sort(key=lambda x: x.get("bar_time") or x.get("beijing_time", ""))
+            ordered_bars = supplement_bars + ordered_bars
+
+        computed = _eth_sar_compute_row_fields(ordered_bars)
+
+        # 计算 width_ratio
+        pre_start = {}
+        for bar in computed:
+            if bar.get("_supplement") and bar.get("sar_seq") == 1:
+                bw = _boll_width_of(bar)
+                if bw is not None:
+                    pre_start[bar.get("bull")] = bw
+
+        current_start = dict(pre_start)
+        seen_first = {}
+        for bar in computed:
+            if bar.get("_supplement"):
+                continue
+            bull_key = bar.get("bull")
+            if bull_key not in current_start and bull_key not in seen_first:
+                bw = _boll_width_of(bar)
+                if bw is not None:
+                    seen_first[bull_key] = bw
+        for bk, bw in seen_first.items():
+            if bk not in current_start:
+                current_start[bk] = bw
+
+        for bar in computed:
+            bull_key = bar.get("bull")
+            if bar.get("sar_seq") == 1:
+                bw1 = _boll_width_of(bar)
+                if bw1 is not None:
+                    current_start[bull_key] = bw1
+            sw = current_start.get(bull_key)
+            bw = _boll_width_of(bar)
+            if sw and bw is not None and sw > 0:
+                bar["width_ratio"] = round(bw / sw, 4)
+            else:
+                bar["width_ratio"] = None
+
+        # 只取 sar_seq=1 且非补充行，按时间升序
+        rows = [b for b in computed
+                if b.get("sar_seq") == 1 and not b.get("_supplement")]
+        rows.sort(key=lambda r: r.get("beijing_time") or r.get("bar_time", ""))
+
+        # 写缓存（非今日才缓存，今日数据会变化）
+        if date_str != today_str:
+            try:
+                with open(cache_fp, "w", encoding="utf-8") as f:
+                    for row in rows:
+                        clean = {k: v for k, v in row.items() if not k.startswith("_")}
+                        f.write(json.dumps(clean, ensure_ascii=False) + "\n")
+            except Exception:
+                pass
+
+        return jsonify({"success": True, "rows": rows, "date": date_str,
+                        "count": len(rows), "from_cache": False})
+
+    except Exception as e:
+        import traceback as tb
+        return jsonify({"success": False, "error": str(e),
+                        "traceback": tb.format_exc()}), 500
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 自动备份调度已迁移至独立 PM2 进程 backup-scheduler-daemon
+# 脚本：/home/user/webapp/backup_scheduler_daemon.py
+# 原因：Flask 进程因内存超限（max_memory_restart=1G）重启时，
+#       嵌入线程会随之终止，导致12小时备份窗口被错过。
+# 迁移后调度器与 Flask 完全独立，Flask 重启不影响备份计划。
+# ══════════════════════════════════════════════════════════════════════════════
+def _auto_backup_loop():
+    """
+    保留此函数以兼容历史调用，但不再在 Flask 进程内启动备份线程。
+    实际调度由独立 PM2 进程 backup-scheduler-daemon 负责。
+    """
+    print("[AutoBackup] 备份调度已迁移至独立进程 backup-scheduler-daemon，Flask内不再启动备份线程", flush=True)
+
+
+# 不再在 Flask 进程内启动备份线程
+import os as _os
+# _auto_backup_loop() 已禁用 — 由 backup-scheduler-daemon PM2 进程接管
+
+
+# ============================================================
+#  TradingView 策略模拟系统 — ETH K线数据接口
+# ============================================================
+@app.route('/api/tv-sim/klines')
+def tv_sim_klines():
+    """从 OKX 拉取 ETH-USDT-SWAP K线，供前端策略模拟使用"""
+    try:
+        import requests as _req
+        bar   = request.args.get('bar', '5m')    # 5m / 1H
+        limit = int(request.args.get('limit', 300))
+        inst  = request.args.get('inst', 'ETH-USDT-SWAP')
+        # OKX 公共接口，无需签名
+        url = f'https://www.okx.com/api/v5/market/candles?instId={inst}&bar={bar}&limit={limit}'
+        resp = _req.get(url, timeout=10)
+        data = resp.json()
+        if data.get('code') != '0':
+            return jsonify({'success': False, 'error': data.get('msg', '获取K线失败')})
+        # OKX 返回 [[ts,o,h,l,c,vol,volCcy,volCcyQuote,confirm], ...]  最新在前
+        raw = data['data']
+        # 转成 {ts,open,high,low,close,volume} 并按时间升序
+        candles = []
+        for r in reversed(raw):
+            candles.append({
+                'ts':     int(r[0]),
+                'open':   float(r[1]),
+                'high':   float(r[2]),
+                'low':    float(r[3]),
+                'close':  float(r[4]),
+                'volume': float(r[5]),
+                'turnover': float(r[7]),   # volCcyQuote = USDT成交额
+            })
+        return jsonify({'success': True, 'data': candles, 'bar': bar, 'inst': inst})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/tv-strategy')
+def tv_strategy_page():
+    return render_template('tv_strategy.html')
+
+# ============================================================
+#  TradingView 策略模拟 — 信号存储 / 读取接口
+#  数据路径: data/tv_signals/tv_signals_YYYYMMDD.jsonl
+#  保留规则: 仅保留最近 15 天
+# ============================================================
+import os as _os, json as _json
+from datetime import datetime as _dt, timedelta as _td
+
+TV_SIG_DIR = _os.path.join(_os.path.dirname(__file__), '..', 'data', 'tv_signals')
+
+def _tv_sig_cleanup():
+    """删除 15 天前的信号文件（按文件名日期，非信号内容日期）"""
+    cutoff = (_dt.now() - _td(days=15)).strftime('%Y%m%d')
+    try:
+        if not _os.path.isdir(TV_SIG_DIR):
+            return
+        for fname in _os.listdir(TV_SIG_DIR):
+            if fname.startswith('tv_signals_') and fname.endswith('.jsonl'):
+                day = fname[len('tv_signals_'):-len('.jsonl')]
+                if day < cutoff:
+                    _os.remove(_os.path.join(TV_SIG_DIR, fname))
+    except Exception:
+        pass
+
+@app.route('/api/tv-sim/save-signal', methods=['POST'])
+def tv_sim_save_signal():
+    """
+    接收前端上报的策略信号，写入**当天**日期的 JSONL 文件。
+    以 (type, ts) 为 key 去重，避免重复追加。
+    Body JSON: { signals: [{type, price, rsi, ts, bar, ...}, ...] }
+    """
+    try:
+        _os.makedirs(TV_SIG_DIR, exist_ok=True)
+        # 先清理旧文件，不会影响今天文件
+        _tv_sig_cleanup()
+
+        body = request.get_json(force=True)
+        signals = body.get('signals', [])
+        if not signals:
+            return jsonify({'success': True, 'saved': 0})
+
+        # 所有信号统一写入今天的文件（本地时间）
+        today = _dt.now().strftime('%Y%m%d')
+        fpath = _os.path.join(TV_SIG_DIR, f'tv_signals_{today}.jsonl')
+
+        # 读取已有记录，用 (type, ts) 去重
+        existing = set()
+        if _os.path.exists(fpath):
+            with open(fpath, 'r', encoding='utf-8') as f:
+                for line in f:
+                    try:
+                        rec = _json.loads(line)
+                        existing.add((rec.get('type'), rec.get('ts')))
+                    except Exception:
+                        pass
+
+        saved = 0
+        with open(fpath, 'a', encoding='utf-8') as f:
+            for sig in signals:
+                key = (sig.get('type'), sig.get('ts'))
+                if key not in existing:
+                    f.write(_json.dumps(sig, ensure_ascii=False) + '\n')
+                    existing.add(key)
+                    saved += 1
+
+        return jsonify({'success': True, 'saved': saved, 'file': f'tv_signals_{today}.jsonl'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/api/tv-sim/signals')
+def tv_sim_get_signals():
+    """
+    读取最近 N 天的信号记录。
+    参数: days=15 (默认), type=line3,line1,... (可选过滤)
+    """
+    try:
+        days  = int(request.args.get('days', 15))
+        ftype = request.args.get('type', '')   # 逗号分隔
+        types = set(ftype.split(',')) if ftype else set()
+
+        records = []
+        for i in range(days):
+            day = (_dt.now() - _td(days=i)).strftime('%Y%m%d')
+            fpath = _os.path.join(TV_SIG_DIR, f'tv_signals_{day}.jsonl')
+            if not _os.path.exists(fpath):
+                continue
+            with open(fpath, 'r', encoding='utf-8') as f:
+                for line in f:
+                    try:
+                        rec = _json.loads(line)
+                        if not types or rec.get('type') in types:
+                            records.append(rec)
+                    except Exception:
+                        pass
+
+        records.sort(key=lambda x: x.get('ts', 0), reverse=True)
+        return jsonify({'success': True, 'count': len(records), 'data': records})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 
 if __name__ == '__main__':

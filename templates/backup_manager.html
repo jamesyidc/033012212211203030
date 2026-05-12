@@ -239,13 +239,14 @@ Flask Web Server (端口9002)
                             </div>
                             <!-- 数据目录 -->
                             <div>
-                                <strong class="text-purple-700">数据目录 (~3.6GB):</strong>
+                                <strong class="text-purple-700">数据目录 (~7.8GB):</strong>
                                 <ul class="list-disc list-inside text-xs text-gray-600 ml-2 mt-1">
-                                    <li>support_resistance_daily (977MB)</li>
-                                    <li>support_resistance_jsonl (740MB)</li>
-                                    <li>anchor_daily (191MB)</li>
-                                    <li>price_speed_jsonl (173MB)</li>
-                                    <li>anchor_profit_stats (163MB)</li>
+                                    <li>coin_change_tracker (316MB)</li>
+                                    <li>price_position (208MB)</li>
+                                    <li>positive_ratio_stats (71MB)</li>
+                                    <li>abc_position (55MB)</li>
+                                    <li>sar_jsonl (33MB)</li>
+                                    <li class="text-teal-600 font-semibold">tv_signals ✅ (ETH策略信号, 15天保留)</li>
                                 </ul>
                             </div>
                             <!-- 环境变量 -->
@@ -277,14 +278,14 @@ Flask Web Server (端口9002)
                                 </p>
                             </div>
                             <div class="bg-green-50 p-3 rounded">
-                                <strong>备份内容 (3,325个文件):</strong>
+                                <strong>备份内容 (4,994个文件 / 7.8GB):</strong>
                                 <div class="grid grid-cols-2 gap-2 text-xs text-gray-600 mt-1">
-                                    <div>• Python: 401文件 (5.38MB)</div>
-                                    <div>• HTML: 289文件 (14.02MB)</div>
-                                    <div>• 配置: 290文件 (3.20MB)</div>
-                                    <div>• 数据: 931文件 (2.97GB)</div>
-                                    <div>• 日志: 38文件 (1.52MB)</div>
-                                    <div>• 其他: 1,359文件 (167.30MB)</div>
+                                    <div>• Python: 401文件</div>
+                                    <div>• HTML: 289文件</div>
+                                    <div>• 配置/JS: 290文件</div>
+                                    <div>• 数据JSONL: 4,000+文件</div>
+                                    <div>• 日志: 38文件</div>
+                                    <div class="text-teal-600 font-semibold">• tv_signals: ✅ 已包含</div>
                                 </div>
                             </div>
                         </div>
@@ -357,6 +358,9 @@ python3 auto_backup_system.py</pre>
                     </h3>
                     <p class="text-2xl font-bold" id="nextBackupTime">计算中...</p>
                     <p class="text-sm opacity-90 mt-1" id="nextBackupCountdown">-</p>
+                    <p class="text-xs opacity-75 mt-2">
+                        <i class="fas fa-shield-alt"></i> 独立PM2进程调度，Flask重启不影响备份计划
+                    </p>
                 </div>
                 <div class="text-6xl opacity-50">
                     <i class="fas fa-calendar-alt"></i>
@@ -418,6 +422,9 @@ python3 auto_backup_system.py</pre>
                         <p class="text-gray-600 text-sm">系统状态</p>
                         <p class="text-lg font-bold text-green-600">
                             <i class="fas fa-check-circle"></i> 正常运行
+                        </p>
+                        <p class="text-xs text-blue-500 mt-1">
+                            <i class="fas fa-clock"></i> 独立调度进程（backup-scheduler），不依赖Flask
                         </p>
                     </div>
                     <div class="bg-green-100 rounded-full p-3">

@@ -1306,6 +1306,46 @@
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
         }
 
+        /* 全仓-平一半多单 */
+        .batch-close-cross-long-half {
+            background: linear-gradient(135deg, #6ee7b7 0%, #34d399 100%);
+            color: #064e3b;
+            border: 2px solid rgba(52,211,153,0.6);
+        }
+        .batch-close-cross-long-half:hover {
+            box-shadow: 0 4px 12px rgba(52, 211, 153, 0.5);
+        }
+
+        /* 全仓-平一半空单 */
+        .batch-close-cross-short-half {
+            background: linear-gradient(135deg, #fda4af 0%, #fb7185 100%);
+            color: #4c0519;
+            border: 2px solid rgba(251,113,133,0.6);
+        }
+        .batch-close-cross-short-half:hover {
+            box-shadow: 0 4px 12px rgba(251, 113, 133, 0.5);
+        }
+
+        /* 全仓-平全部多单 */
+        .batch-close-cross-long-all {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            border: 2px solid rgba(5,150,105,0.8);
+        }
+        .batch-close-cross-long-all:hover {
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.6);
+        }
+
+        /* 全仓-平全部空单 */
+        .batch-close-cross-short-all {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+            border: 2px solid rgba(220,38,38,0.8);
+        }
+        .batch-close-cross-short-all:hover {
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.6);
+        }
+
 
         /* 右侧账户信息 */
         .account-panel {
@@ -3883,7 +3923,21 @@ data/
                             • 统一使用10倍杠杆、市价单<br>
                             • 空单策略：做空涨幅高的币种<br>
                             • 多单策略：做多涨幅高的币种<br>
-                            • <strong style="color: #10b981;">🔒 单笔限额：<span id="maxOrderSizeDisplay1">5</span> USDT</strong> (超出部分自动截断)<br>
+                            • <strong style="color: #10b981;">🔒 单笔保证金上限：</strong><br>
+                            <div style="display:flex; gap:5px; margin:4px 0 2px 0; flex-wrap:wrap;">
+                              <button onclick="setMaxOrderSize(1,5)"  id="mos1_5"  style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">5U</button>
+                              <button onclick="setMaxOrderSize(1,10)" id="mos1_10" style="padding:2px 8px;border-radius:4px;border:1.5px solid #10b981;background:#10b981;color:white;cursor:pointer;font-size:11px;font-weight:bold;">10U</button>
+                              <button onclick="setMaxOrderSize(1,15)" id="mos1_15" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">15U</button>
+                              <button onclick="setMaxOrderSize(1,20)" id="mos1_20" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">20U</button>
+                              <button onclick="setMaxOrderSize(1,40)" id="mos1_40" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">40U</button>
+                              <button onclick="setMaxOrderSize(1,50)" id="mos1_50" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">50U</button>
+                              <button onclick="setMaxOrderSize(1,100)" id="mos1_100" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">100U</button>
+                              <button onclick="setMaxOrderSize(1,200)" id="mos1_200" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">200U</button>
+                              <button onclick="setMaxOrderSize(1,300)" id="mos1_300" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">300U</button>
+                              <button onclick="setMaxOrderSize(1,500)" id="mos1_500" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">500U</button>
+                              <button onclick="setMaxOrderSize(1,1000)" id="mos1_1000" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">1000U</button>
+                              <span style="color:#6ee7b7;font-size:11px;line-height:22px;">当前: <span id="maxOrderSizeDisplay1">10</span>U/笔</span>
+                            </div><br>
                             • <span style="color: #fbbf24;">⚠️ 请先收藏至少6个常用币</span>
                         </div>
                     </div>
@@ -3945,7 +3999,21 @@ data/
                             • <strong style="color: #fbbf24;">多单策略：</strong>预期超跌反弹，开多单等待回升<br>
                             • <strong style="color: #fbbf24;">空单策略：</strong>预期趋势延续，做空继续下跌<br>
                             • 统一使用10倍杠杆、市价单<br>
-                            • <strong style="color: #10b981;">🔒 单笔限额：<span id="maxOrderSizeDisplay2">5</span> USDT</strong> (超出部分自动截断)<br>
+                            • <strong style="color: #10b981;">🔒 单笔保证金上限：</strong><br>
+                            <div style="display:flex; gap:5px; margin:4px 0 2px 0; flex-wrap:wrap;">
+                              <button onclick="setMaxOrderSize(2,5)"  id="mos2_5"  style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">5U</button>
+                              <button onclick="setMaxOrderSize(2,10)" id="mos2_10" style="padding:2px 8px;border-radius:4px;border:1.5px solid #10b981;background:#10b981;color:white;cursor:pointer;font-size:11px;font-weight:bold;">10U</button>
+                              <button onclick="setMaxOrderSize(2,15)" id="mos2_15" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">15U</button>
+                              <button onclick="setMaxOrderSize(2,20)" id="mos2_20" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">20U</button>
+                              <button onclick="setMaxOrderSize(2,40)" id="mos2_40" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">40U</button>
+                              <button onclick="setMaxOrderSize(2,50)" id="mos2_50" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">50U</button>
+                              <button onclick="setMaxOrderSize(2,100)" id="mos2_100" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">100U</button>
+                              <button onclick="setMaxOrderSize(2,200)" id="mos2_200" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">200U</button>
+                              <button onclick="setMaxOrderSize(2,300)" id="mos2_300" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">300U</button>
+                              <button onclick="setMaxOrderSize(2,500)" id="mos2_500" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">500U</button>
+                              <button onclick="setMaxOrderSize(2,1000)" id="mos2_1000" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">1000U</button>
+                              <span style="color:#6ee7b7;font-size:11px;line-height:22px;">当前: <span id="maxOrderSizeDisplay2">10</span>U/笔</span>
+                            </div><br>
                             • <span style="color: #fef3c7;">⚠️ 跌幅大的币种波动极高，风险极大！</span>
                         </div>
                     </div>
@@ -3967,22 +4035,22 @@ data/
                         
                         <!-- 多单策略行 -->
                         <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 8px;">
-                            <button type="button" class="batch-btn long" onclick="batchOrderTop8('long', 1.5)" data-strategy-code="TOP8_LONG_1.5PCT" style="padding: 6px;">
+                            <button type="button" class="batch-btn long" onclick=\"batchOrderTop8Lev10S3('long', 1.5)\" data-strategy-code="TOP8_LONG_1.5PCT" style="padding: 6px;">
                                 <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_LONG_1.5PCT]</span></div>
                                 <div class="batch-btn-desc" style="font-size: 10px;">前8·1.5%·10x</div>
                             </button>
                             
-                            <button type="button" class="batch-btn long" onclick="batchOrderTop8('long', 3)" data-strategy-code="TOP8_LONG_3PCT" style="padding: 6px;">
+                            <button type="button" class="batch-btn long" onclick=\"batchOrderTop8Lev10S3('long', 3)\" data-strategy-code="TOP8_LONG_3PCT" style="padding: 6px;">
                                 <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_LONG_3PCT]</span></div>
                                 <div class="batch-btn-desc" style="font-size: 10px;">前8·3%·10x</div>
                             </button>
                             
-                            <button type="button" class="batch-btn long" onclick="batchOrderTop8('long', 5)" data-strategy-code="TOP8_LONG_5PCT" style="padding: 6px;">
+                            <button type="button" class="batch-btn long" onclick=\"batchOrderTop8Lev10S3('long', 5)\" data-strategy-code="TOP8_LONG_5PCT" style="padding: 6px;">
                                 <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_LONG_5PCT]</span></div>
                                 <div class="batch-btn-desc" style="font-size: 10px;">前8·5%·10x</div>
                             </button>
                             
-                            <button type="button" class="batch-btn long" onclick="batchOrderTop8('long', 8)" data-strategy-code="TOP8_LONG_8PCT" style="padding: 6px;">
+                            <button type="button" class="batch-btn long" onclick=\"batchOrderTop8Lev10S3('long', 8)\" data-strategy-code="TOP8_LONG_8PCT" style="padding: 6px;">
                                 <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_LONG_8PCT]</span></div>
                                 <div class="batch-btn-desc" style="font-size: 10px;">前8·8%·10x</div>
                             </button>
@@ -3995,22 +4063,22 @@ data/
                         
                         <!-- 空单策略行 -->
                         <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;">
-                            <button type="button" class="batch-btn short" onclick="batchOrderTop8('short', 1.5)" data-strategy-code="TOP8_SHORT_1.5PCT" style="padding: 6px;">
+                            <button type="button" class="batch-btn short" onclick=\"batchOrderTop8Lev10S3('short', 1.5)\" data-strategy-code="TOP8_SHORT_1.5PCT" style="padding: 6px;">
                                 <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_SHORT_1.5PCT]</span></div>
                                 <div class="batch-btn-desc" style="font-size: 10px;">前8·1.5%·10x</div>
                             </button>
                             
-                            <button type="button" class="batch-btn short" onclick="batchOrderTop8('short', 3)" data-strategy-code="TOP8_SHORT_3PCT" style="padding: 6px;">
+                            <button type="button" class="batch-btn short" onclick=\"batchOrderTop8Lev10S3('short', 3)\" data-strategy-code="TOP8_SHORT_3PCT" style="padding: 6px;">
                                 <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_SHORT_3PCT]</span></div>
                                 <div class="batch-btn-desc" style="font-size: 10px;">前8·3%·10x</div>
                             </button>
                             
-                            <button type="button" class="batch-btn short" onclick="batchOrderTop8('short', 5)" data-strategy-code="TOP8_SHORT_5PCT" style="padding: 6px;">
+                            <button type="button" class="batch-btn short" onclick=\"batchOrderTop8Lev10S3('short', 5)\" data-strategy-code="TOP8_SHORT_5PCT" style="padding: 6px;">
                                 <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_SHORT_5PCT]</span></div>
                                 <div class="batch-btn-desc" style="font-size: 10px;">前8·5%·10x</div>
                             </button>
                             
-                            <button type="button" class="batch-btn short" onclick="batchOrderTop8('short', 8)" data-strategy-code="TOP8_SHORT_8PCT" style="padding: 6px;">
+                            <button type="button" class="batch-btn short" onclick=\"batchOrderTop8Lev10S3('short', 8)\" data-strategy-code="TOP8_SHORT_8PCT" style="padding: 6px;">
                                 <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_SHORT_8PCT]</span></div>
                                 <div class="batch-btn-desc" style="font-size: 10px;">前8·8%·10x</div>
                             </button>
@@ -4030,22 +4098,22 @@ data/
                         
                         <!-- 多单策略行 -->
                         <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 8px;">
-                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8('long', 1.5)" data-strategy-code="BOTTOM8_LONG_1.5PCT" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                            <button type="button" class="batch-btn long" onclick=\"batchOrderBottom8Lev10S3('long', 1.5)\" data-strategy-code="BOTTOM8_LONG_1.5PCT" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
                                 <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_LONG_1.5PCT]</span></div>
                                 <div class="batch-btn-desc" style="font-size: 10px;">后8·1.5%·10x</div>
                             </button>
                             
-                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8('long', 3)" data-strategy-code="BOTTOM8_LONG_3PCT" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                            <button type="button" class="batch-btn long" onclick=\"batchOrderBottom8Lev10S3('long', 3)\" data-strategy-code="BOTTOM8_LONG_3PCT" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
                                 <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_LONG_3PCT]</span></div>
                                 <div class="batch-btn-desc" style="font-size: 10px;">后8·3%·10x</div>
                             </button>
                             
-                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8('long', 5)" data-strategy-code="BOTTOM8_LONG_5PCT" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                            <button type="button" class="batch-btn long" onclick=\"batchOrderBottom8Lev10S3('long', 5)\" data-strategy-code="BOTTOM8_LONG_5PCT" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
                                 <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_LONG_5PCT]</span></div>
                                 <div class="batch-btn-desc" style="font-size: 10px;">后8·5%·10x</div>
                             </button>
                             
-                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8('long', 8)" data-strategy-code="BOTTOM8_LONG_8PCT" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                            <button type="button" class="batch-btn long" onclick=\"batchOrderBottom8Lev10S3('long', 8)\" data-strategy-code="BOTTOM8_LONG_8PCT" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
                                 <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_LONG_8PCT]</span></div>
                                 <div class="batch-btn-desc" style="font-size: 10px;">后8·8%·10x</div>
                             </button>
@@ -4058,22 +4126,22 @@ data/
                         
                         <!-- 空单策略行 -->
                         <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;">
-                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8('short', 1.5)" data-strategy-code="BOTTOM8_SHORT_1.5PCT" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                            <button type="button" class="batch-btn short" onclick=\"batchOrderBottom8Lev10S3('short', 1.5)\" data-strategy-code="BOTTOM8_SHORT_1.5PCT" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
                                 <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_SHORT_1.5PCT]</span></div>
                                 <div class="batch-btn-desc" style="font-size: 10px;">后8·1.5%·10x</div>
                             </button>
                             
-                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8('short', 3)" data-strategy-code="BOTTOM8_SHORT_3PCT" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                            <button type="button" class="batch-btn short" onclick=\"batchOrderBottom8Lev10S3('short', 3)\" data-strategy-code="BOTTOM8_SHORT_3PCT" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
                                 <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_SHORT_3PCT]</span></div>
                                 <div class="batch-btn-desc" style="font-size: 10px;">后8·3%·10x</div>
                             </button>
                             
-                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8('short', 5)" data-strategy-code="BOTTOM8_SHORT_5PCT" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                            <button type="button" class="batch-btn short" onclick=\"batchOrderBottom8Lev10S3('short', 5)\" data-strategy-code="BOTTOM8_SHORT_5PCT" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
                                 <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_SHORT_5PCT]</span></div>
                                 <div class="batch-btn-desc" style="font-size: 10px;">后8·5%·10x</div>
                             </button>
                             
-                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8('short', 8)" data-strategy-code="BOTTOM8_SHORT_8PCT" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                            <button type="button" class="batch-btn short" onclick=\"batchOrderBottom8Lev10S3('short', 8)\" data-strategy-code="BOTTOM8_SHORT_8PCT" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
                                 <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_SHORT_8PCT]</span></div>
                                 <div class="batch-btn-desc" style="font-size: 10px;">后8·8%·10x</div>
                             </button>
@@ -4092,7 +4160,831 @@ data/
                             • 每个币种平均分配开仓金额，统一使用10倍杠杆<br>
                             • <strong>涨幅前8：</strong>针对表现最强的币种<br>
                             • <strong>涨幅后8：</strong>针对跌幅最大的币种（高风险）<br>
-                            • <strong style="color: #10b981;">🔒 单笔限额：<span id="maxOrderSizeDisplay3">5</span> USDT</strong> (超出部分自动截断)<br>
+                            • <strong style="color: #10b981;">🔒 单笔保证金上限：</strong><br>
+                            <div style="display:flex; gap:5px; margin:4px 0 2px 0; flex-wrap:wrap;">
+                              <button onclick="setMaxOrderSize(3,5)"  id="mos3_5"  style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">5U</button>
+                              <button onclick="setMaxOrderSize(3,10)" id="mos3_10" style="padding:2px 8px;border-radius:4px;border:1.5px solid #10b981;background:#10b981;color:white;cursor:pointer;font-size:11px;font-weight:bold;">10U</button>
+                              <button onclick="setMaxOrderSize(3,15)" id="mos3_15" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">15U</button>
+                              <button onclick="setMaxOrderSize(3,20)" id="mos3_20" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">20U</button>
+                              <button onclick="setMaxOrderSize(3,40)" id="mos3_40" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">40U</button>
+                              <button onclick="setMaxOrderSize(3,50)" id="mos3_50" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">50U</button>
+                              <button onclick="setMaxOrderSize(3,100)" id="mos3_100" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">100U</button>
+                              <button onclick="setMaxOrderSize(3,200)" id="mos3_200" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">200U</button>
+                              <button onclick="setMaxOrderSize(3,300)" id="mos3_300" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">300U</button>
+                              <button onclick="setMaxOrderSize(3,500)" id="mos3_500" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">500U</button>
+                              <button onclick="setMaxOrderSize(3,1000)" id="mos3_1000" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">1000U</button>
+                              <span style="color:#6ee7b7;font-size:11px;line-height:22px;">当前: <span id="maxOrderSizeDisplay3">10</span>U/笔</span>
+                            </div><br>
+                            • <span style="color: #fbbf24;">⚠️ 请先收藏至少8个常用币</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 批量开仓功能区 - 涨幅前8/后8名策略 (20倍杠杆) -->
+                <div class="batch-trading-section" style="margin-top: 20px; padding: 16px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); border-radius: 12px; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4); max-width: 1450px;">
+                    <h3 style="color: white; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-size: 16px;">
+                        <span style="font-size: 18px;">🚀</span>
+                        涨幅前8/后8名策略 (20倍杠杆)
+                        <span style="background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-left: 6px;">高杠杆</span>
+                        <span style="background: rgba(167,139,250,0.4); padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-left: 4px; border: 1px solid rgba(196,181,253,0.6); color: #e9d5ff;">🔒 逐仓 ISOLATED</span>
+                    </h3>
+                    
+                    <!-- 涨幅前8名策略区域 -->
+                    <div style="margin-bottom: 16px; padding: 12px; background: rgba(102,126,234,0.2); border-radius: 8px; border: 2px solid rgba(102,126,234,0.4);">
+                        <h4 style="color: white; font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                            ⚡ 涨幅前8名策略
+                        </h4>
+                        
+                        <!-- 多单策略行 -->
+                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 8px;">
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev20('long', 1.5)" data-strategy-code="TOP8_LONG_1.5PCT_20X" style="padding: 6px;">
+                                <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_LONG_1.5PCT_20X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">前8·1.5%·20x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev20('long', 3)" data-strategy-code="TOP8_LONG_3PCT_20X" style="padding: 6px;">
+                                <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_LONG_3PCT_20X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">前8·3%·20x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev20('long', 5)" data-strategy-code="TOP8_LONG_5PCT_20X" style="padding: 6px;">
+                                <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_LONG_5PCT_20X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">前8·5%·20x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev20('long', 8)" data-strategy-code="TOP8_LONG_8PCT_20X" style="padding: 6px;">
+                                <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_LONG_8PCT_20X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">前8·8%·20x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn long" onclick="executeBalStrategy('top8', 'long', 20)" data-strategy-code="TOP8_LONG_BAL1PCT_20X" style="padding: 6px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">💰 多单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_LONG_BAL1PCT_20X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">前8·余额1%</div>
+                            </button>
+                        </div>
+                        
+                        <!-- 空单策略行 -->
+                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;">
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev20('short', 1.5)" data-strategy-code="TOP8_SHORT_1.5PCT_20X" style="padding: 6px;">
+                                <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_SHORT_1.5PCT_20X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">前8·1.5%·20x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev20('short', 3)" data-strategy-code="TOP8_SHORT_3PCT_20X" style="padding: 6px;">
+                                <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_SHORT_3PCT_20X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">前8·3%·20x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev20('short', 5)" data-strategy-code="TOP8_SHORT_5PCT_20X" style="padding: 6px;">
+                                <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_SHORT_5PCT_20X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">前8·5%·20x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev20('short', 8)" data-strategy-code="TOP8_SHORT_8PCT_20X" style="padding: 6px;">
+                                <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_SHORT_8PCT_20X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">前8·8%·20x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn short" onclick="executeBalStrategy('top8', 'short', 20)" data-strategy-code="TOP8_SHORT_BAL1PCT_20X" style="padding: 6px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">💰 空单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_SHORT_BAL1PCT_20X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">前8·余额1%</div>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 涨幅后8名策略区域 -->
+                    <div style="padding: 12px; background: rgba(220,38,38,0.2); border-radius: 8px; border: 2px solid rgba(220,38,38,0.4);">
+                        <h4 style="color: white; font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                            ⚠️ 涨幅后8名策略 <span style="color: #fbbf24; font-size: 11px; margin-left: auto;">(超高风险)</span>
+                        </h4>
+                        
+                        <!-- 多单策略行 -->
+                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 8px;">
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev20('long', 1.5)" data-strategy-code="BOTTOM8_LONG_1.5PCT_20X" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_LONG_1.5PCT_20X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">后8·1.5%·20x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev20('long', 3)" data-strategy-code="BOTTOM8_LONG_3PCT_20X" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_LONG_3PCT_20X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">后8·3%·20x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev20('long', 5)" data-strategy-code="BOTTOM8_LONG_5PCT_20X" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_LONG_5PCT_20X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">后8·5%·20x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev20('long', 8)" data-strategy-code="BOTTOM8_LONG_8PCT_20X" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_LONG_8PCT_20X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">后8·8%·20x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn long" onclick="executeBalStrategy('bottom8', 'long', 20)" data-strategy-code="BOTTOM8_LONG_BAL1PCT_20X" style="padding: 6px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">💰 多单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_LONG_BAL1PCT_20X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">后8·余额1%</div>
+                            </button>
+                        </div>
+                        
+                        <!-- 空单策略行 -->
+                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;">
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev20('short', 1.5)" data-strategy-code="BOTTOM8_SHORT_1.5PCT_20X" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_SHORT_1.5PCT_20X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">后8·1.5%·20x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev20('short', 3)" data-strategy-code="BOTTOM8_SHORT_3PCT_20X" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_SHORT_3PCT_20X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">后8·3%·20x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev20('short', 5)" data-strategy-code="BOTTOM8_SHORT_5PCT_20X" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_SHORT_5PCT_20X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">后8·5%·20x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev20('short', 8)" data-strategy-code="BOTTOM8_SHORT_8PCT_20X" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_SHORT_8PCT_20X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">后8·8%·20x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn short" onclick="executeBalStrategy('bottom8', 'short', 20)" data-strategy-code="BOTTOM8_SHORT_BAL1PCT_20X" style="padding: 6px; background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">💰 空单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_SHORT_BAL1PCT_20X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">后8·余额1%</div>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 12px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 6px; color: white; font-size: 12px;">
+                        <div style="margin-bottom: 4px;">💡 <strong>策略说明：</strong></div>
+                        <div style="padding-left: 20px;">
+                            • 从⭐<strong>常用币</strong>中选择<strong>涨幅前8名</strong>或<strong>涨幅后8名</strong><br>
+                            • 每个币种平均分配开仓金额，统一使用<strong style="color: #a78bfa;">20倍杠杆 · 逐仓(Isolated)模式</strong><br>
+                            • <strong>逐仓模式：</strong>每个持仓独立占用保证金，强平不影响其他仓位<br>
+                            • <strong>涨幅前8：</strong>针对表现最强的币种<br>
+                            • <strong>涨幅后8：</strong>针对跌幅最大的币种（<strong style="color: #fbbf24;">超高风险</strong>）<br>
+                            • <strong style="color: #10b981;">🔒 单笔保证金上限：</strong><br>
+                            <div style="display:flex; gap:5px; margin:4px 0 2px 0; flex-wrap:wrap;">
+                              <button onclick="setMaxOrderSize(4,5)"  id="mos4_5"  style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">5U</button>
+                              <button onclick="setMaxOrderSize(4,10)" id="mos4_10" style="padding:2px 8px;border-radius:4px;border:1.5px solid #10b981;background:#10b981;color:white;cursor:pointer;font-size:11px;font-weight:bold;">10U</button>
+                              <button onclick="setMaxOrderSize(4,15)" id="mos4_15" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">15U</button>
+                              <button onclick="setMaxOrderSize(4,20)" id="mos4_20" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">20U</button>
+                              <button onclick="setMaxOrderSize(4,40)" id="mos4_40" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">40U</button>
+                              <button onclick="setMaxOrderSize(4,50)" id="mos4_50" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">50U</button>
+                              <button onclick="setMaxOrderSize(4,100)" id="mos4_100" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">100U</button>
+                              <button onclick="setMaxOrderSize(4,200)" id="mos4_200" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">200U</button>
+                              <button onclick="setMaxOrderSize(4,300)" id="mos4_300" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">300U</button>
+                              <button onclick="setMaxOrderSize(4,500)" id="mos4_500" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">500U</button>
+                              <button onclick="setMaxOrderSize(4,1000)" id="mos4_1000" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">1000U</button>
+                              <span style="color:#6ee7b7;font-size:11px;line-height:22px;">当前: <span id="maxOrderSizeDisplay4">10</span>U/笔</span>
+                            </div><br>
+                            • <span style="color: #fbbf24;">⚠️ 请先收藏至少8个常用币</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 批量开仓功能区 - 涨幅前8/后8名策略 (30倍杠杆) -->
+                <div class="batch-trading-section" style="margin-top: 20px; padding: 16px; background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); border-radius: 12px; box-shadow: 0 4px 12px rgba(236, 72, 153, 0.4); max-width: 1450px;">
+                    <h3 style="color: white; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-size: 16px;">
+                        <span style="font-size: 18px;">⚡</span>
+                        涨幅前8/后8名策略 (30倍杠杆)
+                        <span style="background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-left: 6px;">极高杠杆</span>
+                        <span style="background: rgba(249,168,212,0.3); padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-left: 4px; border: 1px solid rgba(249,168,212,0.6); color: #fce7f3;">🔒 逐仓 ISOLATED</span>
+                    </h3>
+                    
+                    <!-- 涨幅前8名策略区域 -->
+                    <div style="margin-bottom: 16px; padding: 12px; background: rgba(102,126,234,0.2); border-radius: 8px; border: 2px solid rgba(102,126,234,0.4);">
+                        <h4 style="color: white; font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                            ⚡ 涨幅前8名策略
+                        </h4>
+                        
+                        <!-- 多单策略行 -->
+                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 8px;">
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev30('long', 1.5)" data-strategy-code="TOP8_LONG_1.5PCT_30X" style="padding: 6px;">
+                                <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_LONG_1.5PCT_30X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">前8·1.5%·30x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev30('long', 3)" data-strategy-code="TOP8_LONG_3PCT_30X" style="padding: 6px;">
+                                <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_LONG_3PCT_30X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">前8·3%·30x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev30('long', 5)" data-strategy-code="TOP8_LONG_5PCT_30X" style="padding: 6px;">
+                                <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_LONG_5PCT_30X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">前8·5%·30x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev30('long', 8)" data-strategy-code="TOP8_LONG_8PCT_30X" style="padding: 6px;">
+                                <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_LONG_8PCT_30X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">前8·8%·30x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn long" onclick="executeBalStrategy('top8', 'long', 30)" data-strategy-code="TOP8_LONG_BAL1PCT_30X" style="padding: 6px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">💰 多单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_LONG_BAL1PCT_30X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">前8·余额1%</div>
+                            </button>
+                        </div>
+                        
+                        <!-- 空单策略行 -->
+                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;">
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev30('short', 1.5)" data-strategy-code="TOP8_SHORT_1.5PCT_30X" style="padding: 6px;">
+                                <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_SHORT_1.5PCT_30X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">前8·1.5%·30x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev30('short', 3)" data-strategy-code="TOP8_SHORT_3PCT_30X" style="padding: 6px;">
+                                <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_SHORT_3PCT_30X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">前8·3%·30x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev30('short', 5)" data-strategy-code="TOP8_SHORT_5PCT_30X" style="padding: 6px;">
+                                <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_SHORT_5PCT_30X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">前8·5%·30x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev30('short', 8)" data-strategy-code="TOP8_SHORT_8PCT_30X" style="padding: 6px;">
+                                <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_SHORT_8PCT_30X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">前8·8%·30x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn short" onclick="executeBalStrategy('top8', 'short', 30)" data-strategy-code="TOP8_SHORT_BAL1PCT_30X" style="padding: 6px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">💰 空单 <span style="font-size: 9px; opacity: 0.7;">[TOP8_SHORT_BAL1PCT_30X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">前8·余额1%</div>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 涨幅后8名策略区域 -->
+                    <div style="padding: 12px; background: rgba(220,38,38,0.2); border-radius: 8px; border: 2px solid rgba(220,38,38,0.4);">
+                        <h4 style="color: white; font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                            ⚠️ 涨幅后8名策略 <span style="color: #fbbf24; font-size: 11px; margin-left: auto;">(极端风险)</span>
+                        </h4>
+                        
+                        <!-- 多单策略行 -->
+                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 8px;">
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev30('long', 1.5)" data-strategy-code="BOTTOM8_LONG_1.5PCT_30X" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_LONG_1.5PCT_30X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">后8·1.5%·30x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev30('long', 3)" data-strategy-code="BOTTOM8_LONG_3PCT_30X" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_LONG_3PCT_30X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">后8·3%·30x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev30('long', 5)" data-strategy-code="BOTTOM8_LONG_5PCT_30X" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_LONG_5PCT_30X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">后8·5%·30x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev30('long', 8)" data-strategy-code="BOTTOM8_LONG_8PCT_30X" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">📈 多单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_LONG_8PCT_30X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">后8·8%·30x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn long" onclick="executeBalStrategy('bottom8', 'long', 30)" data-strategy-code="BOTTOM8_LONG_BAL1PCT_30X" style="padding: 6px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">💰 多单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_LONG_BAL1PCT_30X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">后8·余额1%</div>
+                            </button>
+                        </div>
+                        
+                        <!-- 空单策略行 -->
+                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;">
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev30('short', 1.5)" data-strategy-code="BOTTOM8_SHORT_1.5PCT_30X" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_SHORT_1.5PCT_30X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">后8·1.5%·30x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev30('short', 3)" data-strategy-code="BOTTOM8_SHORT_3PCT_30X" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_SHORT_3PCT_30X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">后8·3%·30x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev30('short', 5)" data-strategy-code="BOTTOM8_SHORT_5PCT_30X" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_SHORT_5PCT_30X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">后8·5%·30x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev30('short', 8)" data-strategy-code="BOTTOM8_SHORT_8PCT_30X" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">📉 空单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_SHORT_8PCT_30X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">后8·8%·30x</div>
+                            </button>
+                            
+                            <button type="button" class="batch-btn short" onclick="executeBalStrategy('bottom8', 'short', 30)" data-strategy-code="BOTTOM8_SHORT_BAL1PCT_30X" style="padding: 6px; background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);">
+                                <div class="batch-btn-title" style="font-size: 12px;">💰 空单 <span style="font-size: 9px; opacity: 0.7;">[BOTTOM8_SHORT_BAL1PCT_30X]</span></div>
+                                <div class="batch-btn-desc" style="font-size: 10px;">后8·余额1%</div>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 12px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 6px; color: white; font-size: 12px;">
+                        <div style="margin-bottom: 4px;">💡 <strong>策略说明：</strong></div>
+                        <div style="padding-left: 20px;">
+                            • 从⭐<strong>常用币</strong>中选择<strong>涨幅前8名</strong>或<strong>涨幅后8名</strong><br>
+                            • 每个币种平均分配开仓金额，统一使用<strong style="color: #f9a8d4;">30倍杠杆 · 逐仓(Isolated)模式</strong><br>
+                            • <strong>逐仓模式：</strong>每个持仓独立占用保证金，强平不影响其他仓位<br>
+                            • <strong>涨幅前8：</strong>针对表现最强的币种<br>
+                            • <strong>涨幅后8：</strong>针对跌幅最大的币种（<strong style="color: #fbbf24;">极端风险</strong>）<br>
+                            • <strong style="color: #10b981;">🔒 单笔保证金上限：</strong><br>
+                            <div style="display:flex; gap:5px; margin:4px 0 2px 0; flex-wrap:wrap;">
+                              <button onclick="setMaxOrderSize(5,5)"  id="mos5_5"  style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">5U</button>
+                              <button onclick="setMaxOrderSize(5,10)" id="mos5_10" style="padding:2px 8px;border-radius:4px;border:1.5px solid #10b981;background:#10b981;color:white;cursor:pointer;font-size:11px;font-weight:bold;">10U</button>
+                              <button onclick="setMaxOrderSize(5,15)" id="mos5_15" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">15U</button>
+                              <button onclick="setMaxOrderSize(5,20)" id="mos5_20" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">20U</button>
+                              <button onclick="setMaxOrderSize(5,40)" id="mos5_40" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">40U</button>
+                              <button onclick="setMaxOrderSize(5,50)" id="mos5_50" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">50U</button>
+                              <button onclick="setMaxOrderSize(5,100)" id="mos5_100" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">100U</button>
+                              <button onclick="setMaxOrderSize(5,200)" id="mos5_200" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">200U</button>
+                              <button onclick="setMaxOrderSize(5,300)" id="mos5_300" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">300U</button>
+                              <button onclick="setMaxOrderSize(5,500)" id="mos5_500" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">500U</button>
+                              <button onclick="setMaxOrderSize(5,1000)" id="mos5_1000" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">1000U</button>
+                              <span style="color:#6ee7b7;font-size:11px;line-height:22px;">当前: <span id="maxOrderSizeDisplay5">10</span>U/笔</span>
+                            </div><br>
+                            • <span style="color: #fbbf24;">⚠️ 请先收藏至少8个常用币</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 批量开仓功能区 - 涨幅前8/后8名策略 (20倍杠杆 全仓模式) -->
+                <div class="batch-trading-section" style="margin-top: 20px; padding: 16px; background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 50%, #7c3aed 100%); border-radius: 12px; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.45); max-width: 1450px; border: 2px solid rgba(125,211,252,0.4);">
+                    <h3 style="color: white; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-size: 16px;">
+                        <span style="font-size: 18px;">🌊</span>
+                        涨幅前8/后8名策略 (20倍杠杆 · 全仓模式)
+                        <span style="background: rgba(255,255,255,0.25); padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-left: 6px; border: 1px solid rgba(255,255,255,0.4);">全仓 CROSS</span>
+                        <span style="background: rgba(255,200,0,0.25); padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-left: 4px; color:#fde68a; border: 1px solid rgba(253,230,138,0.4);">⚠️ 高杠杆</span>
+                    </h3>
+
+                    <!-- 全仓模式说明 -->
+                    <div style="margin-bottom: 12px; padding: 8px 12px; background: rgba(255,255,255,0.12); border-radius: 8px; border-left: 4px solid #7dd3fc; color: white; font-size: 12px;">
+                        🌊 <strong>全仓模式(Cross Margin)：</strong>所有全仓持仓共用账户余额作为保证金，盈亏互抵，强平风险相对分散，但亏损会影响整个账户。
+                    </div>
+
+                    <!-- 涨幅前8名策略区域 -->
+                    <div style="margin-bottom: 16px; padding: 12px; background: rgba(125,211,252,0.15); border-radius: 8px; border: 2px solid rgba(125,211,252,0.35);">
+                        <div style="color: white; font-size: 13px; font-weight: bold; margin-bottom: 8px;">📈 涨幅前8名 (20x 全仓)</div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px;">
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev20Cross('long', 1.5)" data-strategy-code="TOP8_LONG_1.5PCT_20X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📈 做多 1.5% <span style="font-size: 9px; opacity:0.7;">[20X全仓]</span></div>
+                                <div class="batch-btn-desc">余额1.5% · 20x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev20Cross('long', 3)" data-strategy-code="TOP8_LONG_3PCT_20X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📈 做多 3% <span style="font-size: 9px; opacity:0.7;">[20X全仓]</span></div>
+                                <div class="batch-btn-desc">余额3% · 20x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev20Cross('long', 5)" data-strategy-code="TOP8_LONG_5PCT_20X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📈 做多 5% <span style="font-size: 9px; opacity:0.7;">[20X全仓]</span></div>
+                                <div class="batch-btn-desc">余额5% · 20x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev20Cross('long', 8)" data-strategy-code="TOP8_LONG_8PCT_20X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📈 做多 8% <span style="font-size: 9px; opacity:0.7;">[20X全仓]</span></div>
+                                <div class="batch-btn-desc">余额8% · 20x全仓</div>
+                            </button>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev20Cross('short', 1.5)" data-strategy-code="TOP8_SHORT_1.5PCT_20X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📉 做空 1.5% <span style="font-size: 9px; opacity:0.7;">[20X全仓]</span></div>
+                                <div class="batch-btn-desc">余额1.5% · 20x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev20Cross('short', 3)" data-strategy-code="TOP8_SHORT_3PCT_20X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📉 做空 3% <span style="font-size: 9px; opacity:0.7;">[20X全仓]</span></div>
+                                <div class="batch-btn-desc">余额3% · 20x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev20Cross('short', 5)" data-strategy-code="TOP8_SHORT_5PCT_20X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📉 做空 5% <span style="font-size: 9px; opacity:0.7;">[20X全仓]</span></div>
+                                <div class="batch-btn-desc">余额5% · 20x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev20Cross('short', 8)" data-strategy-code="TOP8_SHORT_8PCT_20X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📉 做空 8% <span style="font-size: 9px; opacity:0.7;">[20X全仓]</span></div>
+                                <div class="batch-btn-desc">余额8% · 20x全仓</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 涨幅后8名策略区域 -->
+                    <div style="margin-bottom: 12px; padding: 12px; background: rgba(251,146,60,0.15); border-radius: 8px; border: 2px solid rgba(251,146,60,0.35);">
+                        <div style="color: #fed7aa; font-size: 13px; font-weight: bold; margin-bottom: 8px;">📉 涨幅后8名 (20x 全仓) <span style="color: #fbbf24;">⚠️ 超高风险</span></div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px;">
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev20Cross('long', 1.5)" data-strategy-code="BOTTOM8_LONG_1.5PCT_20X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title">📈 做多 1.5% <span style="font-size: 9px; opacity:0.7;">[20X全仓]</span></div>
+                                <div class="batch-btn-desc">余额1.5% · 20x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev20Cross('long', 3)" data-strategy-code="BOTTOM8_LONG_3PCT_20X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title">📈 做多 3% <span style="font-size: 9px; opacity:0.7;">[20X全仓]</span></div>
+                                <div class="batch-btn-desc">余额3% · 20x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev20Cross('long', 5)" data-strategy-code="BOTTOM8_LONG_5PCT_20X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title">📈 做多 5% <span style="font-size: 9px; opacity:0.7;">[20X全仓]</span></div>
+                                <div class="batch-btn-desc">余额5% · 20x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev20Cross('long', 8)" data-strategy-code="BOTTOM8_LONG_8PCT_20X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title">📈 做多 8% <span style="font-size: 9px; opacity:0.7;">[20X全仓]</span></div>
+                                <div class="batch-btn-desc">余额8% · 20x全仓</div>
+                            </button>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev20Cross('short', 1.5)" data-strategy-code="BOTTOM8_SHORT_1.5PCT_20X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title">📉 做空 1.5% <span style="font-size: 9px; opacity:0.7;">[20X全仓]</span></div>
+                                <div class="batch-btn-desc">余额1.5% · 20x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev20Cross('short', 3)" data-strategy-code="BOTTOM8_SHORT_3PCT_20X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title">📉 做空 3% <span style="font-size: 9px; opacity:0.7;">[20X全仓]</span></div>
+                                <div class="batch-btn-desc">余额3% · 20x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev20Cross('short', 5)" data-strategy-code="BOTTOM8_SHORT_5PCT_20X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title">📉 做空 5% <span style="font-size: 9px; opacity:0.7;">[20X全仓]</span></div>
+                                <div class="batch-btn-desc">余额5% · 20x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev20Cross('short', 8)" data-strategy-code="BOTTOM8_SHORT_8PCT_20X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title">📉 做空 8% <span style="font-size: 9px; opacity:0.7;">[20X全仓]</span></div>
+                                <div class="batch-btn-desc">余额8% · 20x全仓</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 12px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 6px; color: white; font-size: 12px;">
+                        <div style="margin-bottom: 4px;">💡 <strong>策略说明：</strong></div>
+                        <div style="padding-left: 20px;">
+                            • 从⭐<strong>常用币</strong>中选择<strong>涨幅前8名</strong>或<strong>涨幅后8名</strong><br>
+                            • 每个币种平均分配开仓金额，统一使用<strong style="color: #7dd3fc;">20倍杠杆 · 全仓(Cross)模式</strong><br>
+                            • <strong>全仓模式：</strong>共用账户余额做保证金，与逐仓独立保证金不同<br>
+                            • <strong style="color: #10b981;">🔒 单笔保证金上限：</strong><br>
+                            <div style="display:flex; gap:5px; margin:4px 0 2px 0; flex-wrap:wrap;">
+                              <button onclick="setMaxOrderSize(6,5)"  id="mos6_5"  style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">5U</button>
+                              <button onclick="setMaxOrderSize(6,10)" id="mos6_10" style="padding:2px 8px;border-radius:4px;border:1.5px solid #10b981;background:#10b981;color:white;cursor:pointer;font-size:11px;font-weight:bold;">10U</button>
+                              <button onclick="setMaxOrderSize(6,15)" id="mos6_15" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">15U</button>
+                              <button onclick="setMaxOrderSize(6,20)" id="mos6_20" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">20U</button>
+                              <button onclick="setMaxOrderSize(6,40)" id="mos6_40" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">40U</button>
+                              <button onclick="setMaxOrderSize(6,50)" id="mos6_50" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">50U</button>
+                              <button onclick="setMaxOrderSize(6,100)" id="mos6_100" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">100U</button>
+                              <button onclick="setMaxOrderSize(6,200)" id="mos6_200" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">200U</button>
+                              <button onclick="setMaxOrderSize(6,300)" id="mos6_300" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">300U</button>
+                              <button onclick="setMaxOrderSize(6,500)" id="mos6_500" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">500U</button>
+                              <button onclick="setMaxOrderSize(6,1000)" id="mos6_1000" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">1000U</button>
+                              <span style="color:#6ee7b7;font-size:11px;line-height:22px;">当前: <span id="maxOrderSizeDisplay6">10</span>U/笔</span>
+                            </div><br>
+                            • <span style="color: #fbbf24;">⚠️ 请先收藏至少8个常用币</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 批量开仓功能区 - 涨幅前8/后8名策略 (30倍杠杆 全仓模式) -->
+                <div class="batch-trading-section" style="margin-top: 20px; padding: 16px; background: linear-gradient(135deg, #be123c 0%, #9f1239 50%, #4c0519 100%); border-radius: 12px; box-shadow: 0 4px 12px rgba(190, 18, 60, 0.5); max-width: 1450px; border: 2px solid rgba(251,113,133,0.4);">
+                    <h3 style="color: white; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-size: 16px;">
+                        <span style="font-size: 18px;">💥</span>
+                        涨幅前8/后8名策略 (30倍杠杆 · 全仓模式)
+                        <span style="background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-left: 6px; border: 1px solid rgba(255,255,255,0.35);">全仓 CROSS</span>
+                        <span style="background: rgba(255,50,50,0.3); padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-left: 4px; color:#fca5a5; border: 1px solid rgba(252,165,165,0.4);">⚠️⚠️ 极端风险</span>
+                    </h3>
+
+                    <!-- 全仓模式说明 -->
+                    <div style="margin-bottom: 12px; padding: 8px 12px; background: rgba(255,255,255,0.1); border-radius: 8px; border-left: 4px solid #fb7185; color: white; font-size: 12px;">
+                        💥 <strong>全仓模式(Cross Margin)：</strong>30倍全仓为极高风险策略，轻微波动即可触发强平，强烈建议严格设置止损并控制仓位。
+                    </div>
+
+                    <!-- 涨幅前8名策略区域 -->
+                    <div style="margin-bottom: 16px; padding: 12px; background: rgba(251,113,133,0.15); border-radius: 8px; border: 2px solid rgba(251,113,133,0.35);">
+                        <div style="color: white; font-size: 13px; font-weight: bold; margin-bottom: 8px;">📈 涨幅前8名 (30x 全仓)</div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px;">
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev30Cross('long', 1.5)" data-strategy-code="TOP8_LONG_1.5PCT_30X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📈 做多 1.5% <span style="font-size: 9px; opacity:0.7;">[30X全仓]</span></div>
+                                <div class="batch-btn-desc">余额1.5% · 30x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev30Cross('long', 3)" data-strategy-code="TOP8_LONG_3PCT_30X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📈 做多 3% <span style="font-size: 9px; opacity:0.7;">[30X全仓]</span></div>
+                                <div class="batch-btn-desc">余额3% · 30x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev30Cross('long', 5)" data-strategy-code="TOP8_LONG_5PCT_30X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📈 做多 5% <span style="font-size: 9px; opacity:0.7;">[30X全仓]</span></div>
+                                <div class="batch-btn-desc">余额5% · 30x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev30Cross('long', 8)" data-strategy-code="TOP8_LONG_8PCT_30X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📈 做多 8% <span style="font-size: 9px; opacity:0.7;">[30X全仓]</span></div>
+                                <div class="batch-btn-desc">余额8% · 30x全仓</div>
+                            </button>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev30Cross('short', 1.5)" data-strategy-code="TOP8_SHORT_1.5PCT_30X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📉 做空 1.5% <span style="font-size: 9px; opacity:0.7;">[30X全仓]</span></div>
+                                <div class="batch-btn-desc">余额1.5% · 30x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev30Cross('short', 3)" data-strategy-code="TOP8_SHORT_3PCT_30X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📉 做空 3% <span style="font-size: 9px; opacity:0.7;">[30X全仓]</span></div>
+                                <div class="batch-btn-desc">余额3% · 30x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev30Cross('short', 5)" data-strategy-code="TOP8_SHORT_5PCT_30X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📉 做空 5% <span style="font-size: 9px; opacity:0.7;">[30X全仓]</span></div>
+                                <div class="batch-btn-desc">余额5% · 30x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev30Cross('short', 8)" data-strategy-code="TOP8_SHORT_8PCT_30X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📉 做空 8% <span style="font-size: 9px; opacity:0.7;">[30X全仓]</span></div>
+                                <div class="batch-btn-desc">余额8% · 30x全仓</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 涨幅后8名策略区域 -->
+                    <div style="margin-bottom: 12px; padding: 12px; background: rgba(251,146,60,0.15); border-radius: 8px; border: 2px solid rgba(251,146,60,0.35);">
+                        <div style="color: #fed7aa; font-size: 13px; font-weight: bold; margin-bottom: 8px;">📉 涨幅后8名 (30x 全仓) <span style="color: #fbbf24;">⚠️⚠️ 极端风险</span></div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px;">
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev30Cross('long', 1.5)" data-strategy-code="BOTTOM8_LONG_1.5PCT_30X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title">📈 做多 1.5% <span style="font-size: 9px; opacity:0.7;">[30X全仓]</span></div>
+                                <div class="batch-btn-desc">余额1.5% · 30x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev30Cross('long', 3)" data-strategy-code="BOTTOM8_LONG_3PCT_30X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title">📈 做多 3% <span style="font-size: 9px; opacity:0.7;">[30X全仓]</span></div>
+                                <div class="batch-btn-desc">余额3% · 30x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev30Cross('long', 5)" data-strategy-code="BOTTOM8_LONG_5PCT_30X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title">📈 做多 5% <span style="font-size: 9px; opacity:0.7;">[30X全仓]</span></div>
+                                <div class="batch-btn-desc">余额5% · 30x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev30Cross('long', 8)" data-strategy-code="BOTTOM8_LONG_8PCT_30X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title">📈 做多 8% <span style="font-size: 9px; opacity:0.7;">[30X全仓]</span></div>
+                                <div class="batch-btn-desc">余额8% · 30x全仓</div>
+                            </button>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev30Cross('short', 1.5)" data-strategy-code="BOTTOM8_SHORT_1.5PCT_30X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title">📉 做空 1.5% <span style="font-size: 9px; opacity:0.7;">[30X全仓]</span></div>
+                                <div class="batch-btn-desc">余额1.5% · 30x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev30Cross('short', 3)" data-strategy-code="BOTTOM8_SHORT_3PCT_30X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title">📉 做空 3% <span style="font-size: 9px; opacity:0.7;">[30X全仓]</span></div>
+                                <div class="batch-btn-desc">余额3% · 30x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev30Cross('short', 5)" data-strategy-code="BOTTOM8_SHORT_5PCT_30X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title">📉 做空 5% <span style="font-size: 9px; opacity:0.7;">[30X全仓]</span></div>
+                                <div class="batch-btn-desc">余额5% · 30x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev30Cross('short', 8)" data-strategy-code="BOTTOM8_SHORT_8PCT_30X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title">📉 做空 8% <span style="font-size: 9px; opacity:0.7;">[30X全仓]</span></div>
+                                <div class="batch-btn-desc">余额8% · 30x全仓</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 12px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 6px; color: white; font-size: 12px;">
+                        <div style="margin-bottom: 4px;">💡 <strong>策略说明：</strong></div>
+                        <div style="padding-left: 20px;">
+                            • 从⭐<strong>常用币</strong>中选择<strong>涨幅前8名</strong>或<strong>涨幅后8名</strong><br>
+                            • 每个币种平均分配开仓金额，统一使用<strong style="color: #fca5a5;">30倍杠杆 · 全仓(Cross)模式</strong><br>
+                            • <strong>全仓模式：</strong>共用账户余额做保证金，风险传导至整个账户<br>
+                            • <strong style="color: #10b981;">🔒 单笔保证金上限：</strong><br>
+                            <div style="display:flex; gap:5px; margin:4px 0 2px 0; flex-wrap:wrap;">
+                              <button onclick="setMaxOrderSize(7,5)"  id="mos7_5"  style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">5U</button>
+                              <button onclick="setMaxOrderSize(7,10)" id="mos7_10" style="padding:2px 8px;border-radius:4px;border:1.5px solid #10b981;background:#10b981;color:white;cursor:pointer;font-size:11px;font-weight:bold;">10U</button>
+                              <button onclick="setMaxOrderSize(7,15)" id="mos7_15" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">15U</button>
+                              <button onclick="setMaxOrderSize(7,20)" id="mos7_20" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">20U</button>
+                              <button onclick="setMaxOrderSize(7,40)" id="mos7_40" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">40U</button>
+                              <button onclick="setMaxOrderSize(7,50)" id="mos7_50" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">50U</button>
+                              <button onclick="setMaxOrderSize(7,100)" id="mos7_100" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">100U</button>
+                              <button onclick="setMaxOrderSize(7,200)" id="mos7_200" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">200U</button>
+                              <button onclick="setMaxOrderSize(7,300)" id="mos7_300" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">300U</button>
+                              <button onclick="setMaxOrderSize(7,500)" id="mos7_500" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">500U</button>
+                              <button onclick="setMaxOrderSize(7,1000)" id="mos7_1000" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">1000U</button>
+                              <span style="color:#6ee7b7;font-size:11px;line-height:22px;">当前: <span id="maxOrderSizeDisplay7">10</span>U/笔</span>
+                            </div><br>
+                            • <span style="color: #fbbf24;">⚠️ 请先收藏至少8个常用币</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 批量开仓功能区 - 涨幅前8/后8名策略 (50倍杠杆 逐仓模式) -->
+                <div class="batch-trading-section" style="margin-top: 20px; padding: 16px; background: linear-gradient(135deg, #4a044e 0%, #701a75 50%, #86198f 100%); border-radius: 12px; box-shadow: 0 4px 16px rgba(134,25,143,0.6); max-width: 1450px; border: 2px solid rgba(217,70,239,0.5);">
+                    <h3 style="color: white; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-size: 16px;">
+                        <span style="font-size: 18px;">💀</span>
+                        涨幅前8/后8名策略 (50倍杠杆 · 逐仓模式)
+                        <span style="background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-left: 6px; border: 1px solid rgba(255,255,255,0.3);">终极杠杆</span>
+                        <span style="background: rgba(217,70,239,0.3); padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-left: 4px; border: 1px solid rgba(217,70,239,0.6); color: #f5d0fe;">🔒 逐仓 ISOLATED</span>
+                        <span style="background: rgba(255,50,50,0.3); padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-left: 4px; color: #fca5a5; border: 1px solid rgba(252,165,165,0.4);">⚠️⚠️⚠️ 极端风险</span>
+                    </h3>
+
+                    <!-- 涨幅前8名策略区域 -->
+                    <div style="margin-bottom: 16px; padding: 12px; background: rgba(217,70,239,0.15); border-radius: 8px; border: 2px solid rgba(217,70,239,0.4);">
+                        <div style="color: white; font-size: 13px; font-weight: bold; margin-bottom: 8px;">📈 涨幅前8名 (50x 逐仓)</div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px;">
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev50('long', 1.5)" data-strategy-code="TOP8_LONG_1.5PCT_50X" style="padding: 6px;">
+                                <div class="batch-btn-title">📈 做多 1.5% <span style="font-size: 9px; opacity:0.7;">[50X逐仓]</span></div>
+                                <div class="batch-btn-desc">余额1.5% · 50x逐仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev50('long', 3)" data-strategy-code="TOP8_LONG_3PCT_50X" style="padding: 6px;">
+                                <div class="batch-btn-title">📈 做多 3% <span style="font-size: 9px; opacity:0.7;">[50X逐仓]</span></div>
+                                <div class="batch-btn-desc">余额3% · 50x逐仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev50('long', 5)" data-strategy-code="TOP8_LONG_5PCT_50X" style="padding: 6px;">
+                                <div class="batch-btn-title">📈 做多 5% <span style="font-size: 9px; opacity:0.7;">[50X逐仓]</span></div>
+                                <div class="batch-btn-desc">余额5% · 50x逐仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev50('long', 8)" data-strategy-code="TOP8_LONG_8PCT_50X" style="padding: 6px;">
+                                <div class="batch-btn-title">📈 做多 8% <span style="font-size: 9px; opacity:0.7;">[50X逐仓]</span></div>
+                                <div class="batch-btn-desc">余额8% · 50x逐仓</div>
+                            </button>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev50('short', 1.5)" data-strategy-code="TOP8_SHORT_1.5PCT_50X" style="padding: 6px;">
+                                <div class="batch-btn-title">📉 做空 1.5% <span style="font-size: 9px; opacity:0.7;">[50X逐仓]</span></div>
+                                <div class="batch-btn-desc">余额1.5% · 50x逐仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev50('short', 3)" data-strategy-code="TOP8_SHORT_3PCT_50X" style="padding: 6px;">
+                                <div class="batch-btn-title">📉 做空 3% <span style="font-size: 9px; opacity:0.7;">[50X逐仓]</span></div>
+                                <div class="batch-btn-desc">余额3% · 50x逐仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev50('short', 5)" data-strategy-code="TOP8_SHORT_5PCT_50X" style="padding: 6px;">
+                                <div class="batch-btn-title">📉 做空 5% <span style="font-size: 9px; opacity:0.7;">[50X逐仓]</span></div>
+                                <div class="batch-btn-desc">余额5% · 50x逐仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev50('short', 8)" data-strategy-code="TOP8_SHORT_8PCT_50X" style="padding: 6px;">
+                                <div class="batch-btn-title">📉 做空 8% <span style="font-size: 9px; opacity:0.7;">[50X逐仓]</span></div>
+                                <div class="batch-btn-desc">余额8% · 50x逐仓</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 涨幅后8名策略区域 -->
+                    <div style="margin-bottom: 12px; padding: 12px; background: rgba(251,146,60,0.15); border-radius: 8px; border: 2px solid rgba(251,146,60,0.35);">
+                        <div style="color: #fed7aa; font-size: 13px; font-weight: bold; margin-bottom: 8px;">📉 涨幅后8名 (50x 逐仓) <span style="color: #fbbf24;">⚠️⚠️⚠️ 极端风险</span></div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px;">
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev50('long', 1.5)" data-strategy-code="BOTTOM8_LONG_1.5PCT_50X" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title">📈 做多 1.5% <span style="font-size: 9px; opacity:0.7;">[50X逐仓]</span></div>
+                                <div class="batch-btn-desc">余额1.5% · 50x逐仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev50('long', 3)" data-strategy-code="BOTTOM8_LONG_3PCT_50X" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title">📈 做多 3% <span style="font-size: 9px; opacity:0.7;">[50X逐仓]</span></div>
+                                <div class="batch-btn-desc">余额3% · 50x逐仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev50('long', 5)" data-strategy-code="BOTTOM8_LONG_5PCT_50X" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title">📈 做多 5% <span style="font-size: 9px; opacity:0.7;">[50X逐仓]</span></div>
+                                <div class="batch-btn-desc">余额5% · 50x逐仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev50('long', 8)" data-strategy-code="BOTTOM8_LONG_8PCT_50X" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title">📈 做多 8% <span style="font-size: 9px; opacity:0.7;">[50X逐仓]</span></div>
+                                <div class="batch-btn-desc">余额8% · 50x逐仓</div>
+                            </button>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev50('short', 1.5)" data-strategy-code="BOTTOM8_SHORT_1.5PCT_50X" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title">📉 做空 1.5% <span style="font-size: 9px; opacity:0.7;">[50X逐仓]</span></div>
+                                <div class="batch-btn-desc">余额1.5% · 50x逐仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev50('short', 3)" data-strategy-code="BOTTOM8_SHORT_3PCT_50X" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title">📉 做空 3% <span style="font-size: 9px; opacity:0.7;">[50X逐仓]</span></div>
+                                <div class="batch-btn-desc">余额3% · 50x逐仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev50('short', 5)" data-strategy-code="BOTTOM8_SHORT_5PCT_50X" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title">📉 做空 5% <span style="font-size: 9px; opacity:0.7;">[50X逐仓]</span></div>
+                                <div class="batch-btn-desc">余额5% · 50x逐仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev50('short', 8)" data-strategy-code="BOTTOM8_SHORT_8PCT_50X" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title">📉 做空 8% <span style="font-size: 9px; opacity:0.7;">[50X逐仓]</span></div>
+                                <div class="batch-btn-desc">余额8% · 50x逐仓</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 12px; padding: 10px; background: rgba(255,255,255,0.08); border-radius: 6px; color: white; font-size: 12px;">
+                        <div style="margin-bottom: 4px;">💡 <strong>策略说明：</strong></div>
+                        <div style="padding-left: 20px;">
+                            • 从⭐<strong>常用币</strong>中选择<strong>涨幅前8名</strong>或<strong>涨幅后8名</strong><br>
+                            • 每个币种平均分配开仓金额，统一使用<strong style="color: #e9d5ff;">50倍杠杆 · 逐仓(Isolated)模式</strong><br>
+                            • <strong>逐仓模式：</strong>每笔仓位独立保证金，亏损最多损失该仓保证金<br>
+                            • <strong style="color: #10b981;">🔒 单笔保证金上限：</strong><br>
+                            <div style="display:flex; gap:5px; margin:4px 0 2px 0; flex-wrap:wrap;">
+                              <button onclick="setMaxOrderSize(8,5)"  id="mos8_5"  style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">5U</button>
+                              <button onclick="setMaxOrderSize(8,10)" id="mos8_10" style="padding:2px 8px;border-radius:4px;border:1.5px solid #10b981;background:#10b981;color:white;cursor:pointer;font-size:11px;font-weight:bold;">10U</button>
+                              <button onclick="setMaxOrderSize(8,15)" id="mos8_15" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">15U</button>
+                              <button onclick="setMaxOrderSize(8,20)" id="mos8_20" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">20U</button>
+                              <button onclick="setMaxOrderSize(8,40)" id="mos8_40" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">40U</button>
+                              <button onclick="setMaxOrderSize(8,50)" id="mos8_50" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">50U</button>
+                              <button onclick="setMaxOrderSize(8,100)" id="mos8_100" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">100U</button>
+                              <button onclick="setMaxOrderSize(8,200)" id="mos8_200" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">200U</button>
+                              <button onclick="setMaxOrderSize(8,300)" id="mos8_300" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">300U</button>
+                              <button onclick="setMaxOrderSize(8,500)" id="mos8_500" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">500U</button>
+                              <button onclick="setMaxOrderSize(8,1000)" id="mos8_1000" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">1000U</button>
+                              <span style="color:#6ee7b7;font-size:11px;line-height:22px;">当前: <span id="maxOrderSizeDisplay8">10</span>U/笔</span>
+                            </div><br>
+                            • <span style="color: #fbbf24;">⚠️ 请先收藏至少8个常用币</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 批量开仓功能区 - 涨幅前8/后8名策略 (50倍杠杆 全仓模式) -->
+                <div class="batch-trading-section" style="margin-top: 20px; padding: 16px; background: linear-gradient(135deg, #1e003a 0%, #3b0764 50%, #4c0519 100%); border-radius: 12px; box-shadow: 0 4px 16px rgba(109,40,217,0.7); max-width: 1450px; border: 2px solid rgba(167,139,250,0.4);">
+                    <h3 style="color: white; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-size: 16px;">
+                        <span style="font-size: 18px;">☠️</span>
+                        涨幅前8/后8名策略 (50倍杠杆 · 全仓模式)
+                        <span style="background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-left: 6px; border: 1px solid rgba(255,255,255,0.35);">全仓 CROSS</span>
+                        <span style="background: rgba(255,50,50,0.3); padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-left: 4px; color:#fca5a5; border: 1px solid rgba(252,165,165,0.4);">⚠️⚠️⚠️ 极端风险</span>
+                    </h3>
+
+                    <!-- 全仓模式说明 -->
+                    <div style="margin-bottom: 12px; padding: 8px 12px; background: rgba(255,255,255,0.08); border-radius: 8px; border-left: 4px solid #a78bfa; color: white; font-size: 12px;">
+                        ☠️ <strong>全仓模式(Cross Margin)：</strong>50倍全仓为极端风险策略，极微小波动即可触发强平，强烈建议严格设置止损并严格控制仓位。
+                    </div>
+
+                    <!-- 涨幅前8名策略区域 -->
+                    <div style="margin-bottom: 16px; padding: 12px; background: rgba(167,139,250,0.12); border-radius: 8px; border: 2px solid rgba(167,139,250,0.35);">
+                        <div style="color: white; font-size: 13px; font-weight: bold; margin-bottom: 8px;">📈 涨幅前8名 (50x 全仓)</div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px;">
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev50Cross('long', 1.5)" data-strategy-code="TOP8_LONG_1.5PCT_50X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📈 做多 1.5% <span style="font-size: 9px; opacity:0.7;">[50X全仓]</span></div>
+                                <div class="batch-btn-desc">余额1.5% · 50x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev50Cross('long', 3)" data-strategy-code="TOP8_LONG_3PCT_50X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📈 做多 3% <span style="font-size: 9px; opacity:0.7;">[50X全仓]</span></div>
+                                <div class="batch-btn-desc">余额3% · 50x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev50Cross('long', 5)" data-strategy-code="TOP8_LONG_5PCT_50X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📈 做多 5% <span style="font-size: 9px; opacity:0.7;">[50X全仓]</span></div>
+                                <div class="batch-btn-desc">余额5% · 50x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderTop8Lev50Cross('long', 8)" data-strategy-code="TOP8_LONG_8PCT_50X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📈 做多 8% <span style="font-size: 9px; opacity:0.7;">[50X全仓]</span></div>
+                                <div class="batch-btn-desc">余额8% · 50x全仓</div>
+                            </button>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev50Cross('short', 1.5)" data-strategy-code="TOP8_SHORT_1.5PCT_50X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📉 做空 1.5% <span style="font-size: 9px; opacity:0.7;">[50X全仓]</span></div>
+                                <div class="batch-btn-desc">余额1.5% · 50x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev50Cross('short', 3)" data-strategy-code="TOP8_SHORT_3PCT_50X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📉 做空 3% <span style="font-size: 9px; opacity:0.7;">[50X全仓]</span></div>
+                                <div class="batch-btn-desc">余额3% · 50x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev50Cross('short', 5)" data-strategy-code="TOP8_SHORT_5PCT_50X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📉 做空 5% <span style="font-size: 9px; opacity:0.7;">[50X全仓]</span></div>
+                                <div class="batch-btn-desc">余额5% · 50x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderTop8Lev50Cross('short', 8)" data-strategy-code="TOP8_SHORT_8PCT_50X_CROSS" style="padding: 6px;">
+                                <div class="batch-btn-title">📉 做空 8% <span style="font-size: 9px; opacity:0.7;">[50X全仓]</span></div>
+                                <div class="batch-btn-desc">余额8% · 50x全仓</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 涨幅后8名策略区域 -->
+                    <div style="margin-bottom: 12px; padding: 12px; background: rgba(251,146,60,0.15); border-radius: 8px; border: 2px solid rgba(251,146,60,0.35);">
+                        <div style="color: #fed7aa; font-size: 13px; font-weight: bold; margin-bottom: 8px;">📉 涨幅后8名 (50x 全仓) <span style="color: #fbbf24;">⚠️⚠️⚠️ 极端风险</span></div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px;">
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev50Cross('long', 1.5)" data-strategy-code="BOTTOM8_LONG_1.5PCT_50X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title">📈 做多 1.5% <span style="font-size: 9px; opacity:0.7;">[50X全仓]</span></div>
+                                <div class="batch-btn-desc">余额1.5% · 50x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev50Cross('long', 3)" data-strategy-code="BOTTOM8_LONG_3PCT_50X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title">📈 做多 3% <span style="font-size: 9px; opacity:0.7;">[50X全仓]</span></div>
+                                <div class="batch-btn-desc">余额3% · 50x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev50Cross('long', 5)" data-strategy-code="BOTTOM8_LONG_5PCT_50X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title">📈 做多 5% <span style="font-size: 9px; opacity:0.7;">[50X全仓]</span></div>
+                                <div class="batch-btn-desc">余额5% · 50x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn long" onclick="batchOrderBottom8Lev50Cross('long', 8)" data-strategy-code="BOTTOM8_LONG_8PCT_50X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);">
+                                <div class="batch-btn-title">📈 做多 8% <span style="font-size: 9px; opacity:0.7;">[50X全仓]</span></div>
+                                <div class="batch-btn-desc">余额8% · 50x全仓</div>
+                            </button>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev50Cross('short', 1.5)" data-strategy-code="BOTTOM8_SHORT_1.5PCT_50X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title">📉 做空 1.5% <span style="font-size: 9px; opacity:0.7;">[50X全仓]</span></div>
+                                <div class="batch-btn-desc">余额1.5% · 50x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev50Cross('short', 3)" data-strategy-code="BOTTOM8_SHORT_3PCT_50X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title">📉 做空 3% <span style="font-size: 9px; opacity:0.7;">[50X全仓]</span></div>
+                                <div class="batch-btn-desc">余额3% · 50x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev50Cross('short', 5)" data-strategy-code="BOTTOM8_SHORT_5PCT_50X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title">📉 做空 5% <span style="font-size: 9px; opacity:0.7;">[50X全仓]</span></div>
+                                <div class="batch-btn-desc">余额5% · 50x全仓</div>
+                            </button>
+                            <button type="button" class="batch-btn short" onclick="batchOrderBottom8Lev50Cross('short', 8)" data-strategy-code="BOTTOM8_SHORT_8PCT_50X_CROSS" style="padding: 6px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                                <div class="batch-btn-title">📉 做空 8% <span style="font-size: 9px; opacity:0.7;">[50X全仓]</span></div>
+                                <div class="batch-btn-desc">余额8% · 50x全仓</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 12px; padding: 10px; background: rgba(255,255,255,0.08); border-radius: 6px; color: white; font-size: 12px;">
+                        <div style="margin-bottom: 4px;">💡 <strong>策略说明：</strong></div>
+                        <div style="padding-left: 20px;">
+                            • 从⭐<strong>常用币</strong>中选择<strong>涨幅前8名</strong>或<strong>涨幅后8名</strong><br>
+                            • 每个币种平均分配开仓金额，统一使用<strong style="color: #c4b5fd;">50倍杠杆 · 全仓(Cross)模式</strong><br>
+                            • <strong>全仓模式：</strong>共用账户余额做保证金，风险传导至整个账户<br>
+                            • <strong style="color: #10b981;">🔒 单笔保证金上限：</strong><br>
+                            <div style="display:flex; gap:5px; margin:4px 0 2px 0; flex-wrap:wrap;">
+                              <button onclick="setMaxOrderSize(9,5)"  id="mos9_5"  style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">5U</button>
+                              <button onclick="setMaxOrderSize(9,10)" id="mos9_10" style="padding:2px 8px;border-radius:4px;border:1.5px solid #10b981;background:#10b981;color:white;cursor:pointer;font-size:11px;font-weight:bold;">10U</button>
+                              <button onclick="setMaxOrderSize(9,15)" id="mos9_15" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">15U</button>
+                              <button onclick="setMaxOrderSize(9,20)" id="mos9_20" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">20U</button>
+                              <button onclick="setMaxOrderSize(9,40)" id="mos9_40" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">40U</button>
+                              <button onclick="setMaxOrderSize(9,50)" id="mos9_50" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">50U</button>
+                              <button onclick="setMaxOrderSize(9,100)" id="mos9_100" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">100U</button>
+                              <button onclick="setMaxOrderSize(9,200)" id="mos9_200" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">200U</button>
+                              <button onclick="setMaxOrderSize(9,300)" id="mos9_300" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">300U</button>
+                              <button onclick="setMaxOrderSize(9,500)" id="mos9_500" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">500U</button>
+                              <button onclick="setMaxOrderSize(9,1000)" id="mos9_1000" style="padding:2px 8px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:11px;font-weight:bold;">1000U</button>
+                              <span style="color:#6ee7b7;font-size:11px;line-height:22px;">当前: <span id="maxOrderSizeDisplay9">10</span>U/笔</span>
+                            </div><br>
                             • <span style="color: #fbbf24;">⚠️ 请先收藏至少8个常用币</span>
                         </div>
                     </div>
@@ -6263,16 +7155,24 @@ data/
                                 🛡️ 单笔上限设置
                             </label>
                             
-                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                                <input type="number" id="maxOrderSizeInput" value="5" step="0.5" min="1" 
-                                       style="flex: 1; padding: 8px 10px; border: 1px solid #f59e0b; border-radius: 6px; font-size: 14px; font-weight: 600;"
-                                       placeholder="例如: 5">
-                                <span style="color: #92400e; font-size: 14px; font-weight: 700;">USDT</span>
+                            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 8px;">
+                                <button type="button" class="max-order-btn" data-value="5" onclick="selectMaxOrderSize(5, 'maxOrderSizeInput')"
+                                    style="padding: 8px 4px; border: 2px solid #f59e0b; border-radius: 6px; background: white; color: #92400e; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;">5U</button>
+                                <button type="button" class="max-order-btn" data-value="10" onclick="selectMaxOrderSize(10, 'maxOrderSizeInput')"
+                                    style="padding: 8px 4px; border: 2px solid #f59e0b; border-radius: 6px; background: #fef3c7; color: #92400e; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;">10U</button>
+                                <button type="button" class="max-order-btn" data-value="15" onclick="selectMaxOrderSize(15, 'maxOrderSizeInput')"
+                                    style="padding: 8px 4px; border: 2px solid #f59e0b; border-radius: 6px; background: white; color: #92400e; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;">15U</button>
+                                <button type="button" class="max-order-btn" data-value="20" onclick="selectMaxOrderSize(20, 'maxOrderSizeInput')"
+                                    style="padding: 8px 4px; border: 2px solid #f59e0b; border-radius: 6px; background: white; color: #92400e; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;">20U</button>
+                                <button type="button" class="max-order-btn" data-value="40" onclick="selectMaxOrderSize(40, 'maxOrderSizeInput')"
+                                    style="padding: 8px 4px; border: 2px solid #f59e0b; border-radius: 6px; background: white; color: #92400e; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;">40U</button>
                             </div>
+                            <!-- 隐藏input保持原有读取逻辑不变 -->
+                            <input type="hidden" id="maxOrderSizeInput" value="10">
                             
                             <div style="font-size: 10px; color: #92400e; padding: 6px; background: rgba(251, 191, 36, 0.15); border-radius: 4px; line-height: 1.5;">
                                 💡 <strong>说明：</strong>每币开仓金额 = min(可用余额 × 1.5%, 单笔上限)
-                                <br>例如余额67000U，上限5U → 每币 = min(67000×1.5%, 5) = 5 USDT，8币共40 USDT
+                                <br>当前选择: <strong id="maxOrderSizeDisplay_bottom">10</strong> USDT/笔，8币合计上限 <strong id="maxOrderSizeTotalDisplay_bottom">80</strong> USDT
                             </div>
                         </div>
                     </div>
@@ -6376,16 +7276,24 @@ data/
                                 🛡️ 单笔上限设置
                             </label>
                             
-                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                                <input type="number" id="maxOrderSizeInputTop" value="5" step="0.5" min="1" 
-                                       style="flex: 1; padding: 8px 10px; border: 1px solid #f59e0b; border-radius: 6px; font-size: 14px; font-weight: 600;"
-                                       placeholder="例如: 5">
-                                <span style="color: #92400e; font-size: 14px; font-weight: 700;">USDT</span>
+                            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 8px;">
+                                <button type="button" class="max-order-btn" data-value="5" onclick="selectMaxOrderSize(5, 'maxOrderSizeInputTop')"
+                                    style="padding: 8px 4px; border: 2px solid #f59e0b; border-radius: 6px; background: white; color: #92400e; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;">5U</button>
+                                <button type="button" class="max-order-btn" data-value="10" onclick="selectMaxOrderSize(10, 'maxOrderSizeInputTop')"
+                                    style="padding: 8px 4px; border: 2px solid #f59e0b; border-radius: 6px; background: #fef3c7; color: #92400e; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;">10U</button>
+                                <button type="button" class="max-order-btn" data-value="15" onclick="selectMaxOrderSize(15, 'maxOrderSizeInputTop')"
+                                    style="padding: 8px 4px; border: 2px solid #f59e0b; border-radius: 6px; background: white; color: #92400e; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;">15U</button>
+                                <button type="button" class="max-order-btn" data-value="20" onclick="selectMaxOrderSize(20, 'maxOrderSizeInputTop')"
+                                    style="padding: 8px 4px; border: 2px solid #f59e0b; border-radius: 6px; background: white; color: #92400e; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;">20U</button>
+                                <button type="button" class="max-order-btn" data-value="40" onclick="selectMaxOrderSize(40, 'maxOrderSizeInputTop')"
+                                    style="padding: 8px 4px; border: 2px solid #f59e0b; border-radius: 6px; background: white; color: #92400e; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;">40U</button>
                             </div>
+                            <!-- 隐藏input保持原有读取逻辑不变 -->
+                            <input type="hidden" id="maxOrderSizeInputTop" value="10">
                             
                             <div style="font-size: 10px; color: #92400e; padding: 6px; background: rgba(251, 191, 36, 0.15); border-radius: 4px; line-height: 1.5;">
                                 💡 <strong>说明：</strong>每币开仓金额 = min(可用余额 × 1.5%, 单笔上限)
-                                <br>例如余额67000U，上限5U → 每币 = min(67000×1.5%, 5) = 5 USDT，8币共40 USDT
+                                <br>当前选择: <strong id="maxOrderSizeDisplay_top">10</strong> USDT/笔，8币合计上限 <strong id="maxOrderSizeTotalDisplay_top">80</strong> USDT
                             </div>
                         </div>
                     </div>
@@ -6704,8 +7612,11 @@ data/
                         </button>
                     </h3>
                     
-                    <!-- 批量平仓按钮组 -->
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px;">
+                    <!-- 批量平仓按钮组 - 逐仓 ISOLATED -->
+                    <div style="margin-bottom: 6px; font-size: 11px; color: #60a5fa; font-weight: 600; letter-spacing: 0.5px;">
+                        🔒 逐仓平仓 (ISOLATED)
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px;">
                         <button onclick="batchClosePositions('long', 0.5)" class="batch-close-btn batch-close-long-half" data-strategy-code="CLOSE_LONG_HALF">
                             📉 平一半多单 <span style="font-size: 9px; opacity: 0.7;">[CLOSE_LONG_HALF]</span>
                         </button>
@@ -6717,6 +7628,25 @@ data/
                         </button>
                         <button onclick="batchClosePositions('short', 1)" class="batch-close-btn batch-close-short-all" data-strategy-code="CLOSE_SHORT_ALL">
                             ⛔ 平全部空单 <span style="font-size: 9px; opacity: 0.7;">[CLOSE_SHORT_ALL]</span>
+                        </button>
+                    </div>
+
+                    <!-- 批量平仓按钮组 - 全仓 CROSS -->
+                    <div style="margin-bottom: 6px; font-size: 11px; color: #fb923c; font-weight: 600; letter-spacing: 0.5px;">
+                        🌊 全仓平仓 (CROSS)
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px;">
+                        <button onclick="batchClosePositionsCross('long', 0.5)" class="batch-close-btn batch-close-cross-long-half" data-strategy-code="CLOSE_LONG_HALF_CROSS">
+                            📉 平一半多单 <span style="font-size: 9px; opacity: 0.7;">[全仓]</span>
+                        </button>
+                        <button onclick="batchClosePositionsCross('short', 0.5)" class="batch-close-btn batch-close-cross-short-half" data-strategy-code="CLOSE_SHORT_HALF_CROSS">
+                            📈 平一半空单 <span style="font-size: 9px; opacity: 0.7;">[全仓]</span>
+                        </button>
+                        <button onclick="batchClosePositionsCross('long', 1)" class="batch-close-btn batch-close-cross-long-all" data-strategy-code="CLOSE_LONG_ALL_CROSS">
+                            🚫 平全部多单 <span style="font-size: 9px; opacity: 0.7;">[全仓]</span>
+                        </button>
+                        <button onclick="batchClosePositionsCross('short', 1)" class="batch-close-btn batch-close-cross-short-all" data-strategy-code="CLOSE_SHORT_ALL_CROSS">
+                            ⛔ 平全部空单 <span style="font-size: 9px; opacity: 0.7;">[全仓]</span>
                         </button>
                     </div>
                     
@@ -7244,12 +8174,21 @@ data/
                             const sideName = pos.posSide === 'long' ? '做多' : '做空';
                             // 使用posSideForClose用于平仓API调用（单向持仓='net'，双向持仓='long'/'short'）
                             const posSideForClose = pos.posSideForClose || pos.posSide;
+                            // 保证金模式标签
+                            const isCross = pos.mgnMode === 'cross';
+                            const mgnModeTag = isCross
+                                ? `<span style="display:inline-block;background:rgba(251,146,60,0.2);color:#fb923c;border:1px solid rgba(251,146,60,0.5);border-radius:4px;font-size:11px;padding:1px 6px;margin-left:4px;">全仓 CROSS</span>`
+                                : `<span style="display:inline-block;background:rgba(96,165,250,0.15);color:#60a5fa;border:1px solid rgba(96,165,250,0.4);border-radius:4px;font-size:11px;padding:1px 6px;margin-left:4px;">逐仓 ISO</span>`;
+                            // 全仓模式保证金显示（imr兜底后可能是初始保证金）
+                            const marginLabel = isCross ? '初始保证金:' : '保证金:';
+                            const marginNote = isCross ? '<span style="font-size:10px;color:#9ca3af;margin-left:2px;">(全仓)</span>' : '';
                             
                             return `
                                 <div class="position-item">
                                     <div class="position-header">
                                         <span class="position-symbol">${pos.instId}</span>
                                         <span class="position-side ${sideClass}">${sideName}</span>
+                                        ${mgnModeTag}
                                         <button class="close-position-btn" onclick="closePosition('${pos.instId}', '${posSideForClose}')">
                                             平仓
                                         </button>
@@ -7272,8 +8211,8 @@ data/
                                             <span class="position-detail-value">$${pos.markPrice.toFixed(2)}</span>
                                         </div>
                                         <div class="position-detail-item">
-                                            <span class="position-detail-label">保证金:</span>
-                                            <span class="position-detail-value">${pos.margin.toFixed(2)} USDT</span>
+                                            <span class="position-detail-label">${marginLabel}</span>
+                                            <span class="position-detail-value">${pos.margin.toFixed(2)} USDT${marginNote}</span>
                                         </div>
                                     </div>
                                     <div class="position-pnl">
@@ -8665,6 +9604,45 @@ data/
             event.target.classList.add('active');
         }
 
+        // 选择单笔保证金上限（5/10/15/20/40 USDT 五档按钮）
+        function selectMaxOrderSize(value, inputId) {
+            const input = document.getElementById(inputId);
+            if (input) input.value = value;
+
+            // 更新同组按钮高亮：找到input所在父容器内的按钮
+            const container = input ? input.closest('div[style*="padding"]') || document.body : document.body;
+            // 精准：只高亮onclick包含同一inputId的按钮
+            document.querySelectorAll(`.max-order-btn[onclick*="${inputId}"]`).forEach(btn => {
+                const isActive = parseInt(btn.dataset.value) === parseInt(value);
+                btn.style.background = isActive ? '#f59e0b' : 'white';
+                btn.style.color = isActive ? 'white' : '#92400e';
+                btn.style.borderColor = isActive ? '#d97706' : '#f59e0b';
+                btn.style.boxShadow = isActive ? '0 2px 6px rgba(245,158,11,0.4)' : '';
+            });
+
+            // 更新说明文字中的当前值显示
+            const displaySuffix = inputId === 'maxOrderSizeInputTop' ? '_top' : '_bottom';
+            const displayEl = document.getElementById(`maxOrderSizeDisplay${displaySuffix}`);
+            const totalEl = document.getElementById(`maxOrderSizeTotalDisplay${displaySuffix}`);
+            if (displayEl) displayEl.textContent = value;
+            if (totalEl) totalEl.textContent = value * 8;
+
+            // 同步所有策略区域的单笔限额显示 (Display1~9)
+            ['maxOrderSizeDisplay1','maxOrderSizeDisplay2','maxOrderSizeDisplay3',
+             'maxOrderSizeDisplay4','maxOrderSizeDisplay5','maxOrderSizeDisplay6',
+             'maxOrderSizeDisplay7','maxOrderSizeDisplay8','maxOrderSizeDisplay9'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = value;
+            });
+
+            // 同步到账户对象，供 batchOrderTop8/Bottom8 使用
+            const account = accounts.find(acc => acc.id === currentAccount);
+            if (account) {
+                account.maxOrderSize = parseFloat(value);
+                console.log(`✅ maxOrderSize 已更新: ${value} USDT`);
+            }
+        }
+
         // 设置金额百分比
         function setAmount(percent) {
             // 从DOM中获取实时的可用余额
@@ -8756,15 +9734,20 @@ data/
             
             console.log('[batchOrder] 常用币种涨幅前6:', top6Symbols.map(s => `${s.name} (${s.change}%)`));
             
-            // 计算每个币的保证金占用（用户输入的百分比是指保证金占比）
-            const marginPerCoin = (balance * percentPerCoin / 100).toFixed(2);
-            const totalMargin = (marginPerCoin * 6).toFixed(2);
+            // 使用页面当前选择的杠杆倍数
+            const leverage = currentLeverage;
             
-            // ⚠️ 重要：10x杠杆下，合约价值 = 保证金 × 10
-            const contractValuePerCoin = (parseFloat(marginPerCoin) * 10).toFixed(2);
+            // 计算每个币的保证金占用（用户输入的百分比是指保证金占比）
+            const maxOrderSize = account.maxOrderSize || 10; // 单笔保证金上限
+            const calculatedMargin = balance * percentPerCoin / 100;
+            const marginPerCoin = Math.min(calculatedMargin, maxOrderSize).toFixed(2);
+            const totalMargin = (parseFloat(marginPerCoin) * 6).toFixed(2);
+            
+            // 合约价值 = 保证金 × 杠杆（使用currentLeverage而非硬编码10）
+            const contractValuePerCoin = (parseFloat(marginPerCoin) * leverage).toFixed(2);
             const totalContractValue = (parseFloat(contractValuePerCoin) * 6).toFixed(2);
             
-            console.log(`[batchOrder] 余额检查: 可用=${balance.toFixed(2)}, 每币保证金=${marginPerCoin}, 每币合约价值=${contractValuePerCoin}, 总保证金=${totalMargin}, 总合约价值=${totalContractValue}`);
+            console.log(`[batchOrder] 余额检查: 可用=${balance.toFixed(2)}, 杠杆=${leverage}x, 每币保证金=${marginPerCoin}, 每币合约价值=${contractValuePerCoin}, 总保证金=${totalMargin}, 总合约价值=${totalContractValue}`);
             
             // 检查余额是否足够（保守检查：需要总保证金的 1.2 倍作为缓冲）
             const requiredBalance = parseFloat(totalMargin) * 1.2;
@@ -8772,7 +9755,7 @@ data/
                 alert(`❌ 余额不足！\n\n` +
                     `【资金需求】\n` +
                     `  • 每个币保证金: ${marginPerCoin} USDT (${percentPerCoin}%)\n` +
-                    `  • 每个币合约价值: ${contractValuePerCoin} USDT (10x杠杆)\n` +
+                    `  • 每个币合约价值: ${contractValuePerCoin} USDT (${leverage}x杠杆)\n` +
                     `  • 6个币总保证金: ${totalMargin} USDT\n` +
                     `  • 建议余额: ${requiredBalance.toFixed(2)} USDT\n\n` +
                     `【当前状态】\n` +
@@ -8812,10 +9795,10 @@ data/
                 `【常用币涨幅前6】\n${symbolsList}\n\n` +
                 `【开仓参数】\n` +
                 `  • 方向: ${directionText}\n` +
-                `  • 杠杆: 10x\n` +
+                `  • 杠杆: ${leverage}x\n` +
                 `  • 订单类型: 市价单\n\n` +
                 `【资金分配】\n` +
-                `  • 每个币保证金: ${marginPerCoin} USDT (${percentPerCoin}%)\n` +
+                `  • 每个币保证金: ${marginPerCoin} USDT (上限${maxOrderSize}U)\n` +
                 `  • 每个币合约价值: ${contractValuePerCoin} USDT\n` +
                 `  • 总保证金: ${totalMargin} USDT\n` +
                 `  • 总合约价值: ${totalContractValue} USDT\n` +
@@ -8832,10 +9815,10 @@ data/
                 `【常用币涨幅前6】\n${symbolsList}\n\n` +
                 `【开仓参数】\n` +
                 `  • 方向: ${directionText}\n` +
-                `  • 杠杆: 10x\n` +
+                `  • 杠杆: ${leverage}x\n` +
                 `  • 订单类型: 市价单\n\n` +
                 `【资金分配】\n` +
-                `  • 每个币保证金: ${marginPerCoin} USDT (${percentPerCoin}%)\n` +
+                `  • 每个币保证金: ${marginPerCoin} USDT (上限${maxOrderSize}U)\n` +
                 `  • 每个币合约价值: ${contractValuePerCoin} USDT\n` +
                 `  • 总保证金: ${totalMargin} USDT\n` +
                 `  • 总合约价值: ${totalContractValue} USDT\n` +
@@ -8862,8 +9845,8 @@ data/
                         posSide: direction,
                         ordType: 'market',
                         sz: contractValuePerCoin,  // ✅ 传递合约价值（保证金 × 杠杆）
-                        maxOrderSize: contractValuePerCoin,  // ✅ 风控检查也使用合约价值
-                        lever: '10'
+                        maxOrderSize: maxOrderSize * leverage,  // ✅ 风控检查：合约价值上限
+                        lever: String(leverage)  // ✅ 使用currentLeverage，不再硬编码'10'
                     };
                     
                     // 发送订单请求
@@ -8921,8 +9904,8 @@ data/
         }
 
         // 批量开仓 - 涨幅前8名策略
-        async function batchOrderTop8(direction, percentPerCoin, skipConfirm = false) {
-            console.log(`[batchOrderTop8] 开始批量开仓前8: direction=${direction}, percentPerCoin=${percentPerCoin}%, skipConfirm=${skipConfirm}`);
+        async function batchOrderTop8(direction, percentPerCoin, skipConfirm = false, leverage = 10, tdMode = 'isolated') {
+            console.log(`[batchOrderTop8] 开始批量开仓前8: direction=${direction}, percentPerCoin=${percentPerCoin}%, skipConfirm=${skipConfirm}, leverage=${leverage}x, tdMode=${tdMode}`);
             
             const account = accounts.find(acc => acc.id === currentAccount);
             
@@ -8973,10 +9956,10 @@ data/
             console.log('[batchOrderTop8] 常用币种涨幅前8:', top8Symbols.map(s => `${s.name} (${s.change}%)`));
             
             // 计算每个币的保证金占用（从账户配置读取上限）
-            const maxOrderSize = account.maxOrderSize || 5; // 单笔保证金上限，默认5 USDT
+            const maxOrderSize = account.maxOrderSize || 10; // 单笔保证金上限，默认10 USDT
             const calculatedMargin = balance * percentPerCoin / 100;
             const marginPerCoin = Math.min(calculatedMargin, maxOrderSize).toFixed(2);
-            const contractValuePerCoin = (parseFloat(marginPerCoin) * 10).toFixed(2);  // 合约价值 = 保证金 × 杠杆
+            const contractValuePerCoin = (parseFloat(marginPerCoin) * leverage).toFixed(2);  // 合约价值 = 保证金 × 杠杆
             const totalMargin = (marginPerCoin * 8).toFixed(2);
             const totalContractValue = (parseFloat(contractValuePerCoin) * 8).toFixed(2);
             
@@ -8986,7 +9969,7 @@ data/
             console.log(`  • 计算保证金: ${balance.toFixed(2)} × ${percentPerCoin}% = ${calculatedMargin.toFixed(2)} USDT`);
             console.log(`  • 单笔保证金上限: ${maxOrderSize} USDT`);
             console.log(`  • 实际保证金: Math.min(${calculatedMargin.toFixed(2)}, ${maxOrderSize}) = ${marginPerCoin} USDT`);
-            console.log(`  • 合约价值(10x): ${marginPerCoin} × 10 = ${contractValuePerCoin} USDT`);
+            console.log(`  • 合约价值(${leverage}x): ${marginPerCoin} × ${leverage} = ${contractValuePerCoin} USDT`);
             console.log(`  • 总保证金: ${marginPerCoin} × 8 = ${totalMargin} USDT`);
             console.log(`  • 总合约价值: ${contractValuePerCoin} × 8 = ${totalContractValue} USDT`);
             
@@ -8996,7 +9979,7 @@ data/
                 alert(`❌ 余额不足！\n\n` +
                     `【资金需求】\n` +
                     `  • 每个币保证金: ${marginPerCoin} USDT (${percentPerCoin}%)\n` +
-                    `  • 每个币合约价值: ${contractValuePerCoin} USDT (10x杠杆)\n` +
+                    `  • 每个币合约价值: ${contractValuePerCoin} USDT (${leverage}x杠杆)\n` +
                     `  • 8个币总保证金: ${totalMargin} USDT\n` +
                     `  • 建议余额: ${requiredBalance.toFixed(2)} USDT\n\n` +
                     `【当前状态】\n` +
@@ -9018,7 +10001,7 @@ data/
                 `【常用币涨幅前8】\n${symbolsList}\n\n` +
                 `【开仓参数】\n` +
                 `  • 方向: ${directionText}\n` +
-                `  • 杠杆: 10x\n` +
+                `  • 杠杆: ${leverage}x\n` +
                 `  • 订单类型: 市价单\n\n` +
                 `【资金分配】\n` +
                 `  • 每个币保证金: ${marginPerCoin} USDT (${percentPerCoin}%)\n` +
@@ -9044,7 +10027,7 @@ data/
                 `【常用币涨幅前8】\n${symbolsList}\n\n` +
                 `【开仓参数】\n` +
                 `  • 方向: ${directionText}\n` +
-                `  • 杠杆: 10x\n` +
+                `  • 杠杆: ${leverage}x\n` +
                 `  • 订单类型: 市价单\n\n` +
                 `【资金分配】\n` +
                 `  • 每个币保证金: ${marginPerCoin} USDT (${percentPerCoin}%)\n` +
@@ -9073,8 +10056,9 @@ data/
                         posSide: direction,
                         ordType: 'market',
                         sz: contractValuePerCoin,  // ✅ 传递合约价值（保证金 × 杠杆）
-                        maxOrderSize: maxOrderSize * 10,  // ✅ 风控检查：使用账户配置的maxOrderSize × 杠杆(合约价值上限)
-                        lever: '10'
+                        maxOrderSize: maxOrderSize * leverage,  // ✅ 风控检查：使用账户配置的maxOrderSize × 杠杆(合约价值上限)
+                        lever: String(leverage),
+                        tdMode: tdMode  // ✅ 仓位模式: isolated=逐仓, cross=全仓
                     };
                     
                     const response = await fetch('/api/okx-trading/place-order', {
@@ -9097,8 +10081,14 @@ data/
                         console.log(`[batchOrderTop8] ${symbolData.name} 下单成功`);
                     } else {
                         failCount++;
-                        results.push(`❌ ${symbolData.name}: ${result.message || '失败'}`);
+                        const errMsg = result.error || result.message || '失败';
+                        results.push(`❌ ${symbolData.name}: ${errMsg}`);
                         console.error(`[batchOrderTop8] ${symbolData.name} 下单失败:`, result);
+                        // 🔴 杠杆设置失败 → 立刻终止整批，防止用旧杠杆下后续单
+                        if (result.leverage_error) {
+                            alert(`🚫 杠杆设置失败，已中止全部下单！\n\n原因：${errMsg}\n\n请检查：\n1. 该币种是否支持 ${leverage}x 杠杆\n2. 账户是否已有不兼容的持仓\n3. 当前已成功下单：${successCount} 笔`);
+                            break;
+                        }
                     }
                     
                     // 延迟100ms避免请求过快
@@ -9129,8 +10119,8 @@ data/
         }
 
         // 批量开仓 - 涨幅后8名策略
-        async function batchOrderBottom8(direction, percentPerCoin, skipConfirm = false) {
-            console.log(`[batchOrderBottom8] 开始批量开仓后8: direction=${direction}, percentPerCoin=${percentPerCoin}%, skipConfirm=${skipConfirm}`);
+        async function batchOrderBottom8(direction, percentPerCoin, skipConfirm = false, leverage = 10, tdMode = 'isolated') {
+            console.log(`[batchOrderBottom8] 开始批量开仓后8: direction=${direction}, percentPerCoin=${percentPerCoin}%, skipConfirm=${skipConfirm}, leverage=${leverage}x, tdMode=${tdMode}`);
             
             const account = accounts.find(acc => acc.id === currentAccount);
             
@@ -9181,10 +10171,10 @@ data/
             console.log('[batchOrderBottom8] 常用币种涨幅后8:', bottom8Symbols.map(s => `${s.name} (${s.change}%)`));
             
             // 计算每个币的保证金占用（从账户配置读取上限）
-            const maxOrderSize = account.maxOrderSize || 5; // 单笔保证金上限，默认5 USDT
+            const maxOrderSize = account.maxOrderSize || 10; // 单笔保证金上限，默认10 USDT
             const calculatedMargin = balance * percentPerCoin / 100;
             const marginPerCoin = Math.min(calculatedMargin, maxOrderSize).toFixed(2);
-            const contractValuePerCoin = (parseFloat(marginPerCoin) * 10).toFixed(2);  // 合约价值 = 保证金 × 杠杆
+            const contractValuePerCoin = (parseFloat(marginPerCoin) * leverage).toFixed(2);  // 合约价值 = 保证金 × 杠杆
             const totalMargin = (marginPerCoin * 8).toFixed(2);
             const totalContractValue = (parseFloat(contractValuePerCoin) * 8).toFixed(2);
             
@@ -9194,7 +10184,7 @@ data/
             console.log(`  • 计算保证金: ${balance.toFixed(2)} × ${percentPerCoin}% = ${calculatedMargin.toFixed(2)} USDT`);
             console.log(`  • 单笔保证金上限: ${maxOrderSize} USDT`);
             console.log(`  • 实际保证金: Math.min(${calculatedMargin.toFixed(2)}, ${maxOrderSize}) = ${marginPerCoin} USDT`);
-            console.log(`  • 合约价值(10x): ${marginPerCoin} × 10 = ${contractValuePerCoin} USDT`);
+            console.log(`  • 合约价值(${leverage}x): ${marginPerCoin} × ${leverage} = ${contractValuePerCoin} USDT`);
             console.log(`  • 总保证金: ${marginPerCoin} × 8 = ${totalMargin} USDT`);
             console.log(`  • 总合约价值: ${contractValuePerCoin} × 8 = ${totalContractValue} USDT`);
             
@@ -9204,7 +10194,7 @@ data/
                 alert(`❌ 余额不足！\n\n` +
                     `【资金需求】\n` +
                     `  • 每个币保证金: ${marginPerCoin} USDT (${percentPerCoin}%)\n` +
-                    `  • 每个币合约价值: ${contractValuePerCoin} USDT (10x杠杆)\n` +
+                    `  • 每个币合约价值: ${contractValuePerCoin} USDT (${leverage}x杠杆)\n` +
                     `  • 8个币总保证金: ${totalMargin} USDT\n` +
                     `  • 建议余额: ${requiredBalance.toFixed(2)} USDT\n\n` +
                     `【当前状态】\n` +
@@ -9248,7 +10238,7 @@ data/
                 `【常用币涨幅后8（跌幅最大）】\n${symbolsList}\n\n` +
                 `【开仓参数】\n` +
                 `  • 方向: ${directionText}\n` +
-                `  • 杠杆: 10x\n` +
+                `  • 杠杆: ${leverage}x\n` +
                 `  • 订单类型: 市价单\n\n` +
                 `【资金分配】\n` +
                 `  • 每个币保证金: ${marginPerCoin} USDT (${percentPerCoin}%)\n` +
@@ -9273,7 +10263,7 @@ data/
                 `【常用币涨幅后8（跌幅最大）】\n${symbolsList}\n\n` +
                 `【开仓参数】\n` +
                 `  • 方向: ${directionText}\n` +
-                `  • 杠杆: 10x\n` +
+                `  • 杠杆: ${leverage}x\n` +
                 `  • 订单类型: 市价单\n\n` +
                 `【资金分配】\n` +
                 `  • 每个币保证金: ${marginPerCoin} USDT (${percentPerCoin}%)\n` +
@@ -9302,8 +10292,9 @@ data/
                         posSide: direction,
                         ordType: 'market',
                         sz: contractValuePerCoin,  // ✅ 传递合约价值（保证金 × 杠杆）
-                        maxOrderSize: maxOrderSize * 10,  // ✅ 风控检查：使用账户配置的maxOrderSize × 杠杆(合约价值上限)
-                        lever: '10'
+                        maxOrderSize: maxOrderSize * leverage,  // ✅ 风控检查：使用账户配置的maxOrderSize × 杠杆(合约价值上限)
+                        lever: String(leverage),
+                        tdMode: tdMode  // ✅ 仓位模式: isolated=逐仓, cross=全仓
                     };
                     
                     const response = await fetch('/api/okx-trading/place-order', {
@@ -9326,8 +10317,14 @@ data/
                         console.log(`[batchOrderBottom8] ${symbolData.name} 下单成功`);
                     } else {
                         failCount++;
-                        results.push(`❌ ${symbolData.name}: ${result.message || '失败'}`);
+                        const errMsg = result.error || result.message || '失败';
+                        results.push(`❌ ${symbolData.name}: ${errMsg}`);
                         console.error(`[batchOrderBottom8] ${symbolData.name} 下单失败:`, result);
+                        // 🔴 杠杆设置失败 → 立刻终止整批，防止用旧杠杆下后续单
+                        if (result.leverage_error) {
+                            alert(`🚫 杠杆设置失败，已中止全部下单！\n\n原因：${errMsg}\n\n请检查：\n1. 该币种是否支持 ${leverage}x 杠杆\n2. 账户是否已有不兼容的持仓\n3. 当前已成功下单：${successCount} 笔`);
+                            break;
+                        }
                     }
                     
                     // 延迟100ms避免请求过快
@@ -9355,6 +10352,122 @@ data/
             
             // 刷新数据
             await refreshAccountData();
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // 每个批量区块独立保证金上限 (section 1-9, 默认 10 USDT)
+        // ══════════════════════════════════════════════════════════════
+        const sectionMaxOrderSize = {1:10, 2:10, 3:10, 4:10, 5:10, 6:10, 7:10, 8:10, 9:10};
+
+        function setMaxOrderSize(section, value) {
+            sectionMaxOrderSize[section] = value;
+            // 更新 display span
+            const disp = document.getElementById(`maxOrderSizeDisplay${section}`);
+            if (disp) disp.textContent = value;
+            // 刷新按钮高亮
+            [5, 10, 15, 20, 40, 50, 100, 200, 300, 500, 1000].forEach(v => {
+                const btn = document.getElementById(`mos${section}_${v}`);
+                if (!btn) return;
+                const active = (v === value);
+                btn.style.background = active ? '#10b981' : 'rgba(255,255,255,0.1)';
+                btn.style.borderColor = active ? '#10b981' : 'rgba(255,255,255,0.5)';
+                btn.style.color = 'white';
+            });
+            console.log(`[setMaxOrderSize] section=${section} → ${value} USDT`);
+        }
+
+        // 带 section 上限注入的核心调用辅助：临时覆盖 account.maxOrderSize
+        async function batchOrderWithSection(section, isTop8, direction, percentPerCoin, skipConfirm, leverage, tdMode = 'isolated') {
+            const account = accounts.find(acc => acc.id === currentAccount);
+            if (!account) { alert('❌ 请先选择账户'); return; }
+            const prevLimit = account.maxOrderSize;
+            account.maxOrderSize = sectionMaxOrderSize[section] || 10;
+            console.log(`[section ${section}] 保证金上限: ${account.maxOrderSize} USDT, 杠杆: ${leverage}x, 模式: ${tdMode}`);
+            try {
+                if (isTop8) {
+                    return await batchOrderTop8(direction, percentPerCoin, skipConfirm, leverage, tdMode);
+                } else {
+                    return await batchOrderBottom8(direction, percentPerCoin, skipConfirm, leverage, tdMode);
+                }
+            } finally {
+                account.maxOrderSize = prevLimit;
+            }
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // 10倍杠杆包装函数 (Section 3 · 逐仓) — 前8/后8默认区块
+        // ══════════════════════════════════════════════════════════════
+        async function batchOrderTop8Lev10S3(direction, percentPerCoin, skipConfirm = false) {
+            return await batchOrderWithSection(3, true, direction, percentPerCoin, skipConfirm, 10, 'isolated');
+        }
+        async function batchOrderBottom8Lev10S3(direction, percentPerCoin, skipConfirm = false) {
+            return await batchOrderWithSection(3, false, direction, percentPerCoin, skipConfirm, 10, 'isolated');
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // 20倍杠杆包装函数 (Section 4 · 逐仓)
+        // ══════════════════════════════════════════════════════════════
+        async function batchOrderTop8Lev20(direction, percentPerCoin, skipConfirm = false) {
+            return await batchOrderWithSection(4, true, direction, percentPerCoin, skipConfirm, 20, 'isolated');
+        }
+
+        async function batchOrderBottom8Lev20(direction, percentPerCoin, skipConfirm = false) {
+            return await batchOrderWithSection(4, false, direction, percentPerCoin, skipConfirm, 20, 'isolated');
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // 30倍杠杆包装函数 (Section 5 · 逐仓)
+        // ══════════════════════════════════════════════════════════════
+        async function batchOrderTop8Lev30(direction, percentPerCoin, skipConfirm = false) {
+            return await batchOrderWithSection(5, true, direction, percentPerCoin, skipConfirm, 30, 'isolated');
+        }
+
+        async function batchOrderBottom8Lev30(direction, percentPerCoin, skipConfirm = false) {
+            return await batchOrderWithSection(5, false, direction, percentPerCoin, skipConfirm, 30, 'isolated');
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // 20倍杠杆 全仓模式(cross) 包装函数 (Section 6)
+        // ══════════════════════════════════════════════════════════════
+        async function batchOrderTop8Lev20Cross(direction, percentPerCoin, skipConfirm = false) {
+            return await batchOrderWithSection(6, true, direction, percentPerCoin, skipConfirm, 20, 'cross');
+        }
+
+        async function batchOrderBottom8Lev20Cross(direction, percentPerCoin, skipConfirm = false) {
+            return await batchOrderWithSection(6, false, direction, percentPerCoin, skipConfirm, 20, 'cross');
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // 30倍杠杆 全仓模式(cross) 包装函数 (Section 7)
+        // ══════════════════════════════════════════════════════════════
+        async function batchOrderTop8Lev30Cross(direction, percentPerCoin, skipConfirm = false) {
+            return await batchOrderWithSection(7, true, direction, percentPerCoin, skipConfirm, 30, 'cross');
+        }
+
+        async function batchOrderBottom8Lev30Cross(direction, percentPerCoin, skipConfirm = false) {
+            return await batchOrderWithSection(7, false, direction, percentPerCoin, skipConfirm, 30, 'cross');
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // 50倍杠杆 逐仓模式(isolated) 包装函数
+        // ══════════════════════════════════════════════════════════════
+        async function batchOrderTop8Lev50(direction, percentPerCoin, skipConfirm = false) {
+            return await batchOrderWithSection(8, true, direction, percentPerCoin, skipConfirm, 50, 'isolated');
+        }
+
+        async function batchOrderBottom8Lev50(direction, percentPerCoin, skipConfirm = false) {
+            return await batchOrderWithSection(8, false, direction, percentPerCoin, skipConfirm, 50, 'isolated');
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // 50倍杠杆 全仓模式(cross) 包装函数
+        // ══════════════════════════════════════════════════════════════
+        async function batchOrderTop8Lev50Cross(direction, percentPerCoin, skipConfirm = false) {
+            return await batchOrderWithSection(9, true, direction, percentPerCoin, skipConfirm, 50, 'cross');
+        }
+
+        async function batchOrderBottom8Lev50Cross(direction, percentPerCoin, skipConfirm = false) {
+            return await batchOrderWithSection(9, false, direction, percentPerCoin, skipConfirm, 50, 'cross');
         }
 
         // 一键全平所有账户的所有持仓
@@ -9891,6 +11004,136 @@ data/
             }
         }
 
+        // ═══════════════════════════════════════════════════
+        // 全仓(Cross)批量平仓 — 调用时传入 mgnMode='cross'
+        // ═══════════════════════════════════════════════════
+        async function batchClosePositionsCross(posSide, ratio) {
+            console.log(`========== [batchClosePositionsCross] 全仓批量平仓 ==========`);
+            console.log(`[batchClosePositionsCross] 参数: posSide=${posSide}, ratio=${ratio}`);
+
+            const account = accounts.find(acc => acc.id === currentAccount);
+            if (!account) {
+                alert('❌ 未找到账户！请先选择账户。');
+                return;
+            }
+            if (!account.apiKey || !account.apiSecret || !account.passphrase) {
+                alert(`❌ 账户 "${account.name || account.id}" 未配置API凭证！`);
+                return;
+            }
+
+            try {
+                // 获取持仓列表（只看全仓持仓）
+                const response = await fetch('/api/okx-trading/positions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        apiKey: account.apiKey,
+                        apiSecret: account.apiSecret,
+                        passphrase: account.passphrase
+                    })
+                });
+                const result = await response.json();
+
+                if (!result.success || !result.data) {
+                    alert(`❌ 获取持仓失败: ${result.error || '未知错误'}`);
+                    return;
+                }
+
+                // 筛选全仓 + 指定方向
+                const targetPositions = result.data.filter(pos =>
+                    pos.mgnMode === 'cross' && pos.posSide === posSide
+                );
+
+                if (targetPositions.length === 0) {
+                    const dirText = posSide === 'long' ? '多单' : '空单';
+                    alert(`⚠️ 当前没有全仓${dirText}持仓！`);
+                    return;
+                }
+
+                const directionText = posSide === 'long' ? '多单' : '空单';
+                const ratioText = ratio === 1 ? '全部' : '一半';
+                const emoji = posSide === 'long' ? '📉' : '📈';
+
+                const positionsList = targetPositions.map(pos => {
+                    const absSize = Math.abs(pos.posSize);
+                    const closeSize = ratio === 1 ? absSize : Math.floor(absSize / 2) || 1;
+                    const pnl = pos.unrealizedPnl || 0;
+                    return `  ${pnl >= 0 ? '🟢' : '🔴'} ${pos.instId.replace('-USDT-SWAP','')} [全仓]: ${closeSize}张 (${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)} USDT)`;
+                }).join('\n');
+
+                const totalPnl   = targetPositions.reduce((s, p) => s + (p.unrealizedPnl || 0), 0);
+                const totalMgn   = targetPositions.reduce((s, p) => s + (p.margin || 0), 0);
+
+                const confirmMsg =
+                    `🌊 全仓批量平${ratioText}${directionText}\n\n` +
+                    `【持仓列表】\n${positionsList}\n\n` +
+                    `【统计】\n` +
+                    `  • 数量: ${targetPositions.length} 个\n` +
+                    `  • 总保证金(imr): ${totalMgn.toFixed(2)} USDT\n` +
+                    `  • 总浮动盈亏: ${totalPnl >= 0 ? '+' : ''}${totalPnl.toFixed(2)} USDT\n` +
+                    `  • 模式: 全仓(Cross)\n\n确认批量平仓？`;
+
+                const confirmed = await showConfirmDialog(confirmMsg, '🌊 全仓批量平仓确认');
+                if (!confirmed) return;
+
+                let successCount = 0, failCount = 0;
+                const results = [];
+
+                for (const position of targetPositions) {
+                    try {
+                        const coinName = position.instId.replace('-USDT-SWAP', '');
+                        let closeSize = Math.abs(position.posSize);
+
+                        if (ratio !== 1) {
+                            if (closeSize < 1) {
+                                closeSize = null; // 全平
+                            } else {
+                                closeSize = Math.floor(closeSize / 2) || 1;
+                            }
+                        }
+
+                        const posSideForClose = position.posSideForClose || position.posSide;
+                        const closeResponse = await fetch('/api/okx-trading/close-position', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                apiKey: account.apiKey,
+                                apiSecret: account.apiSecret,
+                                passphrase: account.passphrase,
+                                instId: position.instId,
+                                posSide: posSideForClose,
+                                closeSize: closeSize,
+                                mgnMode: 'cross',          // ← 全仓模式
+                                accountId: account.id
+                            })
+                        });
+
+                        const closeResult = await closeResponse.json();
+                        if (closeResult.success) {
+                            successCount++;
+                            const pnl = position.unrealizedPnl || 0;
+                            results.push(`✅ ${coinName}[全仓]: ${closeSize ?? '全部'}张 (${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)} USDT)`);
+                        } else {
+                            failCount++;
+                            results.push(`❌ ${coinName}: ${closeResult.error || '失败'}`);
+                        }
+
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    } catch (err) {
+                        failCount++;
+                        results.push(`❌ ${position.instId.replace('-USDT-SWAP','')}: ${err.message}`);
+                    }
+                }
+
+                alert(`${emoji} 全仓批量平仓完成\n\n成功: ${successCount} 个 | 失败: ${failCount} 个\n\n${results.join('\n')}`);
+                await refreshAccountData();
+
+            } catch (error) {
+                console.error('[batchClosePositionsCross] 异常:', error);
+                alert(`❌ 全仓批量平仓异常: ${error.message}`);
+            }
+        }
+
         // 1:1对冲配对函数
         async function hedgePositions(basePosSide) {
             console.log(`[hedgePositions] 开始对冲配对: basePosSide=${basePosSide}`);
@@ -10022,14 +11265,14 @@ data/
                         // 计算对冲金额（使用相同的保证金）
                         const hedgeAmount = position.margin.toFixed(2);
                         
-                        // 构建订单数据
+                        // 构建订单数据（对冲单使用页面当前选择的杠杆）
                         const orderData = {
                             instId: position.instId,
                             side: hedgeDirection === 'long' ? 'buy' : 'sell',
                             posSide: hedgeDirection,
                             ordType: 'market',
                             sz: hedgeAmount,  // USDT金额
-                            lever: '10'
+                            lever: String(currentLeverage)  // ✅ 使用当前选择的杠杆，不硬编码
                         };
                         
                         // 发送订单请求
@@ -11577,19 +12820,16 @@ ${data.sMsg || result.message || ''}`);
                     document.getElementById('autoTriggerPrice').value = settings.triggerPrice || 65000;
                     
                     // 加载单笔上限配置
-                    const maxOrderSizeEl = document.getElementById('maxOrderSizeInput');
-                    if (maxOrderSizeEl) {
-                        maxOrderSizeEl.value = settings.maxOrderSize || 5;
-                    }
+                    const maxOrderSizeValue = settings.maxOrderSize || 10;
+                    selectMaxOrderSize(maxOrderSizeValue, 'maxOrderSizeInput');
                     
                     // 同步配置到账户对象，供批量开仓函数使用
                     account.positionSize = 1.5;  // 固定为1.5%
-                    account.maxOrderSize = settings.maxOrderSize || 5;
+                    account.maxOrderSize = maxOrderSizeValue;
                     console.log(`✅ 账户配置已同步: positionSize=1.5% (固定), maxOrderSize=${account.maxOrderSize}U`);
                     
                     // 🆕 更新页面上的单笔限额显示
-                    const maxOrderSizeValue = settings.maxOrderSize || 5;
-                    ['maxOrderSizeDisplay1', 'maxOrderSizeDisplay2', 'maxOrderSizeDisplay3'].forEach(id => {
+                    ['maxOrderSizeDisplay1', 'maxOrderSizeDisplay2', 'maxOrderSizeDisplay3', 'maxOrderSizeDisplay4', 'maxOrderSizeDisplay5', 'maxOrderSizeDisplay6', 'maxOrderSizeDisplay7', 'maxOrderSizeDisplay8', 'maxOrderSizeDisplay9'].forEach(id => {
                         const el = document.getElementById(id);
                         if (el) el.textContent = maxOrderSizeValue;
                     });
@@ -11685,15 +12925,13 @@ ${data.sMsg || result.message || ''}`);
                     const typeEl = document.getElementById('autoStrategyTypeTop');
                     
                     // 加载单笔上限配置
-                    const maxOrderSizeEl = document.getElementById('maxOrderSizeInputTop');
-                    if (maxOrderSizeEl) {
-                        maxOrderSizeEl.value = settings.maxOrderSize || 5;
-                        console.log(`✅ 更新单笔上限: ${maxOrderSizeEl.value} USDT`);
-                    }
+                    const maxOrderSizeValTop = settings.maxOrderSize || 10;
+                    selectMaxOrderSize(maxOrderSizeValTop, 'maxOrderSizeInputTop');
+                    console.log(`✅ 更新单笔上限: ${maxOrderSizeValTop} USDT`);
                     
                     // 同步配置到账户对象，供批量开仓函数使用
                     account.positionSize = 1.5;  // 固定为1.5%
-                    account.maxOrderSize = settings.maxOrderSize || 5;
+                    account.maxOrderSize = maxOrderSizeValTop;
                     console.log(`✅ 账户配置已同步(Top): positionSize=1.5% (固定), maxOrderSize=${account.maxOrderSize}U`);
                     
                     if (priceEl) {
@@ -11867,7 +13105,7 @@ ${data.sMsg || result.message || ''}`);
                 triggerPrice: parseFloat(priceEl.value),
                 strategyType: typeEl.value,
                 positionSize: 1.5,  // 固定为1.5%
-                maxOrderSize: maxOrderSizeEl ? parseFloat(maxOrderSizeEl.value) : 5,
+                maxOrderSize: maxOrderSizeEl ? parseFloat(maxOrderSizeEl.value) : 10,
                 lastExecutedTime: currentSettings?.lastExecutedTime || null,
                 executedCount: currentSettings?.executedCount || 0
             };
@@ -14057,9 +15295,9 @@ ${data.sMsg || result.message || ''}`);
          * @param {string} type - 策略类型: 'top8' 或 'bottom8'
          * @param {string} direction - 交易方向: 'long' 或 'short'
          */
-        async function executeBalStrategy(type, direction) {
+        async function executeBalStrategy(type, direction, leverage = 10) {
             try {
-                console.log(`📊 开始执行余额1%策略: ${type === 'top8' ? '涨幅前8' : '涨幅后8'} - ${direction === 'long' ? '做多' : '做空'}`);
+                console.log(`📊 开始执行余额1%策略 (${leverage}x杠杆): ${type === 'top8' ? '涨幅前8' : '涨幅后8'} - ${direction === 'long' ? '做多' : '做空'}`);
                 
                 // 获取当前账户
                 const account = accounts.find(acc => acc.id === currentAccount);
@@ -14094,7 +15332,7 @@ ${data.sMsg || result.message || ''}`);
                 // 确认对话框
                 const typeText = type === 'top8' ? '涨幅前8名' : '涨幅后8名';
                 const directionText = direction === 'long' ? '做多(开多单)' : '做空(开空单)';
-                const confirmMsg = `确认执行余额1%策略吗？\n\n策略类型：${typeText}\n交易方向：${directionText}\n账户余额：${availableBalance.toFixed(2)} USDT\n使用金额：${totalAmount.toFixed(2)} USDT (1%)\n单币金额：${(totalAmount / 8).toFixed(2)} USDT`;
+                const confirmMsg = `确认执行余额1%策略吗？\n\n策略类型：${typeText}\n交易方向：${directionText}\n杠杆倍数：${leverage}x\n账户余额：${availableBalance.toFixed(2)} USDT\n使用金额：${totalAmount.toFixed(2)} USDT (1%)\n单币金额：${(totalAmount / 8).toFixed(2)} USDT`;
 
                 
                 if (!confirm(confirmMsg)) {
@@ -14165,7 +15403,7 @@ ${data.sMsg || result.message || ''}`);
                             direction: direction, // 'long' 或 'short'
                             orderType: 'market',
                             amount: amountPerCoin,
-                            leverage: account.leverage || 10
+                            leverage: leverage
                         };
                         
                         // 发送下单请求

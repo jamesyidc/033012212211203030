@@ -326,6 +326,50 @@
       "out_file": "/home/user/webapp/logs/sar-bias-monitor-out.log",
       "error_file": "/home/user/webapp/logs/sar-bias-monitor-error.log",
       "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "backup-scheduler",
+      "script": "/home/user/webapp/backup_scheduler_daemon.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "200M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/backup-scheduler-out.log",
+      "error_file": "/home/user/webapp/logs/backup-scheduler-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "daily-prediction-generator",
+      "script": "/home/user/webapp/daily_prediction_generator.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "200M",
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "out_file": "/home/user/webapp/logs/daily-prediction-out.log",
+      "error_file": "/home/user/webapp/logs/daily-prediction-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    },
+    {
+      "name": "consolidation-monitor",
+      "script": "/home/user/webapp/consolidation_monitor.py",
+      "cwd": "/home/user/webapp",
+      "interpreter": "python3",
+      "autorestart": true,
+      "max_memory_restart": "200M",
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "TELEGRAM_BOT_TOKEN": "8437045462:AAFePnwdC21cqeWhZISMQHGGgjmroVqE2H0",
+        "TELEGRAM_CHAT_ID": "-1003227444260"
+      },
+      "out_file": "/home/user/webapp/logs/consolidation-monitor-out.log",
+      "error_file": "/home/user/webapp/logs/consolidation-monitor-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
     }
   ]
 }

@@ -611,9 +611,13 @@
     
     ============================================================
     -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- 非阻塞加载 Tailwind CSS（避免阻塞首屏渲染） -->
+    <link rel="stylesheet" href="/static/css/tailwind.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="/static/css/tailwind.min.css"></noscript>
+    <!-- 非阻塞加载 Font Awesome -->
+    <link href="/static/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="/static/css/all.min.css" rel="stylesheet"></noscript>
+    <!-- echarts 移至底部加载，此处仅占位 -->
 </head>
 <body class="bg-gray-100">
     <!-- 加载进度覆盖层 -->
@@ -5771,6 +5775,18 @@ pm2 status                                                # 查看所有进程�
                 </div>
                 <div class="flex items-center gap-2">
                     <span id="ethSarUpdateTime" class="text-xs" style="color:#64748b;">-- : -- : --</span>
+                    <!-- 独立页面入口 -->
+                    <a href="/eth-sar" target="_blank" title="在独立页面中打开"
+                       class="flex items-center gap-1 px-3 h-7 rounded-full text-xs font-semibold transition-all"
+                       style="background:rgba(251,191,36,0.15); border:1px solid rgba(251,191,36,0.4); color:#fbbf24; text-decoration:none;"
+                       onmouseover="this.style.background='rgba(251,191,36,0.28)'"
+                       onmouseout="this.style.background='rgba(251,191,36,0.15)'">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                        </svg>
+                        独立页面
+                    </a>
                     <!-- 历史记录按钮 -->
                     <button onclick="openEthSarHistory()" title="查看历史数据"
                             class="flex items-center gap-1 px-3 h-7 rounded-full text-xs font-semibold transition-all"
@@ -5799,6 +5815,98 @@ pm2 status                                                # 查看所有进程�
 
             <!-- 主体内容 -->
             <div class="px-5 py-4">
+
+                <!-- ── 说明面板（可折叠） ──────────────────────────────── -->
+                <div id="ethSarDescPanel" style="margin-bottom:14px;">
+                    <button onclick="(function(){const c=document.getElementById('ethSarDescContent');const i=document.getElementById('ethSarDescIcon');const o=c.style.display==='none';c.style.display=o?'block':'none';i.textContent=o?'▲':'▼';})()"
+                            style="display:flex;align-items:center;gap:6px;width:100%;padding:6px 10px;
+                                   background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);
+                                   border-radius:8px;cursor:pointer;color:#94a3b8;font-size:11px;font-weight:600;
+                                   text-align:left;"
+                            onmouseover="this.style.background='rgba(99,102,241,0.14)'"
+                            onmouseout="this.style.background='rgba(99,102,241,0.08)'">
+                        <span id="ethSarDescIcon" style="font-size:9px;color:#818cf8;">▼</span>
+                        <span style="color:#a5b4fc;">📖 指标说明</span>
+                        <span style="margin-left:auto;font-weight:400;color:#64748b;">ETH-USDT-SWAP 5分钟 SAR + 布林带 · 点击展开/收起</span>
+                    </button>
+                    <div id="ethSarDescContent" style="display:none;margin-top:6px;padding:12px 14px;
+                             background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.07);
+                             border-radius:10px;font-size:11px;line-height:1.8;color:#94a3b8;">
+
+                        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;">
+
+                            <!-- 数据源 & 刷新 -->
+                            <div style="padding:8px 10px;background:rgba(99,102,241,0.07);border-radius:8px;border-left:3px solid #818cf8;">
+                                <div style="color:#a5b4fc;font-weight:700;margin-bottom:4px;">🔄 数据源 & 刷新</div>
+                                <div>• 数据来自 <b style="color:#e2e8f0;">OKX ETH-USDT-SWAP 5分钟</b> K线</div>
+                                <div>• 每 <b style="color:#e2e8f0;">30秒</b> 自动刷新一次</div>
+                                <div>• 表格第一行为 <b style="color:#818cf8;">实时未收盘K线</b>（蓝色背景+闪烁圆点●），价格实时变动</div>
+                                <div>• 下方最多10行为已收盘确认K线，最新在前</div>
+                            </div>
+
+                            <!-- SAR 指标 -->
+                            <div style="padding:8px 10px;background:rgba(129,140,248,0.07);border-radius:8px;border-left:3px solid #818cf8;">
+                                <div style="color:#a5b4fc;font-weight:700;margin-bottom:4px;">📍 SAR 抛物线指标</div>
+                                <div>• <b style="color:#e2e8f0;">SAR</b>：抛物线转向点价格，参数 AF=0.02/0.02/0.20</div>
+                                <div>• <b style="color:#4ade80;">多头</b>：SAR在价格下方（支撑位），价格若跌破则转空</div>
+                                <div>• <b style="color:#f87171;">空头</b>：SAR在价格上方（阻力位），价格若突破则转多</div>
+                                <div>• <b style="color:#e2e8f0;">序号</b>：当前多/空趋势持续了第几根K线</div>
+                                <div>• <b style="color:#e2e8f0;">方向切换</b>时，行有绿色（多→空）或红色（空→多）左边框</div>
+                            </div>
+
+                            <!-- SAR% & 变化 -->
+                            <div style="padding:8px 10px;background:rgba(165,180,252,0.07);border-radius:8px;border-left:3px solid #a5b4fc;">
+                                <div style="color:#a5b4fc;font-weight:700;margin-bottom:4px;">📊 SAR布林位置 (SAR%)</div>
+                                <div>• 公式：<b style="color:#e2e8f0;">(SAR - LB) / (UB - LB) × 100%</b></div>
+                                <div>• <b style="color:#f87171;">0%</b> = SAR在布林下轨，<b style="color:#4ade80;">100%</b> = SAR在布林上轨</div>
+                                <div>• SAR% &lt; 50%：SAR偏低位，多头区间相对安全</div>
+                                <div>• SAR% &gt; 100%：SAR超出布林上轨，说明空头SAR很高，趋势很强</div>
+                                <div>• <b style="color:#e2e8f0;">变化列</b>：与上一根K线的SAR%差值</div>
+                            </div>
+
+                            <!-- 布林带 -->
+                            <div style="padding:8px 10px;background:rgba(34,197,94,0.06);border-radius:8px;border-left:3px solid #4ade80;">
+                                <div style="color:#4ade80;font-weight:700;margin-bottom:4px;">📏 布林带 (BOLL)</div>
+                                <div>• 周期 <b style="color:#e2e8f0;">20</b>，倍数 <b style="color:#e2e8f0;">2.0</b>，仅用已收盘K线计算</div>
+                                <div>• <b style="color:#f87171;">LB（下轨）</b> = 中轨 - 2×标准差</div>
+                                <div>• <b style="color:#fde68a;">MID（中轨）</b> = 20周期均价</div>
+                                <div>• <b style="color:#4ade80;">UB（上轨）</b> = 中轨 + 2×标准差</div>
+                                <div>• <b style="color:#a78bfa;">开口</b> = UB - LB，表示价格波动区间大小</div>
+                                <div>• <b style="color:#a78bfa;">开口变化</b>：<span style="color:#fb923c;">▲橙色</span>开口扩大（波动增加），<span style="color:#60a5fa;">▼蓝色</span>开口收窄（波动减少）</div>
+                            </div>
+
+                            <!-- K线数据列 -->
+                            <div style="padding:8px 10px;background:rgba(251,146,60,0.06);border-radius:8px;border-left:3px solid #fb923c;">
+                                <div style="color:#fb923c;font-weight:700;margin-bottom:4px;">🕯 K线本体数据</div>
+                                <div>• <b style="color:#fb923c;">最高价</b>：该K线的最高点（橙色）</div>
+                                <div>• <b style="color:#60a5fa;">最低价</b>：该K线的最低点（蓝色）</div>
+                                <div>• <b style="color:#e2e8f0;">收盘价</b>：K线收盘/实时价格；<span style="color:#4ade80;">绿色</span>=上涨，<span style="color:#f87171;">红色</span>=下跌</div>
+                                <div>• <b style="color:#fde68a;">实体%</b>：(收盘-开盘)/开盘×100%，反映K线实体涨跌幅</div>
+                                <div>　正值（绿）= 阳线，负值（红）= 阴线</div>
+                            </div>
+
+                            <!-- SAR距离 -->
+                            <div style="padding:8px 10px;background:rgba(232,121,249,0.06);border-radius:8px;border-left:3px solid #e879f9;">
+                                <div style="color:#e879f9;font-weight:700;margin-bottom:4px;">📐 SAR距离</div>
+                                <div>• <b style="color:#e2e8f0;">SAR距离</b> = |SAR - 收盘价|，表示SAR与当前价格的绝对距离</div>
+                                <div>• <b style="color:#f87171;">↑红色</b>：SAR在价格上方（空头状态），距离=SAR-价格</div>
+                                <div>• <b style="color:#4ade80;">↓绿色</b>：SAR在价格下方（多头状态），距离=价格-SAR</div>
+                                <div>• <b style="color:#e2e8f0;">距离变化</b>：<span style="color:#fb923c;">▲橙色</span>距离拉大（趋势更确定），<span style="color:#818cf8;">▼紫色</span>距离缩小（接近可能翻转）</div>
+                                <div>• 距离<b>快速缩小</b>时需警惕趋势反转信号</div>
+                            </div>
+
+                        </div>
+
+                        <div style="margin-top:10px;padding:8px 12px;background:rgba(251,191,36,0.05);
+                                    border:1px solid rgba(251,191,36,0.15);border-radius:8px;
+                                    color:#fde68a;font-size:10px;line-height:1.7;">
+                            💡 <b>使用建议：</b>
+                            SAR% 在 50% 附近说明SAR处于布林中轨，趋势中性；SAR距离持续缩小+SAR%接近50%时，可能是趋势反转前兆。
+                            开口扩大表示行情加速，开口收窄表示行情趋于平静。实体%大意味着K线动能强。
+                        </div>
+                    </div>
+                </div>
+                <!-- ── /说明面板 ──────────────────────────────────────── -->
 
                 <!-- 当前状态 -->
                 <div id="ethSarCurrentStatus" class="flex flex-wrap gap-3 mb-4">
@@ -5833,7 +5941,7 @@ pm2 status                                                # 查看所有进程�
                     </div>
                 </div>
 
-                <!-- 最近5根K线表格 -->
+                <!-- 最近10根K线表格 -->
                 <div>
                     <div class="text-xs font-semibold mb-2 flex items-center gap-2" style="color:#94a3b8;">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -5847,8 +5955,15 @@ pm2 status                                                # 查看所有进程�
                             <thead>
                                 <tr style="background:rgba(255,255,255,0.06); color:#64748b;">
                                     <th class="px-3 py-2 text-left font-semibold">时间</th>
+                                    <th class="px-3 py-2 text-right font-semibold" style="color:#fb923c;">最高</th>
+                                    <th class="px-3 py-2 text-right font-semibold" style="color:#60a5fa;">最低</th>
                                     <th class="px-3 py-2 text-right font-semibold">收盘价</th>
-                                    <th class="px-3 py-2 text-right font-semibold">SAR</th>
+                                    <th class="px-3 py-2 text-right font-semibold" style="color:#fde68a;">实体%</th><th class="px-3 py-2 text-right font-semibold" style="color:#67e8f9;" title="当日截至该时间点，收盘价在最高最低区间内的位置">所处位置</th>
+                                    
+                                    <th class="px-3 py-2 text-right font-semibold" style="color:#fb923c;" title="(最高-收盘)/收盘 百分比">上影线%</th>
+                                    <th class="px-3 py-2 text-right font-semibold" style="color:#60a5fa;" title="(收盘-最低)/收盘 百分比">下影线%</th>
+                                    <th class="px-3 py-2 text-right font-semibold" style="color:#fdba74;" title="上影线% ÷ 实体%绝对值">上影/实体</th>
+                                    <th class="px-3 py-2 text-right font-semibold" style="color:#93c5fd;" title="下影线% ÷ 实体%绝对值">下影/实体</th><th class="px-3 py-2 text-right font-semibold">SAR</th>
                                     <th class="px-3 py-2 text-center font-semibold">方向</th>
                                     <th class="px-3 py-2 text-center font-semibold">序号</th>
                                     <th class="px-3 py-2 text-right font-semibold">SAR%</th>
@@ -5858,11 +5973,14 @@ pm2 status                                                # 查看所有进程�
                                     <th class="px-3 py-2 text-right font-semibold" style="color:#4ade80;">UB</th>
                                     <th class="px-3 py-2 text-right font-semibold" style="color:#a78bfa;">开口</th>
                                     <th class="px-3 py-2 text-center font-semibold" style="color:#a78bfa;">开口变化</th>
+                                    <th class="px-3 py-2 text-right font-semibold" style="color:#c084fc;" title="当前开口 ÷ 本轮起始开口（空头01或多头01的开口）">开口比</th>
+                                    <th class="px-3 py-2 text-right font-semibold" style="color:#e879f9;">SAR距离</th>
+                                    <th class="px-3 py-2 text-center font-semibold" style="color:#e879f9;">距离变化</th>
                                 </tr>
                             </thead>
                             <tbody id="ethSarBarsTable">
                                 <tr>
-                                    <td colspan="12" class="px-3 py-6 text-center" style="color:#475569;">
+                                    <td colspan="23" class="px-3 py-6 text-center" style="color:#475569;">
                                         <div class="flex items-center justify-center gap-2">
                                             <div class="w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
                                             加载中...
@@ -5876,6 +5994,166 @@ pm2 status                                                # 查看所有进程�
 
             </div><!-- /main body -->
         </div><!-- /ethSarBollPanel -->
+
+        <!-- ════════════════════════════════════════════════════════════════
+             空头01 / 多头01 汇总框（按日期查询，数据存 JSONL）
+             ════════════════════════════════════════════════════════════════ -->
+        <div id="ethSarDailyFlipsPanel" class="mb-6 rounded-2xl border overflow-hidden"
+             style="background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);
+                    border-color:rgba(255,255,255,0.08);">
+
+            <!-- 标题栏 -->
+            <div class="flex items-center justify-between px-5 py-3"
+                 style="background:rgba(255,255,255,0.04); border-bottom:1px solid rgba(255,255,255,0.07);">
+                <div class="flex items-center gap-3">
+                    <div class="w-2 h-2 rounded-full" style="background:#c084fc;box-shadow:0 0 6px #c084fc;"></div>
+                    <span class="font-bold text-white text-sm tracking-wide">
+                        空头01 / 多头01 汇总
+                    </span>
+                    <span class="px-2 py-0.5 rounded-full text-xs font-semibold"
+                          style="background:rgba(192,132,252,0.2); color:#c084fc;">
+                        sar_seq = 1
+                    </span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <!-- 日期选择器 -->
+                    <select id="ethSarFlipsDateSel"
+                            onchange="loadEthSarDailyFlips(this.value)"
+                            style="background:rgba(15,23,42,0.9);border:1px solid rgba(192,132,252,0.35);
+                                   color:#c084fc;border-radius:8px;padding:3px 8px;font-size:11px;
+                                   cursor:pointer;outline:none;">
+                        <option value="">加载中...</option>
+                    </select>
+                    <span id="ethSarFlipsCount" class="text-xs font-semibold px-2 py-0.5 rounded-full"
+                          style="background:rgba(192,132,252,0.15);color:#c084fc;">-- 条</span>
+                    <!-- 刷新按钮 -->
+                    <button onclick="loadEthSarDailyFlips(document.getElementById('ethSarFlipsDateSel').value)"
+                            title="刷新"
+                            style="width:26px;height:26px;display:flex;align-items:center;justify-content:center;
+                                   background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
+                                   border-radius:50%;cursor:pointer;"
+                            onmouseover="this.style.background='rgba(255,255,255,0.15)'"
+                            onmouseout="this.style.background='rgba(255,255,255,0.07)'">
+                        <svg id="ethSarFlipsRefreshIcon" style="width:13px;height:13px;color:#94a3b8;"
+                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 内容区：按时间顺序的表格 -->
+            <div class="px-5 py-4">
+                <div class="overflow-x-auto rounded-xl" style="border:1px solid rgba(255,255,255,0.07);">
+                    <table class="w-full text-xs" style="border-collapse:collapse;">
+                        <thead>
+                            <tr style="background:rgba(255,255,255,0.06);color:#64748b;">
+                                <th class="px-3 py-2 text-left font-semibold">时间</th>
+                                <th class="px-3 py-2 text-right font-semibold" style="color:#fb923c;">最高</th>
+                                <th class="px-3 py-2 text-right font-semibold" style="color:#60a5fa;">最低</th>
+                                <th class="px-3 py-2 text-right font-semibold">收盘价</th>
+                                <th class="px-3 py-2 text-right font-semibold" style="color:#fde68a;">实体%</th><th class="px-3 py-2 text-right font-semibold" style="color:#67e8f9;" title="当日截至该时间点，收盘价在最高最低区间内的位置">所处位置</th>
+                                
+                                <th class="px-3 py-2 text-right font-semibold" style="color:#fb923c;" title="(最高-收盘)/收盘 百分比">上影线%</th>
+                                <th class="px-3 py-2 text-right font-semibold" style="color:#60a5fa;" title="(收盘-最低)/收盘 百分比">下影线%</th>
+                                <th class="px-3 py-2 text-right font-semibold" style="color:#fdba74;" title="上影线% ÷ 实体%绝对值">上影/实体</th>
+                                <th class="px-3 py-2 text-right font-semibold" style="color:#93c5fd;" title="下影线% ÷ 实体%绝对值">下影/实体</th><th class="px-3 py-2 text-right font-semibold">SAR</th>
+                                <th class="px-3 py-2 text-center font-semibold">方向</th>
+                                <th class="px-3 py-2 text-center font-semibold">序号</th>
+                                <th class="px-3 py-2 text-right font-semibold">SAR%</th>
+                                <th class="px-3 py-2 text-center font-semibold">变化</th>
+                                <th class="px-3 py-2 text-right font-semibold" style="color:#f87171;">LB</th>
+                                <th class="px-3 py-2 text-right font-semibold" style="color:#fde68a;">MID</th>
+                                <th class="px-3 py-2 text-right font-semibold" style="color:#4ade80;">UB</th>
+                                <th class="px-3 py-2 text-right font-semibold" style="color:#a78bfa;">开口</th>
+                                <th class="px-3 py-2 text-center font-semibold" style="color:#a78bfa;">开口变化</th>
+                                <th class="px-3 py-2 text-right font-semibold" style="color:#c084fc;" title="当前开口 ÷ 本轮起始开口（空头01或多头01的开口）">开口比</th>
+                                <th class="px-3 py-2 text-right font-semibold" style="color:#e879f9;">SAR距离</th>
+                                <th class="px-3 py-2 text-center font-semibold" style="color:#e879f9;">距离变化</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ethSarFlipsTbody">
+                            <tr><td colspan="23" style="text-align:center;padding:20px;color:#475569;">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div><!-- /ethSarDailyFlipsPanel -->
+
+        <!-- 影线预警记录面板 -->
+        <div id="ethSarShadowAlertPanel" class="mb-6 rounded-2xl border overflow-hidden"
+             style="border-color:rgba(251,146,60,0.3);background:linear-gradient(135deg,rgba(15,23,42,0.95) 0%,rgba(30,41,59,0.98) 100%);">
+            <!-- panel header -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:rgba(251,146,60,0.07);border-bottom:1px solid rgba(251,146,60,0.15);">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="width:8px;height:8px;border-radius:50%;background:#fb923c;box-shadow:0 0 6px #fb923c;"></div>
+                    <span style="font-weight:700;font-size:13px;color:#fff;">🕯️ 影线预警记录</span>
+                    <span style="padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;background:rgba(251,146,60,0.2);color:#fb923c;">上影线≥0.5% 或 下影线≥0.3%</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <select id="ethSarShadowDateSel"
+                            onchange="loadShadowAlertRows(this.value)"
+                            style="background:rgba(15,23,42,0.9);border:1px solid rgba(251,146,60,0.35);color:#fb923c;border-radius:8px;padding:3px 8px;font-size:11px;cursor:pointer;outline:none;">
+                        <option value="">加载中...</option>
+                    </select>
+                    <span id="ethSarShadowCount" class="text-xs font-semibold px-2 py-0.5 rounded-full"
+                          style="background:rgba(251,146,60,0.15);color:#fdba74;">--</span>
+                    <button onclick="loadShadowAlertRows(document.getElementById('ethSarShadowDateSel').value)" title="刷新"
+                            style="width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,255,255,0.08);border:none;cursor:pointer;"
+                            onmouseover="this.style.background='rgba(255,255,255,0.18)'"
+                            onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+                        <svg style="width:13px;height:13px;color:#94a3b8;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <!-- shadow alert table -->
+            <div style="padding:14px 18px;">
+                <div class="overflow-x-auto" style="border:1px solid rgba(255,255,255,0.07);border-radius:10px;max-height:420px;overflow-y:auto;">
+                    <table style="width:100%;border-collapse:collapse;font-size:11.5px;">
+                        <thead>
+                            <tr style="background:rgba(15,23,42,0.95);color:#64748b;position:sticky;top:0;z-index:2;">
+                                <th style="padding:8px 8px;text-align:center;font-weight:600;white-space:nowrap;color:#fb923c;">类型</th>
+                                <th style="padding:8px 10px;text-align:left;font-weight:600;white-space:nowrap;">时间</th>
+                                <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fb923c;white-space:nowrap;">最高</th>
+                                <th style="padding:8px 8px;text-align:right;font-weight:600;color:#60a5fa;white-space:nowrap;">最低</th>
+                                <th style="padding:8px 8px;text-align:right;font-weight:600;white-space:nowrap;">收盘价</th>
+                                <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fde68a;white-space:nowrap;">实体%</th>
+                                <th style="padding:8px 8px;text-align:right;font-weight:600;color:#67e8f9;white-space:nowrap;">所处位置</th>
+                                <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fb923c;white-space:nowrap;">上影线%</th>
+                                <th style="padding:8px 8px;text-align:right;font-weight:600;color:#60a5fa;white-space:nowrap;">下影线%</th>
+                                <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fdba74;white-space:nowrap;">上影/实体</th>
+                                <th style="padding:8px 8px;text-align:right;font-weight:600;color:#93c5fd;white-space:nowrap;">下影/实体</th>
+                                <th style="padding:8px 8px;text-align:right;font-weight:600;white-space:nowrap;">SAR</th>
+                                <th style="padding:8px 8px;text-align:center;font-weight:600;white-space:nowrap;">方向</th>
+                                <th style="padding:8px 8px;text-align:center;font-weight:600;white-space:nowrap;">序号</th>
+                                <th style="padding:8px 8px;text-align:right;font-weight:600;white-space:nowrap;">SAR%</th>
+                                <th style="padding:8px 8px;text-align:center;font-weight:600;white-space:nowrap;">变化</th>
+                                <th style="padding:8px 8px;text-align:right;font-weight:600;color:#f87171;white-space:nowrap;">LB</th>
+                                <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fde68a;white-space:nowrap;">MID</th>
+                                <th style="padding:8px 8px;text-align:right;font-weight:600;color:#4ade80;white-space:nowrap;">UB</th>
+                                <th style="padding:8px 8px;text-align:right;font-weight:600;color:#a78bfa;white-space:nowrap;">开口</th>
+                                <th style="padding:8px 8px;text-align:center;font-weight:600;color:#a78bfa;white-space:nowrap;">开口变化</th>
+                                <th style="padding:8px 8px;text-align:right;font-weight:600;color:#c084fc;white-space:nowrap;">开口比</th>
+                                <th style="padding:8px 8px;text-align:right;font-weight:600;color:#e879f9;white-space:nowrap;">SAR距离</th>
+                                <th style="padding:8px 8px;text-align:center;font-weight:600;color:#e879f9;white-space:nowrap;">距离变化</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ethSarShadowTbody">
+                            <tr><td colspan="24" style="text-align:center;padding:32px;color:#475569;">
+                                <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+                                    <div style="width:14px;height:14px;border:2px solid #fb923c;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+                                    加载中...
+                                </div>
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div><!-- /ethSarShadowAlertPanel -->
 
         <!-- 波峰检测与假突破告警框 -->
         <div id="wavePeakAlertBox" class="mb-6" style="display: none;">
@@ -6969,23 +7247,23 @@ pm2 status                                                # 查看所有进程�
         async function loadDailyPrediction() {
             try {
                 console.log('🔮🔮🔮 加载当日行情预判... [START]');
-                
-                // 获取北京时间
-                const beijingTime = new Date(Date.now() + 8 * 3600000);
-                const hour = beijingTime.getUTCHours();
-                const minute = beijingTime.getUTCMinutes();
-                // 修复：正确获取北京时间的日期字符串（YYYY-MM-DD格式）
-                const beijingDate = `${beijingTime.getUTCFullYear()}-${String(beijingTime.getUTCMonth() + 1).padStart(2, '0')}-${String(beijingTime.getUTCDate()).padStart(2, '0')}`;
-                
-                console.log(`🕐 北京时间: ${hour}:${minute.toString().padStart(2, '0')}, 日期: ${beijingDate}`);
-                
+
+                // ★ 使用后端服务器时间，不再在浏览器中计算 UTC+8
+                const stRes  = await fetch('/api/server-time?_t=' + Date.now(), {cache:'no-store'});
+                const stJson = await stRes.json();
+                const hour        = stJson.beijing_hour   ?? 12;   // 默认12点（正常模式）
+                const beijingDate = stJson.beijing_date   ?? '';
+                // 缓存到全局，供 updatePredictionCardFromData 使用（避免重复计算时区）
+                window._serverBjDate = beijingDate;
+                console.log(`🕐 服务器北京时间: ${stJson.beijing_time}, 日期: ${beijingDate}`);
+
                 // 优先判断时间：如果是0-2点，显示实时统计
-                if (hour >= 0 && hour < 2) {
+                if (stJson.is_0_to_2am) {
                     console.log('⏰⏰⏰ 当前是0-2点，显示实时统计（等待2点后预判）');
                     await loadRealtimePredictionStats(beijingDate);
                     return;
                 }
-                
+
                 // 2点后，尝试加载已保存的预判数据
                 console.log('🔍 当前不在0-2点，尝试加载已保存的预判数据...');
                 const url = `/api/coin-change-tracker/daily-prediction?_t=${Date.now()}`;
@@ -6998,7 +7276,7 @@ pm2 status                                                # 查看所有进程�
                 });
                 const result = await response.json();
                 console.log('📊 预判数据API响应:', result);
-                
+
                 if (result.success && result.data) {
                     // 使用保存的预判数据（2点后）
                     console.log('✅ 使用已保存的预判数据（2点后）');
@@ -7014,166 +7292,60 @@ pm2 status                                                # 查看所有进程�
             }
         }
         
-        // 计算上涨占比柱状图数据（与后端逻辑一致）
-        function calculateUpRatioBarData(times, dataArray) {
-            const interval = 10; // 10分钟
-            const grouped = {};
-            
-            // 按10分钟分组
-            for (let i = 0; i < times.length && i < dataArray.length; i++) {
-                const timeStr = times[i] || '';
-                const dataPoint = dataArray[i] || {};
-                
-                if (!timeStr) continue;
-                
-                try {
-                    const [hours, minutes, seconds] = timeStr.split(':').map(Number);
-                    const totalMinutes = hours * 60 + minutes;
-                    const groupIndex = Math.floor(totalMinutes / interval);
-                    
-                    if (!grouped[groupIndex]) {
-                        grouped[groupIndex] = {
-                            ratios: [],
-                            startTime: `${String(Math.floor(groupIndex * interval / 60)).padStart(2, '0')}:${String(groupIndex * interval % 60).padStart(2, '0')}`
-                        };
-                    }
-                    
-                    // 🔧 优先使用后端计算好的 up_ratio（轻量模式下不返回changes）
-                    if (dataPoint.up_ratio !== undefined) {
-                        grouped[groupIndex].ratios.push(dataPoint.up_ratio);
-                    } else {
-                        // 兼容完整模式：从changes计算（如果有的话）
-                        const changes = dataPoint.changes || {};
-                        const changesValues = Object.values(changes);
-                        if (changesValues.length > 0) {
-                            const upCoins = changesValues.filter(coin => coin.change_pct > 0).length;
-                            const upRatio = (upCoins / changesValues.length) * 100;
-                            grouped[groupIndex].ratios.push(upRatio);
-                        }
-                    }
-                } catch (e) {
-                    continue;
-                }
-            }
-            
-            // 计算每个区间的颜色（与后端Python逻辑一致）
-            const barData = [];
-            const timeLabels = [];
-            
-            Object.keys(grouped).sort((a, b) => parseInt(a) - parseInt(b)).forEach(groupIdx => {
-                const group = grouped[groupIdx];
-                if (!group.ratios || group.ratios.length === 0) return;
-                
-                // 计算平均值
-                const avgUpRatio = group.ratios.reduce((a, b) => a + b, 0) / group.ratios.length;
-                let color;
-                
-                // 根据平均值判断颜色（与后端Python逻辑一致）
-                if (avgUpRatio === 0) {
-                    color = '#9ca3af'; // 空白/灰色 (0%)
-                } else if (avgUpRatio >= 55) {
-                    color = '#22c55e'; // 绿色 (≥55%)
-                } else if (avgUpRatio > 45) {
-                    color = '#f59e0b'; // 黄色 (>45% 且 <55%)
-                } else {
-                    color = '#ef4444'; // 红色 (≤45%)
-                }
-                
-                barData.push({
-                    value: avgUpRatio.toFixed(2),
-                    color: color
-                });
-                timeLabels.push(group.startTime);
-            });
-            
-            return { barData, timeLabels };
-        }
-        
-        // 加载0-2点实时统计（不做预判）
+        // ★ calculateUpRatioBarData 已移至后端 /api/coin-change-tracker/realtime-prediction-stats
+        // 前端不再做任何数值运算，所有颜色/分组/统计由后端完成
+
+        // 加载0-2点实时统计（全部由后端 /api/coin-change-tracker/realtime-prediction-stats 计算）
         async function loadRealtimePredictionStats(date) {
             try {
-                console.log(`🔍 [loadRealtimePredictionStats] 开始加载实时数据... 日期=${date}`);
-                // 获取当日历史数据，只看0-2点的10分钟柱状图
-                // 🔥 不使用limit参数，返回完整日期数据
-                const historyUrl = `/api/coin-change-tracker/history?date=${date}&_t=${Date.now()}`;
-                console.log(`🔍 [loadRealtimePredictionStats] API URL: ${historyUrl}`);
-                const historyResponse = await fetch(historyUrl, { cache: 'no-store' });
-                const historyResult = await historyResponse.json();
-                console.log(`🔍 [loadRealtimePredictionStats] API响应:`, historyResult);
-                
-                if (!historyResult.success || !historyResult.data || historyResult.data.length === 0) {
-                    console.warn('⚠️ 暂无历史数据');
+                console.log(`🔍 [loadRealtimePredictionStats] 调用后端API... 日期=${date}`);
+                const res = await fetch(
+                    `/api/coin-change-tracker/realtime-prediction-stats?date=${date}&_t=${Date.now()}`,
+                    { cache: 'no-store' }
+                );
+                const json = await res.json();
+                console.log(`🔍 [loadRealtimePredictionStats] API响应:`, json);
+
+                if (!json.success) {
+                    console.warn('⚠️ realtime-prediction-stats 失败:', json.error);
                     updatePredictionCard(null);
                     return;
                 }
-                
-                console.log(`📊 [loadRealtimePredictionStats] 数据记录数: ${historyResult.data.length}`);
-                
-                // 计算0-2点的柱状图颜色统计
-                const { barData, timeLabels } = calculateUpRatioBarData(
-                    historyResult.data.map(d => {
-                        // 兼容两种格式：beijing_time 和 time
-                        const timeStr = d.beijing_time || d.time || '';
-                        // 如果是完整时间戳，提取时间部分
-                        return timeStr.includes(' ') ? timeStr.split(' ')[1] : timeStr;
-                    }),
-                    historyResult.data  // 🔧 传入完整数据对象（包含 up_ratio 或 changes）
-                );
-                
-                // 获取当前北京时间，判断哪些区间已完成
-                const beijingTime = new Date(Date.now() + 8 * 3600000);
-                const currentHour = beijingTime.getUTCHours();
-                const currentMinute = beijingTime.getUTCMinutes();
-                const currentTotalMinutes = currentHour * 60 + currentMinute;
-                const currentGroupIndex = Math.floor(currentTotalMinutes / 10);
-                
-                // 只统计0-2点的数据（前12个10分钟区间），且只统计已完成的区间
-                let greenCount = 0;
-                let redCount = 0;
-                let yellowCount = 0;
-                let blankCount = 0;
-                
-                for (let i = 0; i < Math.min(12, barData.length); i++) {
-                    // 判断区间是否已完成：当前时间必须已经超过该区间的结束时间
-                    const groupEndMinutes = (i + 1) * 10;
-                    const isCompleted = currentTotalMinutes >= groupEndMinutes;
-                    
-                    const color = barData[i].color;
-                    
-                    // 只统计已完成的区间
-                    if (isCompleted) {
-                        if (color === '#22c55e') greenCount++;       // 绿色
-                        else if (color === '#ef4444') redCount++;    // 红色
-                        else if (color === '#f59e0b') yellowCount++; // 黄色
-                        else blankCount++;                            // 空白/灰色
-                    }
-                }
-                
-                // 更新实时统计（根据当前数据给出趋势性预判）
-                document.getElementById('predictionGreenCount').textContent = greenCount;
-                document.getElementById('predictionRedCount').textContent = redCount;
-                document.getElementById('predictionYellowCount').textContent = yellowCount;
-                
-                const completedCount = greenCount + redCount + yellowCount + blankCount;
-                const totalCount = 12;
-                
-                // ❌ 删除自定义的判断逻辑，只使用API返回的6种预判信号
-                // 0-2点实时数据收集期间，不做预判，等待2点后API返回正式预判
-                let signal = '⏳ 收集中';
-                let signalClass = 'text-blue-500';
-                let statusBadge = `今日 (${date}) - 数据收集中`;
-                let description = `<i class="fas fa-spinner fa-spin text-blue-600 mr-1"></i>` +
+
+                // 后端已经计算好所有字段，前端直接读取
+                const colorCounts    = json.color_counts;        // {green, red, yellow, blank}
+                const completedCount = json.completed_count;
+                const greenCount     = colorCounts.green  || 0;
+                const redCount       = colorCounts.red    || 0;
+                const yellowCount    = colorCounts.yellow || 0;
+                const blankCount     = colorCounts.blank  || 0;
+
+                // 更新计数显示
+                const gc = document.getElementById('predictionGreenCount');
+                const rc = document.getElementById('predictionRedCount');
+                const yc = document.getElementById('predictionYellowCount');
+                if (gc) gc.textContent = greenCount;
+                if (rc) rc.textContent = redCount;
+                if (yc) yc.textContent = yellowCount;
+
+                // 更新状态卡片（0-2点收集期间只显示进度，不做预判）
+                const signal      = '⏳ 收集中';
+                const signalClass = 'text-blue-500';
+                const statusBadge = `今日 (${date}) - 数据收集中`;
+                const description = `<i class="fas fa-spinner fa-spin text-blue-600 mr-1"></i>` +
                     `正在收集0-2点数据... 绿色${greenCount} 红色${redCount} 黄色${yellowCount} 空白${blankCount}（${completedCount}/12）。` +
                     `<strong>2点后将生成预判信号。</strong>`;
-                
-                document.getElementById('predictionDateBadge').textContent = statusBadge;
-                document.getElementById('predictionSignal').innerHTML = `<span class="${signalClass}">${signal}</span>`;
-                document.getElementById('predictionTime').textContent = `0-2点数据：已收集 ${completedCount}/12 区间`;
-                document.getElementById('predictionDescription').innerHTML = description;
-                
-                console.log(`📊 [loadRealtimePredictionStats] 实时统计结果: 绿${greenCount} 红${redCount} 黄${yellowCount} 空白${blankCount}`);
-                console.log(`📊 [loadRealtimePredictionStats] 已完成区间数: ${greenCount + redCount + yellowCount + blankCount}/12`);
-                console.log(`📊 [loadRealtimePredictionStats] 更新UI完成`);
+
+                const db = document.getElementById('predictionDateBadge');
+                const ps = document.getElementById('predictionSignal');
+                const pt = document.getElementById('predictionTime');
+                const pd = document.getElementById('predictionDescription');
+                if (db) db.textContent = statusBadge;
+                if (ps) ps.innerHTML  = `<span class="${signalClass}">${signal}</span>`;
+                if (pt) pt.textContent = `0-2点数据：已收集 ${completedCount}/12 区间`;
+                if (pd) pd.innerHTML  = description;
+
+                console.log(`📊 [loadRealtimePredictionStats] 后端返回: 绿${greenCount} 红${redCount} 黄${yellowCount} 空白${blankCount} 完成${completedCount}/12`);
             } catch (error) {
                 console.error('❌ 加载实时统计异常:', error);
                 updatePredictionCard(null);
@@ -7198,19 +7370,11 @@ pm2 status                                                # 查看所有进程�
             const timestamp = predictionData.timestamp || '';
             const date = predictionData.date || '';
             
-            // 更新日期标签（使用北京时间判断）
+            // 更新日期标签（使用后端服务器时间 window._serverBjDate，不在浏览器计算UTC+8）
             if (date) {
-                // 获取北京时间的日期（UTC+8）
-                const now = new Date();
-                const beijingTime = new Date(now.getTime() + (8 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
-                const today = beijingTime.toISOString().split('T')[0];
-                const yesterday = new Date(beijingTime.getTime() - 86400000).toISOString().split('T')[0];
-                let dateLabel = date;
-                if (date === today) {
-                    dateLabel = `今日 (${date})`;
-                } else if (date === yesterday) {
-                    dateLabel = `昨日 (${date})`;
-                }
+                const today     = window._serverBjDate || '';
+                const dateLabel = (date === today) ? `今日 (${date})`
+                    : `${date}`;
                 document.getElementById('predictionDateBadge').textContent = dateLabel;
             }
             
@@ -14628,9 +14792,9 @@ pm2 status                                                # 查看所有进程�
                 
                 // 并行执行3个独立的数据加载任务（带5秒超时）
                 const [latestResult, sentimentResult, historyResult] = await Promise.allSettled([
-                    withTimeout(updateLatestData(), 5000, '实时数据加载'),
-                    withTimeout(loadMarketSentiment(), 5000, '市场情绪加载'),
-                    withTimeout(isToday ? updateHistoryData() : updateHistoryData(currentDate), 8000, '历史数据加载')
+                    withTimeout(updateLatestData(), 10000, '实时数据加载'),
+                    withTimeout(loadMarketSentiment(), 10000, '市场情绪加载'),
+                    withTimeout(isToday ? updateHistoryData() : updateHistoryData(currentDate), 20000, '历史数据加载')
                 ]);
                 
                 // 检查各个加载结果
@@ -15666,6 +15830,8 @@ pm2 status                                                # 查看所有进程�
                     return false;
                 }
             }
+            // 将 sendTelegramAlert 暴露到全局，供 window.onload 外部函数调用
+            window.sendTelegramAlert = sendTelegramAlert;
             
             // 显示预警弹窗（简化版，只显示阈值信息）
             function showAlertDialog(type, value, coins) {
@@ -17822,13 +17988,39 @@ pm2 status                                                # 查看所有进程�
             }
         }
         // ════════════════════════════════════════════════════════════════
+        // 全局 Telegram 发送函数（供 window.onload 外部使用）
+        // ════════════════════════════════════════════════════════════════
+        async function _sendTgAlert(message) {
+            try {
+                const resp = await fetch('/api/telegram/send-alert', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message, type: 'coin_alert' })
+                });
+                if (resp.ok) {
+                    const r = await resp.json();
+                    console.log('✅ [TG全局] 通知已发送:', r);
+                    return true;
+                } else {
+                    console.error('❌ [TG全局] 发送失败 HTTP', resp.status);
+                    return false;
+                }
+            } catch (e) {
+                console.error('[TG全局] 发送异常:', e);
+                return false;
+            }
+        }
+
+        // ════════════════════════════════════════════════════════════════
         // ETH 5分钟 SAR + 布林带 独立面板逻辑
+        // ★ 所有数值计算均在后端完成，前端只负责渲染（零运算原则）
         // ════════════════════════════════════════════════════════════════
         let _ethSarTimer = null;
-        let _ethSarPrevPct = null;
+
+        /* ── 纯渲染辅助函数（格式化/颜色/HTML片段，无数值运算） ── */
 
         function _pctToLeft(pct) {
-            // 将SAR%映射到进度条位置 (clamp 0~100)
+            // 将 SAR% 映射到进度条位置 (clamp -10~110)
             const clamped = Math.max(-10, Math.min(110, pct));
             return ((clamped + 10) / 120 * 100).toFixed(1) + '%';
         }
@@ -17855,6 +18047,7 @@ pm2 status                                                # 查看所有进程�
         }
 
         function _pctColor(pct) {
+            if (pct == null) return '#475569';
             if (pct > 100) return '#22c55e';
             if (pct < 0)   return '#ef4444';
             if (pct > 70)  return '#4ade80';
@@ -17862,234 +18055,652 @@ pm2 status                                                # 查看所有进程�
             return '#a5b4fc';
         }
 
-        function _pctDeltaBadge(pct, prevPct) {
-            if (prevPct === null) return '<span style="color:#475569;">--</span>';
-            const delta = pct - prevPct;
-            if (Math.abs(delta) < 0.01) return '<span style="color:#475569;">±0.0%</span>';
+        /* delta 已由后端算好，这里只做格式化渲染 */
+        function _deltaBadge(delta) {
+            if (delta === null || delta === undefined)
+                return '<span style="color:#475569;">--</span>';
+            if (Math.abs(delta) < 0.01)
+                return '<span style="color:#475569;">±0.0%</span>';
             const color = delta > 0 ? '#4ade80' : '#f87171';
             const sign  = delta > 0 ? '+' : '';
             return `<span style="color:${color};font-weight:600;">${sign}${delta.toFixed(1)}%</span>`;
         }
 
+        function _bWidthDeltaBadge(delta) {
+            if (delta === null || delta === undefined)
+                return '<span style="color:#475569;">--</span>';
+            if (Math.abs(delta) < 0.005)
+                return '<span style="color:#475569;">±0.00</span>';
+            return delta > 0
+                ? `<span style="color:#fb923c;font-weight:600;">▲${delta.toFixed(2)}</span>`
+                : `<span style="color:#60a5fa;font-weight:600;">▼${Math.abs(delta).toFixed(2)}</span>`;
+        }
+
+        function _sarDistHtml(sarDist, sarSeq, bull) {
+            if (sarDist === null || sarDist === undefined)
+                return '<span style="color:#475569;">--</span>';
+            const abs  = Math.abs(sarDist);
+            const col  = sarDist > 0 ? '#f87171' : '#4ade80';
+            const arr  = sarDist > 0 ? '↑' : '↓';
+            // 特殊标记：空头01 SAR距离 > 25 或 多头01 SAR距离 < -25
+            const isSeq1 = sarSeq === 1;
+            const triggerShort = isSeq1 && bull === false && sarDist > 25;
+            const triggerLong  = isSeq1 && bull === true  && sarDist < -25;
+            if (triggerShort || triggerLong) {
+                // 醒目高亮：橙色粗体 + 警告背景 + 边框 + 🔔 图标
+                return `<span style="color:#f97316;font-weight:800;background:rgba(249,115,22,0.18);padding:2px 6px;border-radius:4px;border:1px solid rgba(249,115,22,0.55);white-space:nowrap;">🔔${arr}${abs.toFixed(2)}</span>`;
+            }
+            return `<span style="color:${col};font-weight:600;">${arr}${abs.toFixed(2)}</span>`;
+        }
+
+        function _sarDistDeltaBadge(delta) {
+            if (delta === null || delta === undefined)
+                return '<span style="color:#475569;">--</span>';
+            if (Math.abs(delta) < 0.005)
+                return '<span style="color:#475569;">±0.00</span>';
+            return delta > 0
+                ? `<span style="color:#fb923c;font-weight:600;">▲${delta.toFixed(2)}</span>`
+                : `<span style="color:#818cf8;font-weight:600;">▼${Math.abs(delta).toFixed(2)}</span>`;
+        }
+
+        // ── 影线辅助函数 ────────────────────────────────────────────────
+        // 返回 [上影线%HTML, 下影线%HTML, 上影/实体HTML, 下影/实体HTML]
+        function _shadowCols(high, low, close, bodyPct) {
+            const na = '<span style="color:#475569;">--</span>';
+            if (high == null || low == null || close == null || close === 0) {
+                return [na, na, na, na, 0, 0];
+            }
+            const upperPct = (high - close) / close * 100;   // 上影线%
+            const lowerPct = (close - low)  / close * 100;   // 下影线%
+
+            // 阈值标记：上影线≥0.5%  下影线≥0.3%
+            const UPPER_THR = 0.5;
+            const LOWER_THR = 0.3;
+
+            function _pctHtml(val, col, thr) {
+                if (val < 0) return na;   // 价格异常保护
+                const hit = val >= thr;
+                const baseStyle = `color:${hit ? '#fff' : col};font-weight:${hit ? '800' : '600'};`;
+                const bgStyle   = hit
+                    ? `background:${col === '#fb923c' ? 'rgba(251,146,60,0.35)' : 'rgba(96,165,250,0.35)'};border-radius:4px;padding:1px 5px;`
+                    : '';
+                return `<span style="${baseStyle}${bgStyle}">${val.toFixed(2)}%${hit ? ' 🔺' : ''}</span>`;
+            }
+            function _ratioHtml(shadowPct, col) {
+                const absBody = bodyPct != null ? Math.abs(bodyPct) : null;
+                if (absBody == null || absBody < 0.001) {
+                    // 实体%为0，比值无意义
+                    return `<span style="color:#475569;">--</span>`;
+                }
+                const ratio = shadowPct / absBody;
+                const intensity = ratio >= 3 ? '#ef4444' : ratio >= 2 ? '#f87171' : ratio >= 1 ? '#fb923c' : col;
+                const weight    = ratio >= 2 ? '800' : '600';
+                return `<span style="color:${intensity};font-weight:${weight};">${ratio.toFixed(2)}</span>`;
+            }
+
+            const upperHtml = _pctHtml(upperPct, '#fb923c', UPPER_THR);
+            const lowerHtml = _pctHtml(lowerPct, '#60a5fa', LOWER_THR);
+            const upperRatioHtml = _ratioHtml(upperPct, '#fdba74');
+            const lowerRatioHtml = _ratioHtml(lowerPct, '#93c5fd');
+            // 返回6个元素：[upperHtml, lowerHtml, upperRatioHtml, lowerRatioHtml, upperPct, lowerPct]
+            // 调用方用4元素解构 [u,d,ur,dr] 时，后2个自动忽略（向后兼容）
+            return [upperHtml, lowerHtml, upperRatioHtml, lowerRatioHtml, upperPct, lowerPct];
+        }
+
+        function _bodyPctHtml(bodyPct) {
+            if (bodyPct === null || bodyPct === undefined)
+                return '<span style="color:#475569;">--</span>';
+            const col  = bodyPct > 0 ? '#4ade80' : bodyPct < 0 ? '#f87171' : '#475569';
+            const sign = bodyPct > 0 ? '+' : '';
+            return `<span style="color:${col};font-weight:600;">${sign}${bodyPct.toFixed(2)}%</span>`;
+        }
+        function _posHtml(pos) {
+            // pos = 0-100, 收盘价在当日截至该时间最高最低区间内的百分位
+            if (pos == null || isNaN(pos)) return '<span style="color:#475569;">--</span>';
+            const p = Math.max(0, Math.min(100, pos));
+            // 颜色：0-20% 蓝绿（底部区域）, 20-50% 绿色（下半段）,
+            //        50-80% 黄色（上半段）, 80-100% 红色（顶部区域）
+            const col = p >= 80 ? '#f87171' : p >= 50 ? '#fde68a' : p >= 20 ? '#86efac' : '#67e8f9';
+            const bold = (p >= 80 || p <= 20) ? 'font-weight:800;' : 'font-weight:600;';
+            return `<span style="color:${col};${bold}">${p.toFixed(1)}%</span>`;
+        }
+
+
+        /* ── 主加载函数：调用后端 /api/eth-sar-boll/latest-rows ── */
         async function loadEthSarBoll() {
             const refreshIcon = document.getElementById('ethSarRefreshIcon');
             if (refreshIcon) refreshIcon.classList.add('animate-spin');
 
             try {
-                const res  = await fetch('/api/eth-sar-boll/latest?_t=' + Date.now(), {cache:'no-store'});
+                const res  = await fetch('/api/eth-sar-boll/latest-rows?_t=' + Date.now(), {cache:'no-store'});
                 const json = await res.json();
                 if (!json.success) {
                     console.warn('[ETH-SAR] API error:', json.error);
                     return;
                 }
-                const data       = json.data;
-                const cur        = data.current;
-                const bars       = data.last5_bars || [];
-                const currentBar = data.current_bar || null;  // 实时未收盘K线
-                console.log('[ETH-SAR] 已加载:', { price: cur?.price, bars: bars.length, currentBar: currentBar?.bar_time, confirmed: currentBar?.confirmed });
+                const cur        = json.current;      // 顶部状态卡片
+                const bars       = json.bars || [];   // 已收盘K线（旧→新）
+                const currentBar = json.current_bar;  // 实时未收盘K线
+                const _apiDayHigh = json.day_high;    // 当日0点起累计最高价（后端计算）
+                const _apiDayLow  = json.day_low;     // 当日0点起累计最低价（后端计算）
 
-                // ── 更新时间 ──────────────────────────────────────────────
+                console.log('[ETH-SAR] 已加载:', { price: cur?.price, bars: bars.length, currentBar: currentBar?.bar_time });
+
+                // ── 更新时间 ─────────────────────────────────────────────
                 const timeEl = document.getElementById('ethSarUpdateTime');
-                if (timeEl) timeEl.textContent = data.record_time || '--';
+                if (timeEl) timeEl.textContent = json.record_time || '--';
 
-                // ── 当前状态卡片 ───────────────────────────────────────────
+                // ── 当前状态卡片（所有值直接读后端字段，无运算） ─────────
                 const statusEl = document.getElementById('ethSarCurrentStatus');
-                if (statusEl) {
+                if (statusEl && cur) {
                     const priceColor = cur.bull ? '#4ade80' : '#f87171';
-                    const sarPctDisplay = cur.sar_pct > 100
-                        ? `<span style="color:#22c55e;font-weight:800;">${cur.sar_pct.toFixed(1)}% ↑UB</span>`
-                        : cur.sar_pct < 0
-                        ? `<span style="color:#ef4444;font-weight:800;">${cur.sar_pct.toFixed(1)}% ↓LB</span>`
-                        : `<span style="color:#a5b4fc;font-weight:700;">${cur.sar_pct.toFixed(1)}%</span>`;
+                    const sarPct = cur.sar_pct;
+                    const sarPctDisplay = sarPct > 100
+                        ? `<span style="color:#22c55e;font-weight:800;">${sarPct.toFixed(1)}% ↑UB</span>`
+                        : sarPct < 0
+                        ? `<span style="color:#ef4444;font-weight:800;">${sarPct.toFixed(1)}% ↓LB</span>`
+                        : `<span style="color:#a5b4fc;font-weight:700;">${sarPct.toFixed(1)}%</span>`;
 
                     statusEl.innerHTML = `
-                        <div style="flex:0 0 auto; background:rgba(255,255,255,0.05);
-                                    border:1px solid rgba(255,255,255,0.09);
-                                    border-radius:12px; padding:8px 14px;">
+                        <div style="flex:0 0 auto;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:12px;padding:8px 14px;">
                             <div style="color:#64748b;font-size:10px;margin-bottom:2px;">当前价格</div>
-                            <div style="color:${priceColor};font-size:18px;font-weight:800;
-                                        font-family:monospace;">${cur.price.toFixed(2)}</div>
+                            <div style="color:${priceColor};font-size:18px;font-weight:800;font-family:monospace;">${cur.price.toFixed(2)}</div>
                         </div>
-                        <div style="flex:0 0 auto; background:rgba(255,255,255,0.05);
-                                    border:1px solid rgba(255,255,255,0.09);
-                                    border-radius:12px; padding:8px 14px;">
+                        <div style="flex:0 0 auto;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:12px;padding:8px 14px;">
                             <div style="color:#64748b;font-size:10px;margin-bottom:2px;">SAR</div>
-                            <div style="color:#818cf8;font-size:18px;font-weight:800;
-                                        font-family:monospace;">${cur.sar.toFixed(2)}</div>
+                            <div style="color:#818cf8;font-size:18px;font-weight:800;font-family:monospace;">${cur.sar.toFixed(2)}</div>
                         </div>
-                        <div style="flex:0 0 auto; background:rgba(255,255,255,0.05);
-                                    border:1px solid rgba(255,255,255,0.09);
-                                    border-radius:12px; padding:8px 14px;">
+                        <div style="flex:0 0 auto;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:12px;padding:8px 14px;">
                             <div style="color:#64748b;font-size:10px;margin-bottom:2px;">趋势方向</div>
                             <div style="margin-top:2px;">${_dirBadge(cur.bull, cur.sar_seq, false)}</div>
                         </div>
-                        <div style="flex:0 0 auto; background:rgba(255,255,255,0.05);
-                                    border:1px solid rgba(255,255,255,0.09);
-                                    border-radius:12px; padding:8px 14px;">
+                        <div style="flex:0 0 auto;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:12px;padding:8px 14px;">
                             <div style="color:#64748b;font-size:10px;margin-bottom:2px;">SAR 布林位置</div>
                             <div style="font-size:16px;font-weight:800;">${sarPctDisplay}</div>
                         </div>
-                        <div style="flex:0 0 auto; background:rgba(239,68,68,0.08);
-                                    border:1px solid rgba(239,68,68,0.3);
-                                    border-radius:12px; padding:8px 14px;">
+                        <div style="flex:0 0 auto;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:8px 14px;">
                             <div style="color:#94a3b8;font-size:10px;margin-bottom:2px;">BOLL LB <span style="color:#ef4444;font-size:9px;">下轨 0%</span></div>
-                            <div style="color:#f87171;font-size:16px;font-weight:800;
-                                        font-family:monospace;">${cur.boll_lb.toFixed(2)}</div>
+                            <div style="color:#f87171;font-size:16px;font-weight:800;font-family:monospace;">${cur.boll_lb.toFixed(2)}</div>
                         </div>
-                        <div style="flex:0 0 auto; background:rgba(251,191,36,0.08);
-                                    border:1px solid rgba(251,191,36,0.3);
-                                    border-radius:12px; padding:8px 14px;">
+                        <div style="flex:0 0 auto;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.3);border-radius:12px;padding:8px 14px;">
                             <div style="color:#94a3b8;font-size:10px;margin-bottom:2px;">BOLL MID <span style="color:#fbbf24;font-size:9px;">中轨 50%</span></div>
-                            <div style="color:#fde68a;font-size:16px;font-weight:800;
-                                        font-family:monospace;">${cur.boll_mid.toFixed(2)}</div>
+                            <div style="color:#fde68a;font-size:16px;font-weight:800;font-family:monospace;">${cur.boll_mid.toFixed(2)}</div>
                         </div>
-                        <div style="flex:0 0 auto; background:rgba(34,197,94,0.08);
-                                    border:1px solid rgba(34,197,94,0.3);
-                                    border-radius:12px; padding:8px 14px;">
+                        <div style="flex:0 0 auto;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.3);border-radius:12px;padding:8px 14px;">
                             <div style="color:#94a3b8;font-size:10px;margin-bottom:2px;">BOLL UB <span style="color:#22c55e;font-size:9px;">上轨 100%</span></div>
-                            <div style="color:#4ade80;font-size:16px;font-weight:800;
-                                        font-family:monospace;">${cur.boll_ub.toFixed(2)}</div>
+                            <div style="color:#4ade80;font-size:16px;font-weight:800;font-family:monospace;">${cur.boll_ub.toFixed(2)}</div>
                         </div>
                     `;
                 }
 
-                // ── 布林带进度条 ───────────────────────────────────────────
-                document.getElementById('ethSarLB')?.setAttribute('data-val', cur.boll_lb);
+                // ── 布林带进度条（后端提供 sar_pct 和 price_pct） ─────────
                 const lbEl  = document.getElementById('ethSarLB');
                 const midEl = document.getElementById('ethSarMID');
                 const ubEl  = document.getElementById('ethSarUB');
-                if (lbEl)  lbEl.textContent  = cur.boll_lb.toFixed(2);
-                if (midEl) midEl.textContent = cur.boll_mid.toFixed(2);
-                if (ubEl)  ubEl.textContent  = cur.boll_ub.toFixed(2);
+                if (lbEl && cur)  lbEl.textContent  = cur.boll_lb.toFixed(2);
+                if (midEl && cur) midEl.textContent = cur.boll_mid.toFixed(2);
+                if (ubEl && cur)  ubEl.textContent  = cur.boll_ub.toFixed(2);
 
                 const sarBar   = document.getElementById('ethSarPctBar');
                 const priceBar = document.getElementById('ethPricePctBar');
                 const pctLabel = document.getElementById('ethSarPctLabel');
 
-                const sarPct   = cur.sar_pct;
-                const pricePct = _math_sar_pct_inline(cur.price, cur.boll_ub, cur.boll_lb);
+                if (cur) {
+                    const sarPct   = cur.sar_pct;
+                    const pricePct = cur.price_pct ?? 0;  // 后端已计算
 
-                if (sarBar)   sarBar.style.left   = _pctToLeft(sarPct);
-                if (priceBar) priceBar.style.left = _pctToLeft(pricePct);
-                if (pctLabel) {
-                    pctLabel.textContent = sarPct.toFixed(1);
-                    pctLabel.style.color = _pctColor(sarPct);
+                    if (sarBar)   sarBar.style.left   = _pctToLeft(sarPct);
+                    if (priceBar) priceBar.style.left = _pctToLeft(pricePct);
+                    if (pctLabel) {
+                        pctLabel.textContent = sarPct.toFixed(1);
+                        pctLabel.style.color = _pctColor(sarPct);
+                    }
                 }
 
-                // ── 最近5根K线表格 ─────────────────────────────────────────
+                // ── K线表格：渲染函数（直接读后端已算好的字段） ──────────
+                // 开口比：用API返回的 trend_start_boll_width（本轮seq=1的boll_width）
+                // 如果API有，优先用；否则从bars里找seq=1
+                let _liveStartWidth = json.trend_start_boll_width ?? null;
+                if (_liveStartWidth == null) {
+                    // fallback: 从10根bars里找seq=1（短趋势可能在窗口内）
+                    let _liveStartBull = null;
+                    bars.forEach(r => {
+                        if (r.sar_seq === 1 && r.boll_width != null) {
+                            _liveStartWidth = r.boll_width;
+                            _liveStartBull  = r.bull;
+                        } else if (r.bull !== _liveStartBull) {
+                            if (_liveStartBull !== null) {
+                                _liveStartWidth = null; // 方向变了重置
+                            }
+                            _liveStartBull = r.bull;
+                        }
+                    });
+                }
+                // currentBar 沿用同一个起始值
+                // _widthRatioHtml: 优先使用后端计算好的 width_ratio（每根 bar 独立基准），
+                // 回退到旧算法（_liveStartWidth，只适用于当前趋势）
+                function _widthRatioHtml(bWidth, precomputedRatio) {
+                    // 优先：后端已算好的每根 bar 独立 width_ratio
+                    const ratio = (precomputedRatio != null)
+                        ? precomputedRatio
+                        : (_liveStartWidth != null && bWidth != null ? bWidth / _liveStartWidth : null);
+                    if (ratio == null) return `<span style="color:#475569;">--</span>`;
+                    const rv = ratio.toFixed(2);
+                    if (ratio >= 2.2) {
+                        // 布林带开口比值 > 2.2：粗体红色 + 醒目背景
+                        return `<span style="color:#ef4444;font-weight:800;background:rgba(239,68,68,0.15);padding:1px 4px;border-radius:3px;border:1px solid rgba(239,68,68,0.4);">${rv}</span>`;
+                    }
+                    const rc = ratio >= 2.0 ? '#f87171' : ratio >= 1.5 ? '#fb923c' : ratio >= 1.0 ? '#c084fc' : '#86efac';
+                    const rw = ratio >= 1.5 ? '700' : '600';
+                    return `<span style="color:${rc};font-weight:${rw};">${rv}</span>`;
+                }
+
+                // 预计算每根bar截至当时的当日最高/最低位置%（升序扫描，旧→新）
+                // 必须在 _buildBarRow 定义之前构建，否则闭包引用会触发 const 暂时性死区 (TDZ)
+                let _barPosMap = new Map();
+
+                function _buildBarRow(b, isLive) {
+                    const isLiveRow  = isLive === true;
+                    const rowBg      = isLiveRow ? 'background:rgba(99,102,241,0.15);' : 'background:rgba(255,255,255,0.02);';
+                    const leftBorder = b.switched
+                        ? (b.bull ? 'border-left:3px solid #22c55e;' : 'border-left:3px solid #ef4444;')
+                        : 'border-left:3px solid transparent;';
+
+                    const closeVal = b.close ?? b.price ?? 0;
+                    const openVal  = b.open  ?? closeVal;
+                    const priceColor = closeVal >= openVal ? '#4ade80' : '#f87171';
+
+                    const timeStr  = (b.beijing_time || b.bar_time || '').split(' ')[1] || '--';
+                    const timePart = isLiveRow
+                        ? `${timeStr} <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#818cf8;margin-left:4px;vertical-align:middle;animation:pulse 1.2s infinite;"></span>`
+                        : timeStr;
+
+                    const bollLb  = b.boll_lb  != null ? b.boll_lb.toFixed(2)  : '--';
+                    const bollMid = b.boll_mid != null ? b.boll_mid.toFixed(2) : '--';
+                    const bollUb  = b.boll_ub  != null ? b.boll_ub.toFixed(2)  : '--';
+                    const bWidth  = b.boll_width != null ? b.boll_width.toFixed(2) : '--';
+
+                    return `
+                        <tr style="${rowBg}${leftBorder}transition:background 0.2s;">
+                            <td class="px-3 py-2 font-mono" style="color:${isLiveRow?'#e2e8f0':'#94a3b8'};">${timePart}</td>
+                            <td class="px-3 py-2 text-right font-mono" style="color:#fb923c;opacity:0.9;">${b.high != null ? b.high.toFixed(2) : '--'}</td>
+                            <td class="px-3 py-2 text-right font-mono" style="color:#60a5fa;opacity:0.9;">${b.low != null ? b.low.toFixed(2) : '--'}</td>
+                            <td class="px-3 py-2 text-right font-mono" style="color:${priceColor};">${closeVal.toFixed(2)}</td>
+                            <td class="px-3 py-2 text-right font-mono">${_bodyPctHtml(b.body_pct)}</td>
+                            <td class="px-3 py-2 text-right font-mono">${_posHtml(_barPosMap.get(b.bar_time??b.beijing_time))}</td>
+                            ${(([u,d,ur,dr])=>`<td class="px-3 py-2 text-right font-mono">${u}</td><td class="px-3 py-2 text-right font-mono">${d}</td><td class="px-3 py-2 text-right font-mono">${ur}</td><td class="px-3 py-2 text-right font-mono">${dr}</td>`)(_shadowCols(b.high,b.low,b.close??b.price,b.body_pct))}
+                            <td class="px-3 py-2 text-right font-mono" style="color:#818cf8;">${b.sar != null ? b.sar.toFixed(2) : '--'}</td>
+                            <td class="px-3 py-2 text-center">${_dirBadge(b.bull, b.sar_seq, b.switched)}</td>
+                            <td class="px-3 py-2 text-center font-mono" style="color:${b.bull?'#86efac':'#fca5a5'};font-size:11px;">#${String(b.sar_seq).padStart(2,'0')}</td>
+                            <td class="px-3 py-2 text-right font-mono"><span style="color:${_pctColor(b.sar_pct)};font-weight:700;">${b.sar_pct != null ? b.sar_pct.toFixed(1)+'%' : '--'}</span></td>
+                            <td class="px-3 py-2 text-center font-mono">${_deltaBadge(b.sar_pct_delta)}</td>
+                            <td class="px-3 py-2 text-right font-mono" style="color:#f87171;opacity:0.85;">${bollLb}</td>
+                            <td class="px-3 py-2 text-right font-mono" style="color:#fde68a;opacity:0.85;">${bollMid}</td>
+                            <td class="px-3 py-2 text-right font-mono" style="color:#4ade80;opacity:0.85;">${bollUb}</td>
+                            <td class="px-3 py-2 text-right font-mono" style="color:#a78bfa;opacity:0.9;font-weight:600;">${bWidth}</td>
+                            <td class="px-3 py-2 text-center font-mono">${_bWidthDeltaBadge(b.boll_width_delta)}</td>
+                            <td class="px-3 py-2 text-right font-mono">${_widthRatioHtml(b.boll_width, b.width_ratio ?? null)}</td>
+                            <td class="px-3 py-2 text-right font-mono">${_sarDistHtml(b.sar_dist, b.sar_seq, b.bull)}</td>
+                            <td class="px-3 py-2 text-center font-mono">${_sarDistDeltaBadge(b.sar_dist_delta)}</td>
+                        </tr>`;
+                }
+
+                // 用实际数据填充 _barPosMap（bars 旧→新升序）
+                // 优先使用后端返回的 day_high/day_low（当日0点起全量数据），
+                // 避免只有10根K线时区间过窄导致位置%严重失真。
+                {
+                    // 若后端提供了当日锚点，则所有bar共享同一高低区间；
+                    // 否则退回实时累计（仅10根bar，位置可能不准确）
+                    const useFixed = (_apiDayHigh != null && _apiDayLow != null && _apiDayHigh > _apiDayLow);
+                    let runHi = useFixed ? _apiDayHigh : -Infinity;
+                    let runLo = useFixed ? _apiDayLow  :  Infinity;
+                    const allAsc = currentBar ? [...bars, currentBar] : [...bars];
+                    allAsc.forEach(b => {
+                        if (!useFixed) {
+                            if (b.high != null) runHi = Math.max(runHi, b.high);
+                            if (b.low  != null) runLo = Math.min(runLo, b.low);
+                        }
+                        const cls = b.close ?? b.price;
+                        const pos = (runHi > runLo && cls != null)
+                            ? (cls - runLo) / (runHi - runLo) * 100
+                            : null;
+                        _barPosMap.set(b.bar_time ?? b.beijing_time, pos);
+                    });
+                }
+
                 const tbody = document.getElementById('ethSarBarsTable');
                 if (tbody && bars.length > 0) {
-                    // 辅助函数：生成一行K线HTML
-                    function _buildBarRow(b, isLive, olderBar) {
-                        const isLiveRow = isLive === true;
-                        const rowBg = isLiveRow
-                            ? 'background:rgba(99,102,241,0.15);'
-                            : 'background:rgba(255,255,255,0.02);';
-                        const leftBorder = b.switched
-                            ? (b.bull ? 'border-left:3px solid #22c55e;' : 'border-left:3px solid #ef4444;')
-                            : 'border-left:3px solid transparent;';
+                    // bars 是旧→新顺序，倒序渲染（最新在顶）
+                    const barsDesc = [...bars].reverse();
+                    let rows = '';
+                    // ① 实时未收盘K线
+                    if (currentBar) {
+                        rows += _buildBarRow(currentBar, true);
+                    }
+                    // ② 已收盘K线（最多10根，最新在前）
+                    barsDesc.forEach(b => { rows += _buildBarRow(b, false); });
+                    tbody.innerHTML = rows;
 
-                        const priceChange = b.close - b.open;
-                        const deltaBadge  = _pctDeltaBadge(b.sar_pct, olderBar ? olderBar.sar_pct : null);
-                        const sarPctStyle = `color:${_pctColor(b.sar_pct)};font-weight:700;`;
+                    // ── 告警逻辑：统一使用 _sendTgAlert（全局函数，定义在 window.onload 外部）
+                    // _sendTgAlert 直接调用 /api/telegram/send-alert，不依赖 window.onload 是否已执行
+                    const _tgAlert = _sendTgAlert;
 
-                        const bollLb  = (b.boll_lb  != null) ? b.boll_lb.toFixed(2)  : '--';
-                        const bollMid = (b.boll_mid != null) ? b.boll_mid.toFixed(2) : '--';
-                        const bollUb  = (b.boll_ub  != null) ? b.boll_ub.toFixed(2)  : '--';
+                    // ── ① 布林带开口比值 ≥ 2.2 告警 ─────────────────────────────
+                    {
+                        // 找所有bars（含currentBar）中最大的开口比
+                        const allBars = currentBar ? [currentBar, ...bars] : [...bars];
+                        let maxRatio = 0;
+                        let maxRatioBar = null;
+                        allBars.forEach(b => {
+                            const r = (b.width_ratio != null)
+                                ? b.width_ratio
+                                : (_liveStartWidth != null && b.boll_width != null ? b.boll_width / _liveStartWidth : 0);
+                            if (r > maxRatio) { maxRatio = r; maxRatioBar = b; }
+                        });
 
-                        const bWidth = (b.boll_ub != null && b.boll_lb != null) ? (b.boll_ub - b.boll_lb) : null;
-                        const bWidthStr = bWidth != null ? bWidth.toFixed(2) : '--';
-                        const olderBWidth = (olderBar && olderBar.boll_ub != null && olderBar.boll_lb != null)
-                            ? (olderBar.boll_ub - olderBar.boll_lb) : null;
-                        let bWidthDelta = '<span style="color:#475569;">--</span>';
-                        if (bWidth != null && olderBWidth != null) {
-                            const dw = bWidth - olderBWidth;
-                            if (Math.abs(dw) < 0.005) {
-                                bWidthDelta = '<span style="color:#475569;">±0.00</span>';
-                            } else if (dw > 0) {
-                                bWidthDelta = `<span style="color:#fb923c;font-weight:600;">▲${dw.toFixed(2)}</span>`;
-                            } else {
-                                bWidthDelta = `<span style="color:#60a5fa;font-weight:600;">▼${Math.abs(dw).toFixed(2)}</span>`;
+                        if (maxRatio >= 2.2 && maxRatioBar) {
+                            // 防止重复推送：同一开口比值（精确到0.01）每10分钟最多一次
+                            const alertKey = `bollWidthRatioAlert_${Math.floor(maxRatio * 100)}`;
+                            const lastAlert = parseInt(localStorage.getItem(alertKey) || '0');
+                            const now = Date.now();
+                            if (now - lastAlert > 10 * 60 * 1000) {
+                                localStorage.setItem(alertKey, now);
+                                const barTime = maxRatioBar.beijing_time || maxRatioBar.bar_time || '--';
+                                const price   = (maxRatioBar.close ?? maxRatioBar.price ?? 0).toFixed(2);
+                                const bw      = maxRatioBar.boll_width != null ? maxRatioBar.boll_width.toFixed(2) : '--';
+                                const sw      = _liveStartWidth != null ? _liveStartWidth.toFixed(2) : '--';
+                                const bull    = maxRatioBar.bull;
+                                const dir     = bull ? '📈多头' : '📉空头';
+                                const msg = `⚠️ ETH布林带开口比值告警\n\n`
+                                    + `开口比值: ${maxRatio.toFixed(2)} (≥ 2.2 触发)\n`
+                                    + `当前开口: ${bw}  起始开口: ${sw}\n`
+                                    + `方向: ${dir}  序列: #${String(maxRatioBar.sar_seq).padStart(2,'0')}\n`
+                                    + `K线时间: ${barTime}\n`
+                                    + `ETH价格: ${price} USDT\n\n`
+                                    + `💡 布林带大幅扩张，波动加剧，注意风险`;
+                                _tgAlert(msg).then(ok => {
+                                    if (ok) console.log(`✅ [BollWidth] 开口比值 ${maxRatio.toFixed(2)} 告警已发送`);
+                                });
                             }
                         }
-
-                        // 时间标签：live行显示K线时间+动态闪烁圆点；confirmed行显示时间
-                        const timeStr  = (b.beijing_time || b.bar_time || '').split(' ')[1] || '--';
-                        const timePart = isLiveRow
-                            ? `${timeStr} <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#818cf8;margin-left:4px;vertical-align:middle;animation:pulse 1.2s infinite;"></span>`
-                            : timeStr;
-
-                        // 收盘价颜色：live行用实时价格颜色
-                        const priceColor = b.close >= b.open ? '#4ade80' : '#f87171';
-
-                        return `
-                            <tr style="${rowBg}${leftBorder}transition:background 0.2s;">
-                                <td class="px-3 py-2 font-mono" style="color:${isLiveRow?'#e2e8f0':'#94a3b8'};">
-                                    ${timePart}
-                                </td>
-                                <td class="px-3 py-2 text-right font-mono" style="color:${priceColor};">
-                                    ${b.close.toFixed(2)}
-                                </td>
-                                <td class="px-3 py-2 text-right font-mono" style="color:#818cf8;">
-                                    ${b.sar.toFixed(2)}
-                                </td>
-                                <td class="px-3 py-2 text-center">
-                                    ${_dirBadge(b.bull, b.sar_seq, b.switched)}
-                                </td>
-                                <td class="px-3 py-2 text-center font-mono"
-                                    style="color:${b.bull ? '#86efac' : '#fca5a5'};font-size:11px;">
-                                    #${String(b.sar_seq).padStart(2,'0')}
-                                </td>
-                                <td class="px-3 py-2 text-right font-mono">
-                                    <span style="${sarPctStyle}">${b.sar_pct.toFixed(1)}%</span>
-                                </td>
-                                <td class="px-3 py-2 text-center font-mono">${deltaBadge}</td>
-                                <td class="px-3 py-2 text-right font-mono" style="color:#f87171;opacity:0.85;">${bollLb}</td>
-                                <td class="px-3 py-2 text-right font-mono" style="color:#fde68a;opacity:0.85;">${bollMid}</td>
-                                <td class="px-3 py-2 text-right font-mono" style="color:#4ade80;opacity:0.85;">${bollUb}</td>
-                                <td class="px-3 py-2 text-right font-mono" style="color:#a78bfa;opacity:0.9;font-weight:600;">${bWidthStr}</td>
-                                <td class="px-3 py-2 text-center font-mono">${bWidthDelta}</td>
-                            </tr>`;
                     }
 
-                    // 已收盘K线倒序（最新在前）
-                    const barsDesc = [...bars].reverse();
+                    // ── ② 同一多头/空头序列中连续4个开口比递增告警 ──────────────
+                    // 规则：同一 bull 方向内，取最新的连续4根K线（时间升序），
+                    //       若 ratio[0] < ratio[1] < ratio[2] < ratio[3] 则触发。
+                    // 冷却：每个 (bull, trend_id) 组合 1 小时内只推送一次。
+                    {
+                        const allBars2 = currentBar ? [...bars, currentBar] : [...bars];
+                        // 按时间升序（bars 是旧→新，currentBar 是最新追加）
+                        // allBars2 已经是升序，直接用
 
-                    let rows = '';
+                        // 按 bull 方向分组取最新的连续K线
+                        // 仅检测当前 bars 窗口（最多11根），取当前方向的最后4根
+                        const now2 = Date.now();
 
-                    // ① 最顶行：实时未收盘K线（currentBar），对比第一根已收盘K线
-                    if (currentBar) {
-                        // 将currentBar字段适配成表格用的格式
-                        const liveB = {
-                            beijing_time: currentBar.bar_time,
-                            bar_time:     currentBar.bar_time,
-                            close:        currentBar.price,
-                            open:         currentBar.open  || currentBar.price,
-                            sar:          currentBar.sar,
-                            bull:         currentBar.bull,
-                            sar_seq:      currentBar.sar_seq,
-                            switched:     false,           // 未收盘不显示切换
-                            sar_pct:      currentBar.sar_pct,
-                            boll_lb:      currentBar.boll_lb,
-                            boll_mid:     currentBar.boll_mid,
-                            boll_ub:      currentBar.boll_ub,
-                        };
-                        // olderBar = 已收盘最新一根（barsDesc[0]）
-                        rows += _buildBarRow(liveB, true, barsDesc[0] || null);
+                        // 分别检测多头和空头
+                        for (const checkBull of [true, false]) {
+                            // 取该方向的所有bar（升序）
+                            const dirBars = allBars2.filter(b => b.bull === checkBull);
+                            if (dirBars.length < 4) continue;
+
+                            // 取最新的4根（同一 trend_id 内连续）
+                            const last4 = dirBars.slice(-4);
+
+                            // 确保4根bar属于同一个趋势（同一 trend_id 或连续 sar_seq）
+                            const tid0 = last4[0].trend_id;
+                            const tid3 = last4[3].trend_id ?? last4[3].sar_seq ?? 0;
+                            // 如果 trend_id 可用，要求4根都属于同一个 trend；否则要求 sar_seq 连续递增
+                            const sameTrend = (tid0 != null && tid3 != null && tid0 === last4[1].trend_id && last4[1].trend_id === last4[2].trend_id && last4[2].trend_id === tid3);
+                            const seqContinuous = (last4[0].sar_seq != null &&
+                                last4[1].sar_seq === last4[0].sar_seq + 1 &&
+                                last4[2].sar_seq === last4[1].sar_seq + 1 &&
+                                last4[3].sar_seq === last4[2].sar_seq + 1);
+                            if (!sameTrend && !seqContinuous) continue;
+
+                            // 获取4个开口比
+                            const r0 = last4[0].width_ratio;
+                            const r1 = last4[1].width_ratio;
+                            const r2 = last4[2].width_ratio;
+                            const r3 = last4[3].width_ratio;
+                            if (r0 == null || r1 == null || r2 == null || r3 == null) continue;
+
+                            // 判断严格递增
+                            if (!(r0 < r1 && r1 < r2 && r2 < r3)) continue;
+
+                            // 冷却判断：1小时内同一方向+trend_id只推一次
+                            const dirLabel = checkBull ? '多头' : '空头';
+                            const coolKey  = `sarConsec4Alert_${checkBull ? 'bull' : 'bear'}_${tid3}`;
+                            const lastSent = parseInt(localStorage.getItem(coolKey) || '0');
+                            if (now2 - lastSent < 60 * 60 * 1000) continue;  // 1小时冷却
+
+                            localStorage.setItem(coolKey, now2);
+
+                            // 构建 TG 消息
+                            const seq3  = last4[3].sar_seq ?? '--';
+                            const bt3   = last4[3].beijing_time || last4[3].bar_time || '--';
+                            const bt0   = last4[0].beijing_time || last4[0].bar_time || '--';
+                            const price3 = (last4[3].close ?? last4[3].price ?? 0).toFixed(2);
+                            const ratioList = last4.map((b,i) => {
+                                const seq = b.sar_seq ?? (i+1);
+                                return `  ${dirLabel}${String(seq).padStart(2,'0')}: ${b.width_ratio.toFixed(4)}`;
+                            }).join('\n');
+
+                            const msgC4 = `📊 ETH布林带连续4根开口比递增告警\n\n`
+                                + `方向: ${checkBull ? '📈多头' : '📉空头'}  趋势ID: #${tid3}\n`
+                                + `序列: ${dirLabel}${String(last4[0].sar_seq ?? '--').padStart(2,'0')} → ${dirLabel}${String(seq3).padStart(2,'0')}\n`
+                                + `时间范围: ${bt0} → ${bt3}\n`
+                                + `开口比递增:\n${ratioList}\n`
+                                + `当前ETH: ${price3} USDT\n\n`
+                                + `💡 布林带持续扩张，波动性正在加剧`;
+
+                            console.log(`[Consec4] ${dirLabel} 连续4根递增 ratios=${[r0,r1,r2,r3].map(x=>x.toFixed(4)).join(',')}`);
+
+                            if (typeof _tgAlert === 'function') {
+                                _tgAlert(msgC4).then(ok => {
+                                    if (ok) console.log(`✅ [Consec4] ${dirLabel} 递增告警已发送`);
+                                    else    console.warn(`⚠️ [Consec4] TG发送失败`);
+                                });
+                            } else {
+                                console.warn('[Consec4] _tgAlert 不可用，跳过TG推送');
+                            }
+
+                            // 保存到后端 JSONL
+                            const savePayload = {
+                                event_type:   'consec4_increasing',
+                                bull:          checkBull,
+                                direction:     dirLabel,
+                                trend_id:      tid3,
+                                bars: last4.map(b => ({
+                                    beijing_time: b.beijing_time || b.bar_time,
+                                    sar_seq:      b.sar_seq,
+                                    width_ratio:  b.width_ratio,
+                                    boll_width:   b.boll_width,
+                                    close:        b.close ?? b.price,
+                                    bull:         b.bull
+                                })),
+                                ratios:        [r0, r1, r2, r3],
+                                trigger_time:  new Date().toLocaleString('sv', {timeZone:'Asia/Shanghai'}).replace('T',' '),
+                                eth_price:     parseFloat(price3)
+                            };
+                            fetch('/api/eth-sar-boll/save-consec4-event', {
+                                method:  'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body:    JSON.stringify(savePayload)
+                            }).then(r => r.json()).then(j => {
+                                console.log('[Consec4] 已保存到JSONL:', j);
+                            }).catch(e => console.error('[Consec4] 保存失败:', e));
+                        }
                     }
-
-                    // ② 已收盘K线（最多5根，最新在前）
-                    barsDesc.forEach((b, idx) => {
-                        const olderBar = barsDesc[idx + 1] || null;
-                        rows += _buildBarRow(b, false, olderBar);
-                    });
-
-                    tbody.innerHTML = rows;
                 }
 
-                // ── 状态指示灯 ─────────────────────────────────────────────
+                // ── ③ 空头01 SAR距离 > 25 / 多头01 SAR距离 < -25 告警 ──────
+                // 规则：在当前窗口的所有 bars（含 currentBar）中，
+                //   找 sar_seq === 1 的 bar：
+                //     空头01（bull===false, sar_seq===1）sar_dist > 25  → 发 TG
+                //     多头01（bull===true,  sar_seq===1）sar_dist < -25 → 发 TG
+                // 冷却：每个方向 1 小时内只推送一次（localStorage）
+                {
+                    const allBars3 = currentBar ? [currentBar, ...bars] : [...bars];
+                    const now3 = Date.now();
+
+                    // 找最新的空头01和多头01
+                    let shortSeq1Bar = null;
+                    let longSeq1Bar  = null;
+                    // allBars3 = [currentBar（最新）, ...bars旧→新]
+                    // 从前往后找（最新的优先）
+                    for (const b of allBars3) {
+                        if (b.sar_seq === 1) {
+                            if (b.bull === false && shortSeq1Bar === null) shortSeq1Bar = b;
+                            if (b.bull === true  && longSeq1Bar  === null) longSeq1Bar  = b;
+                        }
+                        if (shortSeq1Bar && longSeq1Bar) break;
+                    }
+
+                    // 检测空头01：sar_dist > 25
+                    if (shortSeq1Bar && shortSeq1Bar.sar_dist != null && shortSeq1Bar.sar_dist > 25) {
+                        const coolKey = 'sarDist_short01_gt25';
+                        const lastSent = parseInt(localStorage.getItem(coolKey) || '0');
+                        if (now3 - lastSent >= 60 * 60 * 1000) {
+                            localStorage.setItem(coolKey, now3);
+                            const bt   = shortSeq1Bar.beijing_time || shortSeq1Bar.bar_time || '--';
+                            const dist = shortSeq1Bar.sar_dist.toFixed(2);
+                            const sarV = shortSeq1Bar.sar != null ? shortSeq1Bar.sar.toFixed(2) : '--';
+                            const cls  = shortSeq1Bar.close ?? shortSeq1Bar.price ?? 0;
+                            const msg  = `🚨 ETH SAR距离预警 — 空头01\n\n`
+                                + `方向: 📉空头  序列: #01\n`
+                                + `SAR距离: ${dist}（> 25 触发）\n`
+                                + `SAR: ${sarV}  收盘价: ${cls.toFixed(2)}\n`
+                                + `K线时间: ${bt}\n`
+                                + `ETH价格: ${cls.toFixed(2)} USDT\n\n`
+                                + `💡 空头SAR距离过大，价格远离SAR，注意反转风险`;
+                            _tgAlert(msg).then(ok => {
+                                if (ok) console.log(`✅ [SarDist] 空头01 SAR距离 ${dist} > 25 告警已发送`);
+                                else    console.warn(`⚠️ [SarDist] 空头01 TG发送失败`);
+                            });
+                        } else {
+                            console.log(`[SarDist] 空头01 SAR距离 ${shortSeq1Bar.sar_dist.toFixed(2)} > 25，但冷却中（剩余 ${Math.ceil((60*60*1000-(now3-lastSent))/60000)} 分钟）`);
+                        }
+                    }
+
+                    // 检测多头01：sar_dist < -25
+                    if (longSeq1Bar && longSeq1Bar.sar_dist != null && longSeq1Bar.sar_dist < -25) {
+                        const coolKey = 'sarDist_long01_lt_n25';
+                        const lastSent = parseInt(localStorage.getItem(coolKey) || '0');
+                        if (now3 - lastSent >= 60 * 60 * 1000) {
+                            localStorage.setItem(coolKey, now3);
+                            const bt   = longSeq1Bar.beijing_time || longSeq1Bar.bar_time || '--';
+                            const dist = longSeq1Bar.sar_dist.toFixed(2);
+                            const sarV = longSeq1Bar.sar != null ? longSeq1Bar.sar.toFixed(2) : '--';
+                            const cls  = longSeq1Bar.close ?? longSeq1Bar.price ?? 0;
+                            const msg  = `🚨 ETH SAR距离预警 — 多头01\n\n`
+                                + `方向: 📈多头  序列: #01\n`
+                                + `SAR距离: ${dist}（< -25 触发）\n`
+                                + `SAR: ${sarV}  收盘价: ${cls.toFixed(2)}\n`
+                                + `K线时间: ${bt}\n`
+                                + `ETH价格: ${cls.toFixed(2)} USDT\n\n`
+                                + `💡 多头SAR距离过大，价格大幅高于SAR，注意回调风险`;
+                            _tgAlert(msg).then(ok => {
+                                if (ok) console.log(`✅ [SarDist] 多头01 SAR距离 ${dist} < -25 告警已发送`);
+                                else    console.warn(`⚠️ [SarDist] 多头01 TG发送失败`);
+                            });
+                        } else {
+                            console.log(`[SarDist] 多头01 SAR距离 ${longSeq1Bar.sar_dist.toFixed(2)} < -25，但冷却中（剩余 ${Math.ceil((60*60*1000-(now3-lastSent))/60000)} 分钟）`);
+                        }
+                    }
+                }
+
+                // ── ④ 上影线% ≥ 0.5  /  下影线% ≥ 0.3  告警 ──────────────
+                // 规则：任一触发即记录，每根K线只存一条（alert_type=upper/lower/both）
+                {
+                    const allBars4 = currentBar ? [currentBar, ...bars] : [...bars];
+                    const UPPER_THR = 0.5;
+                    const LOWER_THR = 0.3;
+
+                    for (const b of allBars4) {
+                        const hi  = b.high;
+                        const lo  = b.low;
+                        const cls = b.close ?? b.price;
+                        if (hi == null || lo == null || cls == null || cls === 0) continue;
+
+                        const upperPct = (hi - cls) / cls * 100;
+                        const lowerPct = (cls - lo) / cls * 100;
+                        const barKey   = b.beijing_time || b.bar_time || '';
+                        if (!barKey) continue;
+
+                        const hitUpper = upperPct >= UPPER_THR;
+                        const hitLower = lowerPct >= LOWER_THR;
+                        if (!hitUpper && !hitLower) continue;
+
+                        // 每根K线只用一个冷却key，避免同一根K线存两条
+                        const coolKey = `shadowAlert_${barKey}`;
+                        if (localStorage.getItem(coolKey)) continue;
+                        localStorage.setItem(coolKey, '1');
+
+                        const alertType = (hitUpper && hitLower) ? 'both' : hitUpper ? 'upper' : 'lower';
+                        const dirLabel = b.bull ? '📈多头' : '📉空头';
+                        const sarSeqStr = String(b.sar_seq ?? 0).padStart(2,'0');
+                        const priceStr  = cls.toFixed(2);
+
+                        // TG消息（合并）
+                        const msgLines = [`🕯️ ETH影线预警\n`];
+                        if (hitUpper) msgLines.push(`上影线%: ${upperPct.toFixed(2)}% ≥ ${UPPER_THR}% 🔺 卖压较强`);
+                        if (hitLower) msgLines.push(`下影线%: ${lowerPct.toFixed(2)}% ≥ ${LOWER_THR}% 🔻 买方支撑`);
+                        msgLines.push(`\n最高: ${hi.toFixed(2)}  最低: ${lo.toFixed(2)}  收盘: ${priceStr}`);
+                        msgLines.push(`方向: ${dirLabel}  序列: #${sarSeqStr}`);
+                        msgLines.push(`K线时间: ${barKey}  ETH: ${priceStr} USDT`);
+                        _tgAlert(msgLines.join('\n')).then(ok => {
+                            if (ok) console.log(`✅ [Shadow] ${alertType} 告警已发送 (${barKey})`);
+                            else    console.warn(`⚠️ [Shadow] TG发送失败`);
+                        });
+
+                        // 每根K线保存一条记录
+                        fetch('/api/eth-sar-boll/save-shadow-alert', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({
+                                bar_time:    barKey,
+                                high:        hi,
+                                low:         lo,
+                                close:       cls,
+                                body_pct:    b.body_pct ?? null,
+                                upper_pct:   upperPct,
+                                lower_pct:   lowerPct,
+                                upper_body_ratio: (b.body_pct != null && Math.abs(b.body_pct) >= 0.001) ? upperPct / Math.abs(b.body_pct) : null,
+                                lower_body_ratio: (b.body_pct != null && Math.abs(b.body_pct) >= 0.001) ? lowerPct / Math.abs(b.body_pct) : null,
+                                sar:         b.sar ?? null,
+                                bull:        b.bull ?? null,
+                                sar_seq:     b.sar_seq ?? null,
+                                sar_pct:     b.sar_pct ?? null,
+                                sar_pct_delta: b.sar_pct_delta ?? null,
+                                boll_lb:     b.boll_lb ?? null,
+                                boll_mid:    b.boll_mid ?? null,
+                                boll_ub:     b.boll_ub ?? null,
+                                boll_width:  b.boll_width ?? null,
+                                boll_width_delta: b.boll_width_delta ?? null,
+                                width_ratio: b.width_ratio ?? null,
+                                sar_dist:    b.sar_dist ?? null,
+                                sar_dist_delta: b.sar_dist_delta ?? null,
+                                pos_pct:     _barPosMap.get(b.bar_time ?? b.beijing_time) ?? null,
+                                date:        barKey.split(' ')[0] || '',
+                                alert_type:  alertType,
+                            })
+                        }).catch(e => console.warn('[Shadow] 保存失败', e));
+                    }
+                }
+
+                // ── 影线预警面板静默刷新（API 直接扫描，无需 POST） ──────
+                {
+                    const shadowSel = document.getElementById('ethSarShadowDateSel');
+                    const shadowDate = shadowSel ? shadowSel.value : '';
+                    if (shadowDate && typeof loadShadowAlertRows === 'function') {
+                        loadShadowAlertRows(shadowDate).catch(() => {});
+                    }
+                }
+
+                // ── 状态指示灯 ───────────────────────────────────────────
                 const dot = document.getElementById('ethSarDot');
-                if (dot) {
+                if (dot && cur) {
                     dot.style.background = cur.bull ? '#4ade80' : '#ef4444';
                     dot.style.boxShadow  = cur.bull ? '0 0 6px #4ade80' : '0 0 6px #ef4444';
                 }
@@ -18101,21 +18712,381 @@ pm2 status                                                # 查看所有进程�
             }
         }
 
-        // 内联百分比计算（无需引用后端）
-        function _math_sar_pct_inline(val, ub, lb) {
-            if (ub === lb) return 0;
-            return (val - lb) / (ub - lb) * 100;
-        }
+        // ════════════════════════════════════════════════════════════════
+        // 空头01 / 多头01 汇总框  - loadEthSarDailyFlips
+        // 从 /api/eth-sar-boll/seq1-rows 取指定日期所有 sar_seq=1 行
+        // 数据按日期缓存为 JSONL，支持历史查询
+        // ════════════════════════════════════════════════════════════════
+        let _flipsDateLoaded = false;  // 必须在 loadEthSarDailyFlips() 调用前声明
 
         // 首次加载
         loadEthSarBoll();
+        loadEthSarDailyFlips();  // 同步加载今日空头01/多头01汇总
+        _loadShadowAlertDates(); // 加载影线预警记录面板
 
         // 每30秒自动刷新
         if (_ethSarTimer) clearInterval(_ethSarTimer);
-        _ethSarTimer = setInterval(loadEthSarBoll, 30000);
+        _ethSarTimer = setInterval(() => {
+            loadEthSarBoll();
+            loadEthSarDailyFlips();
+        }, 30000);
+
+        async function _initEthSarFlipsDates() {
+            if (_flipsDateLoaded) return;
+            const sel = document.getElementById('ethSarFlipsDateSel');
+            if (!sel) return;
+            try {
+                const res  = await fetch('/api/eth-sar-boll/available-dates', {cache:'no-store'});
+                const json = await res.json();
+                if (!json.success) return;
+                const today = new Date().toLocaleDateString('en-CA', {timeZone:'Asia/Shanghai'});
+                sel.innerHTML = '';
+                (json.dates || []).forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d;
+                    opt.textContent = d === today ? `${d}（今日）` : d;
+                    sel.appendChild(opt);
+                });
+                // 默认选今日
+                if (json.dates && json.dates.includes(today)) sel.value = today;
+                else if (json.dates && json.dates.length) sel.value = json.dates[0];
+                _flipsDateLoaded = true;
+            } catch(e) {
+                console.error('[DailyFlips] 日期加载失败:', e);
+            }
+        }
+
+        async function loadEthSarDailyFlips(date) {
+            const sel   = document.getElementById('ethSarFlipsDateSel');
+            const tbody = document.getElementById('ethSarFlipsTbody');
+            const cntEl = document.getElementById('ethSarFlipsCount');
+            const icon  = document.getElementById('ethSarFlipsRefreshIcon');
+            if (!tbody) return;
+
+            // 初次调用先加载日期列表
+            await _initEthSarFlipsDates();
+
+            // 确定日期
+            if (!date) {
+                date = sel ? sel.value : new Date().toLocaleDateString('en-CA', {timeZone:'Asia/Shanghai'});
+            }
+            if (sel && sel.value !== date) sel.value = date;
+            if (!date) return;
+
+            if (icon) icon.classList.add('animate-spin');
+            // 保留旧数据，仅降低透明度表示「正在刷新」
+            tbody.style.opacity = '0.45';
+            tbody.style.transition = 'opacity 0.15s';
+
+            try {
+                const res  = await fetch(`/api/eth-sar-boll/seq1-rows?date=${date}`, {cache:'no-store'});
+                const json = await res.json();
+                if (!json.success) {
+                    tbody.innerHTML = `<tr><td colspan="23" style="text-align:center;padding:20px;color:#ef4444;">加载失败: ${json.error||''}</td></tr>`;
+                    return;
+                }
+
+                // 降序：最新在顶
+                const flipsAsc = json.rows || [];
+                const flips    = flipsAsc.slice().reverse();
+                if (cntEl) cntEl.textContent = `${flips.length} 条`;
+
+                if (!flips.length) {
+                    tbody.innerHTML = `<tr><td colspan="23" style="text-align:center;padding:20px;color:#475569;">${date} 暂无数据</td></tr>`;
+                    return;
+                }
+
+                // 预计算 seq1 面板每行截至当时的当日最高/最低位置%（升序扫描）
+                const _flipsPosMap = new Map();
+                {
+                    let runHi = -Infinity, runLo = Infinity;
+                    flipsAsc.forEach(b => {
+                        if (b.high != null) runHi = Math.max(runHi, b.high);
+                        if (b.low  != null) runLo = Math.min(runLo, b.low);
+                        const cls = b.close ?? b.price;
+                        const pos = (runHi > runLo && cls != null)
+                            ? (cls - runLo) / (runHi - runLo) * 100 : null;
+                        _flipsPosMap.set(b.bar_time ?? b.beijing_time, pos);
+                    });
+                }
+
+                let html = '';
+                flips.forEach((r, idx) => {
+                    const bull      = r.bull;
+                    const dirColor  = bull ? '#4ade80' : '#f87171';
+                    const dirBg     = bull ? 'rgba(34,197,94,0.08)'  : 'rgba(239,68,68,0.08)';
+                    const dirBorder = bull ? '3px solid #22c55e' : '3px solid #ef4444';
+                    const seqStr    = String(r.sar_seq || 1).padStart(2, '0');
+                    const dirLabel  = bull ? `▲ 多头${seqStr}` : `▼ 空头${seqStr}`;
+                    const rowBg     = idx % 2 === 0 ? 'background:rgba(255,255,255,0.02);' : '';
+
+                    const timeOnly  = (r.beijing_time || r.bar_time || '').split(' ')[1] || '--';
+                    const high      = r.high      != null ? r.high.toFixed(2)        : '--';
+                    const low       = r.low       != null ? r.low.toFixed(2)         : '--';
+                    const cls       = r.close     != null ? r.close.toFixed(2)       : '--';
+                    const sar       = r.sar       != null ? r.sar.toFixed(2)         : '--';
+                    const lb        = r.boll_lb   != null ? r.boll_lb.toFixed(2)     : '--';
+                    const mid       = r.boll_mid  != null ? r.boll_mid.toFixed(2)    : '--';
+                    const ub        = r.boll_ub   != null ? r.boll_ub.toFixed(2)     : '--';
+                    const bw        = r.boll_width!= null ? r.boll_width.toFixed(2)  : '--';
+                    const dist      = r.sar_dist  != null ? r.sar_dist.toFixed(2)    : '--';
+
+                    // 实体%
+                    const bodyPct   = r.body_pct;
+                    const bodyStr   = bodyPct != null ? (bodyPct > 0 ? '+' : '') + bodyPct.toFixed(2) + '%' : '--';
+                    const bodyCol   = bodyPct != null ? (bodyPct > 0 ? '#4ade80' : '#f87171') : '#64748b';
+
+                    // SAR%
+                    const sarPct    = r.sar_pct;
+                    const sarPctStr = sarPct != null ? sarPct.toFixed(1) + '%' : '--';
+                    const sarPctCol = sarPct != null
+                        ? (sarPct > 100 ? '#22c55e' : sarPct < 0 ? '#ef4444' : '#a5b4fc')
+                        : '#64748b';
+
+                    // SAR% 变化 badge
+                    function _dp(v) {
+                        if (v == null) return `<span style="color:#475569;">--</span>`;
+                        const sign = v > 0 ? '+' : '';
+                        const col  = v > 0 ? '#fb923c' : '#818cf8';
+                        const sym  = v > 0 ? '▲' : '▼';
+                        return `<span style="color:${col};font-size:10px;">${sym}${sign}${v.toFixed(1)}</span>`;
+                    }
+
+                    // 开口变化 badge
+                    function _bwdelta(v) {
+                        if (v == null) return `<span style="color:#475569;">--</span>`;
+                        const sign = v > 0 ? '+' : '';
+                        const col  = v > 0 ? '#fb923c' : '#60a5fa';
+                        const sym  = v > 0 ? '▲' : '▼';
+                        return `<span style="color:${col};font-size:10px;">${sym}${sign}${v.toFixed(2)}</span>`;
+                    }
+
+                    // 开口比
+                    const wr     = r.width_ratio;
+                    let wrHtml;
+                    if (wr == null) {
+                        wrHtml = `<span style="color:#475569;">--</span>`;
+                    } else {
+                        const wrStr = wr.toFixed(2);
+                        const wrCol = wr >= 2.2 ? '#ef4444' : wr >= 2.0 ? '#f87171' : wr >= 1.5 ? '#fb923c' : wr >= 1.0 ? '#c084fc' : '#86efac';
+                        const wrW   = wr >= 1.5 ? '800' : '600';
+                        wrHtml = wr >= 2.2
+                            ? `<span style="color:#ef4444;font-weight:800;background:rgba(239,68,68,0.15);padding:1px 4px;border-radius:3px;border:1px solid rgba(239,68,68,0.4);">${wrStr}</span>`
+                            : `<span style="color:${wrCol};font-weight:${wrW};">${wrStr}</span>`;
+                    }
+
+                    // SAR距离颜色（seq1面板所有行均为sar_seq=1，直接判断阈值）
+                    const distRaw = r.sar_dist;
+                    const distCol = bull ? '#4ade80' : '#f87171';
+                    const _triggerShortSeq1 = !bull && distRaw != null && distRaw > 25;
+                    const _triggerLongSeq1  =  bull && distRaw != null && distRaw < -25;
+                    const distHtml = dist === '--'
+                        ? `<span style="color:#475569;">--</span>`
+                        : (_triggerShortSeq1 || _triggerLongSeq1)
+                            ? `<span style="color:#f97316;font-weight:800;background:rgba(249,115,22,0.18);padding:2px 6px;border-radius:4px;border:1px solid rgba(249,115,22,0.55);white-space:nowrap;">🔔${distRaw > 0 ? '↑' : '↓'}${Math.abs(distRaw).toFixed(2)}</span>`
+                            : `<span style="color:${distCol};font-weight:600;">${distRaw > 0 ? '↑' : '↓'}${Math.abs(distRaw).toFixed(2)}</span>`;
+
+                    // 距离变化 badge
+                    function _distdelta(v) {
+                        if (v == null) return `<span style="color:#475569;">--</span>`;
+                        const sign = v > 0 ? '+' : '';
+                        const col  = v > 0 ? '#fb923c' : '#818cf8';
+                        const sym  = v > 0 ? '▲' : '▼';
+                        return `<span style="color:${col};font-size:10px;">${sym}${sign}${v.toFixed(2)}</span>`;
+                    }
+
+                    html += `<tr style="border-left:${dirBorder};${rowBg}">
+                        <td style="padding:5px 8px;font-family:monospace;color:${dirColor};font-weight:700;white-space:nowrap;">${timeOnly}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#fb923c;opacity:0.9;">${high}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#60a5fa;opacity:0.9;">${low}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:${dirColor};font-weight:600;">${cls}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;"><span style="color:${bodyCol};font-weight:600;">${bodyStr}</span></td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;">${_posHtml(_flipsPosMap.get(r.bar_time??r.beijing_time))}</td>
+                        ${(([u,d,ur,dr])=>`<td style="padding:5px 8px;text-align:right;font-family:monospace;">${u}</td><td style="padding:5px 8px;text-align:right;font-family:monospace;">${d}</td><td style="padding:5px 8px;text-align:right;font-family:monospace;">${ur}</td><td style="padding:5px 8px;text-align:right;font-family:monospace;">${dr}</td>`)(_shadowCols(r.high,r.low,r.close,r.body_pct))}
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#818cf8;">${sar}</td>
+                        <td style="padding:5px 8px;text-align:center;">
+                            <span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:700;
+                                background:${dirBg};border:1px solid ${bull?'rgba(34,197,94,0.4)':'rgba(239,68,68,0.4)'};color:${dirColor};">${dirLabel}</span>
+                        </td>
+                        <td style="padding:5px 8px;text-align:center;font-family:monospace;color:${bull?'#86efac':'#fca5a5'};font-size:11px;">#${seqStr}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;"><span style="color:${sarPctCol};font-weight:700;">${sarPctStr}</span></td>
+                        <td style="padding:5px 8px;text-align:center;font-family:monospace;">${_dp(r.sar_pct_delta)}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#f87171;opacity:0.85;">${lb}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#fde68a;opacity:0.85;">${mid}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#4ade80;opacity:0.85;">${ub}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#a78bfa;font-weight:600;">${bw}</td>
+                        <td style="padding:5px 8px;text-align:center;font-family:monospace;">${_bwdelta(r.boll_width_delta)}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;">${wrHtml}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;">${distHtml}</td>
+                        <td style="padding:5px 8px;text-align:center;font-family:monospace;">${_distdelta(r.sar_dist_delta)}</td>
+                    </tr>`;
+                });
+                tbody.innerHTML = html;
+                // 闪烁提示：先显示高亮色再淡回正常
+                tbody.style.opacity = '1';
+                tbody.style.transition = 'opacity 0.1s';
+                tbody.style.background = 'rgba(192,132,252,0.06)';
+                setTimeout(() => {
+                    tbody.style.transition = 'background 0.6s';
+                    tbody.style.background = '';
+                }, 80);
+
+            } catch(e) {
+                console.error('[DailyFlips] 加载失败:', e);
+                tbody.innerHTML = `<tr><td colspan="23" style="text-align:center;padding:16px;color:#ef4444;">加载出错</td></tr>`;
+                tbody.style.opacity = '1';
+            } finally {
+                if (icon) icon.classList.remove('animate-spin');
+                tbody.style.opacity = '1';
+            }
+        }
+
+        // ════════════════════════════════════════════════════════════════
+        // 影线预警记录面板  loadShadowAlertRows / _loadShadowAlertDates
+        // ════════════════════════════════════════════════════════════════
+        async function loadShadowAlertRows(date) {
+            const tbody   = document.getElementById('ethSarShadowTbody');
+            const countEl = document.getElementById('ethSarShadowCount');
+            if (!tbody) return;
+            // 有内容时降低透明度静默刷新，避免看盘时数据闪烁消失
+            const _shadowIsEmpty = tbody.querySelector('tr') === null ||
+                                   tbody.innerHTML.trim() === '' ||
+                                   tbody.querySelector('td[colspan]') !== null;
+            if (_shadowIsEmpty) {
+                tbody.innerHTML = `<tr><td colspan="24" style="text-align:center;padding:32px;color:#475569;">
+                    <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+                        <div style="width:14px;height:14px;border:2px solid #fb923c;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+                        加载中...
+                    </div></td></tr>`;
+            } else {
+                tbody.style.opacity = '0.45';
+                tbody.style.transition = 'opacity 0.15s';
+            }
+            try {
+                const url  = '/api/eth-sar-boll/shadow-alert-rows?date=' + encodeURIComponent(date || '');
+                const res  = await fetch(url + '&_t=' + Date.now(), {cache:'no-store'});
+                const json = await res.json();
+                if (!json.success) { if (_shadowIsEmpty) tbody.innerHTML = `<tr><td colspan="24" style="text-align:center;padding:24px;color:#f87171;">加载失败</td></tr>`; return; }
+                const rows = json.rows || [];
+                if (countEl) countEl.textContent = rows.length + ' 条';
+                if (rows.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="24" style="text-align:center;padding:32px;color:#475569;">暂无影线预警记录</td></tr>`;
+                    return;
+                }
+                const html = rows.map(r => {
+                    const at = r.alert_type || 'upper';
+                    const isBoth  = at === 'both';
+                    const isUpper = at === 'upper';
+                    const typeBadge = isBoth
+                        ? `<span style="background:rgba(251,146,60,0.3);color:#fb923c;font-weight:700;padding:1px 5px;border-radius:4px;font-size:10px;">上影线</span><span style="background:rgba(96,165,250,0.3);color:#60a5fa;font-weight:700;padding:1px 5px;border-radius:4px;font-size:10px;margin-left:3px;">下影线</span>`
+                        : isUpper
+                        ? `<span style="background:rgba(251,146,60,0.3);color:#fb923c;font-weight:700;padding:1px 6px;border-radius:4px;font-size:10px;">上影线</span>`
+                        : `<span style="background:rgba(96,165,250,0.3);color:#60a5fa;font-weight:700;padding:1px 6px;border-radius:4px;font-size:10px;">下影线</span>`;
+                    const rowBg = isBoth
+                        ? 'background:rgba(168,85,247,0.06);'
+                        : isUpper ? 'background:rgba(251,146,60,0.06);' : 'background:rgba(96,165,250,0.06);';
+                    const borderColor = isBoth ? '#a855f7' : isUpper ? '#fb923c' : '#60a5fa';
+                    const timeStr = (r.bar_time || '').split(' ')[1] || r.bar_time || '--';
+                    const cls = r.close ?? 0;
+                    const [uHtml, dHtml, urHtml, drHtml] = _shadowCols(r.high, r.low, r.close, r.body_pct);
+                    // SAR距离
+                    const distRaw = r.sar_dist;
+                    const distCol = r.bull ? '#4ade80' : '#f87171';
+                    const _trigS = !r.bull && distRaw != null && distRaw > 25;
+                    const _trigL =  r.bull && distRaw != null && distRaw < -25;
+                    const distHtml = distRaw == null ? `<span style="color:#475569;">--</span>`
+                        : (_trigS || _trigL)
+                            ? `<span style="color:#f97316;font-weight:800;background:rgba(249,115,22,0.18);padding:2px 5px;border-radius:4px;border:1px solid rgba(249,115,22,0.55);">🔔${distRaw>0?'↑':'↓'}${Math.abs(distRaw).toFixed(2)}</span>`
+                            : `<span style="color:${distCol};font-weight:600;">${distRaw>0?'↑':'↓'}${Math.abs(distRaw).toFixed(2)}</span>`;
+                    // 距离变化 badge
+                    const ddv = r.sar_dist_delta;
+                    const ddHtml = ddv == null ? `<span style="color:#475569;">--</span>`
+                        : `<span style="color:${ddv>0?'#fb923c':'#818cf8'};font-size:10px;">${ddv>0?'▲':'▼'}${ddv>0?'+':''}${ddv.toFixed(2)}</span>`;
+                    // 开口变化
+                    const bwdv = r.boll_width_delta;
+                    const bwdHtml = bwdv == null ? `<span style="color:#475569;">--</span>`
+                        : `<span style="color:${bwdv>0?'#fb923c':'#60a5fa'};font-size:10px;">${bwdv>0?'▲':'▼'}${bwdv>0?'+':''}${bwdv.toFixed(2)}</span>`;
+                    // SAR%变化
+                    const spd = r.sar_pct_delta;
+                    const spdHtml = spd == null ? `<span style="color:#475569;">--</span>`
+                        : `<span style="color:${spd>0?'#fb923c':'#818cf8'};font-size:10px;">${spd>0?'▲':'▼'}${spd>0?'+':''}${spd.toFixed(1)}</span>`;
+                    // 开口比
+                    const wr = r.width_ratio;
+                    const wrHtml = wr == null ? `<span style="color:#475569;">--</span>`
+                        : wr >= 2.2 ? `<span style="color:#ef4444;font-weight:800;background:rgba(239,68,68,0.15);padding:1px 4px;border-radius:3px;border:1px solid rgba(239,68,68,0.4);">${wr.toFixed(2)}</span>`
+                        : `<span style="color:${wr>=2?'#f87171':wr>=1.5?'#fb923c':wr>=1?'#c084fc':'#86efac'};font-weight:${wr>=1.5?'700':'600'};">${wr.toFixed(2)}</span>`;
+                    // 方向badge
+                    const dirLabel = r.bull ? '📈多头' : '📉空头';
+                    const dirBg = r.bull ? 'background:rgba(74,222,128,0.15);color:#4ade80;border:1px solid rgba(74,222,128,0.35);'
+                                         : 'background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.35);';
+                    const dirBadge = `<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;${dirBg}white-space:nowrap;">${dirLabel}</span>`;
+                    return `<tr style="${rowBg}border-left:3px solid ${borderColor};transition:background 0.2s;">
+                        <td style="padding:5px 8px;text-align:center;white-space:nowrap;">${typeBadge}</td>
+                        <td style="padding:5px 10px;font-family:monospace;color:#94a3b8;white-space:nowrap;">${timeStr}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#fb923c;">${r.high!=null?r.high.toFixed(2):'--'}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#60a5fa;">${r.low!=null?r.low.toFixed(2):'--'}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:${cls>=(r.open??cls)?'#4ade80':'#f87171'};">${cls.toFixed(2)}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;">${_bodyPctHtml(r.body_pct)}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;">${_posHtml(r.pos_pct)}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;">${uHtml}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;">${dHtml}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;">${urHtml}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;">${drHtml}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#818cf8;">${r.sar!=null?r.sar.toFixed(2):'--'}</td>
+                        <td style="padding:5px 8px;text-align:center;">${dirBadge}</td>
+                        <td style="padding:5px 8px;text-align:center;font-family:monospace;color:${r.bull?'#86efac':'#fca5a5'};font-size:10px;">#${String(r.sar_seq??0).padStart(2,'0')}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;"><span style="color:${r.sar_pct>100?'#22c55e':r.sar_pct<0?'#ef4444':'#a5b4fc'};font-weight:700;">${r.sar_pct!=null?r.sar_pct.toFixed(1)+'%':'--'}</span></td>
+                        <td style="padding:5px 8px;text-align:center;font-family:monospace;">${spdHtml}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#f87171;">${r.boll_lb!=null?r.boll_lb.toFixed(2):'--'}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#fde68a;">${r.boll_mid!=null?r.boll_mid.toFixed(2):'--'}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#4ade80;">${r.boll_ub!=null?r.boll_ub.toFixed(2):'--'}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#a78bfa;">${r.boll_width!=null?r.boll_width.toFixed(2):'--'}</td>
+                        <td style="padding:5px 8px;text-align:center;font-family:monospace;">${bwdHtml}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;">${wrHtml}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;">${distHtml}</td>
+                        <td style="padding:5px 8px;text-align:center;font-family:monospace;">${ddHtml}</td>
+                    </tr>`;
+                }).join('');
+                tbody.innerHTML = html;
+            } catch(e) {
+                if (_shadowIsEmpty) tbody.innerHTML = `<tr><td colspan="24" style="text-align:center;padding:24px;color:#f87171;">加载异常: ${e.message}</td></tr>`;
+                console.error('[Shadow] loadShadowAlertRows error:', e);
+            } finally {
+                tbody.style.opacity = '1';
+            }
+        }
+
+        async function _loadShadowAlertDates() {
+            try {
+                const res  = await fetch('/api/eth-sar-boll/shadow-alert-dates', {cache:'no-store'});
+                const json = await res.json();
+                const sel  = document.getElementById('ethSarShadowDateSel');
+                if (!sel || !json.success) return;
+                sel.innerHTML = '';
+                const today = new Date().toLocaleDateString('en-CA', {timeZone:'Asia/Shanghai'});
+                const dates = json.dates || [];
+                if (dates.length === 0) {
+                    const opt = document.createElement('option');
+                    opt.value = today; opt.textContent = today + '（今日）';
+                    sel.appendChild(opt);
+                    await loadShadowAlertRows(today);
+                    return;
+                }
+                dates.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d;
+                    opt.textContent = d === today ? `${d}（今日）` : d;
+                    sel.appendChild(opt);
+                });
+                const initDate = dates.includes(today) ? today : dates[0];
+                sel.value = initDate;
+                await loadShadowAlertRows(initDate);
+            } catch(e) { console.error('[ShadowDates] 加载失败:', e); }
+        }
 
         // ════════════════════════════════════════════════════════════════
         // ETH SAR + 布林带  历史数据弹窗
+        // ★ 链兼容筛选算法已移至后端 /api/eth-sar-boll/history-rows
         // ════════════════════════════════════════════════════════════════
         let _ethSarHistoryDate = '';
 
@@ -18124,7 +19095,6 @@ pm2 status                                                # 查看所有进程�
             if (modal) {
                 modal.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
-                // 加载可用日期
                 await _loadEthSarDates();
             }
         }
@@ -18149,7 +19119,6 @@ pm2 status                                                # 查看所有进程�
                     opt.value = d; opt.textContent = d;
                     sel.appendChild(opt);
                 });
-                // 默认选今天或第一条
                 if (json.dates && json.dates.length > 0) {
                     const today = new Date().toLocaleDateString('en-CA', {timeZone:'Asia/Shanghai'});
                     _ethSarHistoryDate = json.dates.includes(today) ? today : json.dates[0];
@@ -18163,110 +19132,175 @@ pm2 status                                                # 查看所有进程�
             const tbody = document.getElementById('ethSarHistoryTbody');
             const info  = document.getElementById('ethSarHistoryInfo');
             if (!tbody) return;
-            tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;padding:24px;color:#475569;">
+            tbody.innerHTML = `<tr><td colspan="23" style="text-align:center;padding:24px;color:#475569;">
                 <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
                 <div style="width:16px;height:16px;border:2px solid #818cf8;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
                 加载中...</div></td></tr>`;
             try {
-                const res  = await fetch(`/api/eth-sar-boll/history?date=${date}&limit=2000`, {cache:'no-store'});
+                // ★ 调用后端新接口 /api/eth-sar-boll/history-rows
+                // 链兼容筛选 + 所有派生字段计算均在服务器完成
+                const res  = await fetch(`/api/eth-sar-boll/history-rows?date=${date}&limit=2000`, {cache:'no-store'});
                 const json = await res.json();
-                if (!json.success) { tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;padding:24px;color:#ef4444;">加载失败</td></tr>`; return; }
-
-                // 按 bar_time 去重，每根K线只保留最后一条记录
-                const barMap = new Map();
-                (json.data || []).forEach(rec => {
-                    const bt = rec.current && rec.current.bar_time;
-                    if (bt) barMap.set(bt, rec);
-                });
-                // 最新的在最前面（降序）
-                const rows = Array.from(barMap.values()).sort((a,b) =>
-                    b.current.bar_time.localeCompare(a.current.bar_time));
-
-                if (info) info.textContent = `共 ${rows.length} 根K线（最新在前）`;
-
-                if (rows.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;padding:24px;color:#64748b;">暂无数据</td></tr>`;
+                if (!json.success) {
+                    tbody.innerHTML = `<tr><td colspan="23" style="text-align:center;padding:24px;color:#ef4444;">加载失败: ${json.error||''}</td></tr>`;
                     return;
                 }
 
-                let html = '';
-                rows.forEach((rec, idx) => {
-                    const c = rec.current;
-                    const bull = c.bull;
-                    const seqStr = String(c.sar_seq).padStart(2,'0');
-                    const dirColor = bull ? '#4ade80' : '#f87171';
-                    const dirSymbol = bull ? '▲' : '▼';
-                    const dirLabel = bull ? `多头${seqStr}` : `空头${seqStr}`;
+                // rows 已是降序（最新在前），所有字段后端已算好
+                const rows = json.rows || [];
+                if (info) info.textContent = `共 ${rows.length} 根K线（最新在前）`;
 
-                    // 切换行高亮（从last5_bars里找switched）
-                    const bars5 = rec.last5_bars || [];
-                    const curBar = bars5.find(b => b.beijing_time && b.beijing_time.endsWith(c.bar_time.split(' ')[1]));
-                    const switched = curBar ? curBar.switched : false;
+                if (rows.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="23" style="text-align:center;padding:24px;color:#64748b;">暂无数据</td></tr>`;
+                    return;
+                }
+
+                // ── 预计算每行的「开口比」：直接使用后端已算好的 width_ratio 字段 ──
+                // 后端已跨日期补全 sar_seq=1 数据，前端无需自行计算
+                function _histWidthRatioHtml(widthRatio, isConsec4Mark) {
+                    if (widthRatio == null) return `<span style="color:#475569;">--</span>`;
+                    const rv = widthRatio.toFixed(2);
+                    const mark = isConsec4Mark ? ` <span title="连续4根递增" style="font-size:9px;background:rgba(251,191,36,0.3);color:#fbbf24;padding:1px 4px;border-radius:8px;border:1px solid rgba(251,191,36,0.5);vertical-align:middle;">↑4</span>` : '';
+                    if (widthRatio >= 2.2) {
+                        return `<span style="color:#ef4444;font-weight:800;background:rgba(239,68,68,0.15);padding:1px 4px;border-radius:3px;border:1px solid rgba(239,68,68,0.4);">${rv}</span>${mark}`;
+                    }
+                    const rc = widthRatio >= 2.0 ? '#f87171' : widthRatio >= 1.5 ? '#fb923c' : widthRatio >= 1.0 ? '#c084fc' : '#86efac';
+                    const rw = widthRatio >= 1.5 ? '700' : '600';
+                    return `<span style="color:${rc};font-weight:${rw};">${rv}</span>${mark}`;
+                }
+
+                // ── 检测连续4根开口比递增的行（时间升序扫描，降序rows需先反转）──
+                // rows 是降序（最新在前），升序扫描才能正确检测 seq 连续
+                const rowsAsc = [...rows].reverse();
+                // 预计算位置%（按日期分组累计最高/最低，升序扫描）
+                // history-rows 数据可能跨日（含前一天最后几根K线），
+                // 必须按日期重置 runHi/runLo，避免昨日价格污染今日位置%计算
+                const _histPosMap = new Map();
+                {
+                    let runHi = -Infinity, runLo = Infinity;
+                    let curDate = null;
+                    rowsAsc.forEach(b => {
+                        const barKey = b.bar_time ?? b.beijing_time ?? '';
+                        const barDate = barKey.slice(0, 10); // 'YYYY-MM-DD'
+                        if (barDate !== curDate) {
+                            // 新的一天，重置累计区间
+                            runHi = -Infinity;
+                            runLo = Infinity;
+                            curDate = barDate;
+                        }
+                        if (b.high != null) runHi = Math.max(runHi, b.high);
+                        if (b.low  != null) runLo = Math.min(runLo, b.low);
+                        const cls = b.close ?? b.price;
+                        const pos = (runHi > runLo && cls != null)
+                            ? (cls - runLo) / (runHi - runLo) * 100 : null;
+                        _histPosMap.set(barKey, pos);
+                    });
+                }
+                const consec4Marks = new Set();  // 存储 beijing_time，标记这些行
+
+                // 按方向+趋势ID分组（同一 bull + trend_id 组合内，
+                // 检测相邻4根 sar_seq 顺序递增（sar_seq 值依次变大）且开口比严格递增）
+                for (const checkBull of [true, false]) {
+                    const dirBarsAsc = rowsAsc.filter(r => r.bull === checkBull && r.width_ratio != null);
+                    // 按 trend_id 再分组
+                    const tidGroups = {};
+                    dirBarsAsc.forEach(b => {
+                        const tid = b.trend_id ?? 0;
+                        if (!tidGroups[tid]) tidGroups[tid] = [];
+                        tidGroups[tid].push(b);
+                    });
+                    Object.values(tidGroups).forEach(grp => {
+                        // grp 已按时间升序
+                        for (let i = 0; i <= grp.length - 4; i++) {
+                            const b0 = grp[i], b1 = grp[i+1], b2 = grp[i+2], b3 = grp[i+3];
+                            // sar_seq 必须是顺序递增（不要求严格+1，只要 seq 单调递增即可）
+                            const seqUp = (b0.sar_seq < b1.sar_seq && b1.sar_seq < b2.sar_seq && b2.sar_seq < b3.sar_seq);
+                            if (!seqUp) continue;
+                            // 开口比严格递增
+                            if (b0.width_ratio < b1.width_ratio && b1.width_ratio < b2.width_ratio && b2.width_ratio < b3.width_ratio) {
+                                [b0, b1, b2, b3].forEach(b => {
+                                    const key = b.beijing_time || b.bar_time;
+                                    if (key) consec4Marks.add(key);
+                                });
+                            }
+                        }
+                    });
+                }
+
+                let html = '';
+                rows.forEach((b, idx) => {
+                    const _btKey = b.beijing_time || b.bar_time || '';
+                    const isConsec4 = consec4Marks.has(_btKey);
+                    const bull      = b.bull       ?? false;
+                    const sarSeq    = b.sar_seq   ?? 0;
+                    const switched  = b.switched  ?? false;
+                    const sarVal    = b.sar;
+                    const sarPct    = b.sar_pct;
+                    const closeV    = b.close ?? b.price;
+                    const openV     = b.open;
+                    const high      = b.high;
+                    const low       = b.low;
+                    const bollLb    = b.boll_lb;
+                    const bollMid   = b.boll_mid;
+                    const bollUb    = b.boll_ub;
+                    const bt        = b.beijing_time || b.bar_time || '';
+
+
+                    const seqStr    = String(sarSeq).padStart(2,'0');
+                    const dirColor  = bull ? '#4ade80' : '#f87171';
+                    const dirSymbol = bull ? '▲' : '▼';
+                    const dirLabel  = bull ? `多头${seqStr}` : `空头${seqStr}`;
+                    const timeOnly  = bt.split(' ')[1] || bt;
+
                     const rowBorder = switched
                         ? (bull ? 'border-left:3px solid #22c55e;' : 'border-left:3px solid #ef4444;')
-                        : 'border-left:3px solid transparent;';
-                    const rowBg = switched
-                        ? (bull ? 'background:rgba(34,197,94,0.08);' : 'background:rgba(239,68,68,0.08);')
-                        : (idx % 2 === 0 ? 'background:rgba(255,255,255,0.02);' : '');
+                        : (isConsec4 ? 'border-left:3px solid #fbbf24;' : 'border-left:3px solid transparent;');
+                    const rowBg = isConsec4
+                        ? 'background:rgba(251,191,36,0.07);'
+                        : (switched
+                            ? (bull ? 'background:rgba(34,197,94,0.08);' : 'background:rgba(239,68,68,0.08);')
+                            : (idx % 2 === 0 ? 'background:rgba(255,255,255,0.02);' : ''));
 
-                    const pct = c.sar_pct;
-                    const pctColor = pct > 100 ? '#22c55e' : pct < 0 ? '#ef4444' : pct > 70 ? '#4ade80' : pct < 30 ? '#f87171' : '#a5b4fc';
-                    // delta: 对比下一条（更旧的K线），因为是降序排列
-                    const olderRec = rows[idx + 1];
-                    const olderPct = olderRec ? olderRec.current.sar_pct : null;
-                    const delta = olderPct !== null ? (pct - olderPct) : null;
-                    const deltaHtml = delta === null ? '<span style="color:#475569">--</span>'
-                        : delta > 0.005 ? `<span style="color:#4ade80;font-weight:600;">+${delta.toFixed(1)}%</span>`
-                        : delta < -0.005 ? `<span style="color:#f87171;font-weight:600;">${delta.toFixed(1)}%</span>`
-                        : '<span style="color:#475569">±0.0%</span>';
+                    const pctColor = _pctColor(sarPct);
 
-                    const timeOnly = c.bar_time.split(' ')[1];
-
-                    // 布林带开口宽度
-                    const hBWidth = (c.boll_ub != null && c.boll_lb != null) ? (c.boll_ub - c.boll_lb) : null;
-                    const hBWidthStr = hBWidth != null ? hBWidth.toFixed(2) : '--';
-                    const olderCur = olderRec ? olderRec.current : null;
-                    const hOlderBWidth = (olderCur && olderCur.boll_ub != null && olderCur.boll_lb != null)
-                        ? (olderCur.boll_ub - olderCur.boll_lb) : null;
-                    let hBWidthDelta = '<span style="color:#475569">--</span>';
-                    if (hBWidth != null && hOlderBWidth != null) {
-                        const dw = hBWidth - hOlderBWidth;
-                        if (Math.abs(dw) < 0.005) {
-                            hBWidthDelta = '<span style="color:#475569">±0.00</span>';
-                        } else if (dw > 0) {
-                            hBWidthDelta = `<span style="color:#fb923c;font-weight:600;">▲${dw.toFixed(2)}</span>`;
-                        } else {
-                            hBWidthDelta = `<span style="color:#60a5fa;font-weight:600;">▼${Math.abs(dw).toFixed(2)}</span>`;
-                        }
-                    }
+                    // 开口比 = 后端已算好的 width_ratio 字段（跨日期补全）
+                    const widthRatio = b.width_ratio ?? null;
+                    const widthRatioHtml = _histWidthRatioHtml(widthRatio, isConsec4);
 
                     html += `<tr style="${rowBg}${rowBorder}">
-                        <td style="padding:5px 10px;font-family:monospace;color:${switched?dirColor:'#94a3b8'};white-space:nowrap;">
-                            ${timeOnly}${switched ? ' <span style="font-size:9px;font-weight:700;background:'+(bull?'rgba(34,197,94,0.25)':'rgba(239,68,68,0.25)')+';padding:1px 5px;border-radius:10px;color:'+dirColor+';">'+(bull?'↑多':'↓空')+'</span>' : ''}
+                        <td style="padding:5px 8px;font-family:monospace;color:${switched?dirColor:'#94a3b8'};white-space:nowrap;">
+                            ${timeOnly}${switched ? ` <span style="font-size:9px;font-weight:700;background:${bull?'rgba(34,197,94,0.25)':'rgba(239,68,68,0.25)'};padding:1px 5px;border-radius:10px;color:${dirColor};">${bull?'↑多':'↓空'}</span>` : ''}
                         </td>
-                        <td style="padding:5px 10px;text-align:right;font-family:monospace;color:${bull?'#4ade80':'#f87171'};">${c.price.toFixed(2)}</td>
-                        <td style="padding:5px 10px;text-align:right;font-family:monospace;color:#818cf8;">${c.sar.toFixed(2)}</td>
-                        <td style="padding:5px 10px;text-align:center;">
-                            <span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#fb923c;opacity:0.9;">${high != null ? Number(high).toFixed(2) : '--'}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#60a5fa;opacity:0.9;">${low  != null ? Number(low).toFixed(2)  : '--'}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:${bull?'#4ade80':'#f87171'};">${closeV != null ? Number(closeV).toFixed(2) : '--'}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;">${_bodyPctHtml(b.body_pct)}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;">${_posHtml(_histPosMap.get(b.bar_time??b.beijing_time))}</td>
+                        ${(([u,d,ur,dr])=>`<td style="padding:5px 8px;text-align:right;font-family:monospace;">${u}</td><td style="padding:5px 8px;text-align:right;font-family:monospace;">${d}</td><td style="padding:5px 8px;text-align:right;font-family:monospace;">${ur}</td><td style="padding:5px 8px;text-align:right;font-family:monospace;">${dr}</td>`)(_shadowCols(b.high,b.low,b.close??b.price,b.body_pct))}
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#818cf8;">${sarVal != null ? Number(sarVal).toFixed(2) : '--'}</td>
+                        <td style="padding:5px 8px;text-align:center;">
+                            <span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:700;
                                 background:${bull?'rgba(34,197,94,0.15)':'rgba(239,68,68,0.15)'};
                                 border:1px solid ${bull?'rgba(34,197,94,0.4)':'rgba(239,68,68,0.4)'};color:${dirColor};">
                                 ${dirSymbol} ${dirLabel}
                             </span>
                         </td>
-                        <td style="padding:5px 10px;text-align:right;font-family:monospace;color:${pctColor};font-weight:700;">${pct.toFixed(1)}%</td>
-                        <td style="padding:5px 10px;text-align:center;font-family:monospace;">${deltaHtml}</td>
-                        <td style="padding:5px 10px;text-align:right;font-family:monospace;color:#f87171;opacity:0.85;">${c.boll_lb.toFixed(2)}</td>
-                        <td style="padding:5px 10px;text-align:right;font-family:monospace;color:#fde68a;opacity:0.85;">${c.boll_mid.toFixed(2)}</td>
-                        <td style="padding:5px 10px;text-align:right;font-family:monospace;color:#4ade80;opacity:0.85;">${c.boll_ub.toFixed(2)}</td>
-                        <td style="padding:5px 10px;text-align:right;font-family:monospace;color:#a78bfa;font-weight:600;">${hBWidthStr}</td>
-                        <td style="padding:5px 10px;text-align:center;font-family:monospace;">${hBWidthDelta}</td>
-                        <td style="padding:5px 10px;text-align:right;font-family:monospace;color:#64748b;font-size:10px;">${rec.record_time ? rec.record_time.split(' ')[1] : '--'}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:${pctColor};font-weight:700;">${sarPct != null ? sarPct.toFixed(1)+'%' : '--'}</td>
+                        <td style="padding:5px 8px;text-align:center;font-family:monospace;">${_deltaBadge(b.sar_pct_delta)}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#f87171;opacity:0.85;">${bollLb != null ? Number(bollLb).toFixed(2) : '--'}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#fde68a;opacity:0.85;">${bollMid != null ? Number(bollMid).toFixed(2) : '--'}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#4ade80;opacity:0.85;">${bollUb != null ? Number(bollUb).toFixed(2) : '--'}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;color:#a78bfa;font-weight:600;">${b.boll_width != null ? b.boll_width.toFixed(2) : '--'}</td>
+                        <td style="padding:5px 8px;text-align:center;font-family:monospace;">${_bWidthDeltaBadge(b.boll_width_delta)}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;">${widthRatioHtml}</td>
+                        <td style="padding:5px 8px;text-align:right;font-family:monospace;">${_sarDistHtml(b.sar_dist, b.sar_seq, b.bull)}</td>
+                        <td style="padding:5px 8px;text-align:center;font-family:monospace;">${_sarDistDeltaBadge(b.sar_dist_delta)}</td>
                     </tr>`;
                 });
                 tbody.innerHTML = html;
             } catch(e) {
                 console.error('[ETH-SAR History] 加载数据失败:', e);
-                tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;padding:24px;color:#ef4444;">加载出错: ${e.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="23" style="text-align:center;padding:24px;color:#ef4444;">加载出错: ${e.message}</td></tr>`;
             }
         }
 
@@ -18287,7 +19321,7 @@ pm2 status                                                # 查看所有进程�
          onclick="if(event.target===this) closeEthSarHistory()">
         <div style="background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);
                     border:1px solid rgba(255,255,255,0.1); border-radius:16px;
-                    width:min(98vw,1100px); max-height:88vh;
+                    width:min(99vw,1480px); max-height:92vh;
                     display:flex; flex-direction:column; overflow:hidden;">
 
             <!-- 弹窗标题栏 -->
@@ -18321,30 +19355,42 @@ pm2 status                                                # 查看所有进程�
 
             <!-- 表格区域 -->
             <div style="overflow-y:auto; flex:1;">
-                <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                <table style="width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;">
                     <thead style="position:sticky;top:0;z-index:1;">
                         <tr style="background:rgba(15,23,42,0.95);color:#64748b;border-bottom:1px solid rgba(255,255,255,0.08);">
-                            <th style="padding:8px 10px;text-align:left;font-weight:600;white-space:nowrap;">K线时间</th>
-                            <th style="padding:8px 10px;text-align:right;font-weight:600;">价格</th>
-                            <th style="padding:8px 10px;text-align:right;font-weight:600;">SAR</th>
-                            <th style="padding:8px 10px;text-align:center;font-weight:600;">方向</th>
-                            <th style="padding:8px 10px;text-align:right;font-weight:600;">SAR%</th>
-                            <th style="padding:8px 10px;text-align:center;font-weight:600;">变化</th>
-                            <th style="padding:8px 10px;text-align:right;font-weight:600;color:#f87171;">LB</th>
-                            <th style="padding:8px 10px;text-align:right;font-weight:600;color:#fde68a;">MID</th>
-                            <th style="padding:8px 10px;text-align:right;font-weight:600;color:#4ade80;">UB</th>
-                            <th style="padding:8px 10px;text-align:right;font-weight:600;color:#a78bfa;">开口</th>
-                            <th style="padding:8px 10px;text-align:center;font-weight:600;color:#a78bfa;">开口变化</th>
-                            <th style="padding:8px 10px;text-align:right;font-weight:600;color:#475569;">记录时间</th>
+                            <th style="padding:8px 8px;text-align:left;font-weight:600;white-space:nowrap;width:70px;">K线时间</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fb923c;width:72px;">最高</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#60a5fa;width:72px;">最低</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;width:72px;">价格</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fde68a;width:68px;">实体%</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#67e8f9;width:66px;" title="当日截至该时间点，收盘价在最高最低区间内的位置">所处位置</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fb923c;width:66px;" title="(最高-收盘)/收盘">上影线%</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#60a5fa;width:66px;" title="(收盘-最低)/收盘">下影线%</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fdba74;width:66px;" title="上影线% ÷ 实体%">上影/实体</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#93c5fd;width:66px;" title="下影线% ÷ 实体%">下影/实体</th><th style="padding:8px 8px;text-align:right;font-weight:600;width:72px;">SAR</th>
+                            <th style="padding:8px 8px;text-align:center;font-weight:600;width:88px;">方向</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;width:64px;">SAR%</th>
+                            <th style="padding:8px 8px;text-align:center;font-weight:600;width:72px;">变化</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#f87171;width:72px;">LB</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#fde68a;width:72px;">MID</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#4ade80;width:72px;">UB</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#a78bfa;width:62px;">开口</th>
+                            <th style="padding:8px 8px;text-align:center;font-weight:600;color:#a78bfa;width:72px;">开口变化</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#c084fc;width:62px;" title="当前开口 ÷ 本轮起始开口（空头01或多头01的开口）">开口比</th>
+                            <th style="padding:8px 8px;text-align:right;font-weight:600;color:#e879f9;width:72px;">SAR距离</th>
+                            <th style="padding:8px 8px;text-align:center;font-weight:600;color:#e879f9;width:72px;">距离变化</th>
                         </tr>
                     </thead>
                     <tbody id="ethSarHistoryTbody">
-                        <tr><td colspan="12" style="text-align:center;padding:40px;color:#475569;">点击「历史」按钮加载数据</td></tr>
+                        <tr><td colspan="23" style="text-align:center;padding:40px;color:#475569;">点击「历史」按钮加载数据</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
+    <!-- ECharts 在页面底部异步加载（不阻塞首屏） -->
+    <script src="/static/js/echarts.min.js"></script>
 </body>
 </html>
+html>
