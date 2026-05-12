@@ -2889,9 +2889,44 @@ def get_position_color(account_id, total_cost):
                 chart.clear();
                 return;
             }
+
+            // ✅ 过滤空白数据：只保留任意账户有持仓的时间段，前后各加5分钟缓冲
+            const allAccIds = ['A', 'B', 'C', 'D'];
+            const posIndices = historyData
+                .map((d, i) => allAccIds.some(a => (d.accounts[a]?.position_count || 0) > 0) ? i : -1)
+                .filter(i => i >= 0);
+
+            let filteredData;
+            if (posIndices.length === 0) {
+                // 全天无持仓：显示全部数据（无持仓状态）
+                filteredData = historyData;
+            } else {
+                // 有持仓：找出各段有持仓的区间，每段前后各扩展5条缓冲
+                const BUFFER = 5;
+                const includeSet = new Set();
+                // 找连续段
+                let segStart = posIndices[0], segEnd = posIndices[0];
+                for (let k = 1; k <= posIndices.length; k++) {
+                    const cur = posIndices[k];
+                    const prev = posIndices[k - 1];
+                    if (cur !== undefined && cur - prev <= 10) {
+                        // 同一段，延伸
+                        segEnd = cur;
+                    } else {
+                        // 段结束，加入缓冲范围
+                        const from = Math.max(0, segStart - BUFFER);
+                        const to   = Math.min(historyData.length - 1, segEnd + BUFFER);
+                        for (let x = from; x <= to; x++) includeSet.add(x);
+                        segStart = cur;
+                        segEnd   = cur;
+                    }
+                }
+                filteredData = historyData.filter((_, i) => includeSet.has(i));
+                console.log(`📊 数据过滤: 原始${historyData.length}条 → 有效${filteredData.length}条（已去除全部无持仓的空白段）`);
+            }
             
-            // 提取时间（显示 HH:mm 格式）
-            const times = historyData.map(d => {
+            // 提取时间（显示 HH:mm 格式），基于过滤后的数据
+            const times = filteredData.map(d => {
                 const date = new Date(d.timestamp);
                 const hours = String(date.getHours()).padStart(2, '0');
                 const minutes = String(date.getMinutes()).padStart(2, '0');
@@ -2951,10 +2986,10 @@ def get_position_color(account_id, total_cost):
                     let positionIncreasePoints = [];  // 加仓点数组
                     let prevPositionCount = 0;
                     
-                    // ✅ 检测该账户全天是否完全无持仓
-                    const hasAnyPosition = historyData.some(d => (d.accounts[accId]?.position_count || 0) > 0);
+                    // ✅ 检测该账户全天是否完全无持仓（基于过滤后的数据）
+                    const hasAnyPosition = filteredData.some(d => (d.accounts[accId]?.position_count || 0) > 0);
                     
-                    historyData.forEach((d, idx) => {
+                    filteredData.forEach((d, idx) => {
                         const account = d.accounts[accId];
                         const pnl = account?.pnl_pct || 0;
                         const cost = account?.total_cost || 0;
@@ -3151,6 +3186,7 @@ def get_position_color(account_id, total_cost):
                 .map(accId => accountNames[accId]);
             
             const option = {
+                backgroundColor: 'white',
                 title: {
                     text: '各账户盈亏百分比曲线（每分钟采集一次）',
                     left: 'center',
